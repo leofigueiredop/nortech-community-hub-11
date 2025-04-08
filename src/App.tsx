@@ -19,6 +19,7 @@ import LiveStreams from "./pages/LiveStreams";
 import Members from "./pages/Members";
 import Analytics from "./pages/Analytics";
 import CreateSpace from "./pages/CreateSpace";
+import AITerminal from "./pages/AITerminal";
 
 // Import Settings Pages
 import SettingsIndex from "./pages/settings/Index";
@@ -63,6 +64,7 @@ const App = () => (
           <Route path="/live-streams" element={<LiveStreams />} />
           <Route path="/members" element={<Members />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/ai-terminal" element={<AITerminal />} />
           
           {/* Settings Routes */}
           <Route path="/settings" element={<SettingsIndex />} />
