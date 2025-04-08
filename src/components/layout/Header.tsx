@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, MessageSquare, Search, Settings, PlusCircle, Eye, ChevronDown, CheckCircle2, Users, Star, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { useViewContext } from './MainLayout';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -27,13 +29,15 @@ const membershipTypes = [
 
 const Header: React.FC<HeaderProps> = ({ title = "Home", children }) => {
   const { toast } = useToast();
-  const [currentView, setCurrentView] = useState('admin');
+  const { viewAs, setViewAs } = useViewContext();
 
   const handleViewAsMember = (memberId: string) => {
-    setCurrentView(memberId);
+    setViewAs(memberId);
+    
+    const memberType = membershipTypes.find(m => m.id === memberId);
     
     toast({
-      title: `Viewing as ${membershipTypes.find(m => m.id === memberId)?.name}`,
+      title: `Viewing as ${memberType?.name}`,
       description: "You are now viewing your community as this member would see it.",
       duration: 3000,
     });
@@ -50,9 +54,9 @@ const Header: React.FC<HeaderProps> = ({ title = "Home", children }) => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
-                  variant="ghost" 
+                  variant={viewAs === 'admin' ? "ghost" : "outline"} 
                   size="icon" 
-                  className="h-7 w-7 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800" 
+                  className={`h-7 w-7 rounded-full ${viewAs !== 'admin' ? "bg-purple-100 text-purple-600" : "hover:bg-gray-100 dark:hover:bg-gray-800"}`}
                   title="View as Member"
                 >
                   <Eye size={14} />
@@ -71,7 +75,7 @@ const Header: React.FC<HeaderProps> = ({ title = "Home", children }) => {
                       <div className="flex items-center gap-2">
                         <type.icon className="h-4 w-4" />
                         <span className="font-medium">{type.name}</span>
-                        {currentView === type.id && (
+                        {viewAs === type.id && (
                           <CheckCircle2 className="h-4 w-4 text-green-500" />
                         )}
                       </div>
@@ -128,9 +132,11 @@ const Header: React.FC<HeaderProps> = ({ title = "Home", children }) => {
             <Button variant="ghost" size="icon" className="rounded-full text-gray-600 dark:text-gray-300">
               <MessageSquare size={20} />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full text-gray-600 dark:text-gray-300">
-              <Settings size={20} />
-            </Button>
+            {viewAs === 'admin' && (
+              <Button variant="ghost" size="icon" className="rounded-full text-gray-600 dark:text-gray-300">
+                <Settings size={20} />
+              </Button>
+            )}
             
             <div className="w-8 h-8 bg-nortech-purple text-white rounded-full flex items-center justify-center">
               <span className="font-medium text-sm">U</span>
