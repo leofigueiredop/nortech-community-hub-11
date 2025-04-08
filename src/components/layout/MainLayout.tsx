@@ -1,35 +1,28 @@
-
-import React, { ReactNode } from 'react';
-import { 
-  SidebarProvider, 
-  Sidebar, 
-  SidebarContent,
-  SidebarTrigger,
-  SidebarRail
-} from '@/components/ui/sidebar';
+import React from 'react';
 import Header from './Header';
-import SidebarMenuContent from './SidebarMenu';
+import { SidebarProvider, Sidebar, SidebarContent } from '@/components/ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
+import SidebarMenuContent from './SidebarMenuContent';
 
 interface MainLayoutProps {
-  children: ReactNode;
-  title?: string;
+  children: React.ReactNode;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+  const { isMobile } = useIsMobile();
+  
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full bg-gray-50 dark:bg-nortech-dark-bg">
-        <Sidebar>
-          <SidebarContent>
-            <SidebarMenuContent />
-          </SidebarContent>
-          <SidebarRail />
-        </Sidebar>
-        <div className="flex-1 flex flex-col">
-          <Header title={title} />
-          <main className="flex-1 p-6 overflow-auto">
-            {children}
-          </main>
+      <Sidebar className="border-r border-border">
+        <SidebarContent>
+          <SidebarMenuContent />
+        </SidebarContent>
+      </Sidebar>
+      
+      <div className="flex-1 min-w-0 min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
+        <Header />
+        <div className="flex-1 px-6 py-6 overflow-auto">
+          {children}
         </div>
       </div>
     </SidebarProvider>
