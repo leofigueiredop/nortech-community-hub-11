@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Check, Info, Users, MessageSquare } from 'lucide-react';
+import { Check, Info, Users, MessageSquare, Terminal, Sparkles } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import ContentGeneratorSettings from './ContentGeneratorSettings';
+import AITerminalSettings from './AITerminalSettings';
 
 interface AISettingsFormValues {
   contentCoPilotEnabled: boolean;
@@ -45,12 +47,16 @@ const CommunityAISettings: React.FC = () => {
         <TabsTrigger value="features">AI Features</TabsTrigger>
         <TabsTrigger value="matchmaker">AI Matchmaker</TabsTrigger>
         <TabsTrigger value="content-generator">Content Generator</TabsTrigger>
+        <TabsTrigger value="terminal">AI Terminal</TabsTrigger>
       </TabsList>
 
       <TabsContent value="features">
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Community AI</CardTitle>
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-indigo-600" />
+              <CardTitle className="text-xl">Community AI</CardTitle>
+            </div>
             <CardDescription>
               Build and scale your community with the power of AI in Nortech.
               <a href="#" className="text-blue-400 hover:underline ml-1">Learn more</a>
@@ -270,6 +276,10 @@ const CommunityAISettings: React.FC = () => {
 
       <TabsContent value="content-generator">
         <ContentGeneratorSettings />
+      </TabsContent>
+
+      <TabsContent value="terminal">
+        <AITerminalSettings />
       </TabsContent>
     </Tabs>
   );
