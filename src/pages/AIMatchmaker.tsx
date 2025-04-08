@@ -12,7 +12,7 @@ import AITerminal from '@/components/ai/AITerminal';
 const mockChatHistory = [
   { id: 1, name: 'Sarah Chen', lastMessage: 'Thanks for the smart contract tips!', date: '2 days ago', image: '/placeholder.svg' },
   { id: 2, name: 'Mark Johnson', lastMessage: 'Are you going to the Web3 workshop?', date: '3 days ago', image: '/placeholder.svg' },
-  { id: 3, name: 'Priya Sharma', lastMessage: 'I'd love to collaborate on the project', date: '1 week ago', image: '/placeholder.svg' },
+  { id: 3, name: 'Priya Sharma', lastMessage: "I'd love to collaborate on the project", date: '1 week ago', image: '/placeholder.svg' },
 ];
 
 const mockNetworkingMembers = [
