@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SidebarLinkProps {
   to: string;
@@ -14,6 +15,7 @@ interface SidebarLinkProps {
 const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, matchExact = false, additionalPaths = [] }) => {
   const location = useLocation();
   const currentPath = location.pathname;
+  const { isMobile } = useIsMobile();
   
   const isActive = matchExact 
     ? currentPath === to 
@@ -22,7 +24,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, matchExact =
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
-        tooltip={label}
+        tooltip={isMobile ? undefined : label}
         isActive={isActive}
         asChild
         className="transition-all duration-200 hover:translate-x-1"

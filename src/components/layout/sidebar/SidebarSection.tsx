@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu } from '@/components/ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SidebarSectionProps {
   title: string;
@@ -8,12 +9,14 @@ interface SidebarSectionProps {
 }
 
 const SidebarSection: React.FC<SidebarSectionProps> = ({ title, children }) => {
+  const { isMobile } = useIsMobile();
+  
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="uppercase tracking-wider font-medium text-xs text-purple-500/70 dark:text-purple-400/70 pb-0.5">
+      <SidebarGroupLabel className={`uppercase tracking-wider font-medium text-xs text-purple-500/70 dark:text-purple-400/70 pb-0.5 ${isMobile ? 'text-[10px]' : ''}`}>
         {title}
       </SidebarGroupLabel>
-      <SidebarMenu className="space-y-1 text-xs">
+      <SidebarMenu className={`space-y-1 text-xs ${isMobile ? 'space-y-0.5' : ''}`}>
         {children}
       </SidebarMenu>
     </SidebarGroup>

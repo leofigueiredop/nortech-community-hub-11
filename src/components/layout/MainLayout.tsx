@@ -41,7 +41,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
             <Header title={title}>
               <SidebarTrigger className="mr-2 md:hidden" />
             </Header>
-            <div className="flex-1 px-6 py-6 overflow-auto">
+            <div className="flex-1 px-3 py-4 md:px-6 md:py-6 overflow-auto">
               {children}
             </div>
           </div>
