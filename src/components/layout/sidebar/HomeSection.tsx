@@ -7,7 +7,7 @@ const HomeSection: React.FC = () => {
   return (
     <SidebarLink 
       to="/feed" 
-      icon={<Rss size={18} className="text-purple-600" />} 
+      icon={<Rss size={16} className="text-purple-600" />} 
       label="Feed" 
       matchExact={true}
       additionalPaths={["/"]}

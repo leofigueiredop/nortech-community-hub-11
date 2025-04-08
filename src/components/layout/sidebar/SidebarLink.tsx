@@ -25,13 +25,13 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, matchExact =
         tooltip={label}
         isActive={isActive}
         asChild
-        className="transition-all duration-200 hover:translate-x-1 font-medium"
+        className="transition-all duration-200 hover:translate-x-1"
       >
         <Link to={to} className="w-full">
-          <span className="flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-md h-8 w-8 mr-3 transition-colors">
+          <span className="flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-md h-7 w-7 mr-2.5 transition-colors">
             {icon}
           </span>
-          <span className="flex-1">{label}</span>
+          <span className="flex-1 text-xs font-medium">{label}</span>
           {isActive && (
             <span className="h-full w-1 bg-purple-500 absolute -left-2 rounded-r-md" />
           )}
