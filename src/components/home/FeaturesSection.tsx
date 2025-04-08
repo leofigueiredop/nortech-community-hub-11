@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-  UserCircle2, MessageSquare, Calendar, Video, Graduation, Zap, 
+  UserCircle2, MessageSquare, Calendar, Video, GraduationCap, Zap, 
   Badge, FileCode, LineChart, Braces, Shield, Smartphone
 } from 'lucide-react';
 
@@ -29,7 +29,7 @@ const FeaturesSection = () => {
       description: "Broadcast to your community with integrated chat and recording."
     },
     {
-      icon: <Graduation className="h-10 w-10 text-orange-500" />,
+      icon: <GraduationCap className="h-10 w-10 text-orange-500" />,
       title: "Courses",
       description: "Deliver educational content with lessons, quizzes, and completion tracking."
     },
