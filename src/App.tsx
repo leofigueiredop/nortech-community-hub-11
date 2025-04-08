@@ -18,6 +18,7 @@ import Events from "./pages/Events";
 import LiveStreams from "./pages/LiveStreams";
 import Members from "./pages/Members";
 import Analytics from "./pages/Analytics";
+import CreateSpace from "./pages/CreateSpace";
 
 // Import Settings Pages
 import SettingsIndex from "./pages/settings/Index";
@@ -53,6 +54,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/create-post" element={<CreatePost />} />
+          <Route path="/create-space" element={<CreateSpace />} />
           
           {/* New Routes */}
           <Route path="/discussions" element={<Discussions />} />

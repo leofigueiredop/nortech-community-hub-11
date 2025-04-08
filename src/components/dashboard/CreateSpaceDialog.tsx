@@ -1,10 +1,14 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogClose, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { FileText, Calendar, MessageSquare, Layers, Users, Image } from 'lucide-react';
+import { FileText, Calendar, MessageSquare, Layers, Users, Image, Book, HelpCircle, Inbox } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
-type SpaceType = 'posts' | 'events' | 'chat' | 'course' | 'members' | 'images';
+type SpaceType = 'posts' | 'events' | 'chat' | 'course' | 'members' | 'images' | 'support' | 'faq';
 
 interface CreateSpaceDialogProps {
   open: boolean;
@@ -17,55 +21,135 @@ const CreateSpaceDialog: React.FC<CreateSpaceDialogProps> = ({
   onOpenChange,
   onComplete
 }) => {
+  const [step, setStep] = useState(1);
   const [selectedType, setSelectedType] = useState<SpaceType | null>(null);
+  const [spaceName, setSpaceName] = useState('');
+  const [spaceDescription, setSpaceDescription] = useState('');
+  const { toast } = useToast();
   
   const handleNext = () => {
-    if (selectedType) {
-      // In a real implementation, this would create the space with the selected type
-      console.log(`Creating space of type: ${selectedType}`);
-      onComplete?.();
-      onOpenChange(false);
+    if (step === 1) {
+      if (selectedType) {
+        setStep(2);
+      }
+    } else if (step === 2) {
+      if (spaceName.trim()) {
+        // In a real implementation, this would create the space with the selected type and details
+        console.log(`Creating space of type: ${selectedType}, name: ${spaceName}, description: ${spaceDescription}`);
+        toast({
+          title: "Space created",
+          description: `Your ${selectedType} space "${spaceName}" has been created successfully.`,
+        });
+        onComplete?.();
+        resetAndClose();
+      } else {
+        toast({
+          title: "Missing information",
+          description: "Please enter a name for your space.",
+          variant: "destructive"
+        });
+      }
     }
   };
   
+  const resetAndClose = () => {
+    setStep(1);
+    setSelectedType(null);
+    setSpaceName('');
+    setSpaceDescription('');
+    onOpenChange(false);
+  };
+  
+  const handleBack = () => {
+    setStep(1);
+  };
+  
   const spaceTypes = [
-    { type: 'posts' as SpaceType, icon: <FileText className="h-5 w-5" />, label: 'Posts' },
-    { type: 'events' as SpaceType, icon: <Calendar className="h-5 w-5" />, label: 'Events' },
-    { type: 'chat' as SpaceType, icon: <MessageSquare className="h-5 w-5" />, label: 'Chat' },
-    { type: 'course' as SpaceType, icon: <Layers className="h-5 w-5" />, label: 'Course' },
-    { type: 'members' as SpaceType, icon: <Users className="h-5 w-5" />, label: 'Members' },
-    { type: 'images' as SpaceType, icon: <Image className="h-5 w-5" />, label: 'Images' },
+    { type: 'posts' as SpaceType, icon: <FileText className="h-5 w-5" />, label: 'Posts', description: 'Create and share articles, updates and news' },
+    { type: 'events' as SpaceType, icon: <Calendar className="h-5 w-5" />, label: 'Events', description: 'Schedule and manage community events' },
+    { type: 'chat' as SpaceType, icon: <MessageSquare className="h-5 w-5" />, label: 'Chat', description: 'Real-time conversations with members' },
+    { type: 'course' as SpaceType, icon: <Layers className="h-5 w-5" />, label: 'Course', description: 'Create structured learning content' },
+    { type: 'members' as SpaceType, icon: <Users className="h-5 w-5" />, label: 'Members', description: 'Manage community membership' },
+    { type: 'images' as SpaceType, icon: <Image className="h-5 w-5" />, label: 'Images', description: 'Create a photo gallery or album' },
+    { type: 'support' as SpaceType, icon: <Inbox className="h-5 w-5" />, label: 'Support', description: 'Provide help and support for members' },
+    { type: 'faq' as SpaceType, icon: <HelpCircle className="h-5 w-5" />, label: 'FAQ', description: 'Frequently asked questions and answers' },
   ];
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-gray-900 text-white border-gray-700">
-        <DialogTitle className="text-xl font-semibold mb-4">Choose space type</DialogTitle>
+        <DialogTitle className="text-xl font-semibold mb-4">
+          {step === 1 ? "Choose space type" : "Space details"}
+        </DialogTitle>
         
-        <div className="grid grid-cols-2 gap-3">
-          {spaceTypes.map((space) => (
-            <button
-              key={space.type}
-              className={`flex items-center justify-center gap-2 p-3 rounded-md border transition-colors
-                ${selectedType === space.type
-                  ? 'border-nortech-purple bg-nortech-purple/20'
-                  : 'border-gray-700 hover:border-gray-600'
-                }`}
-              onClick={() => setSelectedType(space.type)}
+        {step === 1 && (
+          <>
+            <DialogDescription className="text-gray-300 mb-4">
+              Select what type of space you want to create for your community.
+            </DialogDescription>
+            
+            <div className="grid grid-cols-2 gap-3">
+              {spaceTypes.map((space) => (
+                <button
+                  key={space.type}
+                  className={`flex flex-col items-center justify-center gap-2 p-3 rounded-md border transition-colors
+                    ${selectedType === space.type
+                      ? 'border-nortech-purple bg-nortech-purple/20'
+                      : 'border-gray-700 hover:border-gray-600'
+                    }`}
+                  onClick={() => setSelectedType(space.type)}
+                >
+                  {space.icon}
+                  <span>{space.label}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+        
+        {step === 2 && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-white">Space name</Label>
+              <Input 
+                id="name" 
+                placeholder="Enter space name" 
+                value={spaceName}
+                onChange={(e) => setSpaceName(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-white">Description (optional)</Label>
+              <Textarea 
+                id="description" 
+                placeholder="Describe what this space is about" 
+                value={spaceDescription}
+                onChange={(e) => setSpaceDescription(e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white min-h-[100px]"
+              />
+            </div>
+          </div>
+        )}
+        
+        <div className="mt-6 flex gap-2">
+          {step === 2 && (
+            <Button 
+              variant="outline"
+              className="py-6 text-base font-medium rounded-full border-white text-white hover:bg-white/20"
+              onClick={handleBack}
             >
-              {space.icon}
-              <span>{space.label}</span>
-            </button>
-          ))}
-        </div>
-        
-        <div className="mt-6">
+              Back
+            </Button>
+          )}
+          
           <Button 
-            className="w-full py-6 text-base font-medium rounded-full bg-white text-black hover:bg-gray-200"
+            className="flex-1 py-6 text-base font-medium rounded-full bg-white text-black hover:bg-gray-200"
             onClick={handleNext}
-            disabled={!selectedType}
+            disabled={step === 1 && !selectedType}
           >
-            Next
+            {step === 1 ? "Next" : "Create Space"}
           </Button>
         </div>
         
