@@ -11,6 +11,7 @@ import Profile from "./pages/onboarding/Profile";
 import Features from "./pages/onboarding/Features";
 import Dashboard from "./pages/Dashboard";
 import Feed from "./pages/Feed";
+import CreatePost from "./pages/CreatePost";
 
 // Import Settings Pages
 import SettingsIndex from "./pages/settings/Index";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/onboarding/features" element={<Features />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/feed" element={<Feed />} />
+          <Route path="/create-post" element={<CreatePost />} />
           
           {/* Settings Routes */}
           <Route path="/settings" element={<SettingsIndex />} />
