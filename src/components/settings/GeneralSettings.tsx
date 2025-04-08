@@ -4,8 +4,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const GeneralSettings: React.FC = () => {
   const { toast } = useToast();
@@ -61,14 +67,16 @@ const GeneralSettings: React.FC = () => {
                 <p className="text-gray-500 dark:text-gray-400 mb-2">This will be the default language for new community members.</p>
               </div>
               <div>
-                <Select 
-                  value={language} 
-                  onChange={(e) => setLanguage(e.target.value)}
-                >
-                  <option value="english">English</option>
-                  <option value="spanish">Spanish</option>
-                  <option value="portuguese">Portuguese</option>
-                  <option value="french">French</option>
+                <Select value={language} onValueChange={setLanguage}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="english">English</SelectItem>
+                    <SelectItem value="portuguese">Portuguese</SelectItem>
+                    <SelectItem value="spanish">Spanish</SelectItem>
+                    <SelectItem value="french">French</SelectItem>
+                  </SelectContent>
                 </Select>
               </div>
             </div>
@@ -112,7 +120,7 @@ const GeneralSettings: React.FC = () => {
                   onChange={(e) => setCommunityUrl(e.target.value)}
                 />
                 <div className="flex items-center px-3 border border-l-0 border-gray-200 dark:border-gray-700 rounded-r-md text-gray-500">
-                  .circle.so
+                  .nortech.io
                 </div>
               </div>
             </div>
@@ -146,7 +154,7 @@ const GeneralSettings: React.FC = () => {
               <div>
                 <Input 
                   id="custom-signup-link" 
-                  value={`https://${communityUrl}.circle.so/signup`}
+                  value={`https://${communityUrl}.nortech.io/signup`}
                   readOnly
                 />
               </div>
