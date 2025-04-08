@@ -24,26 +24,26 @@ const Dashboard: React.FC = () => {
   return (
     <MainLayout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        
-        <div className="flex gap-3">
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
           <Button 
-            variant="outline" 
-            className="flex items-center gap-2" 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 rounded-full" 
             onClick={handleViewAsMember}
+            title="View as Member"
           >
             <Eye size={16} />
-            <span>View as Member</span>
-          </Button>
-          
-          <Button 
-            className="flex items-center gap-2 bg-nortech-purple hover:bg-nortech-purple/90"
-            onClick={() => setCreateSpaceOpen(true)}
-          >
-            <PlusCircle size={16} />
-            <span>Create Space</span>
           </Button>
         </div>
+        
+        <Button 
+          className="flex items-center gap-2 bg-nortech-purple hover:bg-nortech-purple/90"
+          onClick={() => setCreateSpaceOpen(true)}
+        >
+          <PlusCircle size={16} />
+          <span>Create Space</span>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

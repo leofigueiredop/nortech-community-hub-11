@@ -12,7 +12,9 @@ import {
   MessageSquare,
   FileText,
   Mail,
-  KeyRound
+  KeyRound,
+  ExternalLink,
+  ArrowRightLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -128,6 +130,27 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ className }) => {
       description: "Single sign-on integration",
       to: "/settings/sso",
       color: "bg-cyan-600"
+    },
+    {
+      icon: <ExternalLink className="h-5 w-5 text-white" />,
+      title: "Integration",
+      description: "Connect with third-party services",
+      to: "/settings/integration",
+      color: "bg-emerald-600"
+    },
+    {
+      icon: <ArrowRightLeft className="h-5 w-5 text-white" />,
+      title: "Migration",
+      description: "Import or export your community data",
+      to: "/settings/migration",
+      color: "bg-fuchsia-600"
+    },
+    {
+      icon: <DollarSign className="h-5 w-5 text-white" />,
+      title: "Paywall",
+      description: "Monetize your community with paywalls",
+      to: "/settings/paywall",
+      color: "bg-violet-600"
     }
   ];
   

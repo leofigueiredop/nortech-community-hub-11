@@ -1,10 +1,11 @@
 
 import React, { ReactNode } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SettingsSidebar from '@/components/settings/SettingsSidebar';
 
 interface SettingsLayoutProps {
   children: ReactNode;
@@ -25,12 +26,15 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
 
   return (
     <MainLayout>
-      <Sheet open={true} onOpenChange={(open) => !open && handleClose()}>
-        <SheetContent 
-          side="right" 
-          className="w-full sm:max-w-3xl border-l border-gray-200 dark:border-gray-700 p-0 overflow-y-auto"
+      <Dialog open={true} onOpenChange={(open) => !open && handleClose()}>
+        <DialogContent 
+          className="max-w-6xl w-[95vw] h-[90vh] p-0 overflow-hidden flex"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
         >
-          <div className="flex flex-col h-full">
+          <SettingsSidebar activeSection={activeSection} />
+          
+          <div className="flex-1 flex flex-col h-full overflow-hidden">
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-semibold">
                 {title || activeSection.charAt(0).toUpperCase() + activeSection.slice(1)} Settings
@@ -43,8 +47,8 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
               {children}
             </div>
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 };

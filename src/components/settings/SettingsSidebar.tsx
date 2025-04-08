@@ -39,8 +39,8 @@ const SettingsMenuItem: React.FC<SettingsMenuItemProps> = ({ icon, label, to, ac
       to={to}
       className={`flex items-center gap-3 px-4 py-3 ${
         active 
-          ? "text-white" 
-          : "text-gray-300 hover:text-white transition-colors"
+          ? "bg-gray-800 text-white rounded-md" 
+          : "text-gray-300 hover:bg-gray-800 hover:text-white hover:rounded-md transition-colors"
       }`}
     >
       {icon}
@@ -59,112 +59,112 @@ interface SettingsSidebarProps {
 
 const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection = "general" }) => {
   return (
-    <div className="w-80 h-screen bg-gray-900 text-white overflow-y-auto">
+    <div className="w-64 h-full bg-gray-900 text-white overflow-y-auto">
       <div className="p-4 mb-2">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           Pablo's Community <span className="text-xs text-gray-400">▼</span>
         </h2>
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-1 px-2">
         <SettingsMenuItem 
-          icon={<Users size={20} />} 
+          icon={<Users size={18} />} 
           label="Audience" 
           to="/settings/audience" 
           active={activeSection === "audience"} 
         />
         <SettingsMenuItem 
-          icon={<MessageSquare size={20} />} 
+          icon={<MessageSquare size={18} />} 
           label="Marketing" 
           to="/settings/marketing" 
           active={activeSection === "marketing"} 
         />
         <SettingsMenuItem 
-          icon={<FileText size={20} />} 
+          icon={<FileText size={18} />} 
           label="Posts" 
           to="/settings/posts" 
           active={activeSection === "posts"} 
         />
         <SettingsMenuItem 
-          icon={<Layout size={20} />} 
+          icon={<Layout size={18} />} 
           label="Spaces" 
           to="/settings/spaces" 
           active={activeSection === "spaces"} 
         />
         <SettingsMenuItem 
-          icon={<Shield size={20} />} 
+          icon={<Shield size={18} />} 
           label="Moderation" 
           to="/settings/moderation" 
           active={activeSection === "moderation"} 
         />
         <SettingsMenuItem 
-          icon={<Video size={20} />} 
+          icon={<Video size={18} />} 
           label="Live" 
           to="/settings/live" 
           active={activeSection === "live"} 
         />
         <SettingsMenuItem 
-          icon={<Workflow size={20} />} 
+          icon={<Workflow size={18} />} 
           label="Workflows" 
           to="/settings/workflows" 
           active={activeSection === "workflows"} 
         />
         <SettingsMenuItem 
-          icon={<Bot size={20} />} 
+          icon={<Bot size={18} />} 
           label="AI Agents" 
           to="/settings/ai-agents" 
           active={activeSection === "ai-agents"} 
         />
         <SettingsMenuItem 
-          icon={<DollarSign size={20} />} 
-          label="Paywalls" 
+          icon={<DollarSign size={18} />} 
+          label="Paywall" 
           to="/settings/paywall" 
           active={activeSection === "paywall"} 
         />
         <SettingsMenuItem 
-          icon={<DollarSign size={20} />} 
+          icon={<DollarSign size={18} />} 
           label="Plans" 
           to="/settings/plans" 
           active={activeSection === "plans"} 
         />
         <SettingsMenuItem 
-          icon={<BarChart3 size={20} />} 
+          icon={<BarChart3 size={18} />} 
           label="Analytics" 
           to="/settings/analytics" 
           active={activeSection === "analytics"} 
         />
         <SettingsMenuItem 
-          icon={<Share size={20} />} 
+          icon={<Share size={18} />} 
           label="Affiliates" 
           to="/settings/affiliates" 
           active={activeSection === "affiliates"} 
         />
         <SettingsMenuItem 
-          icon={<ExternalLink size={20} />} 
+          icon={<ExternalLink size={18} />} 
           label="Integration" 
           to="/settings/integration" 
           active={activeSection === "integration"} 
         />
         <SettingsMenuItem 
-          icon={<ArrowRightLeft size={20} />} 
+          icon={<ArrowRightLeft size={18} />} 
           label="Migration" 
           to="/settings/migration" 
           active={activeSection === "migration"} 
         />
         <SettingsMenuItem 
-          icon={<Monitor size={20} />} 
+          icon={<Monitor size={18} />} 
           label="Site" 
           to="/settings/site" 
           active={activeSection === "site"} 
         />
         <SettingsMenuItem 
-          icon={<Code size={20} />} 
+          icon={<Code size={18} />} 
           label="Developers" 
           to="/settings/developers" 
           active={activeSection === "developers"} 
         />
         <SettingsMenuItem 
-          icon={<Settings size={20} />} 
+          icon={<Settings size={18} />} 
           label="Settings" 
           to="/settings/general" 
           active={activeSection === "general"} 
@@ -173,21 +173,21 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection = "gene
 
       <SectionDivider />
 
-      <div className="space-y-1">
+      <div className="space-y-1 px-2">
         <SettingsMenuItem 
-          icon={<Moon size={20} />} 
+          icon={<Moon size={18} />} 
           label="Switch to light mode" 
           to="/settings/theme" 
           active={false} 
         />
         <SettingsMenuItem 
-          icon={<Palette size={20} />} 
+          icon={<Palette size={18} />} 
           label="Customize theme" 
           to="/settings/customize" 
           active={false} 
         />
         <SettingsMenuItem 
-          icon={<Keyboard size={20} />} 
+          icon={<Keyboard size={18} />} 
           label="Keyboard shortcuts" 
           to="/settings/shortcuts" 
           active={false} 
@@ -196,15 +196,15 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection = "gene
 
       <SectionDivider />
 
-      <div className="space-y-1">
+      <div className="space-y-1 px-2">
         <SettingsMenuItem 
-          icon={<Eye size={20} />} 
+          icon={<Eye size={18} />} 
           label="View as" 
           to="/settings/view-as" 
           active={false} 
         />
         <SettingsMenuItem 
-          icon={<UserPlus size={20} />} 
+          icon={<UserPlus size={18} />} 
           label="Invite member" 
           to="/settings/invite" 
           active={false} 

@@ -1,18 +1,42 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, MessageSquare, Search, Settings, PlusCircle } from 'lucide-react';
+import { Bell, MessageSquare, Search, Settings, PlusCircle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface HeaderProps {
   title?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({ title = "Home" }) => {
+  const { toast } = useToast();
+
+  const handleViewAsMember = () => {
+    toast({
+      title: "Viewing as Member",
+      description: "You are now viewing your community as a regular member would see it.",
+      duration: 3000,
+    });
+  };
+
   return (
     <header className="border-b border-nortech-gray-light dark:border-gray-800">
       <div className="h-16 flex items-center justify-between px-6">
         <div className="flex items-center gap-8">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-nortech-dark-blue dark:text-white">Pablo's Community</span>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-7 w-7 rounded-full" 
+              onClick={handleViewAsMember}
+              title="View as Member"
+            >
+              <Eye size={14} />
+            </Button>
+          </div>
+          
           <nav className="flex items-center space-x-6">
             <Link 
               to="/" 
