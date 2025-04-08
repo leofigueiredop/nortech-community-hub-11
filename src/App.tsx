@@ -20,6 +20,7 @@ import Branding from "./pages/settings/Branding";
 import Mobile from "./pages/settings/Mobile";
 import Defaults from "./pages/settings/Defaults";
 import Plans from "./pages/settings/Plans";
+import Subscriptions from "./pages/settings/Subscriptions";
 import Domain from "./pages/settings/Domain";
 import AIAgents from "./pages/settings/AIAgents";
 import Messaging from "./pages/settings/Messaging";
@@ -54,6 +55,7 @@ const App = () => (
           <Route path="/settings/mobile" element={<Mobile />} />
           <Route path="/settings/defaults" element={<Defaults />} />
           <Route path="/settings/plans" element={<Plans />} />
+          <Route path="/settings/subscriptions" element={<Subscriptions />} />
           <Route path="/settings/domain" element={<Domain />} />
           <Route path="/settings/ai-agents" element={<AIAgents />} />
           <Route path="/settings/messaging" element={<Messaging />} />

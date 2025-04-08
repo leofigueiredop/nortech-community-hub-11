@@ -48,10 +48,10 @@ const SSOSettings: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <Label className="text-base font-semibold text-white block">
-              Allow members with a Circle account to sign in
+              Allow members with a Nortech account to sign in
             </Label>
             <p className="text-gray-400 mt-1">
-              If enabled, we'll still allow members with a Circle account to sign in. Only members with your SSO account will be able to sign in otherwise.
+              If enabled, we'll still allow members with a Nortech account to sign in. Only members with your SSO account will be able to sign in otherwise.
             </p>
           </div>
           <Switch defaultChecked />
@@ -62,12 +62,12 @@ const SSOSettings: React.FC = () => {
             Button label
           </Label>
           <p className="text-gray-400 mb-4">
-            Customize the label copy for the Circle sign in button.
+            Customize the label copy for the Nortech sign in button.
           </p>
           <Input 
             id="button-label" 
             className="bg-gray-700 border-gray-600 text-white" 
-            defaultValue="Sign in with Circle"
+            defaultValue="Sign in with Nortech"
           />
         </div>
         
@@ -77,7 +77,7 @@ const SSOSettings: React.FC = () => {
               Allow members to sign up via a custom URL
             </Label>
             <p className="text-gray-400 mt-1">
-              After enabling SSO, members won't be able to sign up via Circle. However, you can keep the Sign up button visible and point it to a custom sign up URL.
+              After enabling SSO, members won't be able to sign up via Nortech. However, you can keep the Sign up button visible and point it to a custom sign up URL.
             </p>
           </div>
           <Switch />
@@ -101,7 +101,7 @@ const SSOSettings: React.FC = () => {
               OAuth Provider
             </Label>
             <p className="text-gray-400 mb-2">
-              Callback URL: https://pablos-community-9de6af.circle.so/oauth2/callback
+              Callback URL: https://your-community.nortech.io/oauth2/callback
             </p>
           </div>
           

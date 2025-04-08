@@ -14,7 +14,8 @@ import {
   Mail,
   KeyRound,
   ExternalLink,
-  ArrowRightLeft
+  ArrowRightLeft,
+  CreditCard
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -90,6 +91,13 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ className }) => {
       color: "bg-green-600"
     },
     {
+      icon: <CreditCard className="h-5 w-5 text-white" />,
+      title: "Subscriptions",
+      description: "Manage community subscriptions",
+      to: "/settings/subscriptions",
+      color: "bg-emerald-600"
+    },
+    {
       icon: <Globe className="h-5 w-5 text-white" />,
       title: "Domain",
       description: "Custom domain configuration",
@@ -136,7 +144,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ className }) => {
       title: "Integration",
       description: "Connect with third-party services",
       to: "/settings/integration",
-      color: "bg-emerald-600"
+      color: "bg-blue-400"
     },
     {
       icon: <ArrowRightLeft className="h-5 w-5 text-white" />,

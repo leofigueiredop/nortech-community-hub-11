@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DollarSign, BarChart3, Share } from 'lucide-react';
+import { DollarSign, BarChart3, Share, CreditCard } from 'lucide-react';
 import SettingsMenuItem from '../SettingsMenuItem';
 
 interface MonetizationSectionProps {
@@ -15,6 +15,12 @@ const MonetizationSection: React.FC<MonetizationSectionProps> = ({ activeSection
         label="Paywall" 
         to="/settings/paywall" 
         active={activeSection === "paywall"} 
+      />
+      <SettingsMenuItem 
+        icon={<CreditCard size={18} />} 
+        label="Subscriptions" 
+        to="/settings/subscriptions" 
+        active={activeSection === "subscriptions"} 
       />
       <SettingsMenuItem 
         icon={<DollarSign size={18} />} 

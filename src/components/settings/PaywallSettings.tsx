@@ -1,355 +1,263 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DollarSign, PlusCircle, Lock, ExternalLink, ChevronRight, CreditCard, Globe, Smartphone } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Check } from 'lucide-react';
 
 const PaywallSettings: React.FC = () => {
-  const { toast } = useToast();
-  const [connectingStripe, setConnectingStripe] = useState(false);
-  
-  const handleConnectStripe = () => {
-    setConnectingStripe(true);
-    // Simulate API call
-    setTimeout(() => {
-      setConnectingStripe(false);
-      toast({
-        title: "Stripe Connected",
-        description: "Your Stripe account has been successfully connected.",
-      });
-    }, 1500);
+  const planFeatures = {
+    basic: [
+      "Community tools (chat, forum, groups)",
+      "Up to 5 courses, 50 lessons each",
+      "1 admin",
+      "Basic gamification (standard points)",
+      "Email support, business hours"
+    ],
+    advanced: [
+      "All Basic features",
+      "Full branding removal, layout customization",
+      "Unlimited courses",
+      "Advanced gamification & Proof of Study",
+      "Token/NFT support (optional)",
+      "Private groups & nested communities",
+      "Analytics dashboard",
+      "API access & automation",
+      "Up to 5 admins / 10 mods",
+      "Priority onboarding and chat support"
+    ],
+    whitelabel: [
+      "All Advanced features",
+      "Custom mobile app (Android & iOS)",
+      "Fully branded experience (no Nortech ref.)",
+      "Dedicated instance (optional)",
+      "Enterprise integrations (SSO, CRMs, LMSs)",
+      "Custom features on demand",
+      "SLA-based premium support",
+      "Dedicated success manager"
+    ]
   };
-  
-  const handleCreatePaywall = () => {
-    toast({
-      title: "Create Paywall",
-      description: "The paywall creation flow would begin here.",
-    });
+
+  const pricing = {
+    basic: [
+      { members: 100, price: "R$150 / ~$30" },
+      { members: 1000, price: "R$350 / ~$70" },
+      { members: 10000, price: "R$800 / ~$160" },
+      { members: "Unlimited", price: "R$1,200 / ~$240" }
+    ],
+    advanced: [
+      { members: 100, price: "R$300 / ~$60" },
+      { members: 1000, price: "R$700 / ~$140" },
+      { members: 10000, price: "R$1,500 / ~$300" },
+      { members: "Unlimited", price: "R$2,400 / ~$480" }
+    ],
+    whitelabel: [
+      { members: 1000, price: "R$1,500 / ~$300" },
+      { members: 10000, price: "R$3,000 / ~$600" },
+      { members: 100000, price: "R$6,000 / ~$1,200" },
+      { members: "Unlimited", price: "R$9,000 / ~$1,800" }
+    ]
   };
 
   return (
-    <div className="space-y-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">Paywalls & Monetization</h2>
-        <p className="text-gray-500 dark:text-gray-400">
-          Create paywalls to gate premium content and monetize your community.
+    <div className="container mx-auto p-6 space-y-10">
+      <div className="text-center max-w-3xl mx-auto space-y-4 mb-10">
+        <h1 className="text-3xl font-bold">Nortech Communities Pricing Plans</h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Choose the right plan for your community. All plans include the ability to create a branded digital space combining community and education tools.
         </p>
       </div>
-      
-      <Card className="bg-gradient-to-br from-indigo-900 to-purple-800 text-white border-gray-700 mb-8">
-        <CardHeader>
-          <CardTitle className="text-xl">Start accepting payments with paywalls</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <p>
-              Paywalls allow you to charge for access to your entire community, courses, or private spaces. With Nortech, you can accept both fiat and crypto payments.
-            </p>
-            <p>
-              Once you set up a paywall, you can share the checkout link with your audience to make a purchase and unlock access to areas in your community. You can create as many paywalls as you'd like.
-            </p>
-            <p className="flex items-center gap-2">
-              Nortech uses <span className="font-semibold">Stripe</span> for fiat payments. To accept payments in your community, please connect your Stripe account.
-            </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Basic Plan */}
+        <Card className="border-t-4 border-t-blue-500 shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl">Basic Plan</CardTitle>
+            <CardDescription>Community Essentials</CardDescription>
+            <div className="mt-4">
+              <div className="text-3xl font-bold text-nortech-purple">From R$150 <span className="text-sm font-normal text-gray-500">/month</span></div>
+              <div className="text-sm text-gray-500 mt-1">~$30 USD</div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
+              <p className="font-medium">Features include:</p>
+              <ul className="space-y-2">
+                {planFeatures.basic.map((feature, index) => (
+                  <li key={index} className="flex">
+                    <Check className="h-5 w-5 text-green-500 mr-2 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="pt-4">
+                <p className="font-medium mb-2">Pricing tiers:</p>
+                <ul className="space-y-1">
+                  {pricing.basic.map((tier, index) => (
+                    <li key={index} className="text-sm flex justify-between">
+                      <span>Up to {tier.members} members:</span>
+                      <span className="font-medium">{tier.price}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="pt-4">
+                <Button className="w-full bg-blue-500 hover:bg-blue-600">Choose Basic Plan</Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Advanced Plan */}
+        <Card className="border-t-4 border-t-purple-600 shadow-lg relative">
+          <div className="absolute top-0 right-0 bg-purple-600 text-white px-3 py-1 rounded-bl-lg text-xs font-bold">
+            POPULAR
           </div>
-        </CardContent>
-        <CardFooter className="border-t border-white/10 pt-4 gap-3">
-          <Button 
-            className="flex items-center gap-2 bg-white text-purple-900 hover:bg-white/90"
-            onClick={handleConnectStripe}
-            disabled={connectingStripe}
-          >
-            <DollarSign size={16} />
-            {connectingStripe ? 'Connecting...' : 'Connect with Stripe'}
-          </Button>
-          <Button variant="outline" className="flex items-center gap-2 text-white border-white/30 hover:bg-white/10">
-            <ExternalLink size={16} />
-            Learn more
-          </Button>
-        </CardFooter>
-      </Card>
-      
-      <Tabs defaultValue="plans" className="w-full">
-        <TabsList className="mb-6 bg-gray-100 dark:bg-gray-800">
-          <TabsTrigger value="plans" className="text-sm">Membership Plans</TabsTrigger>
-          <TabsTrigger value="spaces" className="text-sm">Gated Spaces</TabsTrigger>
-          <TabsTrigger value="courses" className="text-sm">Course Access</TabsTrigger>
-        </TabsList>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl">Advanced Plan</CardTitle>
+            <CardDescription>Custom Engagement</CardDescription>
+            <div className="mt-4">
+              <div className="text-3xl font-bold text-nortech-purple">From R$300 <span className="text-sm font-normal text-gray-500">/month</span></div>
+              <div className="text-sm text-gray-500 mt-1">~$60 USD</div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
+              <p className="font-medium">Everything in Basic, plus:</p>
+              <ul className="space-y-2">
+                {planFeatures.advanced.map((feature, index) => (
+                  <li key={index} className="flex">
+                    <Check className="h-5 w-5 text-green-500 mr-2 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="pt-4">
+                <p className="font-medium mb-2">Pricing tiers:</p>
+                <ul className="space-y-1">
+                  {pricing.advanced.map((tier, index) => (
+                    <li key={index} className="text-sm flex justify-between">
+                      <span>Up to {tier.members} members:</span>
+                      <span className="font-medium">{tier.price}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="pt-4">
+                <Button className="w-full bg-purple-600 hover:bg-purple-700">Choose Advanced Plan</Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* White Label Plan */}
+        <Card className="border-t-4 border-t-emerald-600 shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl">White Label + App</CardTitle>
+            <CardDescription>Full Custom Solution</CardDescription>
+            <div className="mt-4">
+              <div className="text-3xl font-bold text-nortech-purple">From R$1,500 <span className="text-sm font-normal text-gray-500">/month</span></div>
+              <div className="text-sm text-gray-500 mt-1">~$300 USD + Setup Fee</div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
+              <p className="font-medium">Everything in Advanced, plus:</p>
+              <ul className="space-y-2">
+                {planFeatures.whitelabel.map((feature, index) => (
+                  <li key={index} className="flex">
+                    <Check className="h-5 w-5 text-green-500 mr-2 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="pt-4">
+                <p className="font-medium mb-2">Pricing tiers:</p>
+                <div className="text-sm mb-2">Setup Fee: R$15,000 (~US$3,000 one-time)</div>
+                <ul className="space-y-1">
+                  {pricing.whitelabel.map((tier, index) => (
+                    <li key={index} className="text-sm flex justify-between">
+                      <span>Up to {tier.members} members:</span>
+                      <span className="font-medium">{tier.price}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="pt-4">
+                <Button className="w-full bg-emerald-600 hover:bg-emerald-700">Choose White Label</Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="max-w-3xl mx-auto mt-16 space-y-8">
+        <h2 className="text-2xl font-bold text-center">Payment Options</h2>
         
-        <TabsContent value="plans">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <PlanCard 
-              title="Basic Plan"
-              icon={<Globe size={20} />}
-              features={[
-                "Logo, subdomain or own domain",
-                "Up to 5 courses, 50 lessons each", 
-                "Basic gamification (standard points)",
-                "Community tools (chat, forum, groups)",
-                "Email support, business hours"
-              ]}
-              tiers={[
-                { members: "Up to 100 members", price: "R$150 / $30" },
-                { members: "Up to 1,000 members", price: "R$350 / $70" },
-                { members: "Up to 10,000 members", price: "R$800 / $160" },
-                { members: "Unlimited", price: "R$1,200 / $240" }
-              ]}
-            />
-            
-            <PlanCard 
-              title="Advanced Plan"
-              icon={<CreditCard size={20} />}
-              featured={true}
-              features={[
-                "Full branding removal, customization",
-                "Unlimited courses",
-                "Advanced gamification & Proof of Study",
-                "Token/NFT support (optional)",
-                "Private groups & nested communities",
-                "Analytics dashboard",
-                "API access & automation",
-                "Up to 5 admins / 10 mods"
-              ]}
-              tiers={[
-                { members: "Up to 100 members", price: "R$300 / $60" },
-                { members: "Up to 1,000 members", price: "R$700 / $140" },
-                { members: "Up to 10,000 members", price: "R$1,500 / $300" },
-                { members: "Unlimited", price: "R$2,400 / $480" }
-              ]}
-            />
-            
-            <PlanCard 
-              title="White Label + App"
-              icon={<Smartphone size={20} />}
-              features={[
-                "Custom mobile app (Android & iOS)",
-                "Fully branded experience",
-                "Dedicated instance (optional)",
-                "Enterprise integrations (SSO, CRMs)",
-                "Custom features on demand",
-                "SLA-based premium support",
-                "Dedicated success manager"
-              ]}
-              tiers={[
-                { members: "Up to 1,000 members", price: "R$1,500 / $300" },
-                { members: "Up to 10,000 members", price: "R$3,000 / $600" },
-                { members: "Up to 100,000 members", price: "R$6,000 / $1,200" },
-                { members: "Unlimited", price: "R$9,000 / $1,800" }
-              ]}
-              setupFee="R$15,000 (~$3,000 one-time)"
-            />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Fiat Payments</CardTitle>
+              <CardDescription>Accept traditional payment methods</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-8 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold">
+                  VISA
+                </div>
+                <div className="w-12 h-8 bg-red-100 dark:bg-red-900 rounded flex items-center justify-center text-red-600 dark:text-red-300 font-bold">
+                  MC
+                </div>
+                <div className="w-12 h-8 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center text-gray-600 dark:text-gray-300 font-bold">
+                  PIX
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Accept credit cards, debit cards, and local payment methods like PIX (Brazil).
+              </p>
+              <Button variant="outline" className="w-full">Configure Fiat Gateway</Button>
+            </CardContent>
+          </Card>
           
-          <div className="text-center mt-6">
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                toast({
-                  title: "Create Custom Plan",
-                  description: "You would now be directed to create a custom plan."
-                });
-              }}
-              className="flex items-center gap-2 mx-auto"
-            >
-              <PlusCircle size={16} />
-              Create Custom Plan
-            </Button>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="spaces">
-          <Card className="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
+          <Card>
             <CardHeader>
-              <CardTitle>Gated Spaces</CardTitle>
-              <CardDescription>
-                Create private spaces that require payment to access
-              </CardDescription>
+              <CardTitle className="text-lg">Crypto Payments</CardTitle>
+              <CardDescription>Accept cryptocurrency payments</CardDescription>
             </CardHeader>
-            <CardContent className="pt-2">
-              <div className="text-center py-8 border border-dashed rounded-md border-gray-300 dark:border-gray-700">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">No gated spaces created yet</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-1"
-                  onClick={() => {
-                    toast({
-                      title: "Create Gated Space",
-                      description: "The gated space creation flow would begin here."
-                    });
-                  }}
-                >
-                  <Lock size={16} />
-                  Create Gated Space
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="courses">
-          <Card className="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle>Course Access</CardTitle>
-              <CardDescription>
-                Set up pricing for your educational content
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-2">
-              <div className="text-center py-8 border border-dashed rounded-md border-gray-300 dark:border-gray-700">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">No course paywalls set up yet</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-1"
-                  onClick={() => {
-                    toast({
-                      title: "Create Course Paywall",
-                      description: "The course paywall creation flow would begin here."
-                    });
-                  }}
-                >
-                  <PlusCircle size={16} />
-                  Add Course Paywall
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-      
-      <Card className="mt-6 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-        <CardHeader>
-          <CardTitle>Payment Methods</CardTitle>
-          <CardDescription>
-            Configure how users can pay for access to your community
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div 
-              className="border rounded-md p-4 hover:border-nortech-purple cursor-pointer transition-colors flex justify-between items-center"
-              onClick={() => {
-                toast({
-                  title: "Fiat Payments",
-                  description: "Configure traditional payment methods."
-                });
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <DollarSign className="text-nortech-purple" size={24} />
-                <div>
-                  <h3 className="font-semibold mb-1">Fiat Payments</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Credit/debit cards, bank transfers</p>
+            <CardContent className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center text-amber-600 dark:text-amber-300 font-bold text-xs">
+                  BTC
+                </div>
+                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold text-xs">
+                  ETH
+                </div>
+                <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center text-green-600 dark:text-green-300 font-bold text-xs">
+                  USDC
                 </div>
               </div>
-              <ChevronRight className="text-gray-400" size={18} />
-            </div>
-            
-            <div 
-              className="border rounded-md p-4 hover:border-nortech-purple cursor-pointer transition-colors flex justify-between items-center"
-              onClick={() => {
-                toast({
-                  title: "Crypto Payments",
-                  description: "Configure cryptocurrency payment options."
-                });
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-nortech-purple">
-                  <path d="M9 8H12M9 16H12M12 8V4M12 8V16M12 16V20M16 8H15M16 16H15M20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <div>
-                  <h3 className="font-semibold mb-1">Crypto Payments</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Bitcoin, Ethereum, stablecoins</p>
-                </div>
-              </div>
-              <ChevronRight className="text-gray-400" size={18} />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Accept Bitcoin, Ethereum, USDC and other major cryptocurrencies with our integrated payment gateway.
+              </p>
+              <Button variant="outline" className="w-full">Configure Crypto Gateway</Button>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg text-center">
+          <h3 className="text-lg font-medium mb-2">Need a custom solution?</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Contact our team to discuss enterprise solutions, custom features, or special requirements.
+          </p>
+          <Button variant="default" className="bg-nortech-purple hover:bg-nortech-purple/90">Contact Sales</Button>
+        </div>
+      </div>
     </div>
-  );
-};
-
-interface PlanCardProps {
-  title: string;
-  icon: React.ReactNode;
-  features: string[];
-  tiers: { members: string; price: string }[];
-  setupFee?: string;
-  featured?: boolean;
-}
-
-const PlanCard: React.FC<PlanCardProps> = ({ title, icon, features, tiers, setupFee, featured }) => {
-  return (
-    <Card className={`overflow-hidden ${featured ? 'border-nortech-purple ring-2 ring-nortech-purple ring-opacity-50' : ''}`}>
-      {featured && (
-        <div className="bg-nortech-purple text-white text-center py-1 text-xs font-semibold">
-          RECOMMENDED
-        </div>
-      )}
-      <CardHeader className={`${featured ? 'bg-nortech-purple/10' : ''}`}>
-        <div className="flex items-center gap-2 mb-1">
-          {icon}
-          <CardTitle className="text-lg">{title}</CardTitle>
-        </div>
-        <CardDescription>
-          {features[0]}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-4">
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <h4 className="font-medium text-sm">Features</h4>
-            <ul className="text-sm space-y-1">
-              {features.slice(1).map((feature, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <CheckCircle2 size={14} className="text-green-500 mt-1 shrink-0" />
-                  <span className="text-gray-600 dark:text-gray-300">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          <div className="space-y-2">
-            <h4 className="font-medium text-sm">Pricing Tiers</h4>
-            <ul className="text-sm space-y-2 border-t pt-2">
-              {tiers.map((tier, index) => (
-                <li key={index} className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-300">{tier.members}</span>
-                  <span className="font-medium">{tier.price}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          {setupFee && (
-            <div className="border-t pt-2 text-sm">
-              <span className="font-medium">Setup fee:</span> {setupFee}
-            </div>
-          )}
-        </div>
-      </CardContent>
-      <CardFooter className="bg-gray-50 dark:bg-gray-800 border-t p-4">
-        <Button 
-          variant={featured ? "default" : "outline"} 
-          className={`w-full ${featured ? 'bg-nortech-purple hover:bg-nortech-purple/90' : ''}`}
-          onClick={() => {
-            const { toast } = useToast();
-            toast({
-              title: `${title} Selected`,
-              description: `You've selected the ${title} plan.`
-            });
-          }}
-        >
-          Configure
-        </Button>
-      </CardFooter>
-    </Card>
   );
 };
 

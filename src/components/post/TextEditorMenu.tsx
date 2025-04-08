@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
-  Paragraph, 
+  Type, 
   Heading2, 
   Heading3, 
   ListOrdered, 
@@ -30,7 +30,7 @@ const TextEditorMenu: React.FC<TextEditorMenuProps> = ({ onSelect, isOpen, onClo
       title: 'BASIC',
       items: [
         { icon: Sparkles, label: 'Co-pilot', format: 'co-pilot' },
-        { icon: Paragraph, label: 'Paragraph', format: 'paragraph' },
+        { icon: Type, label: 'Paragraph', format: 'paragraph' },
         { icon: Heading2, label: 'Heading 2', format: 'h2' },
         { icon: Heading3, label: 'Heading 3', format: 'h3' },
         { icon: ListOrdered, label: 'Numbered list', format: 'numbered-list' },
