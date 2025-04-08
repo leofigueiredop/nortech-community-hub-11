@@ -8,7 +8,7 @@ const AIAgents: React.FC = () => {
     <SettingsLayout activeSection="ai-agents" title="AI Intelligence">
       <div className="max-w-3xl mx-auto">
         <p className="text-gray-500 dark:text-gray-400 mb-6">
-          Configure AI-powered features to enhance your community engagement and provide valuable insights.
+          Configure AI-powered features to enhance your community engagement, provide valuable insights, and automate content generation.
         </p>
         
         <CommunityAISettings />

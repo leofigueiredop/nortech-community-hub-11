@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Check, Info, Users } from 'lucide-react';
+import { Check, Info, Users, MessageSquare } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
@@ -8,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import ContentGeneratorSettings from './ContentGeneratorSettings';
 
 interface AISettingsFormValues {
   contentCoPilotEnabled: boolean;
@@ -44,6 +44,7 @@ const CommunityAISettings: React.FC = () => {
       <TabsList className="mb-4">
         <TabsTrigger value="features">AI Features</TabsTrigger>
         <TabsTrigger value="matchmaker">AI Matchmaker</TabsTrigger>
+        <TabsTrigger value="content-generator">Content Generator</TabsTrigger>
       </TabsList>
 
       <TabsContent value="features">
@@ -265,6 +266,10 @@ const CommunityAISettings: React.FC = () => {
             </Form>
           </CardContent>
         </Card>
+      </TabsContent>
+
+      <TabsContent value="content-generator">
+        <ContentGeneratorSettings />
       </TabsContent>
     </Tabs>
   );
