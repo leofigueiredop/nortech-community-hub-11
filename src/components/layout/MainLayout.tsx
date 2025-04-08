@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Header from './Header';
-import { SidebarProvider, Sidebar, SidebarContent } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import SidebarMenuContent from './SidebarMenuContent';
 
@@ -14,17 +14,21 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
   const { isMobile } = useIsMobile();
   
   return (
-    <SidebarProvider defaultOpen={true}>
-      <Sidebar className="border-r border-border">
-        <SidebarContent>
-          <SidebarMenuContent />
-        </SidebarContent>
-      </Sidebar>
-      
-      <div className="flex-1 min-w-0 min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
-        <Header title={title} />
-        <div className="flex-1 px-6 py-6 overflow-auto">
-          {children}
+    <SidebarProvider defaultOpen={!isMobile}>
+      <div className="flex min-h-screen w-full">
+        <Sidebar className="border-r border-border shadow-md bg-gradient-to-b from-slate-100 to-white dark:from-slate-900 dark:to-slate-950">
+          <SidebarContent>
+            <SidebarMenuContent />
+          </SidebarContent>
+        </Sidebar>
+        
+        <div className="flex-1 min-w-0 flex flex-col bg-slate-50 dark:bg-slate-950">
+          <Header title={title}>
+            <SidebarTrigger className="mr-2 md:hidden" />
+          </Header>
+          <div className="flex-1 px-6 py-6 overflow-auto">
+            {children}
+          </div>
         </div>
       </div>
     </SidebarProvider>

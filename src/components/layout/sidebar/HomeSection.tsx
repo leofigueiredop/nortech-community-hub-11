@@ -7,7 +7,7 @@ const HomeSection: React.FC = () => {
   return (
     <SidebarLink 
       to="/" 
-      icon={<Home size={18} />} 
+      icon={<Home size={18} className="text-purple-600" />} 
       label="Home" 
       matchExact={true}
     />

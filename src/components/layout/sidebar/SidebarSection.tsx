@@ -10,8 +10,10 @@ interface SidebarSectionProps {
 const SidebarSection: React.FC<SidebarSectionProps> = ({ title, children }) => {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{title}</SidebarGroupLabel>
-      <SidebarMenu>
+      <SidebarGroupLabel className="uppercase tracking-wider font-bold text-xs text-purple-600 dark:text-purple-400">
+        {title}
+      </SidebarGroupLabel>
+      <SidebarMenu className="space-y-1.5">
         {children}
       </SidebarMenu>
     </SidebarGroup>

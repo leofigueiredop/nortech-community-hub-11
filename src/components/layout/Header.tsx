@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, MessageSquare, Search, Settings, PlusCircle, Eye, ChevronDown, CheckCircle2, Users, Star, Trophy } from 'lucide-react';
@@ -15,6 +14,7 @@ import {
 
 interface HeaderProps {
   title?: string;
+  children?: React.ReactNode;
 }
 
 // Define membership types based on the Nortech Communities pricing structure
@@ -25,7 +25,7 @@ const membershipTypes = [
   { id: 'premium', name: 'White Label Member', description: 'Premium features, dedicated support', icon: Trophy },
 ];
 
-const Header: React.FC<HeaderProps> = ({ title = "Home" }) => {
+const Header: React.FC<HeaderProps> = ({ title = "Home", children }) => {
   const { toast } = useToast();
   const [currentView, setCurrentView] = useState('admin');
 
@@ -44,6 +44,7 @@ const Header: React.FC<HeaderProps> = ({ title = "Home" }) => {
       <div className="h-16 flex items-center justify-between px-6">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2">
+            {children}
             <span className="font-semibold text-nortech-dark-blue dark:text-white">Nortech Community</span>
             
             <DropdownMenu>
