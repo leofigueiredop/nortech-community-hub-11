@@ -14,13 +14,13 @@ const CTASection = () => {
           Start your 14-day free trial today. No credit card required.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Button asChild size="lg" className="bg-white text-nortech-purple hover:bg-white/90 text-lg px-8">
+          <Button asChild size="lg" className="bg-white text-nortech-purple hover:bg-white/90 text-lg px-8 font-medium">
             <Link to="/onboarding/community">
               Get Started Free
             </Link>
           </Button>
           
-          <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8">
+          <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8 font-medium">
             <Link to="/dashboard">
               View Demo
             </Link>

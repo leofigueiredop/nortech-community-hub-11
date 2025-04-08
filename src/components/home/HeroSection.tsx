@@ -52,7 +52,7 @@ const HeroSection = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="h-12 bg-white/10 border-white/20 text-white placeholder:text-white/50"
             />
-            <Button type="submit" className="h-12 px-6 bg-white text-indigo-900 hover:bg-white/90">
+            <Button type="submit" className="h-12 px-6 bg-white text-indigo-900 hover:bg-white/90 font-medium">
               Get Started
             </Button>
           </form>
@@ -61,7 +61,7 @@ const HeroSection = () => {
             <Button 
               asChild
               variant="outline" 
-              className="border-white/20 text-white hover:bg-white/10"
+              className="border-white/20 text-white hover:bg-white/10 font-medium"
             >
               <Link to="/dashboard">
                 View Demo
@@ -71,7 +71,7 @@ const HeroSection = () => {
             <Button 
               asChild
               variant="outline" 
-              className="border-white/20 text-white hover:bg-white/10"
+              className="border-white/20 text-white hover:bg-white/10 font-medium"
             >
               <Link to="/settings/plans">
                 View Pricing

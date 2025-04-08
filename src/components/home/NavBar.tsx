@@ -33,7 +33,7 @@ const NavBar = () => {
             <Link to="/dashboard" className="text-white/80 hover:text-white text-sm font-medium">
               Log in
             </Link>
-            <Button asChild className="bg-white text-indigo-900 hover:bg-white/90">
+            <Button asChild className="bg-white text-indigo-900 hover:bg-white/90 font-medium">
               <Link to="/onboarding/community">
                 Get Started
               </Link>
