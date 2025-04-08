@@ -8,7 +8,7 @@ import {
   SidebarRail
 } from '@/components/ui/sidebar';
 import Header from './Header';
-import SidebarMenu from './SidebarMenu';
+import SidebarMenuContent from './SidebarMenu';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -21,7 +21,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
       <div className="flex min-h-screen w-full bg-gray-50 dark:bg-nortech-dark-bg">
         <Sidebar>
           <SidebarContent>
-            <SidebarMenu />
+            <SidebarMenuContent />
           </SidebarContent>
           <SidebarRail />
         </Sidebar>

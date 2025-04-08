@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { 
   SidebarHeader, 
-  SidebarMenu,
+  SidebarMenu as SidebarMenuComponent,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarSeparator,
@@ -26,7 +26,7 @@ import {
   SidebarGroup 
 } from '@/components/ui/sidebar';
 
-const SidebarMenu: React.FC = () => {
+const SidebarMenuContent: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -42,7 +42,7 @@ const SidebarMenu: React.FC = () => {
       </SidebarHeader>
       
       <SidebarGroup>
-        <SidebarMenu>
+        <SidebarMenuComponent>
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Home"
@@ -55,14 +55,14 @@ const SidebarMenu: React.FC = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenuComponent>
       </SidebarGroup>
       
       <SidebarSeparator />
       
       <SidebarGroup>
         <SidebarGroupLabel>Get Started</SidebarGroupLabel>
-        <SidebarMenu>
+        <SidebarMenuComponent>
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Dashboard"
@@ -75,14 +75,14 @@ const SidebarMenu: React.FC = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenuComponent>
       </SidebarGroup>
       
       <SidebarSeparator />
       
       <SidebarGroup>
         <SidebarGroupLabel>Spaces</SidebarGroupLabel>
-        <SidebarMenu>
+        <SidebarMenuComponent>
           <SidebarMenuItem>
             <SidebarMenuButton 
               tooltip="Create Space"
@@ -94,14 +94,14 @@ const SidebarMenu: React.FC = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenuComponent>
       </SidebarGroup>
       
       <SidebarSeparator />
       
       <SidebarGroup>
         <SidebarGroupLabel>Content</SidebarGroupLabel>
-        <SidebarMenu>
+        <SidebarMenuComponent>
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Posts"
@@ -162,14 +162,14 @@ const SidebarMenu: React.FC = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenuComponent>
       </SidebarGroup>
       
       <SidebarSeparator />
       
       <SidebarGroup>
         <SidebarGroupLabel>Community</SidebarGroupLabel>
-        <SidebarMenu>
+        <SidebarMenuComponent>
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Members"
@@ -206,7 +206,7 @@ const SidebarMenu: React.FC = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenuComponent>
       </SidebarGroup>
       
       <SidebarSeparator />
@@ -228,4 +228,4 @@ const SidebarMenu: React.FC = () => {
   );
 };
 
-export default SidebarMenu;
+export default SidebarMenuContent;
