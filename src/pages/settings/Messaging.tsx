@@ -5,7 +5,7 @@ import MessagingSettings from '@/components/settings/MessagingSettings';
 
 const Messaging: React.FC = () => {
   return (
-    <SettingsLayout activeSection="messaging">
+    <SettingsLayout activeSection="messaging" title="Messaging">
       <MessagingSettings />
     </SettingsLayout>
   );

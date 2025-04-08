@@ -5,7 +5,7 @@ import SSOSettings from '@/components/settings/SSOSettings';
 
 const SSO: React.FC = () => {
   return (
-    <SettingsLayout activeSection="sso">
+    <SettingsLayout activeSection="sso" title="Single Sign-On">
       <SSOSettings />
     </SettingsLayout>
   );

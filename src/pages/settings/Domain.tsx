@@ -5,7 +5,7 @@ import DomainSettings from '@/components/settings/DomainSettings';
 
 const Domain: React.FC = () => {
   return (
-    <SettingsLayout activeSection="domain">
+    <SettingsLayout activeSection="domain" title="Custom Domain">
       <DomainSettings />
     </SettingsLayout>
   );

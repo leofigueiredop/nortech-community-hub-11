@@ -5,7 +5,7 @@ import DefaultsSettings from '@/components/settings/DefaultsSettings';
 
 const Defaults: React.FC = () => {
   return (
-    <SettingsLayout activeSection="defaults">
+    <SettingsLayout activeSection="defaults" title="Default Settings">
       <DefaultsSettings />
     </SettingsLayout>
   );

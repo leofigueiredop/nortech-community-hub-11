@@ -5,7 +5,7 @@ import BrandingSettings from '@/components/settings/BrandingSettings';
 
 const Branding: React.FC = () => {
   return (
-    <SettingsLayout activeSection="branding">
+    <SettingsLayout activeSection="branding" title="Branding">
       <BrandingSettings />
     </SettingsLayout>
   );

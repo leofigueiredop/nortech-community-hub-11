@@ -5,7 +5,7 @@ import GeneralSettings from '@/components/settings/GeneralSettings';
 
 const General: React.FC = () => {
   return (
-    <SettingsLayout activeSection="general">
+    <SettingsLayout activeSection="general" title="General Settings">
       <GeneralSettings />
     </SettingsLayout>
   );

@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Feed from "./pages/Feed";
 
 // Import Settings Pages
+import SettingsIndex from "./pages/settings/Index";
 import General from "./pages/settings/General";
 import Branding from "./pages/settings/Branding";
 import Mobile from "./pages/settings/Mobile";
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/feed" element={<Feed />} />
           
           {/* Settings Routes */}
+          <Route path="/settings" element={<SettingsIndex />} />
           <Route path="/settings/general" element={<General />} />
           <Route path="/settings/branding" element={<Branding />} />
           <Route path="/settings/mobile" element={<Mobile />} />

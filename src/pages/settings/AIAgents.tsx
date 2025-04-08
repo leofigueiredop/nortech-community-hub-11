@@ -5,7 +5,7 @@ import CommunityAISettings from '@/components/settings/CommunityAISettings';
 
 const AIAgents: React.FC = () => {
   return (
-    <SettingsLayout activeSection="ai-agents">
+    <SettingsLayout activeSection="ai-agents" title="AI Agents">
       <CommunityAISettings />
     </SettingsLayout>
   );

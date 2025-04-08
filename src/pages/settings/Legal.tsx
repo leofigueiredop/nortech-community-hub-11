@@ -5,7 +5,7 @@ import LegalSettings from '@/components/settings/LegalSettings';
 
 const Legal: React.FC = () => {
   return (
-    <SettingsLayout activeSection="legal">
+    <SettingsLayout activeSection="legal" title="Legal Documents">
       <LegalSettings />
     </SettingsLayout>
   );

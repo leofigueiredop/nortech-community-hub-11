@@ -5,7 +5,7 @@ import PricingPlans from '@/components/settings/PricingPlans';
 
 const Plans: React.FC = () => {
   return (
-    <SettingsLayout activeSection="plans">
+    <SettingsLayout activeSection="plans" title="Pricing Plans">
       <PricingPlans />
     </SettingsLayout>
   );
