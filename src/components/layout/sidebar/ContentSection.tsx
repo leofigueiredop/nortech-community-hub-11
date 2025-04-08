@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, MessageSquare, BookOpen, Calendar, Play, Terminal } from 'lucide-react';
+import { FileText, MessageSquare, BookOpen, Calendar, Play, Terminal, Users } from 'lucide-react';
 import SidebarSection from './SidebarSection';
 import SidebarLink from './SidebarLink';
 
@@ -37,6 +37,11 @@ const ContentSection: React.FC = () => {
         to="/ai-terminal" 
         icon={<Terminal size={18} />} 
         label="AI Terminal" 
+      />
+      <SidebarLink 
+        to="/ai-matchmaker" 
+        icon={<Users size={18} />} 
+        label="AI Matchmaker" 
       />
     </SidebarSection>
   );
