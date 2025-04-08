@@ -12,6 +12,12 @@ import Features from "./pages/onboarding/Features";
 import Dashboard from "./pages/Dashboard";
 import Feed from "./pages/Feed";
 import CreatePost from "./pages/CreatePost";
+import Discussions from "./pages/Discussions";
+import Courses from "./pages/Courses";
+import Events from "./pages/Events";
+import LiveStreams from "./pages/LiveStreams";
+import Members from "./pages/Members";
+import Analytics from "./pages/Analytics";
 
 // Import Settings Pages
 import SettingsIndex from "./pages/settings/Index";
@@ -47,6 +53,14 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/create-post" element={<CreatePost />} />
+          
+          {/* New Routes */}
+          <Route path="/discussions" element={<Discussions />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/live-streams" element={<LiveStreams />} />
+          <Route path="/members" element={<Members />} />
+          <Route path="/analytics" element={<Analytics />} />
           
           {/* Settings Routes */}
           <Route path="/settings" element={<SettingsIndex />} />
