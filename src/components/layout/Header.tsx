@@ -1,21 +1,40 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, MessageSquare, Search, Settings, PlusCircle, Eye } from 'lucide-react';
+import { Bell, MessageSquare, Search, Settings, PlusCircle, Eye, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 
 interface HeaderProps {
   title?: string;
 }
 
+// Define membership types
+const membershipTypes = [
+  { id: 'admin', name: 'Admin (You)', description: 'Full access to all features' },
+  { id: 'free', name: 'Free Member', description: 'Basic community access' },
+  { id: 'premium', name: 'Premium Member', description: 'Access to premium content' },
+  { id: 'mentor', name: 'Mentor', description: 'Access to mentorship program' },
+];
+
 const Header: React.FC<HeaderProps> = ({ title = "Home" }) => {
   const { toast } = useToast();
+  const [currentView, setCurrentView] = useState('admin');
 
-  const handleViewAsMember = () => {
+  const handleViewAsMember = (memberId: string) => {
+    setCurrentView(memberId);
+    
     toast({
-      title: "Viewing as Member",
-      description: "You are now viewing your community as a regular member would see it.",
+      title: `Viewing as ${membershipTypes.find(m => m.id === memberId)?.name}`,
+      description: "You are now viewing your community as this member would see it.",
       duration: 3000,
     });
   };
@@ -26,15 +45,40 @@ const Header: React.FC<HeaderProps> = ({ title = "Home" }) => {
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-nortech-dark-blue dark:text-white">Pablo's Community</span>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-7 w-7 rounded-full" 
-              onClick={handleViewAsMember}
-              title="View as Member"
-            >
-              <Eye size={14} />
-            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-7 w-7 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800" 
+                  title="View as Member"
+                >
+                  <Eye size={14} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-60">
+                <DropdownMenuLabel>View as member</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {membershipTypes.map((type) => (
+                  <DropdownMenuItem 
+                    key={type.id}
+                    className="flex items-start gap-2 py-2 cursor-pointer"
+                    onClick={() => handleViewAsMember(type.id)}
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{type.name}</span>
+                        {currentView === type.id && (
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500">{type.description}</p>
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           
           <nav className="flex items-center space-x-6">

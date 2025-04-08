@@ -1,15 +1,44 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 const BrandingSettings: React.FC = () => {
+  const { toast } = useToast();
+  const [brandColor, setBrandColor] = useState("#2B2E33");
+  const [brandColorDark, setBrandColorDark] = useState("#FFFFFF");
+  const [replyEmail, setReplyEmail] = useState("p.mani@alphractal.com");
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const handleSaveSettings = () => {
+    setIsSaving(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+      // Update the theme with the new brand color
+      document.documentElement.style.setProperty('--primary', brandColor);
+      
+      toast({
+        title: "Branding updated",
+        description: "Your branding settings have been updated successfully.",
+      });
+    }, 800);
+  };
+  
+  const handleLogoUpload = () => {
+    toast({
+      title: "Upload initiated",
+      description: "Logo upload functionality would be connected here.",
+    });
+  };
+
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold mb-8">Branding</h1>
       
-      <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden mb-8">
+      <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden mb-8 shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="relative">
           <img 
             src="/lovable-uploads/eb471fa8-1a1b-4969-93e9-95c99a0cfcfb.png" 
@@ -27,7 +56,7 @@ const BrandingSettings: React.FC = () => {
         </div>
       </div>
       
-      <div className="space-y-8">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-8 space-y-8 shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-2 gap-8 items-center">
           <div>
             <Label htmlFor="brand-color" className="text-base font-semibold mb-2 block">
@@ -38,10 +67,14 @@ const BrandingSettings: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded border border-gray-300 bg-[#2B2E33]"></div>
+            <div 
+              className="w-6 h-6 rounded border border-gray-300" 
+              style={{ backgroundColor: brandColor }}
+            ></div>
             <Input 
               id="brand-color" 
-              defaultValue="#2B2E33" 
+              value={brandColor}
+              onChange={(e) => setBrandColor(e.target.value)}
               className="font-mono"
             />
           </div>
@@ -57,10 +90,14 @@ const BrandingSettings: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded border border-gray-300 bg-white"></div>
+            <div 
+              className="w-6 h-6 rounded border border-gray-300" 
+              style={{ backgroundColor: brandColorDark }}
+            ></div>
             <Input 
               id="brand-color-dark" 
-              defaultValue="#FFFFFF" 
+              value={brandColorDark}
+              onChange={(e) => setBrandColorDark(e.target.value)}
               className="font-mono"
             />
           </div>
@@ -76,7 +113,11 @@ const BrandingSettings: React.FC = () => {
             </p>
           </div>
           <div>
-            <Button variant="outline" className="w-full h-32 flex items-center justify-center">
+            <Button 
+              variant="outline" 
+              className="w-full h-32 flex items-center justify-center"
+              onClick={handleLogoUpload}
+            >
               Select image
             </Button>
           </div>
@@ -92,7 +133,11 @@ const BrandingSettings: React.FC = () => {
             </p>
           </div>
           <div>
-            <Button variant="outline" className="w-full h-32 flex items-center justify-center">
+            <Button 
+              variant="outline" 
+              className="w-full h-32 flex items-center justify-center"
+              onClick={handleLogoUpload}
+            >
               Select image
             </Button>
           </div>
@@ -108,7 +153,11 @@ const BrandingSettings: React.FC = () => {
             </p>
           </div>
           <div>
-            <Button variant="outline" className="w-full h-32 flex items-center justify-center">
+            <Button 
+              variant="outline" 
+              className="w-full h-32 flex items-center justify-center"
+              onClick={handleLogoUpload}
+            >
               Select image
             </Button>
           </div>
@@ -127,10 +176,21 @@ const BrandingSettings: React.FC = () => {
             <Input 
               id="reply-email" 
               placeholder="Enter reply-to email"
-              defaultValue="p.mani@alphractal.com"
+              value={replyEmail}
+              onChange={(e) => setReplyEmail(e.target.value)}
             />
           </div>
         </div>
+      </div>
+      
+      <div className="flex justify-end">
+        <Button 
+          onClick={handleSaveSettings} 
+          disabled={isSaving}
+          className="bg-nortech-purple hover:bg-nortech-purple/90"
+        >
+          {isSaving ? 'Saving...' : 'Save Changes'}
+        </Button>
       </div>
     </div>
   );

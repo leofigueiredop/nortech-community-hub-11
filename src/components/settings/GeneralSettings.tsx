@@ -1,47 +1,70 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
+import { useToast } from '@/components/ui/use-toast';
 
 const GeneralSettings: React.FC = () => {
+  const { toast } = useToast();
+  const [communityName, setCommunityName] = useState("Pablo's Community");
+  const [language, setLanguage] = useState("english");
+  const [isPrivate, setIsPrivate] = useState(true);
+  const [communityUrl, setCommunityUrl] = useState("pablos-community-9de6a");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveSettings = () => {
+    setIsSaving(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+      toast({
+        title: "Settings saved",
+        description: "Your general settings have been updated successfully.",
+      });
+    }, 800);
+  };
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold mb-8">General</h1>
         
-        <div className="bg-gray-800 rounded-lg p-8 mb-4">
-          <h2 className="text-xl font-semibold mb-8 text-white">Manage general settings</h2>
+        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-8 mb-4 border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-8">Manage general settings</h2>
           
           <div className="space-y-8">
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <Label htmlFor="community-name" className="text-base font-semibold text-white mb-2 block">
+                <Label htmlFor="community-name" className="text-base font-semibold mb-2 block">
                   Community name
                 </Label>
-                <p className="text-gray-400 mb-2">Choose a name that personalizes your community.</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-2">Choose a name that personalizes your community.</p>
               </div>
               <div>
                 <Input 
                   id="community-name" 
                   placeholder="Your community name" 
-                  className="bg-gray-700 border-gray-600 text-white" 
-                  defaultValue="Pablo's Community"
+                  value={communityName}
+                  onChange={(e) => setCommunityName(e.target.value)}
                 />
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <Label htmlFor="default-language" className="text-base font-semibold text-white mb-2 block">
+                <Label htmlFor="default-language" className="text-base font-semibold mb-2 block">
                   Default language
                 </Label>
-                <p className="text-gray-400 mb-2">This will be the default language for new community members.</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-2">This will be the default language for new community members.</p>
               </div>
               <div>
-                <Select defaultValue="english">
+                <Select 
+                  value={language} 
+                  onChange={(e) => setLanguage(e.target.value)}
+                >
                   <option value="english">English</option>
                   <option value="spanish">Spanish</option>
                   <option value="portuguese">Portuguese</option>
@@ -52,16 +75,15 @@ const GeneralSettings: React.FC = () => {
             
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <Label htmlFor="community-id" className="text-base font-semibold text-white mb-2 block">
+                <Label htmlFor="community-id" className="text-base font-semibold mb-2 block">
                   Community ID
                 </Label>
-                <p className="text-gray-400 mb-2">Customer support may ask for your unique community ID when troubleshooting.</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-2">Customer support may ask for your unique community ID when troubleshooting.</p>
               </div>
               <div>
                 <Input 
                   id="community-id" 
-                  className="bg-gray-700 border-gray-600 text-white" 
-                  defaultValue="331737"
+                  value="331737"
                   readOnly
                 />
               </div>
@@ -69,26 +91,27 @@ const GeneralSettings: React.FC = () => {
           </div>
         </div>
         
-        <div className="bg-gray-800 rounded-lg p-8">
-          <h2 className="text-xl font-semibold mb-8 text-white">Visibility</h2>
+        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-8 border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-8">Visibility</h2>
           
           <div className="space-y-8">
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <Label htmlFor="community-url" className="text-base font-semibold text-white mb-2 block">
+                <Label htmlFor="community-url" className="text-base font-semibold mb-2 block">
                   Community URL
                 </Label>
-                <p className="text-gray-400 mb-2">
-                  <a href="#" className="text-blue-400 hover:underline">Set up your custom domain here</a>
+                <p className="text-gray-500 dark:text-gray-400 mb-2">
+                  <a href="#" className="text-blue-600 hover:underline">Set up your custom domain here</a>
                 </p>
               </div>
               <div className="flex">
                 <Input 
                   id="community-url" 
-                  className="bg-gray-700 border-gray-600 text-white rounded-r-none" 
-                  defaultValue="pablos-community-9de6a"
+                  className="rounded-r-none"
+                  value={communityUrl}
+                  onChange={(e) => setCommunityUrl(e.target.value)}
                 />
-                <div className="flex items-center bg-gray-700 px-3 border border-l-0 border-gray-600 rounded-r-md text-gray-400">
+                <div className="flex items-center px-3 border border-l-0 border-gray-200 dark:border-gray-700 rounded-r-md text-gray-500">
                   .circle.so
                 </div>
               </div>
@@ -96,37 +119,49 @@ const GeneralSettings: React.FC = () => {
             
             <div className="grid grid-cols-2 gap-8 items-center">
               <div>
-                <Label className="text-base font-semibold text-white mb-2 block">
+                <Label className="text-base font-semibold mb-2 block">
                   Make this a private community
                 </Label>
-                <p className="text-gray-400 mb-2">
+                <p className="text-gray-500 dark:text-gray-400 mb-2">
                   Your community will not be accessible to visitors. Members will have to be invited by you and sign in to access your community.
                 </p>
               </div>
               <div className="flex justify-end">
-                <Switch defaultChecked />
+                <Switch 
+                  checked={isPrivate} 
+                  onCheckedChange={setIsPrivate} 
+                />
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <Label htmlFor="custom-signup-link" className="text-base font-semibold text-white mb-2 block">
+                <Label htmlFor="custom-signup-link" className="text-base font-semibold mb-2 block">
                   Custom member sign up link
                 </Label>
-                <p className="text-gray-400 mb-2">
+                <p className="text-gray-500 dark:text-gray-400 mb-2">
                   Use this link to invite members to your community.
                 </p>
               </div>
               <div>
                 <Input 
                   id="custom-signup-link" 
-                  className="bg-gray-700 border-gray-600 text-white" 
-                  defaultValue="https://pablos-community-9de6a.circle.so/signup"
+                  value={`https://${communityUrl}.circle.so/signup`}
                   readOnly
                 />
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-8 flex justify-end">
+          <Button 
+            onClick={handleSaveSettings} 
+            disabled={isSaving}
+            className="bg-nortech-purple hover:bg-nortech-purple/90"
+          >
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
         </div>
       </div>
     </div>
