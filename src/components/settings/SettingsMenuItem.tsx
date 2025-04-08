@@ -21,19 +21,21 @@ const SettingsMenuItem: React.FC<SettingsMenuItemProps> = ({
     <Link 
       to={to} 
       className={`
-        flex items-center justify-between px-3 py-2 rounded-md text-sm
+        flex items-center justify-between px-3 py-1.5 my-0.5 text-sm rounded-md
         ${active 
-          ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white' 
-          : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800/50'}
+          ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 font-medium' 
+          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700/50'}
       `}
     >
-      <div className="flex items-center">
-        <span className="mr-3">{icon}</span>
+      <div className="flex items-center gap-2">
+        <span className={`${active ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400'}`}>
+          {icon}
+        </span>
         <span>{label}</span>
       </div>
       
       {badge && (
-        <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">
+        <span className="text-xs bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 px-1.5 py-0.5 rounded-full">
           {badge}
         </span>
       )}

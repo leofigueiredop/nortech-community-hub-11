@@ -14,26 +14,36 @@ interface SettingsSidebarProps {
 
 const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection = "general" }) => {
   return (
-    <div className="w-64 h-full bg-gray-900 text-white overflow-y-auto">
+    <div className="w-full h-full bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white overflow-y-auto">
       <CommunityHeader />
 
-      <TechnicalSection activeSection={activeSection} />
+      <div className="py-2">
+        <TechnicalSection activeSection={activeSection} />
+      </div>
       
       <SectionDivider />
       
-      <ContentManagementSection activeSection={activeSection} />
+      <div className="py-2">
+        <ContentManagementSection activeSection={activeSection} />
+      </div>
       
       <SectionDivider />
       
-      <MonetizationSection activeSection={activeSection} />
+      <div className="py-2">
+        <MonetizationSection activeSection={activeSection} />
+      </div>
       
       <SectionDivider />
       
-      <PreferencesSection activeSection={activeSection} />
+      <div className="py-2">
+        <PreferencesSection activeSection={activeSection} />
+      </div>
       
       <SectionDivider />
       
-      <MemberActionsSection activeSection={activeSection} />
+      <div className="py-2">
+        <MemberActionsSection activeSection={activeSection} />
+      </div>
     </div>
   );
 };

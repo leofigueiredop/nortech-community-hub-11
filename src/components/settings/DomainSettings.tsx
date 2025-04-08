@@ -34,18 +34,18 @@ const DomainSettings: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Custom Domain Setup</CardTitle>
+    <div>
+      <Card className="mb-5 border-gray-200 dark:border-gray-700 shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-medium">Custom Domain Setup</CardTitle>
           <CardDescription>
             Connect your community to a custom domain for a professional branded experience
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-8">
-          <div className="space-y-6">
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="domain" className="text-base font-medium">Domain name</Label>
+              <Label htmlFor="domain" className="text-sm font-medium">Domain name</Label>
               <div className="flex gap-2">
                 <Input 
                   id="domain"
@@ -57,54 +57,55 @@ const DomainSettings: React.FC = () => {
                 <Button 
                   onClick={handleDomainSetup} 
                   disabled={verificationStatus === 'checking'}
-                  className="min-w-[120px]"
+                  className="min-w-[100px]"
+                  size="sm"
                 >
                   {verificationStatus === 'checking' ? 'Verifying...' : 'Setup'}
                 </Button>
               </div>
               {verificationStatus === 'success' && (
-                <div className="flex items-center mt-2 text-sm text-green-600">
-                  <CheckCircle className="h-4 w-4 mr-1" />
+                <div className="flex items-center mt-1 text-xs text-green-600">
+                  <CheckCircle className="h-3 w-3 mr-1" />
                   Domain verified successfully
                 </div>
               )}
             </div>
             
-            <div className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-900">
-              <h3 className="font-medium mb-3">DNS Configuration</h3>
-              <p className="text-muted-foreground mb-4">
+            <div className="rounded-lg border p-3 bg-gray-50 dark:bg-gray-900 text-sm">
+              <h3 className="font-medium mb-2 text-sm">DNS Configuration</h3>
+              <p className="text-muted-foreground mb-3 text-xs">
                 To connect your domain, add this CNAME record to your DNS settings:
               </p>
               
-              <div className="bg-white dark:bg-gray-800 rounded-md overflow-hidden border mb-4">
-                <table className="w-full text-sm">
+              <div className="bg-white dark:bg-gray-800 rounded-md overflow-hidden border mb-3">
+                <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4 text-muted-foreground">Type</th>
-                      <th className="text-left p-4 text-muted-foreground">Host/Name</th>
-                      <th className="text-left p-4 text-muted-foreground">Value/Target</th>
+                      <th className="text-left p-2 text-muted-foreground">Type</th>
+                      <th className="text-left p-2 text-muted-foreground">Host/Name</th>
+                      <th className="text-left p-2 text-muted-foreground">Value/Target</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="p-4 font-mono">CNAME</td>
-                      <td className="p-4 font-mono">@</td>
-                      <td className="p-4 font-mono">pablos-community-9de6af.nortech.app</td>
+                      <td className="p-2 font-mono">CNAME</td>
+                      <td className="p-2 font-mono">@</td>
+                      <td className="p-2 font-mono">pablos-community-9de6af.nortech.app</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               
-              <div className="space-y-3">
-                <Button variant="link" className="p-0 h-auto flex items-center gap-1.5" asChild>
+              <div className="space-y-1.5">
+                <Button variant="link" className="p-0 h-auto flex items-center gap-1.5 text-xs" asChild>
                   <a href="#" className="text-blue-600">
-                    <ExternalLink className="h-4 w-4" />
+                    <ExternalLink className="h-3 w-3" />
                     <span>How to set up DNS records</span>
                   </a>
                 </Button>
-                <Button variant="link" className="p-0 h-auto flex items-center gap-1.5" asChild>
+                <Button variant="link" className="p-0 h-auto flex items-center gap-1.5 text-xs" asChild>
                   <a href="#" className="text-blue-600">
-                    <ExternalLink className="h-4 w-4" />
+                    <ExternalLink className="h-3 w-3" />
                     <span>Troubleshoot domain issues</span>
                   </a>
                 </Button>
@@ -112,13 +113,13 @@ const DomainSettings: React.FC = () => {
             </div>
           </div>
           
-          <div className="flex items-start space-x-4 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <div className="flex items-start space-x-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg text-xs">
             <div className="text-amber-600 dark:text-amber-500 mt-0.5">
-              <AlertCircle className="h-5 w-5" />
+              <AlertCircle className="h-4 w-4" />
             </div>
             <div className="space-y-1">
               <h4 className="font-medium text-amber-800 dark:text-amber-500">Important Note</h4>
-              <p className="text-sm text-amber-700 dark:text-amber-400">
+              <p className="text-xs text-amber-700 dark:text-amber-400">
                 Domain propagation may take up to 24 hours. SSL certificates are automatically provisioned.
               </p>
             </div>
