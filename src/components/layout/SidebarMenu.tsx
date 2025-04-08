@@ -14,11 +14,11 @@ import {
   MessageSquare, 
   FileText, 
   Layout,
-  Menu
+  // Removed the Menu import from lucide-react as it's conflicting
 } from 'lucide-react';
 import { 
   SidebarHeader, 
-  SidebarMenu as Menu,
+  SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarSeparator,
@@ -42,7 +42,7 @@ const SidebarMenu: React.FC = () => {
       </SidebarHeader>
       
       <SidebarGroup>
-        <Menu>
+        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Home"
@@ -55,14 +55,14 @@ const SidebarMenu: React.FC = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </Menu>
+        </SidebarMenu>
       </SidebarGroup>
       
       <SidebarSeparator />
       
       <SidebarGroup>
         <SidebarGroupLabel>Get Started</SidebarGroupLabel>
-        <Menu>
+        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Dashboard"
@@ -75,14 +75,14 @@ const SidebarMenu: React.FC = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </Menu>
+        </SidebarMenu>
       </SidebarGroup>
       
       <SidebarSeparator />
       
       <SidebarGroup>
         <SidebarGroupLabel>Spaces</SidebarGroupLabel>
-        <Menu>
+        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 
               tooltip="Create Space"
@@ -94,14 +94,14 @@ const SidebarMenu: React.FC = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </Menu>
+        </SidebarMenu>
       </SidebarGroup>
       
       <SidebarSeparator />
       
       <SidebarGroup>
         <SidebarGroupLabel>Content</SidebarGroupLabel>
-        <Menu>
+        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Posts"
@@ -162,14 +162,14 @@ const SidebarMenu: React.FC = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </Menu>
+        </SidebarMenu>
       </SidebarGroup>
       
       <SidebarSeparator />
       
       <SidebarGroup>
         <SidebarGroupLabel>Community</SidebarGroupLabel>
-        <Menu>
+        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Members"
@@ -206,7 +206,7 @@ const SidebarMenu: React.FC = () => {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </Menu>
+        </SidebarMenu>
       </SidebarGroup>
       
       <SidebarSeparator />
