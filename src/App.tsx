@@ -25,6 +25,9 @@ import Messaging from "./pages/settings/Messaging";
 import Legal from "./pages/settings/Legal";
 import Digest from "./pages/settings/Digest";
 import SSO from "./pages/settings/SSO";
+import Integration from "./pages/settings/Integration";
+import Migration from "./pages/settings/Migration";
+import Paywall from "./pages/settings/Paywall";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +58,9 @@ const App = () => (
           <Route path="/settings/legal" element={<Legal />} />
           <Route path="/settings/digest" element={<Digest />} />
           <Route path="/settings/sso" element={<SSO />} />
+          <Route path="/settings/integration" element={<Integration />} />
+          <Route path="/settings/migration" element={<Migration />} />
+          <Route path="/settings/paywall" element={<Paywall />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

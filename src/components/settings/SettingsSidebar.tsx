@@ -20,7 +20,10 @@ import {
   Palette,
   Keyboard,
   Eye,
-  UserPlus
+  UserPlus,
+  ExternalLink,
+  ArrowRightLeft,
+  Lock
 } from 'lucide-react';
 
 interface SettingsMenuItemProps {
@@ -115,8 +118,8 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection = "gene
         <SettingsMenuItem 
           icon={<DollarSign size={20} />} 
           label="Paywalls" 
-          to="/settings/paywalls" 
-          active={activeSection === "paywalls"} 
+          to="/settings/paywall" 
+          active={activeSection === "paywall"} 
         />
         <SettingsMenuItem 
           icon={<DollarSign size={20} />} 
@@ -135,6 +138,18 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection = "gene
           label="Affiliates" 
           to="/settings/affiliates" 
           active={activeSection === "affiliates"} 
+        />
+        <SettingsMenuItem 
+          icon={<ExternalLink size={20} />} 
+          label="Integration" 
+          to="/settings/integration" 
+          active={activeSection === "integration"} 
+        />
+        <SettingsMenuItem 
+          icon={<ArrowRightLeft size={20} />} 
+          label="Migration" 
+          to="/settings/migration" 
+          active={activeSection === "migration"} 
         />
         <SettingsMenuItem 
           icon={<Monitor size={20} />} 
