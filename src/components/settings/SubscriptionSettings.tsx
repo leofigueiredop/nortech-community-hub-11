@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,12 +9,17 @@ import {
   Check,
   DollarSign, 
   Calendar,
-  CreditCard
+  CreditCard,
+  FileText,
+  FileVideo,
+  Download,
+  Lock
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useLocation } from 'react-router-dom';
 
 const SubscriptionSettings: React.FC = () => {
   const [subscriptions, setSubscriptions] = useState([
@@ -108,6 +112,9 @@ const SubscriptionSettings: React.FC = () => {
     });
   };
 
+  const location = useLocation();
+  const fromLibrary = location.state?.fromLibrary;
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
@@ -124,6 +131,53 @@ const SubscriptionSettings: React.FC = () => {
       <p className="text-gray-500 dark:text-gray-400">
         Create and manage subscription plans for your community. These plans will be available for purchase by your members.
       </p>
+
+      {fromLibrary && (
+        <Card className="border-2 border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20 mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-purple-500" />
+              Premium Content Access
+            </CardTitle>
+            <CardDescription>
+              Unlock all premium content in the library including PDFs, videos, and downloadable resources
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="bg-white dark:bg-slate-800 p-3 rounded-lg flex items-center gap-3">
+                <FileText className="h-6 w-6 text-purple-500" />
+                <div>
+                  <div className="font-medium">Premium PDFs</div>
+                  <div className="text-xs text-muted-foreground">Downloadable guides</div>
+                </div>
+              </div>
+              <div className="bg-white dark:bg-slate-800 p-3 rounded-lg flex items-center gap-3">
+                <FileVideo className="h-6 w-6 text-purple-500" />
+                <div>
+                  <div className="font-medium">Exclusive Videos</div>
+                  <div className="text-xs text-muted-foreground">In-depth tutorials</div>
+                </div>
+              </div>
+              <div className="bg-white dark:bg-slate-800 p-3 rounded-lg flex items-center gap-3">
+                <Download className="h-6 w-6 text-purple-500" />
+                <div>
+                  <div className="font-medium">All Downloads</div>
+                  <div className="text-xs text-muted-foreground">Save for offline use</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col sm:flex-row gap-3">
+            <Button className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700">
+              Subscribe Monthly - $9.99
+            </Button>
+            <Button variant="outline" className="w-full sm:w-auto border-purple-300 text-purple-700 hover:bg-purple-100">
+              One-Time Access - $49.99
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
 
       <Tabs defaultValue="active" className="w-full">
         <TabsList className="mb-4">

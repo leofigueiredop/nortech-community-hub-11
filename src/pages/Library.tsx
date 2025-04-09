@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
@@ -6,6 +5,7 @@ import ContentFilters from '@/components/library/ContentFilters';
 import ContentGrid from '@/components/library/ContentGrid';
 import FeaturedContent from '@/components/library/FeaturedContent';
 import ContentViewer from '@/components/library/ContentViewer';
+import UpsellBlock from '@/components/library/UpsellBlock';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Folder, Upload, FileVideo, File, FileAudio, BookOpen, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,8 @@ const Library: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<string>('all');
 
-  // Content organized by format
+  const premiumContentCount = content.filter(item => item.accessLevel === 'premium').length;
+
   const videoContent = content.filter(item => item.format === 'video' || item.format === 'youtube' || item.format === 'vimeo');
   const documentContent = content.filter(item => item.format === 'pdf' || item.format === 'text' || item.format === 'gdoc');
   const audioContent = content.filter(item => item.format === 'audio');
@@ -60,6 +61,10 @@ const Library: React.FC = () => {
               Manage Content
             </RouterLink>
           </Button>
+        </div>
+        
+        <div className="mb-6">
+          <UpsellBlock premiumContentCount={premiumContentCount} purchaseType="both" />
         </div>
         
         {featuredContent.length > 0 && (
