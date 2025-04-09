@@ -3,9 +3,8 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, FileVideo, File, FileAudio, Link, Image, FileText } from 'lucide-react';
 import { ContentFormat } from '@/types/library';
-import { ContentFormatOptions } from './management/constants/contentFormOptions';
 
 interface ContentFiltersProps {
   formatFilter: string;
@@ -32,14 +31,32 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
   setAccessFilter,
   setSearchQuery
 }) => {
-  // Find icon for each format from ContentFormatOptions
   const getFormatIcon = (format: string) => {
-    const option = ContentFormatOptions.find(opt => opt.value === format);
-    return option ? option.icon : <Filter size={16} />;
+    switch (format.toLowerCase()) {
+      case 'video':
+        return <FileVideo size={16} />;
+      case 'pdf':
+        return <File size={16} />;
+      case 'audio':
+        return <FileAudio size={16} />;
+      case 'link':
+        return <Link size={16} />;
+      case 'image':
+        return <Image size={16} />;
+      case 'text':
+        return <FileText size={16} />;
+      default:
+        return <Filter size={16} />;
+    }
+  };
+  
+  const getFormatLabel = (format: string) => {
+    if (format === 'all') return 'All Formats';
+    return format.charAt(0).toUpperCase() + format.slice(1);
   };
   
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 mb-6">
       <div className="flex items-center">
         <Search className="h-5 w-5 mr-2 text-slate-400" />
         <Input
@@ -51,31 +68,36 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
         />
       </div>
       
-      <div className="flex items-center gap-2 overflow-x-auto">
+      {/* Format Filters - Inspired by the image */}
+      <div className="flex items-center gap-2 overflow-x-auto py-2">
         <Button
           variant={formatFilter === 'all' ? 'default' : 'outline'}
           onClick={() => setFormatFilter('all')}
+          className={`${formatFilter === 'all' ? 'bg-purple-500 hover:bg-purple-600' : ''} rounded-full min-w-24`}
         >
           <Filter className="h-4 w-4 mr-2" />
           All Formats
         </Button>
-        {allFormats.map((format) => (
+        
+        {['video', 'pdf', 'audio', 'link', 'image', 'text'].map((format) => (
           <Button
             key={format}
             variant={formatFilter === format ? 'default' : 'outline'}
             onClick={() => setFormatFilter(format)}
-            className="whitespace-nowrap"
+            className={`${formatFilter === format ? 'bg-purple-500 hover:bg-purple-600' : ''} rounded-full min-w-24 whitespace-nowrap`}
           >
             {getFormatIcon(format)}
-            {format.charAt(0).toUpperCase() + format.slice(1)}
+            <span className="ml-2">{getFormatLabel(format)}</span>
           </Button>
         ))}
       </div>
       
-      <div className="flex items-center gap-2 overflow-x-auto">
+      {/* Tags Filter */}
+      <div className="flex items-center gap-2 overflow-x-auto py-2 flex-wrap">
         <Button
           variant={tagFilter === 'all' ? 'default' : 'outline'}
           onClick={() => setTagFilter('all')}
+          className={`${tagFilter === 'all' ? 'bg-purple-500 hover:bg-purple-600' : ''} rounded-full`}
         >
           <Filter className="h-4 w-4 mr-2" />
           All Tags
@@ -85,17 +107,19 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
             key={tag}
             variant={tagFilter === tag ? 'default' : 'outline'}
             onClick={() => setTagFilter(tag)}
-            className="cursor-pointer whitespace-nowrap"
+            className={`cursor-pointer whitespace-nowrap px-3 py-1 rounded-full ${tagFilter === tag ? 'bg-purple-500 hover:bg-purple-600' : ''}`}
           >
             {tag}
           </Badge>
         ))}
       </div>
       
-      <div className="flex items-center gap-2">
+      {/* Access Level Filter */}
+      <div className="flex items-center gap-2 py-2">
         <Button
           variant={accessFilter === 'all' ? 'default' : 'outline'}
           onClick={() => setAccessFilter('all')}
+          className={`${accessFilter === 'all' ? 'bg-purple-500 hover:bg-purple-600' : ''} rounded-full`}
         >
           <Filter className="h-4 w-4 mr-2" />
           All Access
@@ -103,12 +127,14 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
         <Button
           variant={accessFilter === 'free' ? 'default' : 'outline'}
           onClick={() => setAccessFilter('free')}
+          className={`${accessFilter === 'free' ? 'bg-purple-500 hover:bg-purple-600' : ''} rounded-full`}
         >
           Free
         </Button>
         <Button
           variant={accessFilter === 'premium' ? 'default' : 'outline'}
           onClick={() => setAccessFilter('premium')}
+          className={`${accessFilter === 'premium' ? 'bg-purple-500 hover:bg-purple-600' : ''} rounded-full`}
         >
           Premium
         </Button>

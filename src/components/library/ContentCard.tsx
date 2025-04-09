@@ -2,8 +2,9 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Lock, FileText, FileVideo, FileAudio, Link, FileImage, Eye } from 'lucide-react';
-import { ContentItem, ContentFormat } from '@/types/library';
+import { Lock, Eye } from 'lucide-react';
+import { ContentItem } from '@/types/library';
+import { ContentFormatIcon } from './management/utils/ContentFormatIcon';
 
 interface ContentCardProps {
   item: ContentItem;
@@ -11,24 +12,6 @@ interface ContentCardProps {
 }
 
 const ContentCard: React.FC<ContentCardProps> = ({ item, onClick }) => {
-  const getFormatIcon = () => {
-    switch (item.format) {
-      case 'video':
-        return <FileVideo size={20} />;
-      case 'pdf':
-        return <FileText size={20} />;
-      case 'audio':
-        return <FileAudio size={20} />;
-      case 'link':
-        return <Link size={20} />;
-      case 'image':
-        return <FileImage size={20} />;
-      case 'text':
-      default:
-        return <FileText size={20} />;
-    }
-  };
-
   const getFormatLabel = () => {
     switch (item.format) {
       case 'video':
@@ -43,6 +26,8 @@ const ContentCard: React.FC<ContentCardProps> = ({ item, onClick }) => {
         return 'Image';
       case 'text':
         return 'Text';
+      case 'course':
+        return 'Course';  
       default:
         return String(item.format).charAt(0).toUpperCase() + String(item.format).slice(1);
     }
@@ -50,7 +35,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item, onClick }) => {
 
   return (
     <Card 
-      className="overflow-hidden h-full flex flex-col cursor-pointer hover:shadow-md transition-shadow"
+      className="overflow-hidden h-full flex flex-col cursor-pointer hover:shadow-md transition-shadow border border-slate-200"
       onClick={onClick}
     >
       <div className="relative">
@@ -68,9 +53,9 @@ const ContentCard: React.FC<ContentCardProps> = ({ item, onClick }) => {
             </div>
           )}
           <div className="absolute bottom-2 left-2">
-            <Badge variant="secondary" className="bg-slate-800/60 backdrop-blur-sm text-white border-none">
-              {getFormatIcon()}
-              <span className="ml-1">{getFormatLabel()}</span>
+            <Badge variant="secondary" className="bg-slate-800/60 backdrop-blur-sm text-white border-none flex items-center gap-1">
+              <ContentFormatIcon format={item.format} />
+              <span>{getFormatLabel()}</span>
               {item.duration && <span className="ml-2 text-xs">{item.duration}</span>}
             </Badge>
           </div>

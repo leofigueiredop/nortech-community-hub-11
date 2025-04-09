@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, FileVideo, FileAudio, Link, Image } from 'lucide-react';
+import { FileText, FileVideo, FileAudio, Link, Image, BookOpen, Youtube, Video, File } from 'lucide-react';
 
 interface ContentFormatIconProps {
   format: string;
@@ -8,12 +8,14 @@ interface ContentFormatIconProps {
 }
 
 export const ContentFormatIcon: React.FC<ContentFormatIconProps> = ({ format, size = 16 }) => {
-  switch (format) {
+  switch (format.toLowerCase()) {
     case 'video':
+      return <FileVideo size={size} />;
     case 'youtube':
     case 'vimeo':
-      return <FileVideo size={size} />;
+      return <Video size={size} />;
     case 'pdf':
+      return <File size={size} />;
     case 'gdoc':
     case 'text':
       return <FileText size={size} />;
@@ -21,6 +23,8 @@ export const ContentFormatIcon: React.FC<ContentFormatIconProps> = ({ format, si
       return <FileAudio size={size} />;
     case 'image':
       return <Image size={size} />;
+    case 'course':
+      return <BookOpen size={size} />;
     case 'link':
     case 'gdrive':
     default:
