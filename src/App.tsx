@@ -45,6 +45,7 @@ import SSO from "./pages/settings/SSO";
 import Integration from "./pages/settings/Integration";
 import Migration from "./pages/settings/Migration";
 import Paywall from "./pages/settings/Paywall";
+import PointsConfiguration from "./pages/settings/PointsConfiguration";
 
 const queryClient = new QueryClient();
 
@@ -96,6 +97,7 @@ const App = () => (
               <Route path="/settings/integration" element={<Integration />} />
               <Route path="/settings/migration" element={<Migration />} />
               <Route path="/settings/paywall" element={<Paywall />} />
+              <Route path="/settings/points" element={<PointsConfiguration />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, MessageSquare, BookOpen, Calendar, Play, Terminal, Users } from 'lucide-react';
+import { FileText, MessageSquare, BookOpen, Calendar, Play, Terminal, Users, Trophy } from 'lucide-react';
 import SidebarSection from './SidebarSection';
 import SidebarLink from './SidebarLink';
 
@@ -42,6 +42,12 @@ const ContentSection: React.FC = () => {
         to="/ai-matchmaker" 
         icon={<Users size={18} />} 
         label="AI Matchmaker" 
+      />
+      <SidebarLink 
+        to="/points" 
+        icon={<Trophy size={18} />} 
+        label="Points" 
+        additionalPaths={['/leaderboard']}
       />
     </SidebarSection>
   );
