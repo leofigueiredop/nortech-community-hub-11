@@ -42,7 +42,7 @@ const TechnicalSection: React.FC<TechnicalSectionProps> = ({ activeSection }) =>
       />
       <SettingsMenuItem 
         icon={<Settings size={18} />} 
-        label="Settings" 
+        label="General" 
         to="/settings/general" 
         active={activeSection === "general"} 
       />

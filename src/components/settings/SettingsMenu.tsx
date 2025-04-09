@@ -15,9 +15,16 @@ import {
   KeyRound,
   ExternalLink,
   ArrowRightLeft,
-  CreditCard
+  CreditCard,
+  Users,
+  Monitor,
+  Code,
+  BarChart3,
+  Share,
+  Shield,
+  Video,
+  Workflow
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface SettingsCategoryProps {
   icon: React.ReactNode;
@@ -54,35 +61,105 @@ interface SettingsMenuProps {
 }
 
 const SettingsMenu: React.FC<SettingsMenuProps> = ({ className }) => {
-  const categories = [
+  // Group categories by section, matching the sidebar organization
+  const technicalCategories = [
+    {
+      icon: <Users className="h-5 w-5 text-white" />,
+      title: "Audience",
+      description: "Manage your target audience and community members",
+      to: "/settings/audience",
+      color: "bg-blue-600"
+    },
+    {
+      icon: <ExternalLink className="h-5 w-5 text-white" />,
+      title: "Integration",
+      description: "Connect with third-party services",
+      to: "/settings/integration",
+      color: "bg-blue-400"
+    },
+    {
+      icon: <ArrowRightLeft className="h-5 w-5 text-white" />,
+      title: "Migration",
+      description: "Import or export your community data",
+      to: "/settings/migration",
+      color: "bg-fuchsia-600"
+    },
+    {
+      icon: <Monitor className="h-5 w-5 text-white" />,
+      title: "Site",
+      description: "Configure your site appearance and behavior",
+      to: "/settings/site",
+      color: "bg-slate-600"
+    },
+    {
+      icon: <Code className="h-5 w-5 text-white" />,
+      title: "Developers",
+      description: "Access developer tools and API documentation",
+      to: "/settings/developers",
+      color: "bg-gray-700"
+    },
     {
       icon: <Settings className="h-5 w-5 text-white" />,
       title: "General",
       description: "Basic community settings and preferences",
       to: "/settings/general",
       color: "bg-gray-700"
+    }
+  ];
+
+  const contentCategories = [
+    {
+      icon: <MessageSquare className="h-5 w-5 text-white" />,
+      title: "Marketing",
+      description: "Manage your marketing campaigns and resources",
+      to: "/settings/marketing",
+      color: "bg-amber-600"
     },
     {
-      icon: <Palette className="h-5 w-5 text-white" />,
-      title: "Branding",
-      description: "Logo, colors, and visual identity",
-      to: "/settings/branding",
-      color: "bg-purple-600"
-    },
-    {
-      icon: <Smartphone className="h-5 w-5 text-white" />,
-      title: "Mobile",
-      description: "Mobile app configuration",
-      to: "/settings/mobile",
-      color: "bg-blue-600"
+      icon: <FileText className="h-5 w-5 text-white" />,
+      title: "Posts",
+      description: "Configure post settings and defaults",
+      to: "/settings/posts",
+      color: "bg-cyan-600"
     },
     {
       icon: <Layout className="h-5 w-5 text-white" />,
-      title: "Defaults",
-      description: "Default settings for new content",
-      to: "/settings/defaults",
+      title: "Spaces",
+      description: "Manage community spaces and areas",
+      to: "/settings/spaces",
+      color: "bg-emerald-600"
+    },
+    {
+      icon: <Shield className="h-5 w-5 text-white" />,
+      title: "Moderation",
+      description: "Community moderation tools and settings",
+      to: "/settings/moderation",
+      color: "bg-red-600"
+    },
+    {
+      icon: <Video className="h-5 w-5 text-white" />,
+      title: "Live",
+      description: "Configure live streaming and events",
+      to: "/settings/live",
       color: "bg-indigo-600"
     },
+    {
+      icon: <Workflow className="h-5 w-5 text-white" />,
+      title: "Workflows",
+      description: "Set up automated community workflows",
+      to: "/settings/workflows",
+      color: "bg-green-600"
+    },
+    {
+      icon: <Bot className="h-5 w-5 text-white" />,
+      title: "AI Agents",
+      description: "Configure AI assistants for your community",
+      to: "/settings/ai-agents",
+      color: "bg-pink-600"
+    }
+  ];
+
+  const monetizationCategories = [
     {
       icon: <CreditCard className="h-5 w-5 text-white" />,
       title: "Nortech Plans",
@@ -105,6 +182,44 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ className }) => {
       color: "bg-violet-600"
     },
     {
+      icon: <BarChart3 className="h-5 w-5 text-white" />,
+      title: "Analytics",
+      description: "Track community performance and metrics",
+      to: "/settings/analytics",
+      color: "bg-blue-600"
+    },
+    {
+      icon: <Share className="h-5 w-5 text-white" />,
+      title: "Affiliates",
+      description: "Manage affiliate programs and partnerships",
+      to: "/settings/affiliates",
+      color: "bg-orange-600"
+    },
+  ];
+
+  const preferencesCategories = [
+    {
+      icon: <Palette className="h-5 w-5 text-white" />,
+      title: "Branding",
+      description: "Logo, colors, and visual identity",
+      to: "/settings/branding",
+      color: "bg-purple-600"
+    },
+    {
+      icon: <Smartphone className="h-5 w-5 text-white" />,
+      title: "Mobile",
+      description: "Mobile app configuration",
+      to: "/settings/mobile",
+      color: "bg-blue-600"
+    },
+    {
+      icon: <Layout className="h-5 w-5 text-white" />,
+      title: "Defaults",
+      description: "Default settings for new content",
+      to: "/settings/defaults",
+      color: "bg-indigo-600"
+    },
+    {
       icon: <Globe className="h-5 w-5 text-white" />,
       title: "Domain",
       description: "Custom domain configuration",
@@ -112,19 +227,15 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ className }) => {
       color: "bg-yellow-600"
     },
     {
-      icon: <Bot className="h-5 w-5 text-white" />,
-      title: "AI Agents",
-      description: "Configure AI assistants for your community",
-      to: "/settings/ai-agents",
-      color: "bg-pink-600"
-    },
-    {
       icon: <MessageSquare className="h-5 w-5 text-white" />,
       title: "Messaging",
       description: "Community messaging preferences",
       to: "/settings/messaging",
       color: "bg-teal-600"
-    },
+    }
+  ];
+
+  const memberCategories = [
     {
       icon: <FileText className="h-5 w-5 text-white" />,
       title: "Legal",
@@ -145,27 +256,44 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ className }) => {
       description: "Single sign-on integration",
       to: "/settings/sso",
       color: "bg-cyan-600"
-    },
-    {
-      icon: <ExternalLink className="h-5 w-5 text-white" />,
-      title: "Integration",
-      description: "Connect with third-party services",
-      to: "/settings/integration",
-      color: "bg-blue-400"
-    },
-    {
-      icon: <ArrowRightLeft className="h-5 w-5 text-white" />,
-      title: "Migration",
-      description: "Import or export your community data",
-      to: "/settings/migration",
-      color: "bg-fuchsia-600"
     }
   ];
   
+  // Combine all categories for rendering
+  const allCategories = [
+    {
+      title: "Community Management",
+      categories: technicalCategories
+    },
+    {
+      title: "Content Management",
+      categories: contentCategories
+    },
+    {
+      title: "Monetization",
+      categories: monetizationCategories
+    },
+    {
+      title: "Community Preferences",
+      categories: preferencesCategories
+    },
+    {
+      title: "Member Experience",
+      categories: memberCategories
+    }
+  ];
+
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${className}`}>
-      {categories.map((category, index) => (
-        <SettingsCategory key={index} {...category} />
+    <div className={`space-y-10 ${className}`}>
+      {allCategories.map((section, sectionIndex) => (
+        <div key={sectionIndex}>
+          <h2 className="text-xl font-semibold mb-4">{section.title}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {section.categories.map((category, index) => (
+              <SettingsCategory key={index} {...category} />
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   );

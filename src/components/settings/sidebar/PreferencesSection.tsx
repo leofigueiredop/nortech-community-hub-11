@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Moon, Palette, Keyboard } from 'lucide-react';
+import { Palette, Smartphone, Layout, Globe, MessageSquare } from 'lucide-react';
 import SettingsMenuItem from '../SettingsMenuItem';
 
 interface PreferencesSectionProps {
@@ -11,22 +11,34 @@ const PreferencesSection: React.FC<PreferencesSectionProps> = ({ activeSection }
   return (
     <div className="space-y-1 px-2">
       <SettingsMenuItem 
-        icon={<Moon size={18} />} 
-        label="Switch to light mode" 
-        to="/settings/theme" 
-        active={activeSection === "theme"} 
-      />
-      <SettingsMenuItem 
         icon={<Palette size={18} />} 
-        label="Customize theme" 
-        to="/settings/customize" 
-        active={activeSection === "customize"} 
+        label="Branding" 
+        to="/settings/branding" 
+        active={activeSection === "branding"} 
       />
       <SettingsMenuItem 
-        icon={<Keyboard size={18} />} 
-        label="Keyboard shortcuts" 
-        to="/settings/shortcuts" 
-        active={activeSection === "shortcuts"} 
+        icon={<Smartphone size={18} />} 
+        label="Mobile" 
+        to="/settings/mobile" 
+        active={activeSection === "mobile"} 
+      />
+      <SettingsMenuItem 
+        icon={<Layout size={18} />} 
+        label="Defaults" 
+        to="/settings/defaults" 
+        active={activeSection === "defaults"} 
+      />
+      <SettingsMenuItem 
+        icon={<Globe size={18} />} 
+        label="Domain" 
+        to="/settings/domain" 
+        active={activeSection === "domain"} 
+      />
+      <SettingsMenuItem 
+        icon={<MessageSquare size={18} />} 
+        label="Messaging" 
+        to="/settings/messaging" 
+        active={activeSection === "messaging"} 
       />
     </div>
   );
