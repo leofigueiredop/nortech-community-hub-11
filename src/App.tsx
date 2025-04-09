@@ -23,6 +23,7 @@ import CreateSpace from "./pages/CreateSpace";
 import AITerminal from "./pages/AITerminal";
 import AIMatchmaker from "./pages/AIMatchmaker";
 import PointsDashboard from "./pages/PointsDashboard";
+import PointsStore from "./pages/PointsStore";
 import Leaderboard from "./pages/Leaderboard";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { PointsProvider } from "./context/PointsContext";
@@ -76,6 +77,7 @@ const App = () => (
               <Route path="/members" element={<Members />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/points" element={<PointsDashboard />} />
+              <Route path="/points/store" element={<PointsStore />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/ai-terminal" element={<AITerminal />} />
               <Route path="/ai-matchmaker" element={<AIMatchmaker />} />

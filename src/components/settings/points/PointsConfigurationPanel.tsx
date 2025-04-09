@@ -5,6 +5,7 @@ import PointsActionsConfig from './PointsActionsConfig';
 import PointsCapsConfig from './PointsCapsConfig';
 import PointsUserManagement from './PointsUserManagement';
 import PointsActivityLog from './PointsActivityLog';
+import RewardsManagement from './RewardsManagement';
 import PointsTemplates from './PointsTemplates';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Info } from 'lucide-react';
@@ -17,7 +18,7 @@ const PointsConfigurationPanel: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Points Configuration</h2>
           <p className="text-muted-foreground mt-1">
-            Configure how users earn points in your community
+            Configure how users earn points and redeem rewards in your community
           </p>
         </div>
         <TooltipProvider>
@@ -47,9 +48,10 @@ const PointsConfigurationPanel: React.FC = () => {
       </Card>
 
       <Tabs defaultValue="actions" className="w-full">
-        <TabsList className="grid grid-cols-4 mb-6">
+        <TabsList className="grid grid-cols-5 mb-6">
           <TabsTrigger value="actions">Actions & Points</TabsTrigger>
           <TabsTrigger value="caps">Point Caps</TabsTrigger>
+          <TabsTrigger value="rewards">Rewards Store</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="logs">Activity Log</TabsTrigger>
         </TabsList>
@@ -60,6 +62,10 @@ const PointsConfigurationPanel: React.FC = () => {
         
         <TabsContent value="caps" className="mt-0">
           <PointsCapsConfig />
+        </TabsContent>
+        
+        <TabsContent value="rewards" className="mt-0">
+          <RewardsManagement />
         </TabsContent>
         
         <TabsContent value="users" className="mt-0">
