@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Filter, Search, Tag, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Link } from 'react-router-dom';
 
 interface FeedFiltersProps {
   contentFilter: string;
@@ -55,6 +57,9 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
     'Web', 'Mobile', 'Backend', 'Frontend', 'Blockchain', 'NFT',
     'Security', 'DevOps', 'Cloud', 'Leadership', 'Mindset'
   ];
+
+  // Sort tags by popularity (in a real app this would be from analytics)
+  const popularTags = [...availableTags].sort(() => 0.5 - Math.random()).slice(0, 6);
 
   const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
@@ -120,9 +125,50 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
         </DropdownMenu>
       </div>
       
+      {/* Popular tags section */}
+      <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-md border border-purple-100 dark:border-purple-800">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center">
+            <Tag size={16} className="mr-2 text-purple-500" />
+            <span className="text-sm font-medium">Trending Topics</span>
+          </div>
+          <Link 
+            to="/tags" 
+            className="text-xs text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300"
+          >
+            View all
+          </Link>
+        </div>
+        
+        <div className="flex flex-wrap gap-2 mb-3">
+          {popularTags.map(tag => (
+            <Badge 
+              key={tag}
+              variant={selectedTags.includes(tag) ? "default" : "outline"} 
+              className={`cursor-pointer ${
+                selectedTags.includes(tag) 
+                  ? 'bg-purple-500 hover:bg-purple-600' 
+                  : 'hover:bg-purple-100 dark:hover:bg-purple-900 border-purple-300'
+              }`}
+              onClick={() => toggleTag(tag)}
+            >
+              #{tag}
+            </Badge>
+          ))}
+          <Link to="/tags">
+            <Badge 
+              variant="outline"
+              className="cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900 border-purple-300"
+            >
+              More...
+            </Badge>
+          </Link>
+        </div>
+      </div>
+      
       <div className="flex items-center mb-2">
         <Tag size={16} className="mr-2 text-purple-500" />
-        <span className="text-sm font-medium">Popular Tags</span>
+        <span className="text-sm font-medium">Filter by Tags</span>
       </div>
       
       <div className="flex flex-wrap gap-2 bg-slate-50 dark:bg-slate-900 p-3 rounded-md border">
@@ -137,7 +183,10 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
             }`}
             onClick={() => toggleTag(tag)}
           >
-            #{tag}
+            <Link to={`/tags/${tag}`} className="mr-1" onClick={(e) => e.stopPropagation()}>
+              #
+            </Link>
+            {tag}
           </Badge>
         ))}
       </div>
@@ -151,7 +200,10 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
               variant="default" 
               className="bg-purple-500 hover:bg-purple-600 cursor-pointer flex items-center gap-1"
             >
-              #{tag}
+              <Link to={`/tags/${tag}`} className="mr-1" onClick={(e) => e.stopPropagation()}>
+                #
+              </Link>
+              {tag}
               <button onClick={() => toggleTag(tag)} className="ml-1">
                 <X size={14} />
               </button>

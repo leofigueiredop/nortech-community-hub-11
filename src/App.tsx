@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,6 +30,7 @@ import ContentManagement from "./pages/ContentManagement";
 import CourseCreate from "./pages/CourseCreate";
 import CourseEdit from "./pages/CourseEdit";
 import Courses from "./pages/Courses";
+import TagPage from "./pages/TagPage";
 
 // Import settings pages
 import SettingsIndex from "./pages/settings/Index";
@@ -90,6 +90,8 @@ const App = () => (
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/ai-terminal" element={<AITerminal />} />
               <Route path="/ai-matchmaker" element={<AIMatchmaker />} />
+              
+              <Route path="/tags/:tagName" element={<TagPage />} />
               
               <Route path="/settings" element={<SettingsIndex />} />
               <Route path="/settings/general" element={<General />} />

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import ContentFilters from '@/components/library/ContentFilters';
@@ -7,6 +7,8 @@ import ContentGrid from '@/components/library/ContentGrid';
 import FeaturedContent from '@/components/library/FeaturedContent';
 import ContentViewer from '@/components/library/ContentViewer';
 import UpsellBlock from '@/components/library/UpsellBlock';
+import TagsExplorer from '@/components/tags/TagsExplorer';
+import TagSuggestions from '@/components/tags/TagSuggestions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Folder, Upload, FileVideo, File, FileAudio, BookOpen, Image, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,6 +36,30 @@ const Library: React.FC = () => {
   } = useLibraryContent();
 
   const [activeTab, setActiveTab] = useState<string>('all');
+  const [visitedTags, setVisitedTags] = useState<string[]>([]);
+
+  // Simulate user interests based on local storage or default to some tags
+  useEffect(() => {
+    // In a real app, this would come from user behavior tracking
+    const storedTags = localStorage.getItem('visitedTags');
+    if (storedTags) {
+      setVisitedTags(JSON.parse(storedTags));
+    } else {
+      // Default tags for new users
+      const defaultTags = ['Web3', 'Development', 'AI'];
+      setVisitedTags(defaultTags);
+      localStorage.setItem('visitedTags', JSON.stringify(defaultTags));
+    }
+  }, []);
+
+  // Track when user selects a tag
+  useEffect(() => {
+    if (tagFilter !== 'all' && !visitedTags.includes(tagFilter)) {
+      const updatedTags = [...visitedTags, tagFilter].slice(-5); // Keep last 5
+      setVisitedTags(updatedTags);
+      localStorage.setItem('visitedTags', JSON.stringify(updatedTags));
+    }
+  }, [tagFilter]);
 
   const premiumContentCount = content.filter(item => item.accessLevel === 'premium').length;
 
@@ -74,6 +100,22 @@ const Library: React.FC = () => {
         <div className="mb-6">
           <UpsellBlock premiumContentCount={premiumContentCount} purchaseType="both" />
         </div>
+        
+        {/* Tag Suggestions based on user interests */}
+        {visitedTags.length > 0 && (
+          <TagSuggestions 
+            visitedTags={visitedTags} 
+            allContent={content}
+            onItemSelect={setSelectedItem}
+          />
+        )}
+        
+        {/* Trending Topics Section */}
+        <TagsExplorer 
+          tags={tagsWithCount.slice(0, 12)} 
+          title="Trending Topics"
+          className="mb-6"
+        />
         
         {featuredContent.length > 0 && (
           <FeaturedContent 
@@ -185,7 +227,9 @@ const Library: React.FC = () => {
                       <span className="text-sm text-muted-foreground">{tag.count} items</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Click to view all content with this tag
+                      <RouterLink to={`/tags/${tag.name}`} className="text-purple-600 hover:underline">
+                        View all content with this tag
+                      </RouterLink>
                     </p>
                   </div>
                 ))}
