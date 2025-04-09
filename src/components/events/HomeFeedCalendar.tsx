@@ -5,50 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { format, isAfter, isBefore, addDays } from 'date-fns';
-import { ChevronRight, Calendar, Users, Video, BookOpen, Presentation } from 'lucide-react';
-
-// Event type definitions and colors
-const EVENT_TYPES = {
-  workshop: { 
-    label: "Workshop", 
-    color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-    icon: <BookOpen size={14} className="mr-1" />
-  },
-  meetup: { 
-    label: "Meetup", 
-    color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-    icon: <Users size={14} className="mr-1" />
-  },
-  webinar: { 
-    label: "Webinar", 
-    color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-    icon: <Presentation size={14} className="mr-1" />
-  },
-  live: { 
-    label: "Live Session", 
-    color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-    icon: <Video size={14} className="mr-1" />
-  },
-  mentoria: { 
-    label: "Mentoring", 
-    color: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-    icon: <Users size={14} className="mr-1" />
-  }
-};
-
-interface Event {
-  id: number;
-  title: string;
-  description: string;
-  date: Date;
-  time: string;
-  type: keyof typeof EVENT_TYPES;
-  location: string;
-  speaker: string;
-  attendees: number;
-  capacity: number;
-  image: string | null;
-}
+import { ChevronRight, Calendar } from 'lucide-react';
+import { EVENT_TYPES, Event } from './EventTypes';
 
 interface HomeFeedCalendarProps {
   events: Event[];
