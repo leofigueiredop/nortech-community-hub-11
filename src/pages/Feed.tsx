@@ -135,7 +135,7 @@ const Feed: React.FC = () => {
         setActiveSegment={setActiveSegment} 
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar - Only visible on large screens by default */}
         <div className="hidden lg:block lg:col-span-1">
           <SpacesSidebar 

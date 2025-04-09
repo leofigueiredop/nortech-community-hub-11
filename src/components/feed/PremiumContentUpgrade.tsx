@@ -17,17 +17,17 @@ const PremiumContentUpgrade: React.FC = () => {
   };
   
   return (
-    <Card className="border-2 border-purple-200 dark:border-purple-900 shadow-md">
-      <CardHeader className="text-center pb-2">
-        <Lock className="w-12 h-12 mx-auto text-nortech-purple mb-2" />
-        <CardTitle className="text-2xl font-bold text-nortech-purple">
+    <Card className="overflow-hidden border border-purple-200 dark:border-purple-900 shadow-sm">
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4">
+        <Lock className="w-12 h-12 mx-auto text-white mb-2" />
+        <CardTitle className="text-2xl font-bold text-white text-center">
           Unlock Premium Content
         </CardTitle>
-        <CardDescription className="text-base">
+        <CardDescription className="text-base text-purple-100 text-center">
           Upgrade your membership to access exclusive premium content
         </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4 pb-4">
+      </div>
+      <CardContent className="space-y-6 pt-6 px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-purple-50 dark:bg-slate-800 rounded-lg p-4 flex items-start space-x-3">
             <Star className="text-amber-500 mt-0.5 flex-shrink-0" />

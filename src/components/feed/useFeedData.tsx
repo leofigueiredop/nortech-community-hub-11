@@ -125,18 +125,8 @@ export const useFeedData = (postsPerPage: number = 5) => {
     { id: 'mentorship', name: 'Mentorship Circle' }
   ];
 
-  // Assign access badges to posts if not already present
-  const postsWithBadges = samplePosts.map(post => {
-    if (post.accessBadge) return post;
-    
-    return {
-      ...post,
-      accessBadge: post.isPaid ? 'premium' : 'free'
-    };
-  });
-
   // Filter posts based on current filter settings
-  const filteredPosts = postsWithBadges.filter(post => {
+  const filteredPosts = samplePosts.filter(post => {
     if (activeSpace !== 'all' && post.space.toLowerCase() !== activeSpace) {
       return false;
     }

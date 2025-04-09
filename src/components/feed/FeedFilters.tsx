@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Filter, Search, Tag, X } from 'lucide-react';
+import { Filter, Search, Tag, X, TrendingUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 
@@ -51,15 +51,11 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
     { id: 'subscription', name: 'My subscription only' }
   ];
 
-  const availableTags = [
+  // Smaller set of popular tags for a cleaner display
+  const popularTags = [
     'Web3', 'Finance', 'Design', 'Development', 'Marketing', 
-    'Mentoring', 'Career', 'Productivity', 'AI', 'Tech', 'Crypto',
-    'Web', 'Mobile', 'Backend', 'Frontend', 'Blockchain', 'NFT',
-    'Security', 'DevOps', 'Cloud', 'Leadership', 'Mindset'
+    'AI', 'Career', 'Blockchain'
   ];
-
-  // Sort tags by popularity (in a real app this would be from analytics)
-  const popularTags = [...availableTags].sort(() => 0.5 - Math.random()).slice(0, 6);
 
   const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
@@ -67,10 +63,6 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
     } else {
       setSelectedTags([...selectedTags, tag]);
     }
-  };
-
-  const handleTagSearch = (tag: string) => {
-    setSearchQuery(`#${tag}`);
   };
 
   return (
@@ -82,7 +74,7 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
             placeholder="Search posts, tags or keywords..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-background border-slate-200"
           />
         </div>
         
@@ -125,11 +117,11 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
         </DropdownMenu>
       </div>
       
-      {/* Popular tags section */}
-      <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-md border border-purple-100 dark:border-purple-800">
+      {/* Trending Topics section - simplified and cleaner */}
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-lg border shadow-sm">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center">
-            <Tag size={16} className="mr-2 text-purple-500" />
+          <div className="flex items-center gap-2">
+            <TrendingUp size={16} className="text-purple-500" />
             <span className="text-sm font-medium">Trending Topics</span>
           </div>
           <Link 
@@ -140,7 +132,7 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
           </Link>
         </div>
         
-        <div className="flex flex-wrap gap-2 mb-3">
+        <div className="flex flex-wrap gap-2">
           {popularTags.map(tag => (
             <Badge 
               key={tag}
@@ -148,77 +140,40 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
               className={`cursor-pointer ${
                 selectedTags.includes(tag) 
                   ? 'bg-purple-500 hover:bg-purple-600' 
-                  : 'hover:bg-purple-100 dark:hover:bg-purple-900 border-purple-300'
+                  : 'hover:bg-purple-100 dark:hover:bg-purple-900 border-purple-200'
               }`}
               onClick={() => toggleTag(tag)}
             >
               #{tag}
             </Badge>
           ))}
-          <Link to="/tags">
-            <Badge 
-              variant="outline"
-              className="cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900 border-purple-300"
-            >
-              More...
-            </Badge>
-          </Link>
         </div>
       </div>
       
-      <div className="flex items-center mb-2">
-        <Tag size={16} className="mr-2 text-purple-500" />
-        <span className="text-sm font-medium">Filter by Tags</span>
-      </div>
-      
-      <div className="flex flex-wrap gap-2 bg-slate-50 dark:bg-slate-900 p-3 rounded-md border">
-        {availableTags.map(tag => (
-          <Badge 
-            key={tag}
-            variant={selectedTags.includes(tag) ? "default" : "outline"} 
-            className={`cursor-pointer ${
-              selectedTags.includes(tag) 
-                ? 'bg-purple-500 hover:bg-purple-600' 
-                : 'hover:bg-purple-100 dark:hover:bg-purple-900 border-purple-300'
-            }`}
-            onClick={() => toggleTag(tag)}
-          >
-            <Link to={`/tags/${tag}`} className="mr-1" onClick={(e) => e.stopPropagation()}>
-              #
-            </Link>
-            {tag}
-          </Badge>
-        ))}
-      </div>
-      
+      {/* Only show active filters when there are any */}
       {selectedTags.length > 0 && (
-        <div className="flex gap-2 items-center">
-          <span className="text-sm font-medium">Active Filters:</span>
+        <div className="flex flex-wrap gap-2 items-center mt-4">
+          <span className="text-sm font-medium">Active:</span>
           {selectedTags.map(tag => (
             <Badge 
               key={tag}
               variant="default" 
               className="bg-purple-500 hover:bg-purple-600 cursor-pointer flex items-center gap-1"
             >
-              <Link to={`/tags/${tag}`} className="mr-1" onClick={(e) => e.stopPropagation()}>
-                #
-              </Link>
-              {tag}
+              #{tag}
               <button onClick={() => toggleTag(tag)} className="ml-1">
                 <X size={14} />
               </button>
             </Badge>
           ))}
-          {selectedTags.length > 0 && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-xs h-7"
-              onClick={() => setSelectedTags([])}
-            >
-              Clear All
-            </Button>
-          )}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-xs h-7 ml-auto"
+            onClick={() => setSelectedTags([])}
+          >
+            Clear All
+          </Button>
         </div>
       )}
     </div>
