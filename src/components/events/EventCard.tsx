@@ -5,7 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { EVENT_TYPES } from './EventTypes';
+import { Calendar, Check, Clock } from 'lucide-react';
+import { EVENT_TYPES, getEventStatus, isUserRegistered } from './EventTypes';
+import { useNotifications } from '@/context/NotificationsContext';
 
 interface EventCardProps {
   event: {
@@ -20,6 +22,8 @@ interface EventCardProps {
     attendees: number;
     capacity: number;
     image: string | null;
+    registeredUsers?: string[];
+    status?: 'upcoming' | 'happening_soon' | 'in_progress' | 'ended';
   };
   onRSVP: (eventId: number) => void;
 }
@@ -27,13 +31,61 @@ interface EventCardProps {
 const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
   const eventType = EVENT_TYPES[event.type];
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
+  
+  // Get the event status
+  const status = event.status || getEventStatus(event);
+  
+  // Check if current user is registered (for demo, always using 'current-user')
+  const isRegistered = isUserRegistered(event);
   
   const handleRSVP = () => {
+    // RSVP for the event
+    onRSVP(event.id);
+    
+    // Show toast notification
     toast({
       title: "RSVP Confirmed",
       description: `You've successfully registered for "${event.title}"`,
     });
-    onRSVP(event.id);
+    
+    // Add to notifications
+    addNotification({
+      type: 'event',
+      title: 'Event Registration Confirmed',
+      message: `You're registered for "${event.title}" on ${format(event.date, 'MMMM d')}`,
+      link: '/events',
+    });
+    
+    // In a real app, we would also send an email confirmation here
+    console.log(`Email confirmation would be sent for event: ${event.title}`);
+  };
+  
+  // Generate Google Calendar link
+  const generateGoogleCalLink = () => {
+    const startDateTime = new Date(event.date);
+    const [startHour, startMinute] = event.time.split(' - ')[0].split(':');
+    startDateTime.setHours(parseInt(startHour), parseInt(startMinute));
+    
+    const endDateTime = new Date(startDateTime);
+    endDateTime.setHours(endDateTime.getHours() + 2); // Assuming 2 hour events
+    
+    const startStr = startDateTime.toISOString().replace(/-|:|\.\d\d\d/g, '');
+    const endStr = endDateTime.toISOString().replace(/-|:|\.\d\d\d/g, '');
+    
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}`;
+  };
+  
+  // Generate Outlook Calendar link
+  const generateOutlookCalLink = () => {
+    const startDateTime = new Date(event.date);
+    const [startHour, startMinute] = event.time.split(' - ')[0].split(':');
+    startDateTime.setHours(parseInt(startHour), parseInt(startMinute));
+    
+    const endDateTime = new Date(startDateTime);
+    endDateTime.setHours(endDateTime.getHours() + 2); // Assuming 2 hour events
+    
+    return `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(event.title)}&startdt=${startDateTime.toISOString()}&enddt=${endDateTime.toISOString()}&body=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}`;
   };
 
   return (
@@ -46,10 +98,31 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
               {format(event.date, 'MMMM d, yyyy')} • {event.time}
             </CardDescription>
           </div>
-          <Badge className={`flex items-center ${eventType.color}`}>
-            {eventType.icon}
-            {eventType.label}
-          </Badge>
+          <div className="flex flex-col gap-1 items-end">
+            <Badge className={`flex items-center ${eventType.color}`}>
+              {eventType.icon}
+              {eventType.label}
+            </Badge>
+            
+            {/* Status badges */}
+            {status === 'happening_soon' && (
+              <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                <Clock size={12} className="mr-1" />
+                Happening soon
+              </Badge>
+            )}
+            {status === 'ended' && (
+              <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">
+                Ended
+              </Badge>
+            )}
+            {isRegistered && (
+              <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+                <Check size={12} className="mr-1" />
+                Registered
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -80,13 +153,47 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
           </div>
         </div>
         
-        <Button 
-          onClick={handleRSVP} 
-          className="w-full bg-nortech-purple hover:bg-nortech-purple/90"
-          disabled={event.attendees >= event.capacity}
-        >
-          {event.attendees >= event.capacity ? "Fully Booked" : "RSVP Now"}
-        </Button>
+        {/* RSVP Button */}
+        {status !== 'ended' && !isRegistered && (
+          <Button 
+            onClick={handleRSVP} 
+            className="w-full bg-nortech-purple hover:bg-nortech-purple/90 mb-2"
+            disabled={event.attendees >= event.capacity}
+          >
+            {event.attendees >= event.capacity ? "Fully Booked" : "Register Now"}
+          </Button>
+        )}
+        
+        {/* Already registered message */}
+        {isRegistered && (
+          <div className="text-center mb-2 text-green-600 font-medium">
+            You're registered for this event
+          </div>
+        )}
+        
+        {/* Calendar buttons */}
+        {(isRegistered || status !== 'ended') && (
+          <div className="flex space-x-2 mt-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1"
+              onClick={() => window.open(generateGoogleCalLink(), '_blank')}
+            >
+              <Calendar size={16} className="mr-2" />
+              Add to Google Calendar
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1"
+              onClick={() => window.open(generateOutlookCalLink(), '_blank')}
+            >
+              <Calendar size={16} className="mr-2" />
+              Add to Outlook
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

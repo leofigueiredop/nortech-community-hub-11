@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { EVENTS } from '@/components/events/EventTypes';
 import WeeklyCalendarView from '@/components/events/WeeklyCalendarView';
 import EventTypeFilter, { EventTypeKey } from '@/components/events/EventTypeFilter';
+import { useNotifications } from '@/context/NotificationsContext';
 
 const EventsWeekly = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
@@ -17,6 +18,7 @@ const EventsWeekly = () => {
     Object.keys(EVENTS.reduce((types, event) => ({ ...types, [event.type]: true }), {})) as EventTypeKey[]
   );
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
 
   // Filter events when selectedTypes changes
   useEffect(() => {
@@ -29,18 +31,37 @@ const EventsWeekly = () => {
 
   // RSVP handler
   const handleRSVP = (eventId: number) => {
-    toast({
-      title: "RSVP Confirmed",
-      description: `You've successfully registered for this event!`,
-    });
+    // Get the event that is being registered for
+    const event = allEvents.find(e => e.id === eventId);
     
-    const updatedEvents = allEvents.map(event => 
-      event.id === eventId 
-        ? { ...event, attendees: event.attendees + 1 }
-        : event
+    if (event) {
+      // Show toast notification
+      toast({
+        title: "Registration Confirmed",
+        description: `You've successfully registered for "${event.title}"`,
+      });
+      
+      // Add to notifications system
+      addNotification({
+        type: 'event',
+        title: 'Event Registration Confirmed',
+        message: `You're registered for "${event.title}" on ${event.date.toLocaleDateString()}`,
+        link: '/events/weekly',
+      });
+    }
+    
+    // Update the event's attendees count and registered users
+    setAllEvents(prevEvents => 
+      prevEvents.map(event => 
+        event.id === eventId 
+          ? { 
+              ...event, 
+              attendees: event.attendees + 1,
+              registeredUsers: [...(event.registeredUsers || []), 'current-user'] 
+            }
+          : event
+      )
     );
-    
-    setAllEvents(updatedEvents);
   };
 
   return (

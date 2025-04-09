@@ -8,6 +8,7 @@ import CalendarView from '@/components/events/CalendarView';
 import EventsList from '@/components/events/EventsList';
 import EventGrid from '@/components/events/EventGrid';
 import EventTypeFilter, { EventTypeKey } from '@/components/events/EventTypeFilter';
+import { useNotifications } from '@/context/NotificationsContext';
 
 const Events = () => {
   const [viewType, setViewType] = useState('calendar');
@@ -17,6 +18,7 @@ const Events = () => {
     Object.keys(EVENTS.reduce((types, event) => ({ ...types, [event.type]: true }), {})) as EventTypeKey[]
   );
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
 
   // Filter events when selectedTypes changes
   useEffect(() => {
@@ -29,11 +31,19 @@ const Events = () => {
 
   const handleRSVP = (eventId: number) => {
     setAllEvents(prevEvents => 
-      prevEvents.map(event => 
-        event.id === eventId 
-          ? { ...event, attendees: event.attendees + 1 }
-          : event
-      )
+      prevEvents.map(event => {
+        if (event.id === eventId) {
+          // Add the current user to the registered users list
+          const updatedEvent = { 
+            ...event, 
+            attendees: event.attendees + 1,
+            registeredUsers: [...(event.registeredUsers || []), 'current-user']
+          };
+          
+          return updatedEvent;
+        }
+        return event;
+      })
     );
   };
 
