@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,8 +23,28 @@ import CreateSpace from "./pages/CreateSpace";
 import AITerminal from "./pages/AITerminal";
 import AIMatchmaker from "./pages/AIMatchmaker";
 import PointsDashboard from "./pages/PointsDashboard";
+import Leaderboard from "./pages/Leaderboard";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { PointsProvider } from "./context/PointsContext";
+
+// Import settings pages
+import SettingsIndex from "./pages/settings/Index";
+import General from "./pages/settings/General";
+import Branding from "./pages/settings/Branding";
+import Mobile from "./pages/settings/Mobile";
+import Defaults from "./pages/settings/Defaults";
+import Plans from "./pages/settings/Plans";
+import Subscriptions from "./pages/settings/Subscriptions";
+import Domain from "./pages/settings/Domain";
+import AIAgents from "./pages/settings/AIAgents";
+import Messaging from "./pages/settings/Messaging";
+import Notifications from "./pages/settings/Notifications";
+import Legal from "./pages/settings/Legal";
+import Digest from "./pages/settings/Digest";
+import SSO from "./pages/settings/SSO";
+import Integration from "./pages/settings/Integration";
+import Migration from "./pages/settings/Migration";
+import Paywall from "./pages/settings/Paywall";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +75,7 @@ const App = () => (
               <Route path="/members" element={<Members />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/points" element={<PointsDashboard />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/ai-terminal" element={<AITerminal />} />
               <Route path="/ai-matchmaker" element={<AIMatchmaker />} />
               
