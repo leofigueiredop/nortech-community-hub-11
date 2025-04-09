@@ -1,4 +1,3 @@
-
 import { ContentItem, ContentCategory, Course } from '@/types/library';
 
 // Mock data for the library
@@ -16,7 +15,11 @@ export const CONTENT_ITEMS: ContentItem[] = [
     updatedAt: '2023-09-15T10:30:00Z',
     duration: '45:21',
     views: 1243,
-    featured: true
+    featured: true,
+    pointsEnabled: true,
+    pointsValue: 10,
+    completionCriteria: 'watch_percent',
+    completionThreshold: 80
   },
   {
     id: '2',
@@ -30,7 +33,9 @@ export const CONTENT_ITEMS: ContentItem[] = [
     createdAt: '2023-10-02T14:15:00Z',
     updatedAt: '2023-10-05T09:20:00Z',
     fileSize: '3.2 MB',
-    views: 765
+    views: 765,
+    pointsEnabled: true,
+    pointsValue: 15
   },
   {
     id: '3',
@@ -44,7 +49,10 @@ export const CONTENT_ITEMS: ContentItem[] = [
     createdAt: '2023-08-20T08:45:00Z',
     updatedAt: '2023-08-22T11:30:00Z',
     fileSize: '4.7 MB',
-    views: 2187
+    views: 2187,
+    pointsEnabled: true,
+    pointsValue: 10,
+    completionCriteria: 'scroll_end'
   },
   {
     id: '4',
@@ -58,7 +66,9 @@ export const CONTENT_ITEMS: ContentItem[] = [
     createdAt: '2023-07-10T16:20:00Z',
     updatedAt: '2023-07-12T13:10:00Z',
     duration: '3:15:42',
-    views: 894
+    views: 894,
+    pointsEnabled: false,
+    pointsValue: 0
   },
   {
     id: '5',
@@ -71,7 +81,10 @@ export const CONTENT_ITEMS: ContentItem[] = [
     accessLevel: 'free',
     createdAt: '2023-11-05T09:30:00Z',
     updatedAt: '2023-11-05T09:30:00Z',
-    views: 567
+    views: 567,
+    pointsEnabled: true,
+    pointsValue: 5,
+    completionCriteria: 'view'
   },
   {
     id: '6',
@@ -85,7 +98,11 @@ export const CONTENT_ITEMS: ContentItem[] = [
     createdAt: '2023-10-18T13:45:00Z',
     updatedAt: '2023-10-20T10:15:00Z',
     duration: '37:52',
-    views: 1089
+    views: 1089,
+    pointsEnabled: true,
+    pointsValue: 8,
+    completionCriteria: 'watch_percent',
+    completionThreshold: 75
   },
   {
     id: '7',
@@ -98,7 +115,9 @@ export const CONTENT_ITEMS: ContentItem[] = [
     accessLevel: 'premium',
     createdAt: '2023-11-10T11:20:00Z',
     updatedAt: '2023-11-10T11:20:00Z',
-    views: 432
+    views: 432,
+    pointsEnabled: false,
+    pointsValue: 0
   },
   {
     id: '8',
@@ -111,7 +130,11 @@ export const CONTENT_ITEMS: ContentItem[] = [
     accessLevel: 'free',
     createdAt: '2023-09-28T15:10:00Z',
     updatedAt: '2023-09-30T09:45:00Z',
-    views: 876
+    views: 876,
+    pointsEnabled: true,
+    pointsValue: 5,
+    completionCriteria: 'time_spent',
+    completionThreshold: 120
   }
 ];
 

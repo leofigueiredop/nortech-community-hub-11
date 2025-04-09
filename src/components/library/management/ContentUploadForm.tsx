@@ -15,6 +15,7 @@ import TagsInput from './form/TagsInput';
 import AccessOptions from './form/AccessOptions';
 import ResourceUrlInput from './form/ResourceUrlInput';
 import { needsFileUpload, needsUrlInput } from './constants/contentFormOptions';
+import { POINTS_VALUES } from '@/context/PointsContext';
 
 interface ContentUploadFormProps {
   isOpen: boolean;
@@ -31,7 +32,11 @@ const formSchema = z.object({
   tags: z.string().optional(),
   accessLevel: z.enum(["free", "premium"]),
   visibility: z.enum(["public", "vip-only", "limited-time"]).optional(),
-  categoryId: z.string().optional()
+  categoryId: z.string().optional(),
+  pointsEnabled: z.boolean().default(false),
+  pointsValue: z.number().default(POINTS_VALUES.content_completion),
+  completionCriteria: z.enum(["view", "scroll_end", "watch_percent", "time_spent"]).optional(),
+  completionThreshold: z.number().optional()
 });
 
 const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, onSave, editItem }) => {
@@ -51,7 +56,11 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
       tags: '',
       accessLevel: 'free',
       visibility: 'public',
-      categoryId: ''
+      categoryId: '',
+      pointsEnabled: false,
+      pointsValue: POINTS_VALUES.content_completion,
+      completionCriteria: 'view',
+      completionThreshold: 80
     }
   });
 
@@ -65,7 +74,11 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
         tags: editItem.tags.join(', '),
         accessLevel: editItem.accessLevel,
         visibility: editItem.visibility || 'public',
-        categoryId: editItem.categoryId || ''
+        categoryId: editItem.categoryId || '',
+        pointsEnabled: editItem.pointsEnabled || false,
+        pointsValue: editItem.pointsValue || POINTS_VALUES.content_completion,
+        completionCriteria: editItem.completionCriteria || 'view',
+        completionThreshold: editItem.completionThreshold || 80
       });
       setSelectedTags(editItem.tags);
       setPreviewImage(editItem.thumbnailUrl || null);
@@ -78,7 +91,11 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
         tags: '',
         accessLevel: 'free',
         visibility: 'public',
-        categoryId: ''
+        categoryId: '',
+        pointsEnabled: false,
+        pointsValue: POINTS_VALUES.content_completion,
+        completionCriteria: 'view',
+        completionThreshold: 80
       });
       setSelectedTags([]);
       setPreviewImage(null);
@@ -104,7 +121,11 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
       views: editItem?.views || 0,
       categoryId: values.categoryId === 'none' ? undefined : values.categoryId,
       visibility: values.visibility as ContentVisibility || 'public',
-      featured: editItem?.featured || false
+      featured: editItem?.featured || false,
+      pointsEnabled: values.pointsEnabled,
+      pointsValue: values.pointsValue,
+      completionCriteria: values.completionCriteria,
+      completionThreshold: values.completionThreshold
     };
     
     // Add optional fields based on format
