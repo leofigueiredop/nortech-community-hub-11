@@ -27,7 +27,7 @@ const ViewControls: React.FC<ViewControlsProps> = ({
     <div className="flex items-center gap-3">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="flex items-center gap-2 rounded-full border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <Eye size={16} />
             {!isMobile ? (
               <>
@@ -60,7 +60,7 @@ const ViewControls: React.FC<ViewControlsProps> = ({
 
       <Button 
         onClick={onCreatePost}
-        className="bg-purple-600 hover:bg-purple-700 text-white flex gap-2 rounded-full"
+        className="bg-purple-600 hover:bg-purple-700 text-white flex gap-2"
         size={isMobile ? "sm" : "default"}
       >
         <PlusCircle size={isMobile ? 16 : 18} />

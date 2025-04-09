@@ -46,24 +46,24 @@ const FeedSegmentTabs: React.FC<FeedSegmentTabsProps> = ({
         onValueChange={setActiveSegment}
         className="w-full"
       >
-        <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto rounded-full p-1 bg-gray-100 dark:bg-gray-800 mb-4">
+        <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto p-1 bg-gray-100 dark:bg-gray-800 mb-4">
           <TabsTrigger 
             value="all" 
-            className="rounded-full flex items-center gap-2 py-2 data-[state=active]:bg-white data-[state=active]:text-purple-700 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white shadow-none data-[state=active]:shadow-sm transition-all"
+            className="flex items-center gap-2 py-2 data-[state=active]:bg-white data-[state=active]:text-purple-700 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white shadow-none data-[state=active]:shadow-sm transition-all"
           >
             <Layers size={16} />
             <span>All</span>
           </TabsTrigger>
           <TabsTrigger 
             value="free" 
-            className="rounded-full flex items-center gap-2 py-2 data-[state=active]:bg-white data-[state=active]:text-purple-700 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white shadow-none data-[state=active]:shadow-sm transition-all"
+            className="flex items-center gap-2 py-2 data-[state=active]:bg-white data-[state=active]:text-purple-700 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white shadow-none data-[state=active]:shadow-sm transition-all"
           >
             <Unlock size={16} />
             <span>Free</span>
           </TabsTrigger>
           <TabsTrigger 
             value="premium" 
-            className="rounded-full flex items-center gap-2 py-2 data-[state=active]:bg-white data-[state=active]:text-purple-700 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white shadow-none data-[state=active]:shadow-sm transition-all"
+            className="flex items-center gap-2 py-2 data-[state=active]:bg-white data-[state=active]:text-purple-700 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white shadow-none data-[state=active]:shadow-sm transition-all"
           >
             <Lock size={16} />
             <span>Premium</span>
@@ -71,7 +71,7 @@ const FeedSegmentTabs: React.FC<FeedSegmentTabsProps> = ({
         </TabsList>
 
         {['all', 'free', 'premium'].map((segment) => (
-          <TabsContent key={segment} value={segment} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-x-auto border border-gray-200 dark:border-gray-700 p-2 flex flex-nowrap gap-1">
+          <TabsContent key={segment} value={segment} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 flex flex-nowrap gap-1 overflow-x-auto">
             {getFilteredSpaces()
               .filter(space => {
                 if (segment === 'all') return true;

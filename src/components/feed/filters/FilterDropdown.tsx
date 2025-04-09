@@ -37,7 +37,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2 rounded-full border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <Filter size={16} />
           <span>Filter</span>
         </Button>

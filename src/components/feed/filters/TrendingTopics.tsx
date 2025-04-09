@@ -20,7 +20,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({
 }) => {
   return (
     <>
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="bg-white dark:bg-gray-800 p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <TrendingUp size={16} className="text-purple-500" />
@@ -39,7 +39,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({
             <Badge 
               key={tag}
               variant={selectedTags.includes(tag) ? "default" : "outline"} 
-              className={`cursor-pointer rounded-full transition-colors ${
+              className={`cursor-pointer ${
                 selectedTags.includes(tag) 
                   ? 'bg-purple-500 hover:bg-purple-600' 
                   : 'hover:bg-purple-100 dark:hover:bg-purple-900 border-purple-200'
@@ -54,13 +54,13 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({
       
       {/* Only show active filters when there are any */}
       {selectedTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center mt-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+        <div className="flex flex-wrap gap-2 items-center mt-4 p-3 bg-gray-50 dark:bg-gray-900">
           <span className="text-sm font-medium">Active:</span>
           {selectedTags.map(tag => (
             <Badge 
               key={tag}
               variant="default" 
-              className="bg-purple-500 hover:bg-purple-600 cursor-pointer flex items-center gap-1 rounded-full"
+              className="bg-purple-500 hover:bg-purple-600 cursor-pointer flex items-center gap-1"
             >
               #{tag}
               <button onClick={() => toggleTag(tag)} className="ml-1">
