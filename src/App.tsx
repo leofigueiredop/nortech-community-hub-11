@@ -21,6 +21,7 @@ import Analytics from "./pages/Analytics";
 import CreateSpace from "./pages/CreateSpace";
 import AITerminal from "./pages/AITerminal";
 import AIMatchmaker from "./pages/AIMatchmaker";
+import { NotificationsProvider } from "./context/NotificationsContext";
 
 // Import Settings Pages
 import SettingsIndex from "./pages/settings/Index";
@@ -35,6 +36,7 @@ import AIAgents from "./pages/settings/AIAgents";
 import Messaging from "./pages/settings/Messaging";
 import Legal from "./pages/settings/Legal";
 import Digest from "./pages/settings/Digest";
+import Notifications from "./pages/settings/Notifications";
 import SSO from "./pages/settings/SSO";
 import Integration from "./pages/settings/Integration";
 import Migration from "./pages/settings/Migration";
@@ -44,53 +46,56 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/onboarding/community" element={<Community />} />
-          <Route path="/onboarding/profile" element={<Profile />} />
-          <Route path="/onboarding/features" element={<Features />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/create-post" element={<CreatePost />} />
-          <Route path="/create-space" element={<CreateSpace />} />
-          
-          {/* New Routes */}
-          <Route path="/discussions" element={<Discussions />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/live-streams" element={<LiveStreams />} />
-          <Route path="/members" element={<Members />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/ai-terminal" element={<AITerminal />} />
-          <Route path="/ai-matchmaker" element={<AIMatchmaker />} />
-          
-          {/* Settings Routes */}
-          <Route path="/settings" element={<SettingsIndex />} />
-          <Route path="/settings/general" element={<General />} />
-          <Route path="/settings/branding" element={<Branding />} />
-          <Route path="/settings/mobile" element={<Mobile />} />
-          <Route path="/settings/defaults" element={<Defaults />} />
-          <Route path="/settings/plans" element={<Plans />} />
-          <Route path="/settings/subscriptions" element={<Subscriptions />} />
-          <Route path="/settings/domain" element={<Domain />} />
-          <Route path="/settings/ai-agents" element={<AIAgents />} />
-          <Route path="/settings/messaging" element={<Messaging />} />
-          <Route path="/settings/legal" element={<Legal />} />
-          <Route path="/settings/digest" element={<Digest />} />
-          <Route path="/settings/sso" element={<SSO />} />
-          <Route path="/settings/integration" element={<Integration />} />
-          <Route path="/settings/migration" element={<Migration />} />
-          <Route path="/settings/paywall" element={<Paywall />} />
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <NotificationsProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/onboarding/community" element={<Community />} />
+            <Route path="/onboarding/profile" element={<Profile />} />
+            <Route path="/onboarding/features" element={<Features />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/create-post" element={<CreatePost />} />
+            <Route path="/create-space" element={<CreateSpace />} />
+            
+            {/* New Routes */}
+            <Route path="/discussions" element={<Discussions />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/live-streams" element={<LiveStreams />} />
+            <Route path="/members" element={<Members />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/ai-terminal" element={<AITerminal />} />
+            <Route path="/ai-matchmaker" element={<AIMatchmaker />} />
+            
+            {/* Settings Routes */}
+            <Route path="/settings" element={<SettingsIndex />} />
+            <Route path="/settings/general" element={<General />} />
+            <Route path="/settings/branding" element={<Branding />} />
+            <Route path="/settings/mobile" element={<Mobile />} />
+            <Route path="/settings/defaults" element={<Defaults />} />
+            <Route path="/settings/plans" element={<Plans />} />
+            <Route path="/settings/subscriptions" element={<Subscriptions />} />
+            <Route path="/settings/domain" element={<Domain />} />
+            <Route path="/settings/ai-agents" element={<AIAgents />} />
+            <Route path="/settings/messaging" element={<Messaging />} />
+            <Route path="/settings/notifications" element={<Notifications />} />
+            <Route path="/settings/legal" element={<Legal />} />
+            <Route path="/settings/digest" element={<Digest />} />
+            <Route path="/settings/sso" element={<SSO />} />
+            <Route path="/settings/integration" element={<Integration />} />
+            <Route path="/settings/migration" element={<Migration />} />
+            <Route path="/settings/paywall" element={<Paywall />} />
+            
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </NotificationsProvider>
   </QueryClientProvider>
 );
 

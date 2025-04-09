@@ -5,6 +5,7 @@ import { Bell, MessageSquare, Search, Settings, PlusCircle, Eye, ChevronDown, Ch
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useViewContext } from './MainLayout';
+import NotificationBell from '@/components/notifications/NotificationBell';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -126,9 +127,7 @@ const Header: React.FC<HeaderProps> = ({ title = "Home", children }) => {
           </div>
           
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="rounded-full text-gray-600 dark:text-gray-300">
-              <Bell size={20} />
-            </Button>
+            <NotificationBell />
             <Button variant="ghost" size="icon" className="rounded-full text-gray-600 dark:text-gray-300">
               <MessageSquare size={20} />
             </Button>
