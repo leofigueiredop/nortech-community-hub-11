@@ -31,8 +31,10 @@ const PaywallPreviewDialog: React.FC<PaywallPreviewDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="py-4">
-          {template}
+        <div className="py-4 max-h-[60vh] overflow-y-auto">
+          <div className="max-w-xs mx-auto">
+            {template}
+          </div>
         </div>
         
         <DialogFooter>

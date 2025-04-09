@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import PaymentIcon from './PaymentIcon';
 
 const PaymentOptionsSection: React.FC = () => {
   return (
@@ -16,15 +17,24 @@ const PaymentOptionsSection: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-8 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold">
-                VISA
-              </div>
-              <div className="w-12 h-8 bg-red-100 dark:bg-red-900 rounded flex items-center justify-center text-red-600 dark:text-red-300 font-bold">
-                MC
-              </div>
-              <div className="w-12 h-8 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center text-gray-600 dark:text-gray-300 font-bold">
-                PIX
-              </div>
+              <PaymentIcon 
+                name="VISA" 
+                bgColorClass="bg-blue-100 dark:bg-blue-900" 
+                textColorClass="text-blue-600 dark:text-blue-300" 
+                type="square"
+              />
+              <PaymentIcon 
+                name="MC" 
+                bgColorClass="bg-red-100 dark:bg-red-900" 
+                textColorClass="text-red-600 dark:text-red-300" 
+                type="square"
+              />
+              <PaymentIcon 
+                name="PIX" 
+                bgColorClass="bg-gray-100 dark:bg-gray-700" 
+                textColorClass="text-gray-600 dark:text-gray-300" 
+                type="square"
+              />
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Accept credit cards, debit cards, and local payment methods like PIX (Brazil).
@@ -40,15 +50,24 @@ const PaymentOptionsSection: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center text-amber-600 dark:text-amber-300 font-bold text-xs">
-                BTC
-              </div>
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold text-xs">
-                ETH
-              </div>
-              <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center text-green-600 dark:text-green-300 font-bold text-xs">
-                USDC
-              </div>
+              <PaymentIcon 
+                name="BTC" 
+                bgColorClass="bg-amber-100 dark:bg-amber-900" 
+                textColorClass="text-amber-600 dark:text-amber-300" 
+                type="circle"
+              />
+              <PaymentIcon 
+                name="ETH" 
+                bgColorClass="bg-blue-100 dark:bg-blue-900" 
+                textColorClass="text-blue-600 dark:text-blue-300" 
+                type="circle"
+              />
+              <PaymentIcon 
+                name="USDC" 
+                bgColorClass="bg-green-100 dark:bg-green-900" 
+                textColorClass="text-green-600 dark:text-green-300" 
+                type="circle"
+              />
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Accept Bitcoin, Ethereum, USDC and other major cryptocurrencies with our integrated payment gateway.
@@ -63,7 +82,7 @@ const PaymentOptionsSection: React.FC = () => {
         <p className="text-gray-600 dark:text-gray-400 mb-4">
           Contact our team to discuss enterprise solutions, custom features, or special requirements.
         </p>
-        <Button variant="default" className="bg-nortech-purple hover:bg-nortech-purple/90">Contact Sales</Button>
+        <Button variant="default" className="bg-purple-600 hover:bg-purple-700">Contact Sales</Button>
       </div>
     </div>
   );
