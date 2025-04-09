@@ -1,29 +1,28 @@
 
 import React, { useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   MessageSquare, 
   ThumbsUp, 
-  Share2, 
+  Share, 
   MoreHorizontal, 
-  Flag, 
-  Bookmark, 
-  Calendar, 
-  Play, 
+  Calendar,
+  Video,
   BookOpen,
-  Lock
+  Pin,
+  Lock,
+  Unlock
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { Badge } from '@/components/ui/badge';
 
 export interface PostProps {
   id: string;
@@ -32,286 +31,187 @@ export interface PostProps {
     avatar: string;
     role?: string;
   };
-  content: string;
   title?: string;
+  content: string;
   createdAt: string;
   likes: number;
   comments: number;
   space: string;
+  type?: 'post' | 'event' | 'live' | 'content';
   isPinned?: boolean;
   isAnnouncement?: boolean;
   isPaid?: boolean;
-  tags?: string[];
-  type?: 'post' | 'event' | 'live' | 'content';
   teaser?: string;
+  tags?: string[];
+  accessBadge?: 'free' | 'premium' | 'unlocked';
+  showAccessBadge?: boolean;
 }
 
-const Post: React.FC<PostProps> = ({
-  id,
-  author,
-  content,
-  title,
-  createdAt,
-  likes,
+const Post: React.FC<PostProps> = ({ 
+  id, 
+  author, 
+  title, 
+  content, 
+  createdAt, 
+  likes, 
   comments,
   space,
+  type,
   isPinned,
   isAnnouncement,
   isPaid,
-  tags = [],
-  type = 'post',
-  teaser
+  teaser,
+  tags,
+  accessBadge = 'free',
+  showAccessBadge = false
 }) => {
-  const [liked, setLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
-  const [showComments, setShowComments] = useState(false);
-  const [newComment, setNewComment] = useState('');
-  const [bookmarked, setBookmarked] = useState(false);
-  const { toast } = useToast();
-
+  
   const handleLike = () => {
-    if (liked) {
-      setLikeCount(likeCount - 1);
+    if (isLiked) {
+      setLikeCount(prev => prev - 1);
     } else {
-      setLikeCount(likeCount + 1);
+      setLikeCount(prev => prev + 1);
     }
-    setLiked(!liked);
+    setIsLiked(!isLiked);
   };
-
-  const handleBookmark = () => {
-    setBookmarked(!bookmarked);
-    toast({
-      title: bookmarked ? "Removed from bookmarks" : "Added to bookmarks",
-      description: bookmarked ? "This post has been removed from your bookmarks." : "This post has been saved to your bookmarks.",
-    });
-  };
-
-  const handleCommentSubmit = () => {
-    if (!newComment.trim()) return;
-    
-    toast({
-      title: "Comment added",
-      description: "Your comment has been added to this post.",
-    });
-    
-    setNewComment('');
-  };
-
+  
   const getTypeIcon = () => {
     switch (type) {
       case 'event':
-        return <Calendar className="h-4 w-4 mr-1" />;
+        return <Calendar size={14} className="mr-1" />;
       case 'live':
-        return <Play className="h-4 w-4 mr-1" />;
+        return <Video size={14} className="mr-1" />;
       case 'content':
-        return <BookOpen className="h-4 w-4 mr-1" />;
+        return <BookOpen size={14} className="mr-1" />;
       default:
         return null;
     }
   };
-
-  const getTypeBadge = () => {
-    switch (type) {
-      case 'event':
+  
+  const getAccessBadge = () => {
+    if (!showAccessBadge) return null;
+    
+    switch (accessBadge) {
+      case 'premium':
         return (
-          <Badge variant="secondary" className="ml-2 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300">
-            {getTypeIcon()}
-            Event
+          <Badge className="bg-amber-500 hover:bg-amber-600 ml-2 flex items-center gap-1">
+            <Lock size={12} />
+            Premium
           </Badge>
         );
-      case 'live':
+      case 'free':
         return (
-          <Badge variant="secondary" className="ml-2 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-            {getTypeIcon()}
-            Live
+          <Badge className="bg-green-500 hover:bg-green-600 ml-2 flex items-center gap-1">
+            <Unlock size={12} />
+            Free
           </Badge>
         );
-      case 'content':
+      case 'unlocked':
         return (
-          <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-            {getTypeIcon()}
-            New Content
+          <Badge className="bg-blue-500 hover:bg-blue-600 ml-2 flex items-center gap-1">
+            <Unlock size={12} />
+            Unlocked
           </Badge>
         );
       default:
         return null;
     }
   };
-
+  
   return (
-    <Card className="mb-4 border-gray-200 dark:border-gray-800">
-      <CardHeader className="p-4 pb-0 flex flex-row items-start justify-between space-y-0">
-        <div className="flex items-start space-x-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={author.avatar} alt={author.name} />
-            <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="flex items-center flex-wrap">
-              <span className="font-semibold text-base">{author.name}</span>
-              {author.role && (
-                <span className="ml-2 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded-full">
-                  {author.role}
-                </span>
-              )}
-              {isPinned && (
-                <span className="ml-2 text-xs bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 px-2 py-0.5 rounded-full">
-                  Pinned
-                </span>
-              )}
-              {isAnnouncement && (
-                <span className="ml-2 text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-0.5 rounded-full">
-                  Announcement
-                </span>
-              )}
-              {getTypeBadge()}
-              {isPaid && (
-                <Badge className="ml-2 bg-nortech-purple text-white">
-                  <Lock className="h-3 w-3 mr-1" />
-                  Premium
-                </Badge>
-              )}
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
-              <span>{createdAt}</span>
-              <span className="mx-1">•</span>
-              <span>{space}</span>
+    <Card className={`shadow-sm ${isPinned ? 'border-l-4 border-l-purple-500' : ''}`}>
+      <CardHeader className="pb-2 space-y-0">
+        <div className="flex justify-between items-start">
+          <div className="flex items-start space-x-3">
+            <Avatar>
+              <AvatarImage src={author.avatar} alt={author.name} />
+              <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="flex items-center">
+                <span className="font-semibold">{author.name}</span>
+                {author.role && (
+                  <Badge variant="outline" className="ml-2 text-xs">{author.role}</Badge>
+                )}
+                {isPinned && (
+                  <Badge variant="outline" className="ml-2 text-xs flex items-center">
+                    <Pin size={10} className="mr-1" />
+                    Pinned
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center">
+                <span className="text-xs text-muted-foreground">{createdAt}</span>
+                <span className="mx-1 text-muted-foreground">•</span>
+                <span className="text-xs text-muted-foreground">{space}</span>
+                {type && (
+                  <>
+                    <span className="mx-1 text-muted-foreground">•</span>
+                    <span className="text-xs text-muted-foreground flex items-center">
+                      {getTypeIcon()}
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </span>
+                  </>
+                )}
+                {getAccessBadge()}
+              </div>
             </div>
           </div>
-        </div>
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <MoreHorizontal className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-            <DropdownMenuItem className="cursor-pointer" onClick={handleBookmark}>
-              <Bookmark className="h-4 w-4 mr-2" />
-              {bookmarked ? 'Remove bookmark' : 'Bookmark post'}
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              Copy link
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600 dark:text-red-400 cursor-pointer">
-              <Flag className="h-4 w-4 mr-2" />
-              Report
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </CardHeader>
-      
-      <CardContent className="p-4">
-        {title && <h3 className="text-lg font-semibold mb-2">{title}</h3>}
-        <div className="whitespace-pre-wrap">
-          {isPaid && !teaser ? (
-            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md text-center">
-              <Lock className="mx-auto h-8 w-8 text-nortech-purple mb-2" />
-              <p className="font-medium">This content is only available to premium members</p>
-              <Button className="mt-3 bg-nortech-purple hover:bg-nortech-purple/90">
-                Upgrade to Access
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreHorizontal size={16} />
               </Button>
-            </div>
-          ) : isPaid && teaser ? (
-            <>
-              <p>{teaser}</p>
-              <div className="mt-4 bg-gray-50 dark:bg-gray-800 p-4 rounded-md text-center">
-                <p className="font-medium mb-2">Continue reading with a premium membership</p>
-                <Button className="bg-nortech-purple hover:bg-nortech-purple/90">
-                  Upgrade to Access
-                </Button>
-              </div>
-            </>
-          ) : (
-            content
-          )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>Save Post</DropdownMenuItem>
+              <DropdownMenuItem>Report</DropdownMenuItem>
+              <DropdownMenuItem>Copy Link</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        
-        {tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
+      </CardHeader>
+      <CardContent className="pt-3">
+        {title && <h3 className="text-lg font-semibold mb-2">{title}</h3>}
+        <p className="whitespace-pre-line text-sm">
+          {isPaid && !isAnnouncement ? teaser : content}
+          {isPaid && !isAnnouncement && (
+            <Button variant="link" className="text-nortech-purple p-0 h-auto">
+              Unlock Premium Content
+            </Button>
+          )}
+        </p>
+        {tags && tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-3">
             {tags.map(tag => (
-              <Badge key={tag} variant="outline" className="hover:bg-slate-100">
-                #{tag}
-              </Badge>
+              <Link key={tag} to={`/tag/${tag.toLowerCase()}`}>
+                <Badge variant="secondary" className="text-xs cursor-pointer hover:bg-secondary/80">
+                  #{tag}
+                </Badge>
+              </Link>
             ))}
           </div>
         )}
       </CardContent>
-      
-      <CardFooter className="p-4 pt-0 flex flex-col">
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {likeCount} likes • {comments} comments
-            </span>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between w-full pt-3 border-t mt-3 border-gray-200 dark:border-gray-800">
+      <CardFooter className="pt-0 flex justify-between">
+        <div className="flex space-x-2">
           <Button 
             variant="ghost" 
             size="sm" 
-            className={`flex-1 ${liked ? 'text-blue-600 dark:text-blue-400' : ''}`}
+            className={`text-xs flex items-center gap-1 ${isLiked ? 'text-purple-600' : ''}`}
             onClick={handleLike}
           >
-            <ThumbsUp className="h-4 w-4 mr-2" />
-            Like
+            <ThumbsUp size={14} /> {likeCount}
           </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="flex-1"
-            onClick={() => setShowComments(!showComments)}
-          >
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Comment
-          </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="flex-1"
-            onClick={handleBookmark}
-          >
-            <Bookmark className={`h-4 w-4 mr-2 ${bookmarked ? 'fill-current' : ''}`} />
-            Save
-          </Button>
-          
-          <Button variant="ghost" size="sm" className="flex-1">
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
+          <Button variant="ghost" size="sm" className="text-xs flex items-center gap-1">
+            <MessageSquare size={14} /> {comments}
           </Button>
         </div>
-        
-        {showComments && (
-          <div className="mt-4 w-full">
-            <div className="flex items-start space-x-3 mb-4">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <Textarea
-                  placeholder="Write a comment..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="min-h-[60px] resize-none"
-                />
-                <div className="flex justify-end mt-2">
-                  <Button 
-                    size="sm" 
-                    className="bg-nortech-purple hover:bg-nortech-purple/90"
-                    onClick={handleCommentSubmit}
-                    disabled={!newComment.trim()}
-                  >
-                    Post
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <Button variant="ghost" size="sm" className="text-xs flex items-center gap-1">
+          <Share size={14} /> Share
+        </Button>
       </CardFooter>
     </Card>
   );

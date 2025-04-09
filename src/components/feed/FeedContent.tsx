@@ -5,6 +5,7 @@ import Post from '@/components/post/Post';
 import FeedFilters from '@/components/feed/FeedFilters';
 import EmptyFeed from '@/components/feed/EmptyFeed';
 import FeedPagination from '@/components/feed/FeedPagination';
+import PremiumContentUpgrade from '@/components/feed/PremiumContentUpgrade';
 
 interface FeedContentProps {
   posts: PostProps[];
@@ -21,6 +22,7 @@ interface FeedContentProps {
   onPageChange: (page: number) => void;
   hasFilters: boolean;
   onClearFilters: () => void;
+  activeSegment?: string;
 }
 
 const FeedContent: React.FC<FeedContentProps> = ({
@@ -37,8 +39,12 @@ const FeedContent: React.FC<FeedContentProps> = ({
   totalPages,
   onPageChange,
   hasFilters,
-  onClearFilters
+  onClearFilters,
+  activeSegment = 'all'
 }) => {
+  // Show premium upgrade CTA if in premium segment with no posts
+  const showPremiumUpgrade = activeSegment === 'premium' && posts.length === 0;
+
   return (
     <div className="w-full">
       <FeedFilters 
@@ -56,7 +62,11 @@ const FeedContent: React.FC<FeedContentProps> = ({
         <>
           <div className="space-y-4">
             {posts.map(post => (
-              <Post key={post.id} {...post} />
+              <Post 
+                key={post.id} 
+                {...post} 
+                showAccessBadge={activeSegment !== 'all'}
+              />
             ))}
           </div>
           
@@ -68,6 +78,8 @@ const FeedContent: React.FC<FeedContentProps> = ({
             />
           )}
         </>
+      ) : showPremiumUpgrade ? (
+        <PremiumContentUpgrade />
       ) : (
         <EmptyFeed 
           hasFilters={hasFilters} 

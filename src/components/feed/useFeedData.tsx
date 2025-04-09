@@ -18,7 +18,8 @@ const samplePosts: PostProps[] = [
     space: 'Announcements',
     isPinned: true,
     isAnnouncement: true,
-    tags: ['Welcome', 'Community']
+    tags: ['Welcome', 'Community'],
+    accessBadge: 'free'
   },
   {
     id: '2',
@@ -31,7 +32,8 @@ const samplePosts: PostProps[] = [
     likes: 15,
     comments: 3,
     space: 'General Discussion',
-    tags: ['Course', 'Feedback']
+    tags: ['Course', 'Feedback'],
+    accessBadge: 'free'
   },
   {
     id: '3',
@@ -48,7 +50,8 @@ const samplePosts: PostProps[] = [
     space: 'Premium Group',
     isPaid: true,
     teaser: 'Hey everyone! I\'ve just uploaded some new resources that might be helpful for those working on the side project challenge...',
-    tags: ['Resources', 'Projects']
+    tags: ['Resources', 'Projects'],
+    accessBadge: 'premium'
   },
   {
     id: '4',
@@ -64,7 +67,8 @@ const samplePosts: PostProps[] = [
     comments: 9,
     space: 'Events',
     type: 'event',
-    tags: ['Web3', 'Workshop', 'Blockchain']
+    tags: ['Web3', 'Workshop', 'Blockchain'],
+    accessBadge: 'free'
   },
   {
     id: '5',
@@ -79,7 +83,8 @@ const samplePosts: PostProps[] = [
     comments: 23,
     space: 'Live Streams',
     type: 'live',
-    tags: ['Career', 'Q&A', 'LiveStream']
+    tags: ['Career', 'Q&A', 'LiveStream'],
+    accessBadge: 'premium'
   },
   {
     id: '6',
@@ -97,7 +102,8 @@ const samplePosts: PostProps[] = [
     type: 'content',
     isPaid: true,
     teaser: 'I\'m excited to announce my new course on Advanced React Patterns is now available for premium members!',
-    tags: ['React', 'Course', 'Development']
+    tags: ['React', 'Course', 'Development'],
+    accessBadge: 'premium'
   }
 ];
 
@@ -119,8 +125,18 @@ export const useFeedData = (postsPerPage: number = 5) => {
     { id: 'mentorship', name: 'Mentorship Circle' }
   ];
 
+  // Assign access badges to posts if not already present
+  const postsWithBadges = samplePosts.map(post => {
+    if (post.accessBadge) return post;
+    
+    return {
+      ...post,
+      accessBadge: post.isPaid ? 'premium' : 'free'
+    };
+  });
+
   // Filter posts based on current filter settings
-  const filteredPosts = samplePosts.filter(post => {
+  const filteredPosts = postsWithBadges.filter(post => {
     if (activeSpace !== 'all' && post.space.toLowerCase() !== activeSpace) {
       return false;
     }

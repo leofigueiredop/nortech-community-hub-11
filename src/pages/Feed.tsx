@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import CreatePostDialog from '@/components/post/CreatePostDialog';
 import SpacesSidebar from '@/components/feed/SpacesSidebar';
@@ -12,11 +12,25 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { useIsMobile } from '@/hooks/use-mobile';
+import FeedSegmentTabs from '@/components/feed/FeedSegmentTabs';
 
 const Feed: React.FC = () => {
   const [createPostOpen, setCreatePostOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isMobile } = useIsMobile();
+  
+  // Get the last selected feed segment from localStorage or default to 'all'
+  const getInitialSegment = () => {
+    const savedSegment = localStorage.getItem('feedSegment');
+    return savedSegment ? savedSegment : 'all';
+  };
+  
+  const [activeSegment, setActiveSegment] = useState(getInitialSegment());
+  
+  // Update localStorage when segment changes
+  useEffect(() => {
+    localStorage.setItem('feedSegment', activeSegment);
+  }, [activeSegment]);
   
   const {
     currentView,
@@ -39,6 +53,17 @@ const Feed: React.FC = () => {
     hasFilters,
     clearAllFilters,
   } = useFeedData();
+
+  // Set accessFilter based on activeSegment
+  useEffect(() => {
+    if (activeSegment === 'free') {
+      setAccessFilter('free');
+    } else if (activeSegment === 'premium') {
+      setAccessFilter('paid');
+    } else {
+      setAccessFilter('all');
+    }
+  }, [activeSegment, setAccessFilter]);
 
   const handleViewChange = (view: string) => {
     setCurrentView(view);
@@ -104,8 +129,13 @@ const Feed: React.FC = () => {
           onCreatePost={() => setCreatePostOpen(true)}
         />
       </div>
+      
+      <FeedSegmentTabs 
+        activeSegment={activeSegment} 
+        setActiveSegment={setActiveSegment} 
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
         {/* Sidebar - Only visible on large screens by default */}
         <div className="hidden lg:block lg:col-span-1">
           <SpacesSidebar 
@@ -132,6 +162,7 @@ const Feed: React.FC = () => {
             onPageChange={setCurrentPage}
             hasFilters={hasFilters}
             onClearFilters={clearAllFilters}
+            activeSegment={activeSegment}
           />
         </div>
       </div>
