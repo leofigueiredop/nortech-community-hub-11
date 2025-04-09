@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Calendar, Users, Video, Laptop, Headphones, Star } from 'lucide-react';
 
@@ -28,6 +29,14 @@ export const EVENT_TYPES = {
     color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
     icon: <Headphones size={14} className="mr-1" />
   }
+};
+
+// Add getTypeFilters function that's being imported in EventsHeader.tsx
+export const getTypeFilters = () => {
+  return Object.entries(EVENT_TYPES).map(([type, details]) => ({
+    type,
+    details
+  }));
 };
 
 export interface Event {
