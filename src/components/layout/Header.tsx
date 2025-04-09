@@ -13,12 +13,12 @@ import {
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { Input } from '@/components/ui/input';
 import {
-  NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuTrigger,
-  NavigationMenuContent,
-} from '@/components/ui/navigation-menu';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export const HeaderPointsBadge: React.FC = () => {
   return (
@@ -70,38 +70,25 @@ const Header: React.FC<{
           
           <HeaderPointsBadge />
           
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="h-8 gap-1 px-2">
-                  <User className="h-5 w-5" />
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="w-56 p-2">
-                    <Link 
-                      to="/onboarding/profile" 
-                      className="block px-3 py-2 text-sm rounded hover:bg-accent"
-                    >
-                      Perfil
-                    </Link>
-                    <Link 
-                      to="/settings/general" 
-                      className="block px-3 py-2 text-sm rounded hover:bg-accent"
-                    >
-                      Configurações
-                    </Link>
-                    <div className="h-px bg-border my-1"></div>
-                    <Link 
-                      to="/" 
-                      className="block px-3 py-2 text-sm rounded hover:bg-accent"
-                    >
-                      Sair
-                    </Link>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                <User className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem asChild>
+                <Link to="/onboarding/profile">Perfil</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/settings/general">Configurações</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/">Sair</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
