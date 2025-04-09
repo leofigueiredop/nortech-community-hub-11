@@ -30,6 +30,7 @@ import { PointsProvider } from "./context/PointsContext";
 import ContentManagement from "./pages/ContentManagement";
 import CourseCreate from "./pages/CourseCreate";
 import CourseEdit from "./pages/CourseEdit";
+import Courses from "./pages/Courses";
 
 // Import settings pages
 import SettingsIndex from "./pages/settings/Index";
@@ -76,6 +77,8 @@ const App = () => (
               
               <Route path="/library" element={<Library />} />
               <Route path="/library/manage" element={<ContentManagement />} />
+              <Route path="/courses" element={<Courses />} />
+              <Route path="/courses/:courseId" element={<Courses />} />
               <Route path="/courses/create" element={<CourseCreate />} />
               <Route path="/courses/edit/:courseId" element={<CourseEdit />} />
               <Route path="/events" element={<Events />} />
