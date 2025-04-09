@@ -28,6 +28,8 @@ import Leaderboard from "./pages/Leaderboard";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { PointsProvider } from "./context/PointsContext";
 import ContentManagement from "./pages/ContentManagement";
+import CourseCreate from "./pages/CourseCreate";
+import CourseEdit from "./pages/CourseEdit";
 
 // Import settings pages
 import SettingsIndex from "./pages/settings/Index";
@@ -74,6 +76,8 @@ const App = () => (
               
               <Route path="/library" element={<Library />} />
               <Route path="/library/manage" element={<ContentManagement />} />
+              <Route path="/courses/create" element={<CourseCreate />} />
+              <Route path="/courses/edit/:courseId" element={<CourseEdit />} />
               <Route path="/events" element={<Events />} />
               <Route path="/live-streams" element={<LiveStreams />} />
               <Route path="/members" element={<Members />} />

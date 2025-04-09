@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { ContentItem, ContentFormat, ContentCategory } from '@/types/library';
+import { ContentItem, ContentFormat, ContentCategory, Course, CourseModule } from '@/types/library';
 
 // Mock data for the library
 const CONTENT_ITEMS: ContentItem[] = [
@@ -125,9 +125,73 @@ const CATEGORIES: ContentCategory[] = [
   { id: '6', name: 'Development', description: 'Software and web development', count: 2 }
 ];
 
+// Mock data for courses
+const COURSES: Course[] = [
+  {
+    id: '1',
+    title: 'Complete Web3 Development Bootcamp',
+    description: 'Comprehensive course covering the fundamentals of Web3 development',
+    thumbnailUrl: '/placeholder.svg',
+    modules: [
+      {
+        id: '1-1',
+        title: 'Introduction to Blockchain',
+        description: 'Learn the basics of blockchain technology',
+        contentItems: ['1', '2'],
+        order: 1,
+        duration: '1:30:00'
+      },
+      {
+        id: '1-2',
+        title: 'Smart Contract Development',
+        description: 'Building and deploying smart contracts',
+        contentItems: ['3', '4'],
+        order: 2,
+        duration: '2:15:00'
+      }
+    ],
+    accessLevel: 'premium',
+    createdAt: '2023-10-20T14:30:00Z',
+    updatedAt: '2023-11-05T09:45:00Z',
+    views: 876,
+    featured: true,
+    tags: ['Web3', 'Development', 'Blockchain', 'Smart Contracts']
+  },
+  {
+    id: '2',
+    title: 'Financial Freedom Masterclass',
+    description: 'Step-by-step guide to achieving financial independence',
+    thumbnailUrl: '/placeholder.svg',
+    modules: [
+      {
+        id: '2-1',
+        title: 'Wealth Building Foundations',
+        description: 'Core principles of building lasting wealth',
+        contentItems: ['5'],
+        order: 1,
+        duration: '1:15:00'
+      },
+      {
+        id: '2-2',
+        title: 'Investment Strategies',
+        description: 'Advanced investment techniques for growth',
+        contentItems: ['6', '7'],
+        order: 2,
+        duration: '1:45:00'
+      }
+    ],
+    accessLevel: 'free',
+    createdAt: '2023-09-10T11:20:00Z',
+    updatedAt: '2023-10-15T13:30:00Z',
+    views: 1245,
+    tags: ['Finance', 'Wealth Building', 'Investment']
+  }
+];
+
 export const useLibraryContent = () => {
   const [content, setContent] = useState<ContentItem[]>(CONTENT_ITEMS);
   const [categories, setCategories] = useState<ContentCategory[]>(CATEGORIES);
+  const [courses, setCourses] = useState<Course[]>(COURSES);
   const [formatFilter, setFormatFilter] = useState<string>('all');
   const [tagFilter, setTagFilter] = useState<string>('all');
   const [accessFilter, setAccessFilter] = useState<string>('all');
@@ -233,6 +297,23 @@ export const useLibraryContent = () => {
     });
   }, []);
 
+  // Course functions
+  const addCourse = useCallback((newCourse: Course) => {
+    setCourses(prev => [...prev, newCourse]);
+  }, []);
+
+  const updateCourse = useCallback((updatedCourse: Course) => {
+    setCourses(prev => 
+      prev.map(course => 
+        course.id === updatedCourse.id ? updatedCourse : course
+      )
+    );
+  }, []);
+
+  const deleteCourse = useCallback((id: string) => {
+    setCourses(prev => prev.filter(course => course.id !== id));
+  }, []);
+
   // Add category
   const addCategory = useCallback((category: ContentCategory) => {
     setCategories(prev => [...prev, category]);
@@ -266,6 +347,7 @@ export const useLibraryContent = () => {
     filteredContent,
     featuredContent,
     categories,
+    courses,
     allTags,
     allFormats,
     formatFilter,
@@ -281,6 +363,9 @@ export const useLibraryContent = () => {
     addContent,
     updateContent,
     deleteContent,
+    addCourse,
+    updateCourse,
+    deleteCourse,
     addCategory,
     updateCategory,
     deleteCategory

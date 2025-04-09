@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { X, Upload, FileText, FileVideo, FileAudio, Link, Image, Youtube, LayoutGrid, Video } from 'lucide-react';
+import { X, Upload, FileText, FileVideo, FileAudio, Link, Image, Youtube, LayoutGrid, Video, BookOpen } from 'lucide-react';
 import { ContentItem, ContentFormat, AccessLevel, ContentVisibility, ContentUpload } from '@/types/library';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { v4 as uuidv4 } from 'uuid';
@@ -32,7 +33,8 @@ const ContentFormatOptions: { value: ContentFormat; label: string; icon: React.R
   { value: 'gdrive', label: 'Google Drive', icon: <LayoutGrid size={16} /> },
   { value: 'link', label: 'External Link', icon: <Link size={16} /> },
   { value: 'image', label: 'Image', icon: <Image size={16} /> },
-  { value: 'text', label: 'Plain Text', icon: <FileText size={16} /> }
+  { value: 'text', label: 'Plain Text', icon: <FileText size={16} /> },
+  { value: 'course', label: 'Course', icon: <BookOpen size={16} /> }
 ];
 
 const formSchema = z.object({

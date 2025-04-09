@@ -1,5 +1,5 @@
 
-export type ContentFormat = 'video' | 'pdf' | 'link' | 'audio' | 'image' | 'text' | 'youtube' | 'vimeo' | 'gdoc' | 'gdrive';
+export type ContentFormat = 'video' | 'pdf' | 'link' | 'audio' | 'image' | 'text' | 'youtube' | 'vimeo' | 'gdoc' | 'gdrive' | 'course';
 export type AccessLevel = 'free' | 'premium';
 export type ContentVisibility = 'public' | 'vip-only' | 'limited-time';
 
@@ -21,6 +21,7 @@ export interface ContentItem {
   categoryId?: string;
   visibility?: ContentVisibility;
   order?: number;
+  modules?: string[]; // IDs of modules for courses
 }
 
 export interface ContentCategory {
@@ -43,4 +44,29 @@ export interface ContentUpload {
   thumbnailUrl?: string;
   categoryId?: string;
   visibility?: ContentVisibility;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  description: string;
+  thumbnailUrl?: string;
+  modules: CourseModule[];
+  accessLevel: AccessLevel;
+  visibility?: ContentVisibility;
+  createdAt: string;
+  updatedAt: string;
+  views: number;
+  featured?: boolean;
+  categoryId?: string;
+  tags: string[];
+}
+
+export interface CourseModule {
+  id: string;
+  title: string;
+  description: string;
+  contentItems: string[]; // IDs of content items
+  order: number;
+  duration?: string;
 }
