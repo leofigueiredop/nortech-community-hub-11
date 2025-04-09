@@ -27,6 +27,7 @@ const ContentSection: React.FC = () => {
         to="/events" 
         icon={<Calendar size={18} />} 
         label="Events" 
+        additionalPaths={['/events/weekly', '/events/calendar']}
       />
       <SidebarLink 
         to="/ai-matchmaker" 

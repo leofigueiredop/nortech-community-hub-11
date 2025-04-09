@@ -16,6 +16,8 @@ import Discussions from "./pages/Discussions";
 import DiscussionTopic from "./pages/DiscussionTopic";
 import Library from "./pages/Library";
 import Events from "./pages/Events";
+import EventsWeekly from "./pages/EventsWeekly";
+import EventsCalendar from "./pages/EventsCalendar";
 import Members from "./pages/Members";
 import Analytics from "./pages/Analytics";
 import CreateSpace from "./pages/CreateSpace";
@@ -82,6 +84,8 @@ const App = () => (
               <Route path="/courses/create" element={<CourseCreate />} />
               <Route path="/courses/edit/:courseId" element={<CourseEdit />} />
               <Route path="/events" element={<Events />} />
+              <Route path="/events/weekly" element={<EventsWeekly />} />
+              <Route path="/events/calendar" element={<EventsCalendar />} />
               <Route path="/members" element={<Members />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/points" element={<PointsDashboard />} />
