@@ -5,7 +5,7 @@ import PaywallSettings from '@/components/settings/PaywallSettings';
 
 const Paywall: React.FC = () => {
   return (
-    <SettingsLayout activeSection="paywall" title="Paywall & Monetization">
+    <SettingsLayout activeSection="paywall" title="Paywall Configuration">
       <PaywallSettings />
     </SettingsLayout>
   );

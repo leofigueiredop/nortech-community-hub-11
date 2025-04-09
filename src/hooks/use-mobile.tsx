@@ -18,11 +18,20 @@ export function useIsMobile() {
     // Check on mount
     checkMobile()
     
-    // Add resize listener
-    window.addEventListener("resize", checkMobile)
+    // Add resize listener with debounce
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkMobile, 100);
+    };
+    
+    window.addEventListener("resize", handleResize)
     
     // Clean up
-    return () => window.removeEventListener("resize", checkMobile)
+    return () => {
+      window.removeEventListener("resize", handleResize)
+      clearTimeout(timeoutId);
+    }
   }, [])
 
   return { isMobile }

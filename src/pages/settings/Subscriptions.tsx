@@ -5,7 +5,7 @@ import SubscriptionSettings from '@/components/settings/SubscriptionSettings';
 
 const Subscriptions: React.FC = () => {
   return (
-    <SettingsLayout activeSection="subscriptions" title="Subscription Plans">
+    <SettingsLayout activeSection="subscriptions" title="Member Subscription Plans">
       <SubscriptionSettings />
     </SettingsLayout>
   );

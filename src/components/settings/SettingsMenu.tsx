@@ -84,18 +84,25 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ className }) => {
       color: "bg-indigo-600"
     },
     {
-      icon: <DollarSign className="h-5 w-5 text-white" />,
-      title: "Plans",
-      description: "Subscription plans and pricing",
+      icon: <CreditCard className="h-5 w-5 text-white" />,
+      title: "Nortech Plans",
+      description: "Your platform subscription options",
       to: "/settings/plans",
       color: "bg-green-600"
     },
     {
-      icon: <CreditCard className="h-5 w-5 text-white" />,
-      title: "Subscriptions",
-      description: "Manage community subscriptions",
+      icon: <DollarSign className="h-5 w-5 text-white" />,
+      title: "Member Subscriptions",
+      description: "Plans for your community members",
       to: "/settings/subscriptions",
       color: "bg-emerald-600"
+    },
+    {
+      icon: <DollarSign className="h-5 w-5 text-white" />,
+      title: "Paywall Setup",
+      description: "Configure monetization options",
+      to: "/settings/paywall",
+      color: "bg-violet-600"
     },
     {
       icon: <Globe className="h-5 w-5 text-white" />,
@@ -152,13 +159,6 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ className }) => {
       description: "Import or export your community data",
       to: "/settings/migration",
       color: "bg-fuchsia-600"
-    },
-    {
-      icon: <DollarSign className="h-5 w-5 text-white" />,
-      title: "Paywall",
-      description: "Monetize your community with paywalls",
-      to: "/settings/paywall",
-      color: "bg-violet-600"
     }
   ];
   

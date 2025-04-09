@@ -5,7 +5,7 @@ import PricingPlans from '@/components/settings/PricingPlans';
 
 const Plans: React.FC = () => {
   return (
-    <SettingsLayout activeSection="plans" title="Pricing Plans">
+    <SettingsLayout activeSection="plans" title="Nortech Platform Plans">
       <PricingPlans />
     </SettingsLayout>
   );
