@@ -10,11 +10,13 @@ import { mockEvents } from '@/components/events/data/EventsMockData';
 import { addPointsForEventAttendance } from '@/utils/pointsTracking';
 import { usePoints } from '@/context/PointsContext';
 
+type ViewType = 'calendar' | 'list' | 'grid';
+
 const Events: React.FC = () => {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
   const [filterType, setFilterType] = useState<EventType | 'all'>('all');
   const { toast } = useToast();
-  const { addPoints } = usePoints();
+  const { addPoints, awardBadge } = usePoints();
   
   // Filter events based on type
   const filteredEvents = filterType === 'all' 
@@ -35,13 +37,17 @@ const Events: React.FC = () => {
     
     // Add points if the event has points value
     if (event.pointsValue && event.pointsValue > 0) {
-      addPoints(event.pointsValue);
+      addPoints({
+        type: 'event_participation',
+        description: `Registered for ${event.title}`,
+        points: event.pointsValue
+      });
       
       // Show toast for points
       toast({
         title: "Points Earned!",
         description: `You earned ${event.pointsValue} points for registering`,
-        variant: "success",
+        variant: "default",
       });
       
       // Track the event attendance with points
@@ -59,7 +65,7 @@ const Events: React.FC = () => {
       <div className="container mx-auto p-4 max-w-7xl">
         <EventsHeader 
           viewType={viewType} 
-          setViewType={setViewType}
+          setViewType={(view: 'grid' | 'list') => setViewType(view)}
           filterType={filterType}
           setFilterType={setFilterType}
         />

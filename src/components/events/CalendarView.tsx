@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import EventCard from './EventCard';
-import { Event } from './EventTypes';
+import { Event } from './types/EventTypes';
 
 interface CalendarViewProps {
   events: Event[];

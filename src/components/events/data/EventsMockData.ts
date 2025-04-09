@@ -1,4 +1,3 @@
-
 import { Event } from '../types/EventTypes';
 
 // Generate random dates for events
@@ -29,7 +28,8 @@ export const mockEvents: Event[] = [
     attendees: 18,
     capacity: 30,
     pointsValue: 150,
-    badgeName: 'React Enthusiast'
+    badgeName: 'React Enthusiast',
+    registeredUsers: []
   },
   {
     id: 2,
@@ -46,7 +46,8 @@ export const mockEvents: Event[] = [
     attendees: 12,
     capacity: 20,
     pointsValue: 50,
-    badgeName: 'Networking Pro'
+    badgeName: 'Networking Pro',
+    registeredUsers: ['current-user']
   },
   {
     id: 3,
@@ -63,7 +64,8 @@ export const mockEvents: Event[] = [
     attendees: 342,
     capacity: 500,
     pointsValue: 300,
-    badgeName: 'Conference Guru'
+    badgeName: 'Conference Guru',
+    registeredUsers: []
   },
   {
     id: 4,
@@ -172,3 +174,6 @@ export const mockEvents: Event[] = [
     badgeName: 'Web Developer'
   }
 ];
+
+// Export for EventsWeekly component
+export const EVENTS = mockEvents;

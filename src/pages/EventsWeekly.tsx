@@ -4,18 +4,19 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { EVENTS } from '@/components/events/data/EventsMockData';
+import { useToast } from '@/components/ui/use-toast';
+import { mockEvents, EVENTS } from '@/components/events/data/EventsMockData';
 import WeeklyCalendarView from '@/components/events/WeeklyCalendarView';
 import EventTypeFilter, { EventTypeKey } from '@/components/events/EventTypeFilter';
 import { useNotifications } from '@/context/NotificationsContext';
+import { EventType } from '@/components/events/types/EventTypes';
 
 const EventsWeekly = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [allEvents, setAllEvents] = useState(EVENTS);
   const [filteredEvents, setFilteredEvents] = useState(EVENTS);
-  const [selectedTypes, setSelectedTypes] = useState<EventTypeKey[]>(
-    Object.keys(EVENTS.reduce((types, event) => ({ ...types, [event.type]: true }), {})) as EventTypeKey[]
+  const [selectedTypes, setSelectedTypes] = useState<EventType[]>(
+    Object.keys(EVENTS.reduce((types, event) => ({ ...types, [event.type]: true }), {})) as EventType[]
   );
   const { toast } = useToast();
   const { addNotification } = useNotifications();
@@ -57,6 +58,7 @@ const EventsWeekly = () => {
           ? { 
               ...event, 
               attendees: event.attendees + 1,
+              isRegistered: true,
               registeredUsers: [...(event.registeredUsers || []), 'current-user'] 
             }
           : event
@@ -87,8 +89,8 @@ const EventsWeekly = () => {
 
         <div className="mb-4">
           <EventTypeFilter 
-            selectedTypes={selectedTypes}
-            onChange={setSelectedTypes}
+            selectedTypes={selectedTypes as any}
+            onChange={setSelectedTypes as any}
           />
         </div>
 

@@ -2,10 +2,11 @@
 import React from 'react';
 import { 
   Users, Coffee, Presentation, VideoIcon, 
-  Briefcase, GraduationCap, HeartHandshake, Trophy 
+  Briefcase, GraduationCap, HeartHandshake, Trophy, 
+  Calendar, Laptop, Headphones, Star
 } from 'lucide-react';
 
-export type EventType = 'workshop' | 'meetup' | 'conference' | 'webinar' | 'career_fair' | 'course' | 'volunteer' | 'competition';
+export type EventType = 'workshop' | 'meetup' | 'conference' | 'webinar' | 'career_fair' | 'course' | 'volunteer' | 'competition' | 'live' | 'mentoria';
 
 export interface Event {
   id: number;
@@ -25,6 +26,7 @@ export interface Event {
   platform?: 'zoom' | 'teams' | 'meet' | 'other';
   pointsValue?: number; // Points earned for attending
   badgeName?: string; // Badge earned for attending
+  registeredUsers?: string[]; // Array of registered user IDs
 }
 
 export const EVENT_TYPES = {
@@ -68,4 +70,22 @@ export const EVENT_TYPES = {
     icon: <Trophy size={14} className="mr-1" />,
     color: 'bg-green-100 text-green-800 border-green-200',
   },
+  live: {
+    label: 'Live',
+    color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+    icon: <Laptop size={14} className="mr-1" />
+  },
+  mentoria: {
+    label: 'Mentoria',
+    color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+    icon: <Headphones size={14} className="mr-1" />
+  }
+};
+
+// Helper function for getting type filters
+export const getTypeFilters = () => {
+  return Object.entries(EVENT_TYPES).map(([type, details]) => ({
+    type,
+    details
+  }));
 };

@@ -3,15 +3,21 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Grid, List, Plus } from 'lucide-react';
-
-type ViewType = 'calendar' | 'list' | 'grid';
+import { EventType } from './types/EventTypes';
 
 interface EventsHeaderProps {
-  viewType: ViewType;
-  setViewType: (view: ViewType) => void;
+  viewType: 'grid' | 'list';
+  setViewType: (view: 'grid' | 'list') => void;
+  filterType: EventType | 'all';
+  setFilterType: (type: EventType | 'all') => void;
 }
 
-const EventsHeader: React.FC<EventsHeaderProps> = ({ viewType, setViewType }) => {
+const EventsHeader: React.FC<EventsHeaderProps> = ({ 
+  viewType, 
+  setViewType, 
+  filterType, 
+  setFilterType 
+}) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <div>
@@ -24,18 +30,9 @@ const EventsHeader: React.FC<EventsHeaderProps> = ({ viewType, setViewType }) =>
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="flex rounded-md shadow-sm">
           <Button
-            variant={viewType === 'calendar' ? 'default' : 'outline'}
-            size="sm"
-            className="rounded-l-md rounded-r-none"
-            onClick={() => setViewType('calendar')}
-          >
-            <Calendar className="h-4 w-4 mr-2" />
-            Calendar
-          </Button>
-          <Button
             variant={viewType === 'list' ? 'default' : 'outline'}
             size="sm"
-            className="rounded-none border-x-0"
+            className="rounded-l-md rounded-r-none"
             onClick={() => setViewType('list')}
           >
             <List className="h-4 w-4 mr-2" />

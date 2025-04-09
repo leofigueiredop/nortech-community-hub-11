@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, isSameDay, eachDayOfInterval, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
-import { Event, EVENT_TYPES } from './EventTypes';
+import { Event } from './types/EventTypes';
 import WeeklyEventCard from './WeeklyEventCard';
 
 interface WeeklyCalendarViewProps {

@@ -1,12 +1,17 @@
-
 import { usePoints, POINTS_VALUES } from '@/context/PointsContext';
 import { ContentItem } from '@/types/library';
 
+// Adding the missing export function
+export const addPointsForEventAttendance = (eventId: number, points: number, badgeName?: string) => {
+  console.log(`Recording attendance for event ${eventId} with ${points} points and badge ${badgeName || 'none'}`);
+  // In a real app, this would make an API call to record attendance
+};
+
 export const usePointsTracking = () => {
-  const { awardPoints, awardBadge } = usePoints();
+  const { addPoints, awardBadge } = usePoints();
   
   const trackLogin = () => {
-    awardPoints({
+    addPoints({
       type: 'login',
       description: 'Daily login bonus',
       points: POINTS_VALUES.login
@@ -14,7 +19,7 @@ export const usePointsTracking = () => {
   };
   
   const trackComment = (postTitle: string) => {
-    awardPoints({
+    addPoints({
       type: 'comment',
       description: `Comment on "${postTitle}"`,
       points: POINTS_VALUES.comment
@@ -22,7 +27,7 @@ export const usePointsTracking = () => {
   };
   
   const trackLike = (postTitle: string) => {
-    awardPoints({
+    addPoints({
       type: 'like',
       description: `Liked "${postTitle}"`,
       points: POINTS_VALUES.like
@@ -30,7 +35,7 @@ export const usePointsTracking = () => {
   };
   
   const trackCourseCompletion = (courseName: string) => {
-    awardPoints({
+    addPoints({
       type: 'course_completion',
       description: `Completed "${courseName}" course`,
       points: POINTS_VALUES.course_completion
@@ -48,7 +53,7 @@ export const usePointsTracking = () => {
   const trackEventParticipation = (eventName: string, eventType?: string, customPoints?: number) => {
     const pointsValue = customPoints || POINTS_VALUES.event_participation;
     
-    awardPoints({
+    addPoints({
       type: 'event_participation',
       description: `Participated in "${eventName}" event`,
       points: pointsValue
@@ -79,7 +84,7 @@ export const usePointsTracking = () => {
   };
   
   const trackReferral = (username: string) => {
-    awardPoints({
+    addPoints({
       type: 'referral',
       description: `Referred user ${username}`,
       points: POINTS_VALUES.referral
@@ -89,7 +94,7 @@ export const usePointsTracking = () => {
   const trackContentView = (content: ContentItem) => {
     if (!content.pointsEnabled) return;
     
-    awardPoints({
+    addPoints({
       type: 'content_view',
       description: `Viewed "${content.title}"`,
       points: content.pointsValue || POINTS_VALUES.content_view
@@ -99,7 +104,7 @@ export const usePointsTracking = () => {
   const trackContentCompletion = (content: ContentItem) => {
     if (!content.pointsEnabled) return;
     
-    awardPoints({
+    addPoints({
       type: 'content_completion',
       description: `Completed "${content.title}"`,
       points: content.pointsValue || POINTS_VALUES.content_completion

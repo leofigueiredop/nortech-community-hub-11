@@ -36,5 +36,6 @@ export const getEventStatus = (event: Event): 'upcoming' | 'happening_soon' | 'i
 
 // Check if user is registered for an event
 export const isUserRegistered = (event: Event, userId: string = 'current-user'): boolean => {
-  return event.registeredUsers?.includes(userId) || false;
+  if (!event.registeredUsers) return event.isRegistered;
+  return event.registeredUsers.includes(userId) || event.isRegistered;
 };
