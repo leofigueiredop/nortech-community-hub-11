@@ -4,14 +4,16 @@ import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { EVENT_TYPES, Event } from './EventTypes';
+import { Event, EVENT_TYPES } from './types/EventTypes';
 
 interface EventGridProps {
   events: Event[];
+  viewType: 'grid' | 'list';
   onRSVP: (eventId: number) => void;
+  onOpenAttendanceModal: (eventId: number) => void;
 }
 
-const EventGrid: React.FC<EventGridProps> = ({ events, onRSVP }) => {
+const EventGrid: React.FC<EventGridProps> = ({ events, viewType, onRSVP, onOpenAttendanceModal }) => {
   if (events.length === 0) {
     return (
       <div className="col-span-full py-8 text-center text-gray-500">

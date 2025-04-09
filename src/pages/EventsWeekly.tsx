@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
-import { mockEvents, EVENTS } from '@/components/events/data/EventsMockData';
+import { mockEvents } from '@/components/events/data/EventsMockData';
 import WeeklyCalendarView from '@/components/events/WeeklyCalendarView';
 import EventTypeFilter, { EventTypeKey } from '@/components/events/EventTypeFilter';
 import { useNotifications } from '@/context/NotificationsContext';
@@ -13,10 +13,10 @@ import { EventType } from '@/components/events/types/EventTypes';
 
 const EventsWeekly = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [allEvents, setAllEvents] = useState(EVENTS);
-  const [filteredEvents, setFilteredEvents] = useState(EVENTS);
+  const [allEvents, setAllEvents] = useState(mockEvents);
+  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
   const [selectedTypes, setSelectedTypes] = useState<EventType[]>(
-    Object.keys(EVENTS.reduce((types, event) => ({ ...types, [event.type]: true }), {})) as EventType[]
+    Object.keys(mockEvents.reduce((types, event) => ({ ...types, [event.type]: true }), {})) as EventType[]
   );
   const { toast } = useToast();
   const { addNotification } = useNotifications();

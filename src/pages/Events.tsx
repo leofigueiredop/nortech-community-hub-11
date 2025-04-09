@@ -33,6 +33,7 @@ const Events: React.FC = () => {
     toast({
       title: "RSVP Successful!",
       description: `You've registered for ${event.title}`,
+      variant: "default"
     });
     
     // Add points if the event has points value

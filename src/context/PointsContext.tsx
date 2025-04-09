@@ -25,6 +25,7 @@ interface PointsContextType {
   pointsHistory: PointsActivity[];
   userBadges: Badge[];
   awardPoints: (activity: Omit<PointsActivity, 'id' | 'timestamp'>) => void;
+  addPoints: (activity: Omit<PointsActivity, 'id' | 'timestamp'>) => void; // Adding this function as an alias
   awardBadge: (badge: Omit<Badge, 'id' | 'createdAt'>) => void;
   getUserLevel: () => { level: number; nextLevel: number; progress: number };
 }
@@ -109,6 +110,9 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     console.log(`Points awarded: ${activity.points} for ${activity.type}`);
   };
   
+  // Adding addPoints as an alias for awardPoints to maintain compatibility
+  const addPoints = awardPoints;
+  
   // Function to award badges
   const awardBadge = (badge: Omit<Badge, 'id' | 'createdAt'>) => {
     // Check if user already has this badge
@@ -183,6 +187,7 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         pointsHistory,
         userBadges,
         awardPoints,
+        addPoints, // Adding the alias to the context value
         awardBadge,
         getUserLevel,
       }}

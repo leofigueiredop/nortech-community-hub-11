@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { EVENT_TYPES } from './types/EventTypes';
+import { EVENT_TYPES, Event } from './types/EventTypes'; 
 import { getEventStatus, isUserRegistered } from './utils/EventUtils';
 import { useNotifications } from '@/context/NotificationsContext';
 import EventAttendanceManager from './attendance/EventAttendanceManager';
@@ -15,23 +15,7 @@ import EventCardActions from './card/EventCardActions';
 import EventCalendarButtons from './card/EventCalendarButtons';
 
 interface EventCardProps {
-  event: {
-    id: number;
-    title: string;
-    description: string;
-    date: Date;
-    time: string;
-    type: keyof typeof EVENT_TYPES;
-    location: string;
-    speaker: string;
-    attendees: number;
-    capacity: number;
-    image: string | null;
-    registeredUsers?: string[];
-    status?: 'upcoming' | 'happening_soon' | 'in_progress' | 'ended';
-    pointsValue?: number;
-    badgeName?: string;
-  };
+  event: Event;
   onRSVP: (eventId: number) => void;
 }
 
