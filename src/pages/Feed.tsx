@@ -6,16 +6,10 @@ import FeedContent from '@/components/feed/FeedContent';
 import SettingsPopover from '@/components/feed/SettingsPopover';
 import ViewControls from '@/components/feed/ViewControls';
 import { useFeedData } from '@/components/feed/useFeedData';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu } from 'lucide-react';
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { useIsMobile } from '@/hooks/use-mobile';
 import FeedSegmentTabs from '@/components/feed/FeedSegmentTabs';
 
 const Feed: React.FC = () => {
   const [createPostOpen, setCreatePostOpen] = useState(false);
-  const { isMobile } = useIsMobile();
   
   // Get the last selected feed segment from localStorage or default to 'all'
   const getInitialSegment = () => {

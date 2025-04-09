@@ -1,4 +1,6 @@
 
+import { PostProps } from '@/components/post/Post';
+
 export const spaceOptions = [
   { id: 'all', name: 'All Spaces' },
   { id: 'announcements', name: 'Announcements' },
@@ -8,7 +10,7 @@ export const spaceOptions = [
   { id: 'mentorship', name: 'Mentorship Circle' }
 ];
 
-export const samplePosts = [
+export const samplePosts: PostProps[] = [
   {
     id: '1',
     author: {
