@@ -7,9 +7,17 @@ import FeedContent from '@/components/feed/FeedContent';
 import SettingsPopover from '@/components/feed/SettingsPopover';
 import ViewControls from '@/components/feed/ViewControls';
 import { useFeedData } from '@/components/feed/useFeedData';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Menu } from 'lucide-react';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Feed: React.FC = () => {
   const [createPostOpen, setCreatePostOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isMobile } = useIsMobile();
+  
   const {
     currentView,
     setCurrentView,
@@ -38,12 +46,57 @@ const Feed: React.FC = () => {
 
   const handleSpaceChange = (space: string) => {
     setActiveSpace(space);
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
   };
+
+  // Mobile sidebar implementation using Drawer
+  const MobileSidebar = () => (
+    <Drawer open={sidebarOpen} onOpenChange={setSidebarOpen}>
+      <DrawerTrigger asChild>
+        <Button variant="outline" size="icon" className="md:hidden">
+          <Menu className="h-5 w-5" />
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent className="h-[80vh]">
+        <div className="p-4">
+          <SpacesSidebar 
+            spaces={spaceOptions} 
+            activeSpace={activeSpace} 
+            onSpaceChange={handleSpaceChange} 
+          />
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+
+  // Desktop sidebar implementation using Sheet
+  const DesktopSidebar = () => (
+    <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+      <SheetTrigger asChild>
+        <Button variant="outline" size="icon" className="hidden md:flex lg:hidden">
+          <Menu className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-80">
+        <SpacesSidebar 
+          spaces={spaceOptions} 
+          activeSpace={activeSpace} 
+          onSpaceChange={handleSpaceChange} 
+        />
+      </SheetContent>
+    </Sheet>
+  );
 
   return (
     <MainLayout title="Feed">
       <div className="flex justify-between items-center mb-6">
-        <SettingsPopover />
+        <div className="flex items-center gap-2">
+          <MobileSidebar />
+          <DesktopSidebar />
+          <SettingsPopover />
+        </div>
         
         <ViewControls
           currentView={currentView}
@@ -52,8 +105,9 @@ const Feed: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Sidebar - Only visible on large screens by default */}
+        <div className="hidden lg:block lg:col-span-1">
           <SpacesSidebar 
             spaces={spaceOptions} 
             activeSpace={activeSpace} 
@@ -61,22 +115,25 @@ const Feed: React.FC = () => {
           />
         </div>
 
-        <FeedContent
-          posts={filteredPosts}
-          contentFilter={contentFilter}
-          setContentFilter={setContentFilter}
-          accessFilter={accessFilter}
-          setAccessFilter={setAccessFilter}
-          selectedTags={selectedTags}
-          setSelectedTags={setSelectedTags}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          hasFilters={hasFilters}
-          onClearFilters={clearAllFilters}
-        />
+        {/* Main content - Takes full width on mobile and tablets, 3/4 on desktop */}
+        <div className="lg:col-span-3 col-span-1 w-full">
+          <FeedContent
+            posts={filteredPosts}
+            contentFilter={contentFilter}
+            setContentFilter={setContentFilter}
+            accessFilter={accessFilter}
+            setAccessFilter={setAccessFilter}
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            hasFilters={hasFilters}
+            onClearFilters={clearAllFilters}
+          />
+        </div>
       </div>
 
       <CreatePostDialog

@@ -23,7 +23,11 @@ const SpacesSidebar: React.FC<SpacesSidebarProps> = ({
           <Button
             key={space.id}
             variant="ghost"
-            className={`w-full justify-start mb-1 ${activeSpace === space.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+            className={`w-full justify-start mb-1 ${
+              activeSpace === space.id 
+                ? 'bg-gray-100 dark:bg-gray-700 font-medium' 
+                : 'hover:bg-gray-50 dark:hover:bg-gray-700/70'
+            }`}
             onClick={() => onSpaceChange(space.id)}
           >
             {space.name}

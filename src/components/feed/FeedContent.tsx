@@ -40,7 +40,7 @@ const FeedContent: React.FC<FeedContentProps> = ({
   onClearFilters
 }) => {
   return (
-    <div className="md:col-span-2">
+    <div className="w-full">
       <FeedFilters 
         contentFilter={contentFilter}
         setContentFilter={setContentFilter}
@@ -54,9 +54,11 @@ const FeedContent: React.FC<FeedContentProps> = ({
 
       {posts.length > 0 ? (
         <>
-          {posts.map(post => (
-            <Post key={post.id} {...post} />
-          ))}
+          <div className="space-y-4">
+            {posts.map(post => (
+              <Post key={post.id} {...post} />
+            ))}
+          </div>
           
           {totalPages > 1 && (
             <FeedPagination 

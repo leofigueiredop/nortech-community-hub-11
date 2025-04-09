@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ViewControlsProps {
   currentView: string;
@@ -20,16 +21,24 @@ const ViewControls: React.FC<ViewControlsProps> = ({
   onViewChange, 
   onCreatePost 
 }) => {
+  const { isMobile } = useIsMobile();
+  
   return (
     <div className="flex items-center gap-3">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="bg-transparent border-gray-700 text-gray-200 flex items-center gap-2">
             <Eye size={16} />
-            {currentView === 'all' ? 'View All' : 
-             currentView === 'free' ? 'View as Free Member' : 
-             currentView === 'premium' ? 'View as Premium Member' : 
-             'View as Mentor'}
+            {!isMobile ? (
+              <>
+                {currentView === 'all' ? 'View All' : 
+                 currentView === 'free' ? 'View as Free Member' : 
+                 currentView === 'premium' ? 'View as Premium Member' : 
+                 'View as Mentor'}
+              </>
+            ) : (
+              <span>View</span>
+            )}
             <ChevronDown size={14} />
           </Button>
         </DropdownMenuTrigger>
@@ -52,9 +61,11 @@ const ViewControls: React.FC<ViewControlsProps> = ({
       <Button 
         onClick={onCreatePost}
         className="bg-nortech-purple hover:bg-nortech-purple/90 text-white flex gap-2"
+        size={isMobile ? "sm" : "default"}
       >
-        <PlusCircle size={18} />
-        Create post
+        <PlusCircle size={isMobile ? 16 : 18} />
+        {!isMobile && "Create post"}
+        {isMobile && "Post"}
       </Button>
     </div>
   );
