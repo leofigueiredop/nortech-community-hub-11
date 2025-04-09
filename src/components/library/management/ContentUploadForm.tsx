@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -288,7 +287,7 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           {categories.map(category => (
                             <SelectItem key={category.id} value={category.id}>
                               {category.name}
