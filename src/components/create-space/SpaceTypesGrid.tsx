@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import SpaceTypeCard from './SpaceTypeCard';
-import { LucideIcon } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface SpaceType {
   type: string;
@@ -20,9 +20,20 @@ interface SpaceTypesGridProps {
 
 const SpaceTypesGrid: React.FC<SpaceTypesGridProps> = ({ 
   currentTab, 
-  spaceTypes, 
+  spaceTypes: initialSpaceTypes, 
   onSelectType 
 }) => {
+  const [spaceTypes, setSpaceTypes] = useState<SpaceType[]>(initialSpaceTypes);
+  const { toast } = useToast();
+
+  const handleDeleteSpace = (typeToDelete: string) => {
+    setSpaceTypes(prev => prev.filter(space => space.type !== typeToDelete));
+    toast({
+      title: "Space type removed",
+      description: "The space type has been removed from your options.",
+    });
+  };
+  
   const filteredSpaces = currentTab === 'all' 
     ? spaceTypes 
     : spaceTypes.filter(space => space.category === currentTab);
@@ -37,6 +48,7 @@ const SpaceTypesGrid: React.FC<SpaceTypesGridProps> = ({
             title={space.title}
             description={space.description}
             onClick={() => onSelectType(space.type)}
+            onDelete={() => handleDeleteSpace(space.type)}
           />
         ))}
       </div>

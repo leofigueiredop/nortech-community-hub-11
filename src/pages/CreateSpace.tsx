@@ -55,6 +55,12 @@ const CreateSpace: React.FC = () => {
     );
   }
 
+  // Add ids to template options
+  const templatesWithIds = templateOptions.map((template, index) => ({
+    ...template,
+    id: `template-${index}`
+  }));
+
   return (
     <MainLayout>
       <div className="mb-6">
@@ -83,7 +89,7 @@ const CreateSpace: React.FC = () => {
         />
       </Tabs>
       
-      <TemplatesSection templateOptions={templateOptions} />
+      <TemplatesSection templateOptions={templatesWithIds} />
     </MainLayout>
   );
 };
