@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useToast } from '@/hooks/use-toast';
-import { EVENTS } from '@/components/events/EventTypes';
+import { EVENTS } from '@/components/events/data/EventsMockData';
 import EventsHeader from '@/components/events/EventsHeader';
 import CalendarView from '@/components/events/CalendarView';
 import EventsList from '@/components/events/EventsList';
@@ -24,7 +23,6 @@ const Events = () => {
   const { addNotification } = useNotifications();
   const { trackEventParticipation } = usePointsTracking();
 
-  // Filter events when selectedTypes changes
   useEffect(() => {
     if (selectedTypes.length === 0) {
       setFilteredEvents([]);
@@ -37,20 +35,16 @@ const Events = () => {
     setAllEvents(prevEvents => 
       prevEvents.map(event => {
         if (event.id === eventId) {
-          // Add the current user to the registered users list
           const updatedEvent = { 
             ...event, 
             attendees: event.attendees + 1,
             registeredUsers: [...(event.registeredUsers || []), 'current-user']
           };
           
-          // Track event participation for points - now passing custom points value if available
-          const pointsValue = event.pointsValue || 20; // Default to 20 if not specified
+          const pointsValue = event.pointsValue || 20;
           trackEventParticipation(event.title, event.type, pointsValue);
           
-          // If the event has a custom badge, award it
           if (event.badgeName) {
-            // The badge will be awarded in the trackEventParticipation function
           }
           
           return updatedEvent;
@@ -60,7 +54,6 @@ const Events = () => {
     );
   };
 
-  // Filter events for the current month
   const currentMonthEvents = filteredEvents.filter(event => {
     const now = new Date();
     return event.date.getMonth() === now.getMonth() && 

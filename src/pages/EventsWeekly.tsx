@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { EVENTS } from '@/components/events/EventTypes';
+import { EVENTS } from '@/components/events/data/EventsMockData';
 import WeeklyCalendarView from '@/components/events/WeeklyCalendarView';
 import EventTypeFilter, { EventTypeKey } from '@/components/events/EventTypeFilter';
 import { useNotifications } from '@/context/NotificationsContext';
