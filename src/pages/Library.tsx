@@ -7,7 +7,9 @@ import ContentGrid from '@/components/library/ContentGrid';
 import FeaturedContent from '@/components/library/FeaturedContent';
 import ContentViewer from '@/components/library/ContentViewer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Folder } from 'lucide-react';
+import { FileText, Folder, Upload } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Link as RouterLink } from 'react-router-dom';
 
 const Library: React.FC = () => {
   const {
@@ -32,6 +34,12 @@ const Library: React.FC = () => {
       <div className="mb-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Content Library</h1>
+          <Button asChild>
+            <RouterLink to="/library/manage" className="flex items-center gap-2">
+              <Upload size={16} />
+              Manage Content
+            </RouterLink>
+          </Button>
         </div>
         
         {featuredContent.length > 0 && (
@@ -81,7 +89,11 @@ const Library: React.FC = () => {
                   className="border rounded-lg p-4 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition-colors"
                   onClick={() => {
                     setTagFilter(tag);
-                    document.querySelector('[data-value="all"]')?.click();
+                    // Find the all tab trigger and programmatically click it
+                    const allTabTrigger = document.querySelector('[data-value="all"]');
+                    if (allTabTrigger) {
+                      (allTabTrigger as HTMLElement).click();
+                    }
                   }}
                 >
                   <h3 className="font-medium text-lg mb-1">{tag}</h3>

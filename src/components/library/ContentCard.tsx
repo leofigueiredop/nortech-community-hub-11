@@ -3,7 +3,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Lock, FileText, FileVideo, FileAudio, Link, FileImage, Eye } from 'lucide-react';
-import { ContentItem } from '@/types/library';
+import { ContentItem, ContentFormat } from '@/types/library';
 
 interface ContentCardProps {
   item: ContentItem;
@@ -44,7 +44,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item, onClick }) => {
       case 'text':
         return 'Text';
       default:
-        return item.format.charAt(0).toUpperCase() + item.format.slice(1);
+        return String(item.format).charAt(0).toUpperCase() + String(item.format).slice(1);
     }
   };
 

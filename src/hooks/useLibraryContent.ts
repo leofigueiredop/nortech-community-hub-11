@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { ContentItem, ContentFormat, ContentCategory } from '@/types/library';
 
 // Mock data for the library
@@ -126,6 +126,8 @@ const CATEGORIES: ContentCategory[] = [
 ];
 
 export const useLibraryContent = () => {
+  const [content, setContent] = useState<ContentItem[]>(CONTENT_ITEMS);
+  const [categories, setCategories] = useState<ContentCategory[]>(CATEGORIES);
   const [formatFilter, setFormatFilter] = useState<string>('all');
   const [tagFilter, setTagFilter] = useState<string>('all');
   const [accessFilter, setAccessFilter] = useState<string>('all');
@@ -134,16 +136,16 @@ export const useLibraryContent = () => {
 
   // Get all unique tags from content items
   const allTags = Array.from(
-    new Set(CONTENT_ITEMS.flatMap(item => item.tags))
+    new Set(content.flatMap(item => item.tags))
   ).sort();
 
   // Get all formats
   const allFormats = Array.from(
-    new Set(CONTENT_ITEMS.map(item => item.format))
+    new Set(content.map(item => item.format))
   );
 
   // Filter content based on current filters
-  const filteredContent = CONTENT_ITEMS.filter(item => {
+  const filteredContent = content.filter(item => {
     const matchesFormat = formatFilter === 'all' || item.format === formatFilter;
     const matchesTag = tagFilter === 'all' || item.tags.includes(tagFilter);
     const matchesAccess = accessFilter === 'all' || item.accessLevel === accessFilter;
@@ -155,13 +157,115 @@ export const useLibraryContent = () => {
   });
 
   // Get featured content
-  const featuredContent = CONTENT_ITEMS.filter(item => item.featured);
+  const featuredContent = content.filter(item => item.featured);
+
+  // Add new content
+  const addContent = useCallback((newContent: ContentItem) => {
+    setContent(prev => [...prev, newContent]);
+    
+    // Update category count
+    if (newContent.categoryId) {
+      setCategories(prev => 
+        prev.map(cat => 
+          cat.id === newContent.categoryId 
+            ? { ...cat, count: cat.count + 1 } 
+            : cat
+        )
+      );
+    }
+  }, []);
+
+  // Update existing content
+  const updateContent = useCallback((updatedContent: ContentItem) => {
+    setContent(prev => {
+      const existingItem = prev.find(item => item.id === updatedContent.id);
+      
+      // Handle category count changes
+      if (existingItem && existingItem.categoryId !== updatedContent.categoryId) {
+        setCategories(categories => {
+          let newCategories = [...categories];
+          
+          // Decrease count in old category
+          if (existingItem.categoryId) {
+            newCategories = newCategories.map(cat => 
+              cat.id === existingItem.categoryId 
+                ? { ...cat, count: Math.max(0, cat.count - 1) } 
+                : cat
+            );
+          }
+          
+          // Increase count in new category
+          if (updatedContent.categoryId) {
+            newCategories = newCategories.map(cat => 
+              cat.id === updatedContent.categoryId 
+                ? { ...cat, count: cat.count + 1 } 
+                : cat
+            );
+          }
+          
+          return newCategories;
+        });
+      }
+      
+      return prev.map(item => 
+        item.id === updatedContent.id ? updatedContent : item
+      );
+    });
+  }, []);
+
+  // Delete content
+  const deleteContent = useCallback((id: string) => {
+    setContent(prev => {
+      const itemToDelete = prev.find(item => item.id === id);
+      
+      // Update category count
+      if (itemToDelete?.categoryId) {
+        setCategories(categories => 
+          categories.map(cat => 
+            cat.id === itemToDelete.categoryId 
+              ? { ...cat, count: Math.max(0, cat.count - 1) } 
+              : cat
+          )
+        );
+      }
+      
+      return prev.filter(item => item.id !== id);
+    });
+  }, []);
+
+  // Add category
+  const addCategory = useCallback((category: ContentCategory) => {
+    setCategories(prev => [...prev, category]);
+  }, []);
+
+  // Update category
+  const updateCategory = useCallback((updatedCategory: ContentCategory) => {
+    setCategories(prev => 
+      prev.map(cat => 
+        cat.id === updatedCategory.id ? updatedCategory : cat
+      )
+    );
+  }, []);
+
+  // Delete category
+  const deleteCategory = useCallback((id: string) => {
+    setCategories(prev => prev.filter(cat => cat.id !== id));
+    
+    // Remove category from content items
+    setContent(prev => 
+      prev.map(item => 
+        item.categoryId === id 
+          ? { ...item, categoryId: undefined } 
+          : item
+      )
+    );
+  }, []);
 
   return {
-    content: CONTENT_ITEMS,
+    content,
     filteredContent,
     featuredContent,
-    categories: CATEGORIES,
+    categories,
     allTags,
     allFormats,
     formatFilter,
@@ -173,6 +277,12 @@ export const useLibraryContent = () => {
     setTagFilter,
     setAccessFilter,
     setSearchQuery,
-    setSelectedItem
+    setSelectedItem,
+    addContent,
+    updateContent,
+    deleteContent,
+    addCategory,
+    updateCategory,
+    deleteCategory
   };
 };

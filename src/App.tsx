@@ -27,6 +27,7 @@ import PointsStore from "./pages/PointsStore";
 import Leaderboard from "./pages/Leaderboard";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { PointsProvider } from "./context/PointsContext";
+import ContentManagement from "./pages/ContentManagement";
 
 // Import settings pages
 import SettingsIndex from "./pages/settings/Index";
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="/discussions/:topicId" element={<DiscussionTopic />} />
               
               <Route path="/library" element={<Library />} />
+              <Route path="/library/manage" element={<ContentManagement />} />
               <Route path="/events" element={<Events />} />
               <Route path="/live-streams" element={<LiveStreams />} />
               <Route path="/members" element={<Members />} />
