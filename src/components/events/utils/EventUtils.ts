@@ -1,0 +1,40 @@
+
+import { Event } from '../types/EventTypes';
+
+// Helper functions for event status
+export const getEventStatus = (event: Event): 'upcoming' | 'happening_soon' | 'in_progress' | 'ended' => {
+  const now = new Date();
+  const eventDate = new Date(event.date);
+  const eventTime = event.time.split(' - ')[0]; // Get start time
+  const [hourStr, minuteStr] = eventTime.split(':');
+  const hour = parseInt(hourStr);
+  const minute = parseInt(minuteStr);
+  
+  // Set event start and end time
+  const eventStart = new Date(eventDate);
+  eventStart.setHours(hour);
+  eventStart.setMinutes(minute);
+  
+  // Approximate event end time (2 hours after start)
+  const eventEnd = new Date(eventStart);
+  eventEnd.setHours(eventEnd.getHours() + 2);
+  
+  // Check if event is happening soon (within 24 hours)
+  const oneDay = 24 * 60 * 60 * 1000;
+  const timeDiff = eventStart.getTime() - now.getTime();
+  
+  if (now > eventEnd) {
+    return 'ended';
+  } else if (now >= eventStart && now <= eventEnd) {
+    return 'in_progress';
+  } else if (timeDiff > 0 && timeDiff <= oneDay) {
+    return 'happening_soon';
+  } else {
+    return 'upcoming';
+  }
+};
+
+// Check if user is registered for an event
+export const isUserRegistered = (event: Event, userId: string = 'current-user'): boolean => {
+  return event.registeredUsers?.includes(userId) || false;
+};

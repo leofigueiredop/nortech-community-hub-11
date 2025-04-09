@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, Check, Clock } from 'lucide-react';
-import { EVENT_TYPES, getEventStatus, isUserRegistered } from './EventTypes';
+import { EVENT_TYPES, getEventStatus, isUserRegistered } from './types/EventTypes';
 import { useNotifications } from '@/context/NotificationsContext';
 
 interface EventCardProps {
