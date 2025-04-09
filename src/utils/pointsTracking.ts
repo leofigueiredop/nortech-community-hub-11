@@ -44,7 +44,7 @@ export const usePointsTracking = () => {
     });
   };
   
-  // Enhanced version with more tracking options
+  // Enhanced version with more tracking options and custom points
   const trackEventParticipation = (eventName: string, eventType?: string, customPoints?: number) => {
     const pointsValue = customPoints || POINTS_VALUES.event_participation;
     

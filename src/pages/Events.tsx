@@ -44,8 +44,14 @@ const Events = () => {
             registeredUsers: [...(event.registeredUsers || []), 'current-user']
           };
           
-          // Track event participation for points
-          trackEventParticipation(event.title, event.type);
+          // Track event participation for points - now passing custom points value if available
+          const pointsValue = event.pointsValue || 20; // Default to 20 if not specified
+          trackEventParticipation(event.title, event.type, pointsValue);
+          
+          // If the event has a custom badge, award it
+          if (event.badgeName) {
+            // The badge will be awarded in the trackEventParticipation function
+          }
           
           return updatedEvent;
         }
