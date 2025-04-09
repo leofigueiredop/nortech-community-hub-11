@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Plus, Globe, Users, ArrowRight } from 'lucide-react';
@@ -402,11 +401,7 @@ const Index: React.FC = () => {
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center">Choose Your Plan</DialogTitle>
           </DialogHeader>
-          <PricingPlans onSelectPlan={() => {
-            setIsPricingModalOpen(false);
-            // Navigate to onboarding
-            window.location.href = '/onboarding/community';
-          }} />
+          <PricingPlans />
         </DialogContent>
       </Dialog>
     </div>
