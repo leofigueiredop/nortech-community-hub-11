@@ -1,88 +1,75 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
-import { useToast } from '@/hooks/use-toast';
-import { EVENTS } from '@/components/events/data/EventsMockData';
 import EventsHeader from '@/components/events/EventsHeader';
-import CalendarView from '@/components/events/CalendarView';
-import EventsList from '@/components/events/EventsList';
 import EventGrid from '@/components/events/EventGrid';
-import EventTypeFilter, { EventTypeKey } from '@/components/events/EventTypeFilter';
-import { useNotifications } from '@/context/NotificationsContext';
-import { usePointsTracking } from '@/utils/pointsTracking';
+import { useToast } from '@/components/ui/use-toast';
+import { EventType, Event } from '@/components/events/types/EventTypes';
+import { EVENT_TYPES } from '@/components/events/types/EventTypes';
+import { mockEvents } from '@/components/events/data/EventsMockData';
+import { addPointsForEventAttendance } from '@/utils/pointsTracking';
+import { usePoints } from '@/context/PointsContext';
 
-type ViewType = 'calendar' | 'list' | 'grid';
-
-const Events = () => {
-  const [viewType, setViewType] = useState<ViewType>('calendar');
-  const [allEvents, setAllEvents] = useState(EVENTS);
-  const [filteredEvents, setFilteredEvents] = useState(EVENTS);
-  const [selectedTypes, setSelectedTypes] = useState<EventTypeKey[]>(
-    Object.keys(EVENTS.reduce((types, event) => ({ ...types, [event.type]: true }), {})) as EventTypeKey[]
-  );
+const Events: React.FC = () => {
+  const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
+  const [filterType, setFilterType] = useState<EventType | 'all'>('all');
   const { toast } = useToast();
-  const { addNotification } = useNotifications();
-  const { trackEventParticipation } = usePointsTracking();
-
-  useEffect(() => {
-    if (selectedTypes.length === 0) {
-      setFilteredEvents([]);
-    } else {
-      setFilteredEvents(allEvents.filter(event => selectedTypes.includes(event.type)));
-    }
-  }, [selectedTypes, allEvents]);
+  const { addPoints } = usePoints();
+  
+  // Filter events based on type
+  const filteredEvents = filterType === 'all' 
+    ? mockEvents 
+    : mockEvents.filter(event => event.type === filterType);
 
   const handleRSVP = (eventId: number) => {
-    setAllEvents(prevEvents => 
-      prevEvents.map(event => {
-        if (event.id === eventId) {
-          const updatedEvent = { 
-            ...event, 
-            attendees: event.attendees + 1,
-            registeredUsers: [...(event.registeredUsers || []), 'current-user']
-          };
-          
-          const pointsValue = event.pointsValue || 20;
-          trackEventParticipation(event.title, event.type, pointsValue);
-          
-          if (event.badgeName) {
-          }
-          
-          return updatedEvent;
-        }
-        return event;
-      })
-    );
+    // Find the event
+    const event = mockEvents.find(e => e.id === eventId);
+    
+    if (!event) return;
+    
+    // Show toast
+    toast({
+      title: "RSVP Successful!",
+      description: `You've registered for ${event.title}`,
+    });
+    
+    // Add points if the event has points value
+    if (event.pointsValue && event.pointsValue > 0) {
+      addPoints(event.pointsValue);
+      
+      // Show toast for points
+      toast({
+        title: "Points Earned!",
+        description: `You earned ${event.pointsValue} points for registering`,
+        variant: "success",
+      });
+      
+      // Track the event attendance with points
+      addPointsForEventAttendance(eventId, event.pointsValue, event.badgeName);
+    }
   };
 
-  const currentMonthEvents = filteredEvents.filter(event => {
-    const now = new Date();
-    return event.date.getMonth() === now.getMonth() && 
-           event.date.getFullYear() === now.getFullYear();
-  });
+  const handleOpenAttendanceModal = (eventId: number) => {
+    // Implementation for opening attendance modal
+    console.log('Opening attendance modal for event', eventId);
+  };
 
   return (
-    <MainLayout title="Events">
-      <div className="mb-6">
-        <EventsHeader viewType={viewType} setViewType={setViewType} />
-
-        <div className="mb-4 mt-2">
-          <EventTypeFilter 
-            selectedTypes={selectedTypes}
-            onChange={setSelectedTypes}
-          />
-        </div>
-
-        {viewType === 'calendar' && (
-          <CalendarView events={filteredEvents} onRSVP={handleRSVP} />
-        )}
-
-        {viewType === 'list' && (
-          <EventsList events={currentMonthEvents} onRSVP={handleRSVP} />
-        )}
-
-        {viewType === 'grid' && (
-          <EventGrid events={currentMonthEvents} onRSVP={handleRSVP} />
-        )}
+    <MainLayout>
+      <div className="container mx-auto p-4 max-w-7xl">
+        <EventsHeader 
+          viewType={viewType} 
+          setViewType={setViewType}
+          filterType={filterType}
+          setFilterType={setFilterType}
+        />
+        
+        <EventGrid 
+          events={filteredEvents} 
+          viewType={viewType}
+          onRSVP={handleRSVP}
+          onOpenAttendanceModal={handleOpenAttendanceModal}
+        />
       </div>
     </MainLayout>
   );
