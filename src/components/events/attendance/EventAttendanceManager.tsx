@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileUploader } from '@/components/library/management/form/FileUploader';
+import FileUploader from '@/components/library/management/form/FileUploader';
 import CSVUploader from './CSVUploader';
 import AttendanceList from './AttendanceList';
 import BadgeAssignment from './BadgeAssignment';
