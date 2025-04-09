@@ -1,4 +1,15 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
+
+// Badge interface
+export interface Badge {
+  id: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  category: 'event' | 'achievement' | 'role' | 'custom';
+  createdAt: Date;
+}
 
 export interface PointsActivity {
   id: string;
@@ -6,12 +17,15 @@ export interface PointsActivity {
   description: string;
   points: number;
   timestamp: Date;
+  badge?: Badge; // Optional badge awarded with points
 }
 
 interface PointsContextType {
   totalPoints: number;
   pointsHistory: PointsActivity[];
+  userBadges: Badge[];
   awardPoints: (activity: Omit<PointsActivity, 'id' | 'timestamp'>) => void;
+  awardBadge: (badge: Omit<Badge, 'id' | 'createdAt'>) => void;
   getUserLevel: () => { level: number; nextLevel: number; progress: number };
 }
 
@@ -57,8 +71,27 @@ const MOCK_POINTS_HISTORY: PointsActivity[] = [
   },
 ];
 
+// Mock badges
+const MOCK_BADGES: Badge[] = [
+  {
+    id: '1',
+    name: 'Early Adopter',
+    description: 'Joined during the platform launch phase',
+    category: 'role',
+    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+  },
+  {
+    id: '2',
+    name: 'Course Champion',
+    description: 'Completed 5 courses',
+    category: 'achievement',
+    createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+  }
+];
+
 export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pointsHistory, setPointsHistory] = useState<PointsActivity[]>(MOCK_POINTS_HISTORY);
+  const [userBadges, setUserBadges] = useState<Badge[]>(MOCK_BADGES);
   
   // Calculate total points
   const totalPoints = pointsHistory.reduce((total, activity) => total + activity.points, 0);
@@ -74,6 +107,25 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     
     // Log to console for debugging
     console.log(`Points awarded: ${activity.points} for ${activity.type}`);
+  };
+  
+  // Function to award badges
+  const awardBadge = (badge: Omit<Badge, 'id' | 'createdAt'>) => {
+    // Check if user already has this badge
+    if (userBadges.some(b => b.name === badge.name)) {
+      console.log(`User already has the "${badge.name}" badge`);
+      return;
+    }
+    
+    const newBadge: Badge = {
+      ...badge,
+      id: Date.now().toString(),
+      createdAt: new Date()
+    };
+    
+    setUserBadges(prev => [...prev, newBadge]);
+    
+    console.log(`Badge awarded: ${badge.name}`);
   };
   
   // Function to determine user level based on total points
@@ -129,7 +181,9 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       value={{
         totalPoints,
         pointsHistory,
+        userBadges,
         awardPoints,
+        awardBadge,
         getUserLevel,
       }}
     >

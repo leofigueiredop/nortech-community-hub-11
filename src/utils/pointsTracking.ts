@@ -3,7 +3,7 @@ import { usePoints, POINTS_VALUES } from '@/context/PointsContext';
 import { ContentItem } from '@/types/library';
 
 export const usePointsTracking = () => {
-  const { awardPoints } = usePoints();
+  const { awardPoints, awardBadge } = usePoints();
   
   const trackLogin = () => {
     awardPoints({
@@ -35,13 +35,27 @@ export const usePointsTracking = () => {
       description: `Completed "${courseName}" course`,
       points: POINTS_VALUES.course_completion
     });
+    
+    // Award course completion badge
+    awardBadge({
+      name: `${courseName} Graduate`,
+      description: `Completed the ${courseName} course`,
+      category: 'achievement'
+    });
   };
   
-  const trackEventParticipation = (eventName: string) => {
+  const trackEventParticipation = (eventName: string, customPoints?: number) => {
     awardPoints({
       type: 'event_participation',
       description: `Participated in "${eventName}" event`,
-      points: POINTS_VALUES.event_participation
+      points: customPoints || POINTS_VALUES.event_participation
+    });
+    
+    // Award event attendance badge
+    awardBadge({
+      name: `${eventName} Attendee`,
+      description: `Attended the ${eventName} event`,
+      category: 'event'
     });
   };
   
@@ -73,6 +87,15 @@ export const usePointsTracking = () => {
     });
   };
   
+  // New function to award custom badge
+  const awardCustomBadge = (name: string, description: string, category: 'event' | 'achievement' | 'role' | 'custom' = 'custom') => {
+    awardBadge({
+      name,
+      description,
+      category
+    });
+  };
+  
   return {
     trackLogin,
     trackComment,
@@ -81,6 +104,7 @@ export const usePointsTracking = () => {
     trackEventParticipation,
     trackReferral,
     trackContentView,
-    trackContentCompletion
+    trackContentCompletion,
+    awardCustomBadge
   };
 };

@@ -1,14 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, Check, Clock } from 'lucide-react';
+import { Calendar, Check, Clock, Users } from 'lucide-react';
 import { EVENT_TYPES } from './types/EventTypes';
 import { getEventStatus, isUserRegistered } from './utils/EventUtils';
 import { useNotifications } from '@/context/NotificationsContext';
+import EventAttendanceManager from './attendance/EventAttendanceManager';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface EventCardProps {
   event: {
@@ -33,6 +35,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
   const eventType = EVENT_TYPES[event.type];
   const { toast } = useToast();
   const { addNotification } = useNotifications();
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
   
   // Get the event status
   const status = event.status || getEventStatus(event);
@@ -154,6 +157,18 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
           </div>
         </div>
         
+        {/* Post-event attendance management button (shown if event has ended) */}
+        {status === 'ended' && (
+          <Button 
+            variant="outline" 
+            onClick={() => setShowAttendanceModal(true)}
+            className="w-full mb-2 bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100 hover:text-amber-900"
+          >
+            <Users size={16} className="mr-2" />
+            Manage Event Attendance
+          </Button>
+        )}
+        
         {/* RSVP Button */}
         {status !== 'ended' && !isRegistered && (
           <Button 
@@ -196,6 +211,16 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
           </div>
         )}
       </CardContent>
+      
+      {/* Attendance management dialog */}
+      <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Attendance Management - {event.title}</DialogTitle>
+          </DialogHeader>
+          <EventAttendanceManager eventId={event.id} eventTitle={event.title} />
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
