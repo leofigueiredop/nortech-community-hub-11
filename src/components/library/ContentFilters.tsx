@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, FileText, FileVideo, FileAudio, Link as LinkIcon, FileImage, Youtube, Video, LayoutGrid } from 'lucide-react';
+import { Search, Filter, FileText, FileVideo, FileAudio, Link as LinkIcon, FileImage, Youtube, Video, LayoutGrid, BookOpen } from 'lucide-react';
 import { ContentFormat } from '@/types/library';
 
 interface ContentFiltersProps {
@@ -40,7 +41,8 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
     youtube: <Youtube size={16} />,
     vimeo: <Video size={16} />,
     gdoc: <FileText size={16} />,
-    gdrive: <LayoutGrid size={16} />
+    gdrive: <LayoutGrid size={16} />,
+    course: <BookOpen size={16} />
   };
   
   return (
