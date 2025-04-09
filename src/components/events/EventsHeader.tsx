@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, CalendarIcon, List, Grid } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { getTypeFilters } from './EventTypes';
+import { getTypeFilters } from './types/EventTypes';
 
 interface EventsHeaderProps {
   viewType: string;
