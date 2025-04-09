@@ -1,0 +1,146 @@
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+export interface PointsActivity {
+  id: string;
+  type: 'login' | 'comment' | 'like' | 'course_completion' | 'event_participation' | 'referral';
+  description: string;
+  points: number;
+  timestamp: Date;
+}
+
+interface PointsContextType {
+  totalPoints: number;
+  pointsHistory: PointsActivity[];
+  awardPoints: (activity: Omit<PointsActivity, 'id' | 'timestamp'>) => void;
+  getUserLevel: () => { level: number; nextLevel: number; progress: number };
+}
+
+const PointsContext = createContext<PointsContextType | undefined>(undefined);
+
+// Point values for different activities
+export const POINTS_VALUES = {
+  login: 5,
+  comment: 3,
+  like: 1,
+  course_completion: 50,
+  event_participation: 20,
+  referral: 25
+};
+
+// Level thresholds
+const LEVEL_THRESHOLDS = [0, 100, 250, 500, 1000, 2000, 5000, 10000];
+
+// Mock data for demonstrations
+const MOCK_POINTS_HISTORY: PointsActivity[] = [
+  {
+    id: '1',
+    type: 'login',
+    description: 'Daily login bonus',
+    points: POINTS_VALUES.login,
+    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+  },
+  {
+    id: '2',
+    type: 'comment',
+    description: 'Comment on "React Best Practices"',
+    points: POINTS_VALUES.comment,
+    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+  },
+  {
+    id: '3',
+    type: 'course_completion',
+    description: 'Completed "Web3 Fundamentals" course',
+    points: POINTS_VALUES.course_completion,
+    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+  },
+];
+
+export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [pointsHistory, setPointsHistory] = useState<PointsActivity[]>(MOCK_POINTS_HISTORY);
+  
+  // Calculate total points
+  const totalPoints = pointsHistory.reduce((total, activity) => total + activity.points, 0);
+  
+  const awardPoints = (activity: Omit<PointsActivity, 'id' | 'timestamp'>) => {
+    const newActivity: PointsActivity = {
+      ...activity,
+      id: Date.now().toString(),
+      timestamp: new Date(),
+    };
+    
+    setPointsHistory(prev => [newActivity, ...prev]);
+    
+    // Log to console for debugging
+    console.log(`Points awarded: ${activity.points} for ${activity.type}`);
+  };
+  
+  // Function to determine user level based on total points
+  const getUserLevel = () => {
+    let level = 0;
+    
+    // Find current level
+    for (let i = 0; i < LEVEL_THRESHOLDS.length; i++) {
+      if (totalPoints >= LEVEL_THRESHOLDS[i]) {
+        level = i;
+      } else {
+        break;
+      }
+    }
+    
+    // Calculate progress to next level
+    const currentLevelThreshold = LEVEL_THRESHOLDS[level];
+    const nextLevelThreshold = level < LEVEL_THRESHOLDS.length - 1 
+      ? LEVEL_THRESHOLDS[level + 1] 
+      : currentLevelThreshold * 2;
+    
+    const pointsForNextLevel = nextLevelThreshold - currentLevelThreshold;
+    const pointsEarnedTowardsNextLevel = totalPoints - currentLevelThreshold;
+    const progress = Math.min(Math.floor((pointsEarnedTowardsNextLevel / pointsForNextLevel) * 100), 100);
+    
+    return {
+      level,
+      nextLevel: level + 1,
+      progress
+    };
+  };
+  
+  // Check for daily login bonus (once per day)
+  useEffect(() => {
+    const lastLoginDate = localStorage.getItem('lastLoginDate');
+    const today = new Date().toDateString();
+    
+    if (lastLoginDate !== today) {
+      // Award login points
+      awardPoints({
+        type: 'login',
+        description: 'Daily login bonus',
+        points: POINTS_VALUES.login
+      });
+      
+      // Update last login date
+      localStorage.setItem('lastLoginDate', today);
+    }
+  }, []);
+  
+  return (
+    <PointsContext.Provider
+      value={{
+        totalPoints,
+        pointsHistory,
+        awardPoints,
+        getUserLevel,
+      }}
+    >
+      {children}
+    </PointsContext.Provider>
+  );
+};
+
+export const usePoints = () => {
+  const context = useContext(PointsContext);
+  if (context === undefined) {
+    throw new Error('usePoints must be used within a PointsProvider');
+  }
+  return context;
+};
