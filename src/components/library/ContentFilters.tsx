@@ -3,8 +3,9 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, FileText, FileVideo, FileAudio, Link as LinkIcon, FileImage, Youtube, Video, LayoutGrid, BookOpen } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { ContentFormat } from '@/types/library';
+import { ContentFormatOptions } from './management/constants/contentFormOptions';
 
 interface ContentFiltersProps {
   formatFilter: string;
@@ -31,18 +32,10 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
   setAccessFilter,
   setSearchQuery
 }) => {
-  const formatIcons: Record<ContentFormat, React.ReactNode> = {
-    video: <FileVideo size={16} />,
-    pdf: <FileText size={16} />,
-    link: <LinkIcon size={16} />,
-    audio: <FileAudio size={16} />,
-    image: <FileImage size={16} />,
-    text: <FileText size={16} />,
-    youtube: <Youtube size={16} />,
-    vimeo: <Video size={16} />,
-    gdoc: <FileText size={16} />,
-    gdrive: <LayoutGrid size={16} />,
-    course: <BookOpen size={16} />
+  // Find icon for each format from ContentFormatOptions
+  const getFormatIcon = (format: string) => {
+    const option = ContentFormatOptions.find(opt => opt.value === format);
+    return option ? option.icon : <Filter size={16} />;
   };
   
   return (
@@ -73,7 +66,7 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
             onClick={() => setFormatFilter(format)}
             className="whitespace-nowrap"
           >
-            {formatIcons[format as ContentFormat]}
+            {getFormatIcon(format)}
             {format.charAt(0).toUpperCase() + format.slice(1)}
           </Button>
         ))}
