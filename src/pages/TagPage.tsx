@@ -31,9 +31,11 @@ const TagPage: React.FC = () => {
         tags: item.tags,
         likes: Math.floor(Math.random() * 100),
         comments: Math.floor(Math.random() * 20),
-        date: item.createdAt,
+        createdAt: item.createdAt || new Date().toLocaleDateString(), // Add missing createdAt property
+        space: "General Community", // Add missing space property
         isPinned: false,
-        isLiked: false
+        isPaid: false,
+        type: 'post' as const
       }));
   }, [content, tagName]);
   
