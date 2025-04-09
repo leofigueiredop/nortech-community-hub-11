@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
@@ -7,11 +7,25 @@ import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { EVENTS } from '@/components/events/EventTypes';
 import WeeklyCalendarView from '@/components/events/WeeklyCalendarView';
+import EventTypeFilter, { EventTypeKey } from '@/components/events/EventTypeFilter';
 
 const EventsWeekly = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [events, setEvents] = useState(EVENTS);
+  const [allEvents, setAllEvents] = useState(EVENTS);
+  const [filteredEvents, setFilteredEvents] = useState(EVENTS);
+  const [selectedTypes, setSelectedTypes] = useState<EventTypeKey[]>(
+    Object.keys(EVENTS.reduce((types, event) => ({ ...types, [event.type]: true }), {})) as EventTypeKey[]
+  );
   const { toast } = useToast();
+
+  // Filter events when selectedTypes changes
+  useEffect(() => {
+    if (selectedTypes.length === 0) {
+      setFilteredEvents([]);
+    } else {
+      setFilteredEvents(allEvents.filter(event => selectedTypes.includes(event.type)));
+    }
+  }, [selectedTypes, allEvents]);
 
   // RSVP handler
   const handleRSVP = (eventId: number) => {
@@ -19,13 +33,14 @@ const EventsWeekly = () => {
       title: "RSVP Confirmed",
       description: `You've successfully registered for this event!`,
     });
-    setEvents(prevEvents => 
-      prevEvents.map(event => 
-        event.id === eventId 
-          ? { ...event, attendees: event.attendees + 1 }
-          : event
-      )
+    
+    const updatedEvents = allEvents.map(event => 
+      event.id === eventId 
+        ? { ...event, attendees: event.attendees + 1 }
+        : event
     );
+    
+    setAllEvents(updatedEvents);
   };
 
   return (
@@ -49,8 +64,15 @@ const EventsWeekly = () => {
           </div>
         </div>
 
+        <div className="mb-4">
+          <EventTypeFilter 
+            selectedTypes={selectedTypes}
+            onChange={setSelectedTypes}
+          />
+        </div>
+
         <WeeklyCalendarView 
-          events={events}
+          events={filteredEvents}
           currentWeek={currentWeek}
           setCurrentWeek={setCurrentWeek}
           onRSVP={handleRSVP}
