@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Calendar, Grid, List, Plus, ViewIcon } from 'lucide-react';
+import { Calendar, Grid, List, Plus } from 'lucide-react';
 
 type ViewType = 'calendar' | 'list' | 'grid';
 

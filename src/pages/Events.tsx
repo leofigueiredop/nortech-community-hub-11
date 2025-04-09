@@ -9,9 +9,12 @@ import EventsList from '@/components/events/EventsList';
 import EventGrid from '@/components/events/EventGrid';
 import EventTypeFilter, { EventTypeKey } from '@/components/events/EventTypeFilter';
 import { useNotifications } from '@/context/NotificationsContext';
+import { usePointsTracking } from '@/utils/pointsTracking';
+
+type ViewType = 'calendar' | 'list' | 'grid';
 
 const Events = () => {
-  const [viewType, setViewType] = useState('calendar');
+  const [viewType, setViewType] = useState<ViewType>('calendar');
   const [allEvents, setAllEvents] = useState(EVENTS);
   const [filteredEvents, setFilteredEvents] = useState(EVENTS);
   const [selectedTypes, setSelectedTypes] = useState<EventTypeKey[]>(
@@ -19,6 +22,7 @@ const Events = () => {
   );
   const { toast } = useToast();
   const { addNotification } = useNotifications();
+  const { trackEventParticipation } = usePointsTracking();
 
   // Filter events when selectedTypes changes
   useEffect(() => {
@@ -39,6 +43,9 @@ const Events = () => {
             attendees: event.attendees + 1,
             registeredUsers: [...(event.registeredUsers || []), 'current-user']
           };
+          
+          // Track event participation for points
+          trackEventParticipation(event.title, event.type);
           
           return updatedEvent;
         }

@@ -51,8 +51,7 @@ export const usePointsTracking = () => {
     awardPoints({
       type: 'event_participation',
       description: `Participated in "${eventName}" event`,
-      points: pointsValue,
-      metadata: { eventType }
+      points: pointsValue
     });
     
     // Award event attendance badge

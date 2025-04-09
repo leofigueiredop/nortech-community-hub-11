@@ -12,21 +12,9 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Clock, Image, MapPin, Tag, Users } from 'lucide-react';
+import { Calendar, Clock, Image, MapPin, Tag, Users, Globe, Video, Link } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { EVENT_TYPES } from '@/components/events/types/EventTypes';
-
-// Create a TimePicker component since it doesn't exist in shadcn/ui by default
-const TimePicker: React.FC<{value: string; onChange: (value: string) => void}> = ({ value, onChange }) => {
-  return (
-    <Input 
-      type="time" 
-      value={value} 
-      onChange={(e) => onChange(e.target.value)} 
-      className="w-full"
-    />
-  );
-};
 
 const CreateEvent = () => {
   const navigate = useNavigate();
@@ -38,6 +26,9 @@ const CreateEvent = () => {
     startTime: '18:00',
     endTime: '20:00',
     location: '',
+    isOnline: false,
+    platform: 'zoom',
+    meetingLink: '',
     type: 'workshop',
     speaker: '',
     capacity: 50,
@@ -84,11 +75,6 @@ const CreateEvent = () => {
       navigate('/events');
     }, 1500);
   };
-  
-  // Generate time options for display
-  const timeOptions = Array.from({ length: 24 }).map((_, hour) => {
-    return ['00', '30'].map(minute => `${hour.toString().padStart(2, '0')}:${minute}`);
-  }).flat();
   
   return (
     <MainLayout title="Create Event">
@@ -168,28 +154,23 @@ const CreateEvent = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label>Date</Label>
-                  <div className="flex items-center border rounded-md p-2">
-                    <Calendar className="mr-2 h-4 w-4 opacity-50" />
-                    <DatePicker
-                      date={eventData.date}
-                      setDate={(date) => handleInputChange('date', date)}
-                    />
-                  </div>
+                  <DatePicker
+                    date={eventData.date}
+                    setDate={(date) => handleInputChange('date', date)}
+                  />
                 </div>
                 
                 <div className="grid gap-2">
                   <Label>Time</Label>
                   <div className="flex gap-2 items-center">
-                    <div className="flex-1 flex items-center border rounded-md p-2">
-                      <Clock className="mr-2 h-4 w-4 opacity-50" />
+                    <div className="flex-1">
                       <TimePicker
                         value={eventData.startTime}
                         onChange={(value) => handleInputChange('startTime', value)}
                       />
                     </div>
                     <span className="opacity-50">to</span>
-                    <div className="flex-1 flex items-center border rounded-md p-2">
-                      <Clock className="mr-2 h-4 w-4 opacity-50" />
+                    <div className="flex-1">
                       <TimePicker
                         value={eventData.endTime}
                         onChange={(value) => handleInputChange('endTime', value)}
@@ -199,19 +180,65 @@ const CreateEvent = () => {
                 </div>
               </div>
               
-              <div className="grid gap-2">
-                <Label htmlFor="location">Location</Label>
-                <div className="flex items-center border rounded-md pl-2">
-                  <MapPin className="h-4 w-4 opacity-50" />
-                  <Input 
-                    id="location" 
-                    value={eventData.location}
-                    onChange={(e) => handleInputChange('location', e.target.value)}
-                    placeholder="Enter location or 'Online'"
-                    className="border-0"
-                  />
-                </div>
+              <div className="flex items-center space-x-2 my-4">
+                <Switch
+                  id="isOnline"
+                  checked={eventData.isOnline}
+                  onCheckedChange={(checked) => handleInputChange('isOnline', checked)}
+                />
+                <Label htmlFor="isOnline">This is an online event</Label>
               </div>
+              
+              {eventData.isOnline ? (
+                <div className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="platform">Online Platform</Label>
+                    <Select 
+                      value={eventData.platform}
+                      onValueChange={(value) => handleInputChange('platform', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select platform" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="zoom">Zoom</SelectItem>
+                        <SelectItem value="teams">Microsoft Teams</SelectItem>
+                        <SelectItem value="meet">Google Meet</SelectItem>
+                        <SelectItem value="webex">Cisco Webex</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="meetingLink">Meeting Link</Label>
+                    <div className="flex items-center border rounded-md pl-2">
+                      <Link className="h-4 w-4 opacity-50" />
+                      <Input 
+                        id="meetingLink" 
+                        value={eventData.meetingLink}
+                        onChange={(e) => handleInputChange('meetingLink', e.target.value)}
+                        placeholder="Enter meeting URL"
+                        className="border-0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid gap-2">
+                  <Label htmlFor="location">Location</Label>
+                  <div className="flex items-center border rounded-md pl-2">
+                    <MapPin className="h-4 w-4 opacity-50" />
+                    <Input 
+                      id="location" 
+                      value={eventData.location}
+                      onChange={(e) => handleInputChange('location', e.target.value)}
+                      placeholder="Enter physical location"
+                      className="border-0"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             
             <Separator />
