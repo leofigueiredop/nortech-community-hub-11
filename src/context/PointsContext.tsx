@@ -1,9 +1,8 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface PointsActivity {
   id: string;
-  type: 'login' | 'comment' | 'like' | 'course_completion' | 'event_participation' | 'referral';
+  type: 'login' | 'comment' | 'like' | 'course_completion' | 'event_participation' | 'referral' | 'content_view' | 'content_completion';
   description: string;
   points: number;
   timestamp: Date;
@@ -25,7 +24,9 @@ export const POINTS_VALUES = {
   like: 1,
   course_completion: 50,
   event_participation: 20,
-  referral: 25
+  referral: 25,
+  content_view: 2,
+  content_completion: 10
 };
 
 // Level thresholds

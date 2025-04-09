@@ -8,6 +8,8 @@ import { ContentFormat } from '@/types/library';
 import { ContentFormatOptions } from '../constants/contentFormOptions';
 import { ContentCategory } from '@/types/library';
 import { UseFormReturn } from 'react-hook-form';
+import { Card } from '@/components/ui/card';
+import PointsConfig from './PointsConfig';
 
 interface ContentBasicInfoProps {
   form: UseFormReturn<any>;
@@ -101,6 +103,10 @@ const ContentBasicInfo: React.FC<ContentBasicInfoProps> = ({ form, categories })
           </FormItem>
         )}
       />
+
+      <Card className="p-4 mt-6">
+        <PointsConfig form={form} />
+      </Card>
     </>
   );
 };

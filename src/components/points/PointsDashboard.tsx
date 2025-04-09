@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
 import { usePoints } from '@/context/PointsContext';
 import PointsHistory from './PointsHistory';
+import ContentProgress from './ContentProgress';
 import { Award, Gift, ChevronRight, Trophy, BookOpen, Star } from 'lucide-react';
 
 const PointsDashboard: React.FC = () => {
@@ -86,12 +87,17 @@ const PointsDashboard: React.FC = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="rewards" className="space-y-4">
+      <Tabs defaultValue="content" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="content">Content Progress</TabsTrigger>
           <TabsTrigger value="rewards">Popular Rewards</TabsTrigger>
           <TabsTrigger value="history">Points History</TabsTrigger>
           <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="content">
+          <ContentProgress />
+        </TabsContent>
         
         <TabsContent value="rewards" className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

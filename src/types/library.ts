@@ -22,6 +22,20 @@ export interface ContentItem {
   visibility?: ContentVisibility;
   order?: number;
   modules?: string[]; // IDs of modules for courses
+  // Points system integration
+  pointsEnabled: boolean;
+  pointsValue: number;
+  completionCriteria?: 'view' | 'scroll_end' | 'watch_percent' | 'time_spent';
+  completionThreshold?: number; // e.g., 80% for watch_percent, 120 for time_spent (seconds)
+}
+
+export interface ContentProgress {
+  userId: string;
+  contentId: string;
+  progress: number; // 0-100
+  completed: boolean;
+  lastInteractedAt: string;
+  pointsAwarded: boolean;
 }
 
 export interface ContentCategory {

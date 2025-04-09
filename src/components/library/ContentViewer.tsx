@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,10 +10,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Clock, Download, ExternalLink, Eye, FileText, Lock } from 'lucide-react';
+import { Calendar, Clock, Download, ExternalLink, Eye, FileText, Lock, Trophy } from 'lucide-react';
 import { ContentItem } from '@/types/library';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
+import { usePoints } from '@/context/PointsContext';
+import { Progress } from '@/components/ui/progress';
 
 interface ContentViewerProps {
   item: ContentItem | null;
@@ -22,24 +23,116 @@ interface ContentViewerProps {
 }
 
 const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
-  if (!item) return null;
+  const { awardPoints } = usePoints();
+  const [progress, setProgress] = useState(0);
+  const [pointsAwarded, setPointsAwarded] = useState(false);
+  const timeSpentRef = useRef(0);
+  const intervalRef = useRef<number | null>(null);
+  
+  useEffect(() => {
+    if (item) {
+      setProgress(0);
+      setPointsAwarded(false);
+      timeSpentRef.current = 0;
+      
+      intervalRef.current = window.setInterval(() => {
+        timeSpentRef.current += 1;
+        
+        if (item.completionCriteria === 'time_spent' && item.completionThreshold) {
+          const newProgress = Math.min(Math.floor((timeSpentRef.current / item.completionThreshold) * 100), 100);
+          setProgress(newProgress);
+          
+          if (newProgress >= 100 && !pointsAwarded && item.pointsEnabled) {
+            awardPoints({
+              type: 'content_completion',
+              description: `Completed "${item.title}"`,
+              points: item.pointsValue
+            });
+            setPointsAwarded(true);
+            
+            toast({
+              title: "Points Awarded!",
+              description: `You earned ${item.pointsValue} points for completing this content.`,
+              variant: "default",
+            });
+          }
+        }
+      }, 1000);
+    }
+    
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [item, awardPoints]);
+  
+  const handleContentView = () => {
+    if (!item || pointsAwarded || !item.pointsEnabled) return;
+    
+    if (item.completionCriteria === 'view' || !item.completionCriteria) {
+      awardPoints({
+        type: 'content_view',
+        description: `Viewed "${item.title}"`,
+        points: item.pointsValue
+      });
+      setPointsAwarded(true);
+      setProgress(100);
+      
+      toast({
+        title: "Points Awarded!",
+        description: `You earned ${item.pointsValue} points for viewing this content.`,
+        variant: "default",
+      });
+    }
+  };
+  
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (!item || pointsAwarded || !item.pointsEnabled || item.completionCriteria !== 'scroll_end') return;
+    
+    const target = e.currentTarget;
+    const scrollPosition = target.scrollTop + target.clientHeight;
+    const scrollHeight = target.scrollHeight;
+    const scrollPercentage = (scrollPosition / scrollHeight) * 100;
+    
+    setProgress(Math.min(Math.floor(scrollPercentage), 100));
+    
+    if (scrollPercentage > 90 && !pointsAwarded) {
+      awardPoints({
+        type: 'content_completion',
+        description: `Read through "${item.title}"`,
+        points: item.pointsValue
+      });
+      setPointsAwarded(true);
+      setProgress(100);
+      
+      toast({
+        title: "Points Awarded!",
+        description: `You earned ${item.pointsValue} points for reading through this content.`,
+        variant: "default",
+      });
+    }
+  };
 
   const handleAccessContent = () => {
-    if (item.accessLevel === 'premium') {
+    if (item?.accessLevel === 'premium') {
       toast({
         title: 'Premium Content',
         description: 'This content requires a premium subscription.',
         variant: 'destructive',
       });
     } else {
+      handleContentView();
+      
       toast({
         title: 'Opening Content',
-        description: `Opening ${item.title}`,
+        description: `Opening ${item?.title}`,
       });
-      // Logic to open the content would go here
-      window.open(item.resourceUrl, '_blank');
+      window.open(item?.resourceUrl, '_blank');
     }
   };
+
+  if (!item) return null;
 
   const renderContentPreview = () => {
     switch (item.format) {
@@ -127,7 +220,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
 
   return (
     <Dialog open={!!item} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" onScroll={handleScroll}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">{item.title}</DialogTitle>
           <DialogDescription className="flex items-center gap-2 mt-2">
@@ -143,6 +236,11 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
                 'Free'
               )}
             </Badge>
+            {item.pointsEnabled && (
+              <Badge variant="outline" className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-300">
+                <Trophy size={12} className="mr-1" /> {item.pointsValue} pts
+              </Badge>
+            )}
             <span className="text-muted-foreground text-sm">
               <Calendar className="inline h-3 w-3 mr-1" />
               {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
@@ -161,6 +259,16 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
         </DialogHeader>
 
         {renderContentPreview()}
+
+        {item.pointsEnabled && (
+          <div className="mb-4">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-muted-foreground">Progress</span>
+              <span className="font-medium">{progress}%</span>
+            </div>
+            <Progress value={progress} className="h-2" />
+          </div>
+        )}
 
         <div className="space-y-4">
           <div>

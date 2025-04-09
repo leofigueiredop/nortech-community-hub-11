@@ -1,5 +1,6 @@
 
 import { usePoints, POINTS_VALUES } from '@/context/PointsContext';
+import { ContentItem } from '@/types/library';
 
 export const usePointsTracking = () => {
   const { awardPoints } = usePoints();
@@ -52,12 +53,34 @@ export const usePointsTracking = () => {
     });
   };
   
+  const trackContentView = (content: ContentItem) => {
+    if (!content.pointsEnabled) return;
+    
+    awardPoints({
+      type: 'content_view',
+      description: `Viewed "${content.title}"`,
+      points: content.pointsValue || POINTS_VALUES.content_view
+    });
+  };
+  
+  const trackContentCompletion = (content: ContentItem) => {
+    if (!content.pointsEnabled) return;
+    
+    awardPoints({
+      type: 'content_completion',
+      description: `Completed "${content.title}"`,
+      points: content.pointsValue || POINTS_VALUES.content_completion
+    });
+  };
+  
   return {
     trackLogin,
     trackComment,
     trackLike,
     trackCourseCompletion,
     trackEventParticipation,
-    trackReferral
+    trackReferral,
+    trackContentView,
+    trackContentCompletion
   };
 };
