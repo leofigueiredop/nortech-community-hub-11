@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,59 +16,6 @@ const PaywallSettings: React.FC = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<'simple' | 'featured' | 'premium'>('simple');
   
-  const planFeatures = {
-    basic: [
-      "Community tools (chat, forum, groups)",
-      "Up to 5 courses, 50 lessons each",
-      "1 admin",
-      "Basic gamification (standard points)",
-      "Email support, business hours"
-    ],
-    advanced: [
-      "All Basic features",
-      "Full branding removal, layout customization",
-      "Unlimited courses",
-      "Advanced gamification & Proof of Study",
-      "Token/NFT support (optional)",
-      "Private groups & nested communities",
-      "Analytics dashboard",
-      "API access & automation",
-      "Up to 5 admins / 10 mods",
-      "Priority onboarding and chat support"
-    ],
-    whitelabel: [
-      "All Advanced features",
-      "Custom mobile app (Android & iOS)",
-      "Fully branded experience (no Nortech ref.)",
-      "Dedicated instance (optional)",
-      "Enterprise integrations (SSO, CRMs, LMSs)",
-      "Custom features on demand",
-      "SLA-based premium support",
-      "Dedicated success manager"
-    ]
-  };
-
-  const pricing = {
-    basic: [
-      { members: 100, price: "R$150 / ~$30" },
-      { members: 1000, price: "R$350 / ~$70" },
-      { members: 10000, price: "R$800 / ~$160" },
-      { members: "Unlimited", price: "R$1,200 / ~$240" }
-    ],
-    advanced: [
-      { members: 100, price: "R$300 / ~$60" },
-      { members: 1000, price: "R$700 / ~$140" },
-      { members: 10000, price: "R$1,500 / ~$300" },
-      { members: "Unlimited", price: "R$2,400 / ~$480" }
-    ],
-    whitelabel: [
-      { members: 1000, price: "R$1,500 / ~$300" },
-      { members: 10000, price: "R$3,000 / ~$600" },
-      { members: 100000, price: "R$6,000 / ~$1,200" },
-      { members: "Unlimited", price: "R$9,000 / ~$1,800" }
-    ]
-  };
-
   const paywallTemplates = {
     simple: {
       title: "Simple & Clean",
@@ -167,21 +115,21 @@ const PaywallSettings: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-10">
-      <div className="text-center max-w-3xl mx-auto space-y-4 mb-10">
-        <h1 className="text-3xl font-bold">Paywall Setup</h1>
+    <div className="container mx-auto p-3 md:p-6 space-y-8">
+      <div className="text-center max-w-3xl mx-auto space-y-4 mb-6 md:mb-10">
+        <h1 className="text-2xl md:text-3xl font-bold">Paywall Setup</h1>
         <p className="text-gray-600 dark:text-gray-400">
           Configure how paywalls appear when members encounter premium content
         </p>
       </div>
 
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6">Paywall Landing Templates</h2>
+        <h2 className="text-xl md:text-2xl font-bold mb-4">Paywall Templates</h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
           Choose how your paywall looks when users encounter premium content
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
           {Object.entries(paywallTemplates).map(([key, template]) => (
             <Card 
               key={key} 
@@ -200,16 +148,19 @@ const PaywallSettings: React.FC = () => {
                 <CardDescription>{template.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="aspect-[3/4] overflow-hidden rounded border bg-slate-50 dark:bg-slate-800 flex items-center justify-center p-2">
-                  <div className="transform scale-[0.7] w-full">
+                <div className="bg-slate-50 dark:bg-slate-800 border rounded-lg p-4 flex items-center justify-center">
+                  <div className="w-full max-w-xs mx-auto">
                     {template.preview}
                   </div>
                 </div>
                 <div className="flex space-x-2 mt-4">
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => setPreviewOpen(true)}>
+                  <Button variant="outline" size="sm" className="flex-1" onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewOpen(true);
+                  }}>
                     <Eye size={16} className="mr-1" /> Preview
                   </Button>
-                  <Button size="sm" className="flex-1">
+                  <Button size="sm" className="flex-1" onClick={(e) => e.stopPropagation()}>
                     <Edit size={16} className="mr-1" /> Customize
                   </Button>
                 </div>
@@ -261,136 +212,10 @@ const PaywallSettings: React.FC = () => {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <Card className="border-t-4 border-t-blue-500 shadow-lg">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl">Basic Plan</CardTitle>
-            <CardDescription>Community Essentials</CardDescription>
-            <div className="mt-4">
-              <div className="text-3xl font-bold text-nortech-purple">From R$150 <span className="text-sm font-normal text-gray-500">/month</span></div>
-              <div className="text-sm text-gray-500 mt-1">~$30 USD</div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
-              <p className="font-medium">Features include:</p>
-              <ul className="space-y-2">
-                {planFeatures.basic.map((feature, index) => (
-                  <li key={index} className="flex">
-                    <Check className="h-5 w-5 text-green-500 mr-2 shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <div className="pt-4">
-                <p className="font-medium mb-2">Pricing tiers:</p>
-                <ul className="space-y-1">
-                  {pricing.basic.map((tier, index) => (
-                    <li key={index} className="text-sm flex justify-between">
-                      <span>Up to {tier.members} members:</span>
-                      <span className="font-medium">{tier.price}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div className="pt-4">
-                <Button className="w-full bg-blue-500 hover:bg-blue-600">Choose Basic Plan</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-t-4 border-t-purple-600 shadow-lg relative">
-          <div className="absolute top-0 right-0 bg-purple-600 text-white px-3 py-1 rounded-bl-lg text-xs font-bold">
-            POPULAR
-          </div>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl">Advanced Plan</CardTitle>
-            <CardDescription>Custom Engagement</CardDescription>
-            <div className="mt-4">
-              <div className="text-3xl font-bold text-nortech-purple">From R$300 <span className="text-sm font-normal text-gray-500">/month</span></div>
-              <div className="text-sm text-gray-500 mt-1">~$60 USD</div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
-              <p className="font-medium">Everything in Basic, plus:</p>
-              <ul className="space-y-2">
-                {planFeatures.advanced.map((feature, index) => (
-                  <li key={index} className="flex">
-                    <Check className="h-5 w-5 text-green-500 mr-2 shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <div className="pt-4">
-                <p className="font-medium mb-2">Pricing tiers:</p>
-                <ul className="space-y-1">
-                  {pricing.advanced.map((tier, index) => (
-                    <li key={index} className="text-sm flex justify-between">
-                      <span>Up to {tier.members} members:</span>
-                      <span className="font-medium">{tier.price}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div className="pt-4">
-                <Button className="w-full bg-purple-600 hover:bg-purple-700">Choose Advanced Plan</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-t-4 border-t-emerald-600 shadow-lg">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl">White Label + App</CardTitle>
-            <CardDescription>Full Custom Solution</CardDescription>
-            <div className="mt-4">
-              <div className="text-3xl font-bold text-nortech-purple">From R$1,500 <span className="text-sm font-normal text-gray-500">/month</span></div>
-              <div className="text-sm text-gray-500 mt-1">~$300 USD + Setup Fee</div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
-              <p className="font-medium">Everything in Advanced, plus:</p>
-              <ul className="space-y-2">
-                {planFeatures.whitelabel.map((feature, index) => (
-                  <li key={index} className="flex">
-                    <Check className="h-5 w-5 text-green-500 mr-2 shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <div className="pt-4">
-                <p className="font-medium mb-2">Pricing tiers:</p>
-                <div className="text-sm mb-2">Setup Fee: R$15,000 (~US$3,000 one-time)</div>
-                <ul className="space-y-1">
-                  {pricing.whitelabel.map((tier, index) => (
-                    <li key={index} className="text-sm flex justify-between">
-                      <span>Up to {tier.members} members:</span>
-                      <span className="font-medium">{tier.price}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div className="pt-4">
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-700">Choose White Label</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="max-w-3xl mx-auto mt-16 space-y-8">
-        <h2 className="text-2xl font-bold text-center">Payment Options</h2>
+      <div className="max-w-3xl mx-auto mt-8 md:mt-16 space-y-6 md:space-y-8">
+        <h2 className="text-xl md:text-2xl font-bold text-center">Payment Options</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Fiat Payments</CardTitle>
@@ -440,7 +265,7 @@ const PaywallSettings: React.FC = () => {
           </Card>
         </div>
         
-        <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg text-center">
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 md:p-6 rounded-lg text-center">
           <h3 className="text-lg font-medium mb-2">Need a custom solution?</h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
             Contact our team to discuss enterprise solutions, custom features, or special requirements.
