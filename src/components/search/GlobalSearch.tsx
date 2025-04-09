@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -11,9 +10,11 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
-import { Search, Tag, Book, Calendar, File, MessageSquare, X } from 'lucide-react';
+import { Search, Tag, Book, Calendar, File, MessageSquare, X, Bot } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useSearchResults } from '@/hooks/useSearchResults';
+import CopilotButton from './CopilotButton';
+import AITerminal from '@/components/ai/AITerminal';
 
 interface GlobalSearchProps {
   open: boolean;
@@ -24,6 +25,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onOpenChange }) => {
   const [query, setQuery] = useState('');
   const { results, isLoading } = useSearchResults(query);
   const navigate = useNavigate();
+  const [showAITerminal, setShowAITerminal] = useState(false);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -46,6 +48,10 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onOpenChange }) => {
     setQuery('');
     onOpenChange(false);
     navigate(value);
+  };
+
+  const toggleAITerminal = () => {
+    setShowAITerminal(!showAITerminal);
   };
 
   // Helper function to highlight matched text
@@ -88,7 +94,10 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onOpenChange }) => {
                     results.library.length > 0 || results.events.length > 0;
 
   return (
-    <CommandDialog open={open} onOpenChange={onOpenChange}>
+    <CommandDialog open={open} onOpenChange={(open) => {
+      onOpenChange(open);
+      if (!open) setShowAITerminal(false);
+    }}>
       <div className="flex items-center border-b px-3">
         <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
         <CommandInput 
@@ -97,161 +106,192 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onOpenChange }) => {
           onValueChange={setQuery}
           className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
         />
-        {query && (
-          <button 
-            onClick={() => setQuery('')}
-            className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          <CopilotButton onClick={toggleAITerminal} />
+          {query && (
+            <button 
+              onClick={() => setQuery('')}
+              className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
       
-      <CommandList>
-        {query === '' ? (
-          <CommandEmpty className="py-6 text-center text-sm">
-            Type to search posts, courses, library content, and events...
-          </CommandEmpty>
-        ) : isLoading ? (
-          <div className="p-4 text-center text-sm">
-            Searching...
-          </div>
-        ) : !hasResults ? (
-          <CommandEmpty className="py-6 text-center text-sm">
-            No results found for "{query}"
-          </CommandEmpty>
-        ) : (
-          <>
-            {isHashtagSearch && (
-              <CommandGroup heading="Tags">
-                <CommandItem
-                  onSelect={() => handleSelect(`/feed?tag=${query.substring(1)}`)}
-                  className="flex items-center"
+      {showAITerminal ? (
+        <div className="p-4">
+          <AITerminal 
+            terminalName="AI Copilot" 
+            onClose={() => setShowAITerminal(false)}
+            initialPrompt={query}
+          />
+        </div>
+      ) : (
+        <CommandList>
+          {query === '' ? (
+            <CommandEmpty className="py-6 text-center text-sm">
+              Type to search posts, courses, library content, and events...
+              <div className="mt-2 text-center">
+                <button 
+                  className="text-indigo-600 dark:text-indigo-400 flex items-center gap-1 mx-auto"
+                  onClick={toggleAITerminal}
                 >
-                  <Tag className="mr-2 h-4 w-4" />
-                  <span>Browse all content with {query}</span>
-                </CommandItem>
-              </CommandGroup>
-            )}
-
-            {results.posts && results.posts.length > 0 && (
-              <CommandGroup heading="Posts">
-                {results.posts.map((post) => (
+                  <Bot className="h-4 w-4" />
+                  <span>Or ask AI Copilot</span>
+                </button>
+              </div>
+            </CommandEmpty>
+          ) : isLoading ? (
+            <div className="p-4 text-center text-sm">
+              Searching...
+            </div>
+          ) : !hasResults ? (
+            <CommandEmpty className="py-6 text-center text-sm">
+              <p>No results found for "{query}"</p>
+              <div className="mt-2 text-center">
+                <button 
+                  className="text-indigo-600 dark:text-indigo-400 flex items-center gap-1 mx-auto"
+                  onClick={toggleAITerminal}
+                >
+                  <Bot className="h-4 w-4" />
+                  <span>Try asking AI Copilot</span>
+                </button>
+              </div>
+            </CommandEmpty>
+          ) : (
+            <>
+              {isHashtagSearch && (
+                <CommandGroup heading="Tags">
                   <CommandItem
-                    key={post.id}
-                    onSelect={() => handleSelect(`/discussions/${post.id}`)}
-                    className="flex flex-col items-start"
+                    onSelect={() => handleSelect(`/feed?tag=${query.substring(1)}`)}
+                    className="flex items-center"
                   >
-                    <div className="flex items-center w-full">
-                      {getContentIcon('post')}
-                      <span className="font-medium">{highlightMatch(post.title)}</span>
-                    </div>
-                    {post.preview && (
-                      <p className="text-xs text-muted-foreground mt-1 ml-6 line-clamp-1">
-                        {highlightMatch(post.preview)}
-                      </p>
-                    )}
-                    {post.tags && post.tags.length > 0 && (
-                      <div className="flex gap-1 mt-1 ml-6">
-                        {post.tags.map((tag) => (
-                          <Badge key={tag} variant="outline" className="text-xs px-1 py-0">
-                            #{tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
+                    <Tag className="mr-2 h-4 w-4" />
+                    <span>Browse all content with {query}</span>
                   </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
+                </CommandGroup>
+              )}
 
-            {results.courses && results.courses.length > 0 && (
-              <>
-                <CommandSeparator />
-                <CommandGroup heading="Courses">
-                  {results.courses.map((course) => (
+              {results.posts && results.posts.length > 0 && (
+                <CommandGroup heading="Posts">
+                  {results.posts.map((post) => (
                     <CommandItem
-                      key={course.id}
-                      onSelect={() => handleSelect(`/courses/${course.id}`)}
+                      key={post.id}
+                      onSelect={() => handleSelect(`/discussions/${post.id}`)}
                       className="flex flex-col items-start"
                     >
                       <div className="flex items-center w-full">
-                        {getContentIcon('course')}
-                        <span className="font-medium">{highlightMatch(course.title)}</span>
+                        {getContentIcon('post')}
+                        <span className="font-medium">{highlightMatch(post.title)}</span>
                       </div>
-                      {course.preview && (
+                      {post.preview && (
                         <p className="text-xs text-muted-foreground mt-1 ml-6 line-clamp-1">
-                          {highlightMatch(course.preview)}
+                          {highlightMatch(post.preview)}
                         </p>
                       )}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </>
-            )}
-
-            {results.library && results.library.length > 0 && (
-              <>
-                <CommandSeparator />
-                <CommandGroup heading="Library">
-                  {results.library.map((item) => (
-                    <CommandItem
-                      key={item.id}
-                      onSelect={() => handleSelect(`/library?item=${item.id}`)}
-                      className="flex flex-col items-start"
-                    >
-                      <div className="flex items-center w-full">
-                        {getContentIcon('library')}
-                        <span className="font-medium">{highlightMatch(item.title)}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1 ml-6 line-clamp-1">
-                        {highlightMatch(item.description)}
-                      </p>
-                      {item.tags && item.tags.length > 0 && (
+                      {post.tags && post.tags.length > 0 && (
                         <div className="flex gap-1 mt-1 ml-6">
-                          {item.tags.slice(0, 3).map((tag) => (
+                          {post.tags.map((tag) => (
                             <Badge key={tag} variant="outline" className="text-xs px-1 py-0">
                               #{tag}
                             </Badge>
                           ))}
-                          {item.tags.length > 3 && (
-                            <span className="text-xs text-muted-foreground">+{item.tags.length - 3} more</span>
-                          )}
                         </div>
                       )}
                     </CommandItem>
                   ))}
                 </CommandGroup>
-              </>
-            )}
+              )}
 
-            {results.events && results.events.length > 0 && (
-              <>
-                <CommandSeparator />
-                <CommandGroup heading="Events">
-                  {results.events.map((event) => (
-                    <CommandItem
-                      key={event.id}
-                      onSelect={() => handleSelect(`/events/${event.id}`)}
-                      className="flex flex-col items-start"
-                    >
-                      <div className="flex items-center w-full">
-                        {getContentIcon('event')}
-                        <span className="font-medium">{highlightMatch(event.title)}</span>
-                      </div>
-                      {event.date && (
-                        <p className="text-xs text-muted-foreground mt-1 ml-6">
-                          {event.date}
+              {results.courses && results.courses.length > 0 && (
+                <>
+                  <CommandSeparator />
+                  <CommandGroup heading="Courses">
+                    {results.courses.map((course) => (
+                      <CommandItem
+                        key={course.id}
+                        onSelect={() => handleSelect(`/courses/${course.id}`)}
+                        className="flex flex-col items-start"
+                      >
+                        <div className="flex items-center w-full">
+                          {getContentIcon('course')}
+                          <span className="font-medium">{highlightMatch(course.title)}</span>
+                        </div>
+                        {course.preview && (
+                          <p className="text-xs text-muted-foreground mt-1 ml-6 line-clamp-1">
+                            {highlightMatch(course.preview)}
+                          </p>
+                        )}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </>
+              )}
+
+              {results.library && results.library.length > 0 && (
+                <>
+                  <CommandSeparator />
+                  <CommandGroup heading="Library">
+                    {results.library.map((item) => (
+                      <CommandItem
+                        key={item.id}
+                        onSelect={() => handleSelect(`/library?item=${item.id}`)}
+                        className="flex flex-col items-start"
+                      >
+                        <div className="flex items-center w-full">
+                          {getContentIcon('library')}
+                          <span className="font-medium">{highlightMatch(item.title)}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1 ml-6 line-clamp-1">
+                          {highlightMatch(item.description)}
                         </p>
-                      )}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </>
-            )}
-          </>
-        )}
-      </CommandList>
+                        {item.tags && item.tags.length > 0 && (
+                          <div className="flex gap-1 mt-1 ml-6">
+                            {item.tags.slice(0, 3).map((tag) => (
+                              <Badge key={tag} variant="outline" className="text-xs px-1 py-0">
+                                #{tag}
+                              </Badge>
+                            ))}
+                            {item.tags.length > 3 && (
+                              <span className="text-xs text-muted-foreground">+{item.tags.length - 3} more</span>
+                            )}
+                          </div>
+                        )}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </>
+              )}
+
+              {results.events && results.events.length > 0 && (
+                <>
+                  <CommandSeparator />
+                  <CommandGroup heading="Events">
+                    {results.events.map((event) => (
+                      <CommandItem
+                        key={event.id}
+                        onSelect={() => handleSelect(`/events/${event.id}`)}
+                        className="flex flex-col items-start"
+                      >
+                        <div className="flex items-center w-full">
+                          {getContentIcon('event')}
+                          <span className="font-medium">{highlightMatch(event.title)}</span>
+                        </div>
+                        {event.date && (
+                          <p className="text-xs text-muted-foreground mt-1 ml-6">
+                            {event.date}
+                          </p>
+                        )}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </>
+              )}
+            </>
+          )}
+        </CommandList>
+      )}
     </CommandDialog>
   );
 };

@@ -15,12 +15,14 @@ interface AITerminalProps {
   terminalName?: string;
   onClose?: () => void;
   onMinimize?: () => void;
+  initialPrompt?: string;
 }
 
 const AITerminal: React.FC<AITerminalProps> = ({ 
   terminalName = "Nortech AI",
   onClose,
-  onMinimize
+  onMinimize,
+  initialPrompt = ""
 }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -29,7 +31,7 @@ const AITerminal: React.FC<AITerminalProps> = ({
       timestamp: new Date()
     }
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialPrompt);
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -38,6 +40,13 @@ const AITerminal: React.FC<AITerminalProps> = ({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Process initial prompt if provided
+  useEffect(() => {
+    if (initialPrompt && initialPrompt.trim() !== '') {
+      handleSendMessage();
+    }
+  }, []);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();

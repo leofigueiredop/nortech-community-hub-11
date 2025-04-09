@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,7 +16,6 @@ import Discussions from "./pages/Discussions";
 import DiscussionTopic from "./pages/DiscussionTopic";
 import Library from "./pages/Library";
 import Events from "./pages/Events";
-import LiveStreams from "./pages/LiveStreams";
 import Members from "./pages/Members";
 import Analytics from "./pages/Analytics";
 import CreateSpace from "./pages/CreateSpace";
@@ -82,7 +82,6 @@ const App = () => (
               <Route path="/courses/create" element={<CourseCreate />} />
               <Route path="/courses/edit/:courseId" element={<CourseEdit />} />
               <Route path="/events" element={<Events />} />
-              <Route path="/live-streams" element={<LiveStreams />} />
               <Route path="/members" element={<Members />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/points" element={<PointsDashboard />} />
