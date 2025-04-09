@@ -8,6 +8,7 @@ export interface SettingsMenuItemProps {
   to: string;
   active?: boolean;
   badge?: string;
+  className?: string;
 }
 
 const SettingsMenuItem: React.FC<SettingsMenuItemProps> = ({ 
@@ -15,7 +16,8 @@ const SettingsMenuItem: React.FC<SettingsMenuItemProps> = ({
   label, 
   to, 
   active = false,
-  badge
+  badge,
+  className
 }) => {
   return (
     <Link 
@@ -25,6 +27,7 @@ const SettingsMenuItem: React.FC<SettingsMenuItemProps> = ({
         ${active 
           ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 font-medium' 
           : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700/50'}
+        ${className || ''}
       `}
     >
       <div className="flex items-center gap-2">
