@@ -1,80 +1,65 @@
+
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, CalendarIcon, List, Grid } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { getTypeFilters } from './types/EventTypes';
+import { Calendar, Grid, List, Plus, ViewIcon } from 'lucide-react';
+
+type ViewType = 'calendar' | 'list' | 'grid';
 
 interface EventsHeaderProps {
-  viewType: string;
-  setViewType: (viewType: string) => void;
+  viewType: ViewType;
+  setViewType: (view: ViewType) => void;
 }
 
 const EventsHeader: React.FC<EventsHeaderProps> = ({ viewType, setViewType }) => {
-  const { toast } = useToast();
-  const typeFilters = getTypeFilters();
-
-  const handleCreateEvent = () => {
-    toast({
-      title: "Feature Coming Soon",
-      description: "The ability to create events will be available in a future update.",
-    });
-  };
-
   return (
-    <>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Community Events</h1>
-        <div className="flex items-center gap-3">
-          <div className="border rounded-lg flex overflow-hidden">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={`rounded-none ${viewType === 'calendar' ? 'bg-muted' : ''}`}
-              onClick={() => setViewType('calendar')}
-            >
-              <CalendarIcon size={16} />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className={`rounded-none ${viewType === 'list' ? 'bg-muted' : ''}`}
-              onClick={() => setViewType('list')}
-            >
-              <List size={16} />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className={`rounded-none ${viewType === 'grid' ? 'bg-muted' : ''}`}
-              onClick={() => setViewType('grid')}
-            >
-              <Grid size={16} />
-            </Button>
-          </div>
-          <Button 
-            onClick={handleCreateEvent}
-            className="flex items-center gap-2 bg-nortech-purple hover:bg-nortech-purple/90"
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Events</h1>
+        <p className="text-muted-foreground">
+          Discover and attend upcoming community events
+        </p>
+      </div>
+      
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex rounded-md shadow-sm">
+          <Button
+            variant={viewType === 'calendar' ? 'default' : 'outline'}
+            size="sm"
+            className="rounded-l-md rounded-r-none"
+            onClick={() => setViewType('calendar')}
           >
-            <Plus size={16} />
-            <span>New Event</span>
+            <Calendar className="h-4 w-4 mr-2" />
+            Calendar
+          </Button>
+          <Button
+            variant={viewType === 'list' ? 'default' : 'outline'}
+            size="sm"
+            className="rounded-none border-x-0"
+            onClick={() => setViewType('list')}
+          >
+            <List className="h-4 w-4 mr-2" />
+            List
+          </Button>
+          <Button
+            variant={viewType === 'grid' ? 'default' : 'outline'}
+            size="sm"
+            className="rounded-r-md rounded-l-none"
+            onClick={() => setViewType('grid')}
+          >
+            <Grid className="h-4 w-4 mr-2" />
+            Grid
           </Button>
         </div>
+        
+        <Link to="/events/create">
+          <Button className="w-full sm:w-auto bg-nortech-purple hover:bg-nortech-purple/90">
+            <Plus className="h-4 w-4 mr-2" />
+            Create Event
+          </Button>
+        </Link>
       </div>
-
-      {/* Type filters */}
-      <div className="flex flex-wrap mb-4">
-        {typeFilters.map(({ type, details }) => (
-          <Badge 
-            key={type} 
-            className={`cursor-pointer ${details.color} flex items-center gap-1 mb-2 mr-2`}
-          >
-            {details.icon}
-            {details.label}
-          </Badge>
-        ))}
-      </div>
-    </>
+    </div>
   );
 };
 

@@ -44,11 +44,15 @@ export const usePointsTracking = () => {
     });
   };
   
-  const trackEventParticipation = (eventName: string, customPoints?: number) => {
+  // Enhanced version with more tracking options
+  const trackEventParticipation = (eventName: string, eventType?: string, customPoints?: number) => {
+    const pointsValue = customPoints || POINTS_VALUES.event_participation;
+    
     awardPoints({
       type: 'event_participation',
       description: `Participated in "${eventName}" event`,
-      points: customPoints || POINTS_VALUES.event_participation
+      points: pointsValue,
+      metadata: { eventType }
     });
     
     // Award event attendance badge
@@ -57,6 +61,22 @@ export const usePointsTracking = () => {
       description: `Attended the ${eventName} event`,
       category: 'event'
     });
+    
+    // Check if this is the 5th event attended (simplified example)
+    checkEventAttendanceMilestones();
+  };
+  
+  // New function to check attendance milestones
+  const checkEventAttendanceMilestones = () => {
+    // In a real app, this would query the user's attendance history
+    // For this example, we'll just award a special badge
+    setTimeout(() => {
+      awardBadge({
+        name: 'Event Enthusiast',
+        description: 'Attended 5 community events',
+        category: 'achievement'
+      });
+    }, 1000);
   };
   
   const trackReferral = (username: string) => {
@@ -105,6 +125,7 @@ export const usePointsTracking = () => {
     trackReferral,
     trackContentView,
     trackContentCompletion,
-    awardCustomBadge
+    awardCustomBadge,
+    checkEventAttendanceMilestones
   };
 };

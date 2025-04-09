@@ -33,6 +33,8 @@ import CourseCreate from "./pages/CourseCreate";
 import CourseEdit from "./pages/CourseEdit";
 import Courses from "./pages/Courses";
 import TagPage from "./pages/TagPage";
+import UserProfile from "./pages/UserProfile";
+import CreateEvent from "./pages/CreateEvent";
 
 // Import settings pages
 import SettingsIndex from "./pages/settings/Index";
@@ -86,6 +88,7 @@ const App = () => (
               <Route path="/events" element={<Events />} />
               <Route path="/events/weekly" element={<EventsWeekly />} />
               <Route path="/events/calendar" element={<EventsCalendar />} />
+              <Route path="/events/create" element={<CreateEvent />} />
               <Route path="/members" element={<Members />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/points" element={<PointsDashboard />} />
@@ -93,6 +96,8 @@ const App = () => (
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/ai-terminal" element={<AITerminal />} />
               <Route path="/ai-matchmaker" element={<AIMatchmaker />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/profile/:userId" element={<UserProfile />} />
               
               <Route path="/tags/:tagName" element={<TagPage />} />
               
