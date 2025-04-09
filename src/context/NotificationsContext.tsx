@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface Notification {
@@ -69,7 +68,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
     id: '5',
     type: 'milestone',
     title: 'Achievement Unlocked!',
-    message: 'Congratulations! You've completed your first course on Nortech Communities.',
+    message: "Congratulations! You've completed your first course on Nortech Communities.",
     link: '/courses',
     timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
     read: true
