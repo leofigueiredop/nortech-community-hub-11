@@ -23,11 +23,12 @@ interface Event {
   date?: string;
 }
 
-interface SearchResults {
+export interface SearchResults {
   posts: Post[];
   courses: Course[];
   library: ContentItem[];
   events: Event[];
+  length?: number; // Add length property for convenience
 }
 
 // Mock data
@@ -61,7 +62,7 @@ export const useSearchResults = (query: string) => {
 
   useEffect(() => {
     if (!query || query.length < 2) {
-      setResults({ posts: [], courses: [], library: [], events: [] });
+      setResults({ posts: [], courses: [], library: [], events: [], length: 0 });
       return;
     }
 
@@ -109,11 +110,20 @@ export const useSearchResults = (query: string) => {
           (event.date && event.date.toLowerCase().includes(searchTerm))
         );
 
-        setResults({
+        const searchResults = {
           posts: matchedPosts,
           courses: matchedCourses,
           library: matchedLibrary,
           events: matchedEvents
+        };
+        
+        // Calculate total length
+        const totalLength = matchedPosts.length + matchedCourses.length + 
+                            matchedLibrary.length + matchedEvents.length;
+        
+        setResults({
+          ...searchResults,
+          length: totalLength
         });
       } catch (error) {
         console.error("Error searching content:", error);

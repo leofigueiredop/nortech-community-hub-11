@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, Tag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 interface FeedFiltersProps {
@@ -52,7 +52,9 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
 
   const availableTags = [
     'Web3', 'Finance', 'Design', 'Development', 'Marketing', 
-    'Mentoring', 'Career', 'Productivity', 'AI', 'Tech'
+    'Mentoring', 'Career', 'Productivity', 'AI', 'Tech', 'Crypto',
+    'Web', 'Mobile', 'Backend', 'Frontend', 'Blockchain', 'NFT',
+    'Security', 'DevOps', 'Cloud', 'Leadership', 'Mindset'
   ];
 
   const toggleTag = (tag: string) => {
@@ -61,6 +63,10 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
     } else {
       setSelectedTags([...selectedTags, tag]);
     }
+  };
+
+  const handleTagSearch = (tag: string) => {
+    setSearchQuery(`#${tag}`);
   };
 
   return (
@@ -115,18 +121,55 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
         </DropdownMenu>
       </div>
       
-      <div className="flex flex-wrap gap-2">
+      <div className="flex items-center mb-2">
+        <Tag size={16} className="mr-2 text-purple-500" />
+        <span className="text-sm font-medium">Popular Tags</span>
+      </div>
+      
+      <div className="flex flex-wrap gap-2 bg-slate-50 dark:bg-slate-900 p-3 rounded-md border">
         {availableTags.map(tag => (
           <Badge 
             key={tag}
             variant={selectedTags.includes(tag) ? "default" : "outline"} 
-            className={`cursor-pointer ${selectedTags.includes(tag) ? 'bg-nortech-purple hover:bg-nortech-purple/90' : ''}`}
+            className={`cursor-pointer ${
+              selectedTags.includes(tag) 
+                ? 'bg-purple-500 hover:bg-purple-600' 
+                : 'hover:bg-purple-100 dark:hover:bg-purple-900 border-purple-300'
+            }`}
             onClick={() => toggleTag(tag)}
           >
             #{tag}
           </Badge>
         ))}
       </div>
+      
+      {selectedTags.length > 0 && (
+        <div className="flex gap-2 items-center">
+          <span className="text-sm font-medium">Active Filters:</span>
+          {selectedTags.map(tag => (
+            <Badge 
+              key={tag}
+              variant="default" 
+              className="bg-purple-500 hover:bg-purple-600 cursor-pointer flex items-center gap-1"
+            >
+              #{tag}
+              <button onClick={() => toggleTag(tag)} className="ml-1">
+                <X size={14} />
+              </button>
+            </Badge>
+          ))}
+          {selectedTags.length > 0 && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs h-7"
+              onClick={() => setSelectedTags([])}
+            >
+              Clear All
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 };

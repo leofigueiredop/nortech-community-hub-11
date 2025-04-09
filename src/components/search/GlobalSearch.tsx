@@ -82,6 +82,10 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onOpenChange }) => {
 
   // Check if query is a hashtag search
   const isHashtagSearch = query.startsWith('#');
+  
+  // Calculate if we have any results
+  const hasResults = results.posts.length > 0 || results.courses.length > 0 || 
+                    results.library.length > 0 || results.events.length > 0;
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
@@ -112,7 +116,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onOpenChange }) => {
           <div className="p-4 text-center text-sm">
             Searching...
           </div>
-        ) : results.length === 0 ? (
+        ) : !hasResults ? (
           <CommandEmpty className="py-6 text-center text-sm">
             No results found for "{query}"
           </CommandEmpty>
@@ -200,15 +204,20 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ open, onOpenChange }) => {
                         {getContentIcon('library')}
                         <span className="font-medium">{highlightMatch(item.title)}</span>
                       </div>
-                      {item.preview && (
-                        <p className="text-xs text-muted-foreground mt-1 ml-6 line-clamp-1">
-                          {highlightMatch(item.preview)}
-                        </p>
-                      )}
-                      {item.format && (
-                        <Badge variant="outline" className="text-xs px-1 py-0 mt-1 ml-6">
-                          {item.format}
-                        </Badge>
+                      <p className="text-xs text-muted-foreground mt-1 ml-6 line-clamp-1">
+                        {highlightMatch(item.description)}
+                      </p>
+                      {item.tags && item.tags.length > 0 && (
+                        <div className="flex gap-1 mt-1 ml-6">
+                          {item.tags.slice(0, 3).map((tag) => (
+                            <Badge key={tag} variant="outline" className="text-xs px-1 py-0">
+                              #{tag}
+                            </Badge>
+                          ))}
+                          {item.tags.length > 3 && (
+                            <span className="text-xs text-muted-foreground">+{item.tags.length - 3} more</span>
+                          )}
+                        </div>
                       )}
                     </CommandItem>
                   ))}

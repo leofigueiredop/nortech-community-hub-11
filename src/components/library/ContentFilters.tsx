@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, FileVideo, File, FileAudio, Link, Image, FileText } from 'lucide-react';
+import { Search, Filter, Tag, Folder } from 'lucide-react';
 import { ContentFormat } from '@/types/library';
 import {
   DropdownMenu,
@@ -41,7 +41,7 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
   setAccessFilter,
   setSearchQuery
 }) => {
-  const [tagsOpen, setTagsOpen] = useState(false);
+  const [tagsOpen, setTagsOpen] = useState(true);
   
   const getFormatLabel = (format: string) => {
     if (format === 'all') return 'All Formats';
@@ -120,14 +120,15 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
         </DropdownMenu>
       </div>
       
-      {/* Simple tag filter with toggle functionality */}
+      {/* Tag filter section with toggle functionality */}
       <div className="flex items-center mb-2">
         <Button 
           variant="ghost" 
           onClick={() => setTagsOpen(!tagsOpen)} 
-          className="text-sm text-muted-foreground p-0 h-auto"
+          className="text-sm text-muted-foreground p-0 h-auto flex items-center"
         >
-          Tags
+          <Tag size={16} className="mr-2 text-purple-500" />
+          <span>Tags</span>
           <span className="ml-1 text-xs">
             {tagsOpen ? "▼" : "►"}
           </span>
@@ -137,21 +138,25 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
             className="ml-2 bg-purple-500 hover:bg-purple-600 cursor-pointer"
             onClick={() => setTagFilter('all')}
           >
-            {tagFilter} ×
+            #{tagFilter} ×
           </Badge>
         )}
       </div>
       
       {tagsOpen && (
-        <div className="flex flex-wrap gap-2 mb-2">
+        <div className="flex flex-wrap gap-2 mb-2 bg-slate-50 dark:bg-slate-900 p-3 rounded-md border">
           {allTags.map((tag) => (
             <Badge
               key={tag}
               variant={tagFilter === tag ? 'default' : 'outline'}
               onClick={() => setTagFilter(tag)}
-              className={`cursor-pointer whitespace-nowrap ${tagFilter === tag ? 'bg-purple-500 hover:bg-purple-600' : ''}`}
+              className={`cursor-pointer whitespace-nowrap ${
+                tagFilter === tag 
+                  ? 'bg-purple-500 hover:bg-purple-600' 
+                  : 'hover:bg-purple-100 dark:hover:bg-purple-900 border-purple-300'
+              }`}
             >
-              {tag}
+              #{tag}
             </Badge>
           ))}
         </div>

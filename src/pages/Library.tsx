@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
@@ -7,10 +8,11 @@ import FeaturedContent from '@/components/library/FeaturedContent';
 import ContentViewer from '@/components/library/ContentViewer';
 import UpsellBlock from '@/components/library/UpsellBlock';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Folder, Upload, FileVideo, File, FileAudio, BookOpen, Image } from 'lucide-react';
+import { FileText, Folder, Upload, FileVideo, File, FileAudio, BookOpen, Image, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link as RouterLink } from 'react-router-dom';
 import { ContentFormat } from '@/types/library';
+import { Badge } from '@/components/ui/badge';
 
 const Library: React.FC = () => {
   const {
@@ -43,12 +45,18 @@ const Library: React.FC = () => {
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    if (value !== 'all' && value !== 'categories') {
+    if (value !== 'all' && value !== 'categories' && value !== 'tags') {
       setFormatFilter(value as ContentFormat);
     } else if (value === 'all') {
       setFormatFilter('all');
     }
   };
+
+  // Get popular tags with content count
+  const tagsWithCount = allTags.map(tag => ({
+    name: tag,
+    count: content.filter(item => item.tags.includes(tag)).length
+  })).sort((a, b) => b.count - a.count);
 
   return (
     <MainLayout title="Content Library">
@@ -94,6 +102,9 @@ const Library: React.FC = () => {
               </TabsTrigger>
               <TabsTrigger value="image" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
                 <Image size={16} /> Images
+              </TabsTrigger>
+              <TabsTrigger value="tags" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
+                <Tag size={16} /> Tags
               </TabsTrigger>
               <TabsTrigger value="categories" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
                 <Folder size={16} /> Categories
@@ -154,6 +165,32 @@ const Library: React.FC = () => {
               items={imageContent} 
               onItemSelect={setSelectedItem} 
             />
+          </TabsContent>
+          
+          <TabsContent value="tags">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold mb-4">Browse Content by Tags</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {tagsWithCount.map(tag => (
+                  <div 
+                    key={tag.name} 
+                    className="border rounded-lg p-4 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition-colors"
+                    onClick={() => {
+                      setTagFilter(tag.name);
+                      setActiveTab('all');
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge className="bg-purple-500">#{tag.name}</Badge>
+                      <span className="text-sm text-muted-foreground">{tag.count} items</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Click to view all content with this tag
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </TabsContent>
           
           <TabsContent value="categories">
