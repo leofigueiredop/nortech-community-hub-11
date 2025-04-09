@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, MessageSquare, BookOpen, Calendar, Play, Terminal, Users, Trophy } from 'lucide-react';
+import { FileText, MessageSquare, Calendar, Play, Terminal, Users, Trophy, Library } from 'lucide-react';
 import SidebarSection from './SidebarSection';
 import SidebarLink from './SidebarLink';
 
@@ -19,9 +19,9 @@ const ContentSection: React.FC = () => {
         label="Discussions" 
       />
       <SidebarLink 
-        to="/courses" 
-        icon={<BookOpen size={18} />} 
-        label="Courses" 
+        to="/library" 
+        icon={<Library size={18} />} 
+        label="Content Library" 
       />
       <SidebarLink 
         to="/events" 
@@ -47,7 +47,7 @@ const ContentSection: React.FC = () => {
         to="/points" 
         icon={<Trophy size={18} />} 
         label="Points" 
-        additionalPaths={['/leaderboard']}
+        additionalPaths={['/leaderboard', '/points/store']}
       />
     </SidebarSection>
   );

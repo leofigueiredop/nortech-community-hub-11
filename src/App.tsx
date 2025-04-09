@@ -14,7 +14,7 @@ import Feed from "./pages/Feed";
 import CreatePost from "./pages/CreatePost";
 import Discussions from "./pages/Discussions";
 import DiscussionTopic from "./pages/DiscussionTopic";
-import Courses from "./pages/Courses";
+import Library from "./pages/Library";
 import Events from "./pages/Events";
 import LiveStreams from "./pages/LiveStreams";
 import Members from "./pages/Members";
@@ -71,7 +71,7 @@ const App = () => (
               <Route path="/discussions" element={<Discussions />} />
               <Route path="/discussions/:topicId" element={<DiscussionTopic />} />
               
-              <Route path="/courses" element={<Courses />} />
+              <Route path="/library" element={<Library />} />
               <Route path="/events" element={<Events />} />
               <Route path="/live-streams" element={<LiveStreams />} />
               <Route path="/members" element={<Members />} />

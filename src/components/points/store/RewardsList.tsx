@@ -12,13 +12,13 @@ interface RewardsListProps {
 const RewardsList: React.FC<RewardsListProps> = ({ searchQuery, categoryFilter, sortBy }) => {
   const { rewards, isLoading } = useRewards();
   
-  // Filter rewards based on search query and category
+  // Filter rewards based on search query and type
   const filteredRewards = rewards.filter(reward => {
     const matchesSearch = searchQuery === '' || 
       reward.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       reward.description.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesCategory = categoryFilter === 'all' || reward.category === categoryFilter;
+    const matchesCategory = categoryFilter === 'all' || reward.type === categoryFilter;
     
     return matchesSearch && matchesCategory;
   });
