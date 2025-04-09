@@ -1,43 +1,22 @@
-
 import React from 'react';
-import { Search, Filter } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { ContentFormat, AccessLevel } from '@/types/library';
+import { Search, Filter, FileText, FileVideo, FileAudio, Link as LinkIcon, FileImage, Youtube, Video, LayoutGrid } from 'lucide-react';
+import { ContentFormat } from '@/types/library';
 
 interface ContentFiltersProps {
   formatFilter: string;
   tagFilter: string;
   accessFilter: string;
   searchQuery: string;
-  allFormats: ContentFormat[];
+  allFormats: string[];
   allTags: string[];
   setFormatFilter: (format: string) => void;
   setTagFilter: (tag: string) => void;
-  setAccessFilter: (access: string) => void;
+  setAccessFilter: (level: string) => void;
   setSearchQuery: (query: string) => void;
 }
-
-const formatLabels: Record<ContentFormat, string> = {
-  'video': 'Videos',
-  'pdf': 'PDFs',
-  'link': 'Links',
-  'audio': 'Audio',
-  'image': 'Images',
-  'text': 'Text'
-};
-
-const accessLabels: Record<AccessLevel, string> = {
-  'free': 'Free',
-  'premium': 'Premium'
-};
 
 const ContentFilters: React.FC<ContentFiltersProps> = ({
   formatFilter,
@@ -51,73 +30,92 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
   setAccessFilter,
   setSearchQuery
 }) => {
+  const formatIcons: Record<ContentFormat, React.ReactNode> = {
+    video: <FileVideo size={16} />,
+    pdf: <FileText size={16} />,
+    link: <LinkIcon size={16} />,
+    audio: <FileAudio size={16} />,
+    image: <FileImage size={16} />,
+    text: <FileText size={16} />,
+    youtube: <Youtube size={16} />,
+    vimeo: <Video size={16} />,
+    gdoc: <FileText size={16} />,
+    gdrive: <LayoutGrid size={16} />
+  };
+  
   return (
-    <div className="mb-6 space-y-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center">
+        <Search className="h-5 w-5 mr-2 text-slate-400" />
         <Input
+          type="search"
           placeholder="Search content..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
+          className="flex-grow"
         />
       </div>
       
-      <div className="flex flex-wrap gap-3">
-        <div className="w-full sm:w-auto">
-          <Select value={formatFilter} onValueChange={setFormatFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Format" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Formats</SelectItem>
-              {allFormats.map((format) => (
-                <SelectItem key={format} value={format}>
-                  {formatLabels[format]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="w-full sm:w-auto">
-          <Select value={tagFilter} onValueChange={setTagFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {allTags.map((tag) => (
-                <SelectItem key={tag} value={tag}>{tag}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="w-full sm:w-auto">
-          <Select value={accessFilter} onValueChange={setAccessFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Access Level" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Access</SelectItem>
-              <SelectItem value="free">{accessLabels.free}</SelectItem>
-              <SelectItem value="premium">{accessLabels.premium}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <Button 
-          variant="outline" 
-          onClick={() => {
-            setFormatFilter('all');
-            setTagFilter('all');
-            setAccessFilter('all');
-            setSearchQuery('');
-          }}
-          className="ml-auto"
+      <div className="flex items-center gap-2 overflow-x-auto">
+        <Button
+          variant={formatFilter === 'all' ? 'default' : 'outline'}
+          onClick={() => setFormatFilter('all')}
         >
-          <Filter className="mr-2 h-4 w-4" /> Reset Filters
+          <Filter className="h-4 w-4 mr-2" />
+          All Formats
+        </Button>
+        {allFormats.map((format) => (
+          <Button
+            key={format}
+            variant={formatFilter === format ? 'default' : 'outline'}
+            onClick={() => setFormatFilter(format)}
+            className="whitespace-nowrap"
+          >
+            {formatIcons[format as ContentFormat]}
+            {format.charAt(0).toUpperCase() + format.slice(1)}
+          </Button>
+        ))}
+      </div>
+      
+      <div className="flex items-center gap-2 overflow-x-auto">
+        <Button
+          variant={tagFilter === 'all' ? 'default' : 'outline'}
+          onClick={() => setTagFilter('all')}
+        >
+          <Filter className="h-4 w-4 mr-2" />
+          All Tags
+        </Button>
+        {allTags.map((tag) => (
+          <Badge
+            key={tag}
+            variant={tagFilter === tag ? 'default' : 'outline'}
+            onClick={() => setTagFilter(tag)}
+            className="cursor-pointer whitespace-nowrap"
+          >
+            {tag}
+          </Badge>
+        ))}
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <Button
+          variant={accessFilter === 'all' ? 'default' : 'outline'}
+          onClick={() => setAccessFilter('all')}
+        >
+          <Filter className="h-4 w-4 mr-2" />
+          All Access
+        </Button>
+        <Button
+          variant={accessFilter === 'free' ? 'default' : 'outline'}
+          onClick={() => setAccessFilter('free')}
+        >
+          Free
+        </Button>
+        <Button
+          variant={accessFilter === 'premium' ? 'default' : 'outline'}
+          onClick={() => setAccessFilter('premium')}
+        >
+          Premium
         </Button>
       </div>
     </div>

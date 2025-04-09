@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { X, Upload, FileText, FileVideo, FileAudio, Link, Image, Youtube, LayoutGrid } from 'lucide-react';
+import { X, Upload, FileText, FileVideo, FileAudio, Link, Image, Youtube, LayoutGrid, Video } from 'lucide-react';
 import { ContentItem, ContentFormat, AccessLevel, ContentVisibility, ContentUpload } from '@/types/library';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { v4 as uuidv4 } from 'uuid';
