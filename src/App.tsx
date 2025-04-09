@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Feed from "./pages/Feed";
 import CreatePost from "./pages/CreatePost";
 import Discussions from "./pages/Discussions";
+import DiscussionTopic from "./pages/DiscussionTopic";
 import Courses from "./pages/Courses";
 import Events from "./pages/Events";
 import LiveStreams from "./pages/LiveStreams";
@@ -61,8 +61,9 @@ const App = () => (
             <Route path="/create-post" element={<CreatePost />} />
             <Route path="/create-space" element={<CreateSpace />} />
             
-            {/* New Routes */}
             <Route path="/discussions" element={<Discussions />} />
+            <Route path="/discussions/:topicId" element={<DiscussionTopic />} />
+            
             <Route path="/courses" element={<Courses />} />
             <Route path="/events" element={<Events />} />
             <Route path="/live-streams" element={<LiveStreams />} />
@@ -71,7 +72,6 @@ const App = () => (
             <Route path="/ai-terminal" element={<AITerminal />} />
             <Route path="/ai-matchmaker" element={<AIMatchmaker />} />
             
-            {/* Settings Routes */}
             <Route path="/settings" element={<SettingsIndex />} />
             <Route path="/settings/general" element={<General />} />
             <Route path="/settings/branding" element={<Branding />} />
@@ -90,7 +90,6 @@ const App = () => (
             <Route path="/settings/migration" element={<Migration />} />
             <Route path="/settings/paywall" element={<Paywall />} />
             
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
