@@ -1,9 +1,8 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ChevronDown, Settings, Moon, Palette, Keyboard, Eye, UserPlus, PlusCircle, Filter } from 'lucide-react';
+import { ChevronDown, Settings, Moon, Palette, Keyboard, Eye, UserPlus, PlusCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Post, { PostProps } from '@/components/post/Post';
 import CreatePostDialog from '@/components/post/CreatePostDialog';
@@ -13,6 +12,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import FeedFilters from '@/components/feed/FeedFilters';
+import SpacesSidebar from '@/components/feed/SpacesSidebar';
+import EmptyFeed from '@/components/feed/EmptyFeed';
+import FeedPagination from '@/components/feed/FeedPagination';
 
 const SettingsPopover: React.FC = () => {
   return (
@@ -84,7 +87,6 @@ const SettingsPopover: React.FC = () => {
   );
 };
 
-// Sample post data
 const samplePosts: PostProps[] = [
   {
     id: '1',
@@ -100,7 +102,8 @@ const samplePosts: PostProps[] = [
     comments: 7,
     space: 'Announcements',
     isPinned: true,
-    isAnnouncement: true
+    isAnnouncement: true,
+    tags: ['Welcome', 'Community']
   },
   {
     id: '2',
@@ -112,7 +115,8 @@ const samplePosts: PostProps[] = [
     createdAt: 'Yesterday at 3:22 PM',
     likes: 15,
     comments: 3,
-    space: 'General Discussion'
+    space: 'General Discussion',
+    tags: ['Course', 'Feedback']
   },
   {
     id: '3',
@@ -126,19 +130,145 @@ const samplePosts: PostProps[] = [
     createdAt: '2 days ago',
     likes: 42,
     comments: 11,
-    space: 'Premium Group'
+    space: 'Premium Group',
+    isPaid: true,
+    teaser: 'Hey everyone! I\'ve just uploaded some new resources that might be helpful for those working on the side project challenge...',
+    tags: ['Resources', 'Projects']
+  },
+  {
+    id: '4',
+    author: {
+      name: 'Ana Vitória',
+      avatar: '',
+      role: 'Mentor'
+    },
+    title: 'Upcoming Workshop: Web3 Fundamentals',
+    content: 'Join me this Friday at 6 PM for a comprehensive workshop on Web3 fundamentals. We\'ll cover blockchain basics, smart contracts, and build a simple dApp together!\n\nThis is perfect for beginners who want to understand the Web3 ecosystem.\n\nRegister using the link in the description.',
+    createdAt: '3 days ago',
+    likes: 38,
+    comments: 9,
+    space: 'Events',
+    type: 'event',
+    tags: ['Web3', 'Workshop', 'Blockchain']
+  },
+  {
+    id: '5',
+    author: {
+      name: 'Roberto Almeida',
+      avatar: '',
+    },
+    title: 'LIVE TODAY: Q&A Session with Industry Experts',
+    content: 'I\'ll be hosting a live Q&A session today at 7 PM with industry experts from Google, Microsoft, and Meta. We\'ll be discussing career progression in tech and answering your questions.\n\nPremium members will get priority for their questions!',
+    createdAt: '5 hours ago',
+    likes: 56,
+    comments: 23,
+    space: 'Live Streams',
+    type: 'live',
+    tags: ['Career', 'Q&A', 'LiveStream']
+  },
+  {
+    id: '6',
+    author: {
+      name: 'Juliana Santos',
+      avatar: '',
+      role: 'Content Creator'
+    },
+    title: 'New Course Released: Advanced React Patterns',
+    content: 'I\'m excited to announce my new course on Advanced React Patterns is now available for premium members! This course covers context API, compound components, render props, and much more.\n\nThe first module is available for free members as well. Check it out!',
+    createdAt: '1 day ago',
+    likes: 78,
+    comments: 34,
+    space: 'Courses',
+    type: 'content',
+    isPaid: true,
+    teaser: 'I\'m excited to announce my new course on Advanced React Patterns is now available for premium members!',
+    tags: ['React', 'Course', 'Development']
   }
 ];
 
 const Feed: React.FC = () => {
   const [createPostOpen, setCreatePostOpen] = useState(false);
   const [currentView, setCurrentView] = useState('all');
-  const [posts, setPosts] = useState(samplePosts);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [contentFilter, setContentFilter] = useState('all');
+  const [accessFilter, setAccessFilter] = useState('all');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activeSpace, setActiveSpace] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 5;
+
+  const filteredPosts = samplePosts.filter(post => {
+    if (activeSpace !== 'all' && post.space.toLowerCase() !== activeSpace) {
+      return false;
+    }
+    
+    if (contentFilter !== 'all') {
+      if (contentFilter === 'posts' && post.type && post.type !== 'post') return false;
+      if (contentFilter === 'events' && post.type !== 'event') return false;
+      if (contentFilter === 'lives' && post.type !== 'live') return false;
+      if (contentFilter === 'content' && post.type !== 'content') return false;
+    }
+    
+    if (accessFilter !== 'all') {
+      if (accessFilter === 'free' && post.isPaid) return false;
+      if (accessFilter === 'paid' && !post.isPaid) return false;
+      if (accessFilter === 'subscription' && !post.isPaid) return false;
+    }
+    
+    if (selectedTags.length > 0) {
+      if (!post.tags || !post.tags.some(tag => selectedTags.includes(tag))) {
+        return false;
+      }
+    }
+    
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const titleMatch = post.title?.toLowerCase().includes(query);
+      const contentMatch = post.content.toLowerCase().includes(query);
+      const tagMatch = post.tags?.some(tag => tag.toLowerCase().includes(query));
+      const authorMatch = post.author.name.toLowerCase().includes(query);
+      
+      if (!(titleMatch || contentMatch || tagMatch || authorMatch)) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+  
+  const sortedPosts = [...filteredPosts].sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    
+    return 0;
+  });
+  
+  const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
+  const currentPosts = sortedPosts.slice(
+    (currentPage - 1) * postsPerPage,
+    currentPage * postsPerPage
+  );
+  
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, contentFilter, accessFilter, selectedTags, activeSpace]);
+  
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setContentFilter('all');
+    setAccessFilter('all');
+    setSelectedTags([]);
+    setActiveSpace('all');
+  };
+  
+  const hasFilters = searchQuery !== '' || 
+                     contentFilter !== 'all' || 
+                     accessFilter !== 'all' || 
+                     selectedTags.length > 0 ||
+                     activeSpace !== 'all';
 
   const handleViewChange = (view: string) => {
     setCurrentView(view);
-    // In a real app, filter posts based on the selected view
   };
 
   const spaceOptions = [
@@ -152,7 +282,6 @@ const Feed: React.FC = () => {
 
   const handleSpaceChange = (space: string) => {
     setActiveSpace(space);
-    // In a real app, filter posts based on the selected space
   };
 
   return (
@@ -199,60 +328,45 @@ const Feed: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Left sidebar - Spaces */}
         <div className="md:col-span-1">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
-            <div className="p-4 font-medium border-b border-gray-200 dark:border-gray-700">
-              Spaces
-            </div>
-            <div className="p-2">
-              {spaceOptions.map(space => (
-                <Button
-                  key={space.id}
-                  variant="ghost"
-                  className={`w-full justify-start mb-1 ${activeSpace === space.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
-                  onClick={() => handleSpaceChange(space.id)}
-                >
-                  {space.name}
-                </Button>
-              ))}
-            </div>
-          </div>
+          <SpacesSidebar 
+            spaces={spaceOptions} 
+            activeSpace={activeSpace} 
+            onSpaceChange={handleSpaceChange} 
+          />
         </div>
 
-        {/* Main feed */}
         <div className="md:col-span-2">
-          <div className="mb-4 flex justify-between items-center">
-            <h2 className="text-xl font-semibold">
-              {activeSpace === 'all' ? 'All Posts' : 
-               spaceOptions.find(s => s.id === activeSpace)?.name}
-            </h2>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Filter size={16} />
-              Filter
-            </Button>
-          </div>
+          <FeedFilters 
+            contentFilter={contentFilter}
+            setContentFilter={setContentFilter}
+            accessFilter={accessFilter}
+            setAccessFilter={setAccessFilter}
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
 
-          {posts.length > 0 ? (
-            posts.map(post => (
-              <Post key={post.id} {...post} />
-            ))
+          {sortedPosts.length > 0 ? (
+            <>
+              {currentPosts.map(post => (
+                <Post key={post.id} {...post} />
+              ))}
+              
+              {totalPages > 1 && (
+                <FeedPagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              )}
+            </>
           ) : (
-            <div className="bg-nortech-light-purple rounded-lg p-8 text-center">
-              <h2 className="text-2xl font-semibold mb-4 text-nortech-dark-blue">
-                Welcome to your community
-              </h2>
-              <p className="text-lg text-nortech-text-muted mb-8">
-                Your feed is where you'll see new posts
-              </p>
-              <Button 
-                onClick={() => setCreatePostOpen(true)}
-                className="bg-nortech-purple hover:bg-nortech-purple/90 text-white flex gap-2"
-              >
-                <PlusCircle size={18} />
-                Create post
-              </Button>
-            </div>
+            <EmptyFeed 
+              hasFilters={hasFilters} 
+              onClearFilters={clearAllFilters} 
+            />
           )}
         </div>
       </div>

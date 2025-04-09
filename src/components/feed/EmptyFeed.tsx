@@ -1,11 +1,37 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const EmptyFeed: React.FC = () => {
+interface EmptyFeedProps {
+  hasFilters?: boolean;
+  onClearFilters?: () => void;
+}
+
+const EmptyFeed: React.FC<EmptyFeedProps> = ({ hasFilters, onClearFilters }) => {
   const navigate = useNavigate();
+  
+  if (hasFilters) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] bg-gray-50 dark:bg-gray-800 rounded-lg p-8">
+        <Filter className="h-12 w-12 text-gray-400 mb-4" />
+        <h2 className="text-2xl font-semibold text-center mb-4">
+          No matching posts found
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400 text-center mb-8">
+          We couldn't find any posts matching your current filters
+        </p>
+        <Button 
+          onClick={onClearFilters}
+          variant="outline"
+          className="flex gap-2"
+        >
+          Clear all filters
+        </Button>
+      </div>
+    );
+  }
   
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] bg-nortech-light-purple rounded-lg p-8">
