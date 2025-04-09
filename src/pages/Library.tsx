@@ -2,19 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
-import ContentFilters from '@/components/library/ContentFilters';
-import ContentGrid from '@/components/library/ContentGrid';
-import FeaturedContent from '@/components/library/FeaturedContent';
 import ContentViewer from '@/components/library/ContentViewer';
-import UpsellBlock from '@/components/library/UpsellBlock';
-import TagsExplorer from '@/components/tags/TagsExplorer';
 import TagSuggestions from '@/components/tags/TagSuggestions';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Folder, Upload, FileVideo, File, FileAudio, BookOpen, Image, Tag } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Link as RouterLink } from 'react-router-dom';
+import TagsExplorer from '@/components/tags/TagsExplorer';
+import FeaturedContent from '@/components/library/FeaturedContent';
+import LibraryHeader from '@/components/library/LibraryHeader';
+import FormatTabs from '@/components/library/FormatTabs';
+import TabContents from '@/components/library/TabContents';
 import { ContentFormat } from '@/types/library';
-import { Badge } from '@/components/ui/badge';
 
 const Library: React.FC = () => {
   const {
@@ -59,7 +54,7 @@ const Library: React.FC = () => {
       setVisitedTags(updatedTags);
       localStorage.setItem('visitedTags', JSON.stringify(updatedTags));
     }
-  }, [tagFilter]);
+  }, [tagFilter, visitedTags]);
 
   const premiumContentCount = content.filter(item => item.accessLevel === 'premium').length;
 
@@ -87,19 +82,7 @@ const Library: React.FC = () => {
   return (
     <MainLayout title="Content Library">
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Content Library</h1>
-          <Button asChild>
-            <RouterLink to="/library/manage" className="flex items-center gap-2">
-              <Upload size={16} />
-              Manage Content
-            </RouterLink>
-          </Button>
-        </div>
-        
-        <div className="mb-6">
-          <UpsellBlock premiumContentCount={premiumContentCount} purchaseType="both" />
-        </div>
+        <LibraryHeader premiumContentCount={premiumContentCount} />
         
         {/* Tag Suggestions based on user interests */}
         {visitedTags.length > 0 && (
@@ -124,139 +107,34 @@ const Library: React.FC = () => {
           />
         )}
         
-        <Tabs defaultValue="all" className="mb-6" value={activeTab} onValueChange={handleTabChange}>
-          <div className="flex justify-between items-center mb-4">
-            <TabsList className="bg-purple-100 dark:bg-slate-800">
-              <TabsTrigger value="all" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
-                <FileText size={16} /> All Content
-              </TabsTrigger>
-              <TabsTrigger value="video" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
-                <FileVideo size={16} /> Videos
-              </TabsTrigger>
-              <TabsTrigger value="pdf" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
-                <File size={16} /> Documents
-              </TabsTrigger>
-              <TabsTrigger value="audio" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
-                <FileAudio size={16} /> Audio
-              </TabsTrigger>
-              <TabsTrigger value="course" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
-                <BookOpen size={16} /> Courses
-              </TabsTrigger>
-              <TabsTrigger value="image" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
-                <Image size={16} /> Images
-              </TabsTrigger>
-              <TabsTrigger value="tags" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
-                <Tag size={16} /> Tags
-              </TabsTrigger>
-              <TabsTrigger value="categories" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
-                <Folder size={16} /> Categories
-              </TabsTrigger>
-            </TabsList>
-          </div>
-          
-          <TabsContent value="all">
-            <ContentFilters
-              formatFilter={formatFilter}
-              tagFilter={tagFilter}
-              accessFilter={accessFilter}
-              searchQuery={searchQuery}
-              allFormats={allFormats}
-              allTags={allTags}
-              setFormatFilter={setFormatFilter}
-              setTagFilter={setTagFilter}
-              setAccessFilter={setAccessFilter}
-              setSearchQuery={setSearchQuery}
-            />
-            
-            <ContentGrid 
-              items={filteredContent} 
-              onItemSelect={setSelectedItem} 
-            />
-          </TabsContent>
-          
-          <TabsContent value="video">
-            <ContentGrid 
-              items={videoContent} 
-              onItemSelect={setSelectedItem} 
-            />
-          </TabsContent>
-          
-          <TabsContent value="pdf">
-            <ContentGrid 
-              items={documentContent} 
-              onItemSelect={setSelectedItem} 
-            />
-          </TabsContent>
-          
-          <TabsContent value="audio">
-            <ContentGrid 
-              items={audioContent} 
-              onItemSelect={setSelectedItem} 
-            />
-          </TabsContent>
-          
-          <TabsContent value="course">
-            <ContentGrid 
-              items={courseContent} 
-              onItemSelect={setSelectedItem} 
-            />
-          </TabsContent>
-          
-          <TabsContent value="image">
-            <ContentGrid 
-              items={imageContent} 
-              onItemSelect={setSelectedItem} 
-            />
-          </TabsContent>
-          
-          <TabsContent value="tags">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-4">Browse Content by Tags</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {tagsWithCount.map(tag => (
-                  <div 
-                    key={tag.name} 
-                    className="border rounded-lg p-4 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition-colors"
-                    onClick={() => {
-                      setTagFilter(tag.name);
-                      setActiveTab('all');
-                    }}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <Badge className="bg-purple-500">#{tag.name}</Badge>
-                      <span className="text-sm text-muted-foreground">{tag.count} items</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      <RouterLink to={`/tags/${tag.name}`} className="text-purple-600 hover:underline">
-                        View all content with this tag
-                      </RouterLink>
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="categories">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {allTags.map(tag => (
-                <div 
-                  key={tag} 
-                  className="border rounded-lg p-4 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition-colors"
-                  onClick={() => {
-                    setTagFilter(tag);
-                    setActiveTab('all');
-                  }}
-                >
-                  <h3 className="font-medium text-lg mb-1">{tag}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {content.filter(item => item.tags.includes(tag)).length} items
-                  </p>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+        <FormatTabs 
+          activeTab={activeTab} 
+          onTabChange={handleTabChange}
+        >
+          <TabContents 
+            activeTab={activeTab}
+            formatFilter={formatFilter}
+            tagFilter={tagFilter}
+            accessFilter={accessFilter}
+            searchQuery={searchQuery}
+            allFormats={allFormats}
+            allTags={allTags}
+            setFormatFilter={setFormatFilter}
+            setTagFilter={setTagFilter}
+            setAccessFilter={setAccessFilter}
+            setSearchQuery={setSearchQuery}
+            setActiveTab={setActiveTab}
+            filteredContent={filteredContent}
+            videoContent={videoContent}
+            documentContent={documentContent}
+            audioContent={audioContent}
+            courseContent={courseContent}
+            imageContent={imageContent}
+            tagsWithCount={tagsWithCount}
+            content={content}
+            onItemSelect={setSelectedItem}
+          />
+        </FormatTabs>
       </div>
       
       <ContentViewer 
