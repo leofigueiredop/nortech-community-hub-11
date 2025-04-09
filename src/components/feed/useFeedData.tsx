@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PostProps } from '@/components/post/Post';
 import { samplePosts, spaceOptions } from './utils/feedConstants';
 import { useFilterState } from './hooks/useFilterState';
@@ -13,6 +12,7 @@ import {
   sortPosts
 } from './utils/feedFilterUtils';
 import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
 
 export const useFeedData = (postsPerPage: number = 5, initialSegment: string = 'all') => {
   const [currentView, setCurrentView] = useState('all');
@@ -20,11 +20,9 @@ export const useFeedData = (postsPerPage: number = 5, initialSegment: string = '
   const [hasSeenUpgradePrompt, setHasSeenUpgradePrompt] = useState(false);
   const { toast } = useToast();
   
-  // Check for premium content interactions on mount
   useEffect(() => {
     const premiumInteractions = parseInt(localStorage.getItem('premiumInteractions') || '0');
     
-    // If user has interacted with premium content at least 5 times and hasn't seen the prompt yet
     if (premiumInteractions >= 5 && !hasSeenUpgradePrompt && initialSegment === 'free') {
       toast({
         title: "Upgrade to Premium",
@@ -44,24 +42,20 @@ export const useFeedData = (postsPerPage: number = 5, initialSegment: string = '
     }
   }, [initialSegment, hasSeenUpgradePrompt, toast]);
   
-  // Apply all filters to posts
   const applyFilters = () => {
     let filteredPosts = [...samplePosts];
     
-    // Apply each filter in sequence
     filteredPosts = filterBySpace(filteredPosts, filterState.activeSpace);
     filteredPosts = filterByContentType(filteredPosts, filterState.contentFilter);
     filteredPosts = filterByAccessLevel(filteredPosts, filterState.accessFilter);
     filteredPosts = filterByTags(filteredPosts, filterState.selectedTags);
     filteredPosts = filterBySearchQuery(filteredPosts, filterState.searchQuery);
     
-    // Sort posts (pinned first)
     return sortPosts(filteredPosts);
   };
   
   const sortedFilteredPosts = applyFilters();
   
-  // Setup pagination
   const { 
     currentPage, 
     setCurrentPage, 
@@ -79,10 +73,8 @@ export const useFeedData = (postsPerPage: number = 5, initialSegment: string = '
     ]
   );
   
-  // Get current page posts
   const currentPosts = paginatedItems(sortedFilteredPosts);
   
-  // Check if any filters are active
   const hasFilters = filterState.searchQuery !== '' || 
                      filterState.contentFilter !== 'all' || 
                      filterState.accessFilter !== 'all' || 
@@ -111,23 +103,3 @@ export const useFeedData = (postsPerPage: number = 5, initialSegment: string = '
     clearAllFilters: filterActions.clearAllFilters,
   };
 };
-
-const Button = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "default" | "ghost" | "outline"; }
->(({ className, variant, ...props }, ref) => {
-  return (
-    <button
-      ref={ref}
-      className={`px-4 py-2 rounded-sm text-sm font-medium ${
-        variant === "default" 
-          ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-          : variant === "outline"
-          ? "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-          : "hover:bg-accent hover:text-accent-foreground"
-      } ${className}`}
-      {...props}
-    />
-  );
-});
-Button.displayName = "Button";
