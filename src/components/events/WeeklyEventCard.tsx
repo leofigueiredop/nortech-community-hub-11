@@ -2,7 +2,8 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Check, Clock } from 'lucide-react';
-import { Event, EVENT_TYPES, getEventStatus, isUserRegistered } from './types/EventTypes';
+import { Event, EVENT_TYPES } from './types/EventTypes';
+import { getEventStatus, isUserRegistered } from './utils/EventUtils';
 
 interface WeeklyEventCardProps {
   event: Event;
