@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +11,16 @@ import {
   Image, 
   HelpCircle, 
   Inbox, 
-  ChevronRight 
+  ChevronRight,
+  BookOpen,
+  FileImage,
+  Video,
+  Music,
+  Sparkles,
+  Search,
+  Lightbulb,
+  LayoutTemplate,
+  Wand2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -68,7 +76,6 @@ const CreateSpace: React.FC = () => {
       description: `Your ${selectedType} space "${spaceName}" has been created successfully.`,
     });
 
-    // Reset form after success
     setSelectedType(null);
     setDetailsStep(false);
     setSpaceName('');
@@ -84,18 +91,11 @@ const CreateSpace: React.FC = () => {
       category: 'content'
     },
     { 
-      type: 'events', 
-      icon: <Calendar className="h-5 w-5 text-nortech-purple" />, 
-      title: 'Events', 
-      description: 'Schedule and manage in-person or virtual events for your community.',
-      category: 'community'
-    },
-    { 
-      type: 'chat', 
-      icon: <MessageSquare className="h-5 w-5 text-nortech-purple" />, 
-      title: 'Chat', 
-      description: 'Enable real-time conversations between community members.',
-      category: 'communication'
+      type: 'library', 
+      icon: <BookOpen className="h-5 w-5 text-nortech-purple" />, 
+      title: 'Content Library', 
+      description: 'Organize and share rich media content with your community.',
+      category: 'content'
     },
     { 
       type: 'course', 
@@ -105,18 +105,48 @@ const CreateSpace: React.FC = () => {
       category: 'content'
     },
     { 
-      type: 'members', 
-      icon: <Users className="h-5 w-5 text-nortech-purple" />, 
-      title: 'Members', 
-      description: 'Create a dedicated space to manage community membership.',
+      type: 'gallery', 
+      icon: <FileImage className="h-5 w-5 text-nortech-purple" />, 
+      title: 'Image Gallery', 
+      description: 'Share photos and image collections with your community.',
+      category: 'content'
+    },
+    { 
+      type: 'videos', 
+      icon: <Video className="h-5 w-5 text-nortech-purple" />, 
+      title: 'Video Collection', 
+      description: 'Organize and share video content with your members.',
+      category: 'content'
+    },
+    { 
+      type: 'podcast', 
+      icon: <Music className="h-5 w-5 text-nortech-purple" />, 
+      title: 'Podcast', 
+      description: 'Create and share audio content and episodes.',
+      category: 'content'
+    },
+    
+    { 
+      type: 'events', 
+      icon: <Calendar className="h-5 w-5 text-nortech-purple" />, 
+      title: 'Events', 
+      description: 'Schedule and manage in-person or virtual events for your community.',
       category: 'community'
     },
     { 
-      type: 'images', 
-      icon: <Image className="h-5 w-5 text-nortech-purple" />, 
-      title: 'Gallery', 
-      description: 'Share photos and images with your community members.',
-      category: 'content'
+      type: 'members', 
+      icon: <Users className="h-5 w-5 text-nortech-purple" />, 
+      title: 'Members Hub', 
+      description: 'Create a dedicated space to manage community membership.',
+      category: 'community'
+    },
+    
+    { 
+      type: 'chat', 
+      icon: <MessageSquare className="h-5 w-5 text-nortech-purple" />, 
+      title: 'Chat', 
+      description: 'Enable real-time conversations between community members.',
+      category: 'communication'
     },
     { 
       type: 'support', 
@@ -132,6 +162,51 @@ const CreateSpace: React.FC = () => {
       description: 'Create a space for frequently asked questions and answers.',
       category: 'communication'
     },
+    
+    { 
+      type: 'ai-matchmaker', 
+      icon: <Sparkles className="h-5 w-5 text-nortech-purple" />, 
+      title: 'AI Matchmaker', 
+      description: 'Connect members with shared interests using AI algorithms.',
+      category: 'ai'
+    },
+    { 
+      type: 'ai-content', 
+      icon: <Wand2 className="h-5 w-5 text-nortech-purple" />, 
+      title: 'AI Content Generator', 
+      description: 'Create content automatically based on your community needs.',
+      category: 'ai'
+    },
+    { 
+      type: 'ai-search', 
+      icon: <Search className="h-5 w-5 text-nortech-purple" />, 
+      title: 'Smart Search', 
+      description: 'AI-powered search to help members find what they need quickly.',
+      category: 'ai'
+    },
+  ];
+
+  const templateOptions = [
+    {
+      title: "Community Hub",
+      description: "Complete community space with posts, events, and member sections",
+      icon: <Users className="h-5 w-5 text-nortech-purple" />
+    },
+    {
+      title: "Learning Academy",
+      description: "Educational space with courses, resources, and assessments",
+      icon: <BookOpen className="h-5 w-5 text-nortech-purple" />
+    },
+    {
+      title: "Content Creator",
+      description: "Publish and monetize articles, videos, and podcasts",
+      icon: <FileText className="h-5 w-5 text-nortech-purple" />
+    },
+    {
+      title: "Events Platform",
+      description: "Manage registrations, RSVPs, and virtual events",
+      icon: <Calendar className="h-5 w-5 text-nortech-purple" />
+    }
   ];
 
   const filteredSpaces = currentTab === 'all' 
@@ -214,6 +289,7 @@ const CreateSpace: React.FC = () => {
           <TabsTrigger value="content">Content</TabsTrigger>
           <TabsTrigger value="community">Community</TabsTrigger>
           <TabsTrigger value="communication">Communication</TabsTrigger>
+          <TabsTrigger value="ai">AI-Powered</TabsTrigger>
         </TabsList>
         
         <TabsContent value={currentTab}>
@@ -235,15 +311,34 @@ const CreateSpace: React.FC = () => {
       </Tabs>
       
       <div className="mt-12 bg-slate-50 dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-medium mb-2">Need inspiration?</h2>
-            <p className="text-gray-500 dark:text-gray-400">
-              Check out examples of popular community spaces and how others have set them up.
-            </p>
-          </div>
+        <div className="mb-6">
+          <h2 className="text-lg font-medium mb-2">Start with a template</h2>
+          <p className="text-gray-500 dark:text-gray-400">
+            Get started quickly with pre-configured spaces designed for specific use cases.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {templateOptions.map((template, index) => (
+            <Card key={index} className="cursor-pointer hover:border-nortech-purple transition-colors">
+              <CardHeader className="py-4">
+                <div className="flex items-center gap-2">
+                  <div className="bg-nortech-purple/10 p-2 rounded-lg">
+                    {template.icon}
+                  </div>
+                  <CardTitle className="text-base">{template.title}</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <CardDescription className="text-xs line-clamp-2">{template.description}</CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        
+        <div className="flex justify-end">
           <Button className="shrink-0">
-            Browse examples <ChevronRight className="ml-2 h-4 w-4" />
+            Browse all templates <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </div>
