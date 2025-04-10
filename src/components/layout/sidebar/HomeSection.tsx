@@ -9,7 +9,6 @@ const HomeSection: React.FC = () => {
       to="/feed" 
       icon={<Rss size={16} className="text-purple-600" />} 
       label="Feed" 
-      matchExact={true}
       additionalPaths={["/"]}
     />
   );
