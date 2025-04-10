@@ -54,7 +54,7 @@ const WriteTab: React.FC<WriteTabProps> = ({
             <Badge key={tag} variant="secondary" className="bg-gray-700 text-gray-200">
               #{tag}
               <button
-                onClick={() => setSelectedTags(tags => tags.filter(t => t !== tag))}
+                onClick={() => setSelectedTags(selectedTags.filter(t => t !== tag))}
                 className="ml-1 hover:text-white"
               >
                 <X size={14} />

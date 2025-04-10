@@ -3,6 +3,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { FileText, Lock, Clock } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 
 interface PreviewTabProps {
   title: string;
@@ -20,8 +21,8 @@ interface PreviewTabProps {
   isScheduled: boolean;
   scheduledDate: Date | undefined;
   scheduledTime: string;
-  getPostTypeIcon: () => React.ReactNode;
-  getVisibilityIcon: () => React.ReactNode;
+  getPostTypeIcon: () => string;
+  getVisibilityIcon: () => string;
 }
 
 const PreviewTab: React.FC<PreviewTabProps> = ({
@@ -43,6 +44,12 @@ const PreviewTab: React.FC<PreviewTabProps> = ({
   getPostTypeIcon,
   getVisibilityIcon
 }) => {
+  // Dynamically render Lucide icons based on their name
+  const renderIcon = (iconName: string) => {
+    const IconComponent = LucideIcons[iconName as keyof typeof LucideIcons];
+    return IconComponent ? <IconComponent size={14} /> : null;
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-gray-900 dark:text-gray-100">
@@ -50,12 +57,12 @@ const PreviewTab: React.FC<PreviewTabProps> = ({
         
         <div className="mb-3 flex items-center">
           <div className="flex items-center mr-3">
-            {getPostTypeIcon()}
+            {renderIcon(getPostTypeIcon())}
             <span className="ml-1 text-sm">{postType.charAt(0).toUpperCase() + postType.slice(1)}</span>
           </div>
           
           <div className="flex items-center">
-            {getVisibilityIcon()}
+            {renderIcon(getVisibilityIcon())}
             <span className="ml-1 text-sm">
               {visibilityOption === 'free' ? 'Free' : 
                 visibilityOption === 'premium' ? 'Premium' : 
