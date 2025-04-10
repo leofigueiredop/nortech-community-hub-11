@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Dialog, 
@@ -50,43 +49,9 @@ import {
   TrendingUp,
   Youtube,
   Layers,
-  AlignLeft
+  AlignLeft,
+  Settings
 } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Card } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { TimePicker } from '@/components/ui/time-picker';
-import { Slider } from '@/components/ui/slider';
-import TagsInput from '@/components/library/management/form/TagsInput';
-import { 
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel
-} from "@/components/ui/form";
-import { Separator } from '@/components/ui/separator';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { format } from 'date-fns';
-
-interface CreatePostDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
 
 // Mock data for spaces
 const spaces = [
@@ -1188,4 +1153,3 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
 };
 
 export default CreatePostDialog;
-
