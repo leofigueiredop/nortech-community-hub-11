@@ -1,6 +1,14 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  formatText, 
+  validatePost, 
+  detectEmbedType, 
+  getPostTypeIcon, 
+  getVisibilityIcon,
+  checkSensitiveContent
+} from '../utils/postUtils';
 
 interface PostData {
   title: string;
@@ -73,6 +81,9 @@ export const usePostCreation = (onDialogClose: () => void) => {
   const [currentTab, setCurrentTab] = useState('write');
   const [advancedEditorEnabled, setAdvancedEditorEnabled] = useState(false);
   
+  // Selection tracking
+  const [textSelection, setTextSelection] = useState<{ start: number, end: number }>({ start: 0, end: 0 });
+  
   // File upload states
   const [showFileAttachDialog, setShowFileAttachDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -103,6 +114,9 @@ export const usePostCreation = (onDialogClose: () => void) => {
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
   const [scheduledTime, setScheduledTime] = useState('12:00');
   const [calendarOpen, setCalendarOpen] = useState(false);
+  
+  // Validation
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Get estimated reach based on space and visibility
   const getEstimatedReach = () => {
@@ -138,77 +152,12 @@ export const usePostCreation = (onDialogClose: () => void) => {
       };
     }
   }, [attachedFiles]);
-
-  const formatText = (format: string) => {
-    // Text formatting logic
-    switch (format) {
-      case 'bold':
-        setContent(content + ' **bold text** ');
-        break;
-      case 'italic':
-        setContent(content + ' *italic text* ');
-        break;
-      case 'list':
-        setContent(content + '\n• List item\n• List item\n• List item\n');
-        break;
-      case 'ordered-list':
-        setContent(content + '\n1. First item\n2. Second item\n3. Third item\n');
-        break;
-      case 'quote':
-        setContent(content + '\n> Blockquote text\n');
-        break;
-      case 'divider':
-        setContent(content + '\n---\n');
-        break;
-      case 'code':
-        setContent(content + '\n```\ncode block\n```\n');
-        break;
-      case 'mention':
-        setContent(content + ' @mention ');
-        break;
-      case 'spoiler':
-        setContent(content + '\n||Spoiler content||\n');
-        break;
-      case 'collapsible':
-        setContent(content + '\n<details>\n<summary>Click to expand</summary>\nHidden content here\n</details>\n');
-        break;
-      default:
-        break;
-    }
+  
+  // Format text using the utility function
+  const handleFormatText = (format: string) => {
+    setContent(formatText(content, format, textSelection));
   };
   
-  // Function to determine post type icon
-  const getPostTypeIcon = () => {
-    switch (postType) {
-      case 'standard':
-        return 'FileText';
-      case 'event':
-        return 'Calendar';
-      case 'question':
-        return 'MessageSquare';
-      case 'resource':
-        return 'FileVideo';
-      case 'paid':
-        return 'DollarSign';
-      default:
-        return 'FileText';
-    }
-  };
-  
-  // Function to determine visibility icon
-  const getVisibilityIcon = () => {
-    switch (visibilityOption) {
-      case 'free':
-        return 'Eye';
-      case 'premium':
-        return 'Lock';
-      case 'teaser':
-        return 'Layers';
-      default:
-        return 'Eye';
-    }
-  };
-
   const handleSavePoll = () => {
     setContent(content + `\n\n[POLL: ${pollQuestion}]\n`);
     setShowPollDialog(false);
@@ -247,13 +196,8 @@ export const usePostCreation = (onDialogClose: () => void) => {
       return;
     }
     
-    // Detect embed type
-    let type = 'link';
-    if (embedUrl.includes('youtube.com') || embedUrl.includes('youtu.be')) {
-      type = 'youtube';
-    } else if (embedUrl.includes('loom.com')) {
-      type = 'loom';
-    }
+    // Use the utility function to detect embed type
+    const type = detectEmbedType(embedUrl);
     
     setEmbedType(type);
     setEmbeds([...embeds, {type, url: embedUrl}]);
@@ -286,25 +230,7 @@ export const usePostCreation = (onDialogClose: () => void) => {
   };
 
   const handlePublish = () => {
-    if (!selectedSpace) {
-      toast({
-        title: "Space Required",
-        description: "Please select a space to post in.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!content.trim()) {
-      toast({
-        title: "Content Required",
-        description: "Please write something before publishing.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Gather post data for API submission
+    // Gather post data for validation
     const postData: PostData = {
       title,
       content,
@@ -332,6 +258,32 @@ export const usePostCreation = (onDialogClose: () => void) => {
         endDate: setEndDate ? "future-date" : null
       } : null
     };
+    
+    // Check for sensitive content
+    if (checkSensitiveContent(content)) {
+      toast({
+        title: "Content Warning",
+        description: "Your post may contain sensitive information. Please review before publishing.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Validate the post data
+    const { valid, errors } = validatePost(postData);
+    setValidationErrors(errors);
+    
+    if (!valid) {
+      // Get the first error message to display
+      const firstError = Object.values(errors)[0];
+      
+      toast({
+        title: "Validation Error",
+        description: firstError || "Please check your post for errors.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     // In a real app, you would submit this to an API
     console.log("Publishing post:", postData);
@@ -365,6 +317,7 @@ export const usePostCreation = (onDialogClose: () => void) => {
     setScheduledTime('12:00');
     setPollQuestion('');
     setPollOptions(['']);
+    setValidationErrors({});
   };
 
   return {
@@ -385,6 +338,10 @@ export const usePostCreation = (onDialogClose: () => void) => {
     setCurrentTab,
     advancedEditorEnabled,
     setAdvancedEditorEnabled,
+    
+    // Text selection
+    textSelection,
+    setTextSelection,
     
     // File upload states
     showFileAttachDialog,
@@ -433,11 +390,14 @@ export const usePostCreation = (onDialogClose: () => void) => {
     calendarOpen,
     setCalendarOpen,
     
+    // Validation
+    validationErrors,
+    
     // Methods
     getEstimatedReach,
-    formatText,
-    getPostTypeIcon,
-    getVisibilityIcon,
+    formatText: handleFormatText,
+    getPostTypeIcon: () => getPostTypeIcon(postType),
+    getVisibilityIcon: () => getVisibilityIcon(visibilityOption),
     handleSavePoll,
     handleFileAttach,
     handleFileSelected,

@@ -2,8 +2,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { FileText, Lock, Clock } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import { FileText, Lock, Clock, Eye, Calendar, MessageSquare, FileVideo, DollarSign, Layers } from 'lucide-react';
 
 interface PreviewTabProps {
   title: string;
@@ -44,10 +43,19 @@ const PreviewTab: React.FC<PreviewTabProps> = ({
   getPostTypeIcon,
   getVisibilityIcon
 }) => {
-  // Dynamically render Lucide icons based on their name
-  const renderIcon = (iconName: string) => {
-    const IconComponent = LucideIcons[iconName as keyof typeof LucideIcons];
-    return IconComponent ? <IconComponent size={14} /> : null;
+  // Map icon name to component
+  const getIconComponent = (iconName: string) => {
+    switch (iconName) {
+      case 'FileText': return <FileText size={14} />;
+      case 'Calendar': return <Calendar size={14} />;
+      case 'MessageSquare': return <MessageSquare size={14} />;
+      case 'FileVideo': return <FileVideo size={14} />;
+      case 'DollarSign': return <DollarSign size={14} />;
+      case 'Eye': return <Eye size={14} />;
+      case 'Lock': return <Lock size={14} />;
+      case 'Layers': return <Layers size={14} />;
+      default: return <FileText size={14} />;
+    }
   };
 
   return (
@@ -57,12 +65,12 @@ const PreviewTab: React.FC<PreviewTabProps> = ({
         
         <div className="mb-3 flex items-center">
           <div className="flex items-center mr-3">
-            {renderIcon(getPostTypeIcon())}
+            {getIconComponent(getPostTypeIcon())}
             <span className="ml-1 text-sm">{postType.charAt(0).toUpperCase() + postType.slice(1)}</span>
           </div>
           
           <div className="flex items-center">
-            {renderIcon(getVisibilityIcon())}
+            {getIconComponent(getVisibilityIcon())}
             <span className="ml-1 text-sm">
               {visibilityOption === 'free' ? 'Free' : 
                 visibilityOption === 'premium' ? 'Premium' : 

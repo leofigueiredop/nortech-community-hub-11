@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +32,17 @@ const WriteTab: React.FC<WriteTabProps> = ({
   embeds,
   handleRemoveEmbed
 }) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+    // Auto resize textarea (optional enhancement)
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Input
@@ -42,9 +53,10 @@ const WriteTab: React.FC<WriteTabProps> = ({
       />
       
       <Textarea
+        ref={textareaRef}
         placeholder="Write something..."
         value={content}
-        onChange={(e) => setContent(e.target.value)}
+        onChange={handleTextareaChange}
         className="w-full min-h-[240px] border-0 bg-transparent text-white placeholder:text-gray-500 focus-visible:ring-0 resize-none"
       />
       
