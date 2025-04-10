@@ -68,7 +68,7 @@ const CommunityForm: React.FC = () => {
                 className="rounded-r-none"
               />
               <div className="inline-flex items-center justify-center rounded-r-md border border-l-0 border-input bg-background px-3 text-sm text-muted-foreground">
-                .circle.so
+                .nortech.company
               </div>
             </div>
           </div>
