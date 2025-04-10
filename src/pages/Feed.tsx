@@ -23,16 +23,11 @@ const Feed: React.FC = () => {
   // In a real app, this would check the user's subscription status from the backend
   useEffect(() => {
     // Mock implementation - in a real app this would be an API call
-    const checkSubscription = async () => {
-      // This would be an actual API call in a real implementation
-      // const response = await api.checkSubscription();
-      // setIsSubscribed(response.isSubscribed);
-      
-      // For demo purposes, let's assume the user is not subscribed
-      setIsSubscribed(false);
-    };
+    // const response = await api.checkSubscription();
+    // setIsSubscribed(response.isSubscribed);
     
-    checkSubscription();
+    // For demo purposes, let's assume the user is not subscribed
+    setIsSubscribed(false);
   }, []);
   
   // Update localStorage when segment changes

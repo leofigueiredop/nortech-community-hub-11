@@ -5,12 +5,14 @@ import WelcomeCard from '@/components/dashboard/WelcomeCard';
 import SetupChecklist from '@/components/dashboard/SetupChecklist';
 import QuickActions from '@/components/dashboard/QuickActions';
 import CreateSpaceDialog from '@/components/dashboard/CreateSpaceDialog';
+import CreatePostDialog from '@/components/post/CreatePostDialog';
 import { Button } from '@/components/ui/button';
 import { Eye, PlusCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 const Dashboard: React.FC = () => {
   const [createSpaceOpen, setCreateSpaceOpen] = useState(false);
+  const [createPostOpen, setCreatePostOpen] = useState(false);
   const { toast } = useToast();
   const { viewAs, setViewAs } = useViewContext();
 
@@ -40,15 +42,26 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
         
-        {viewAs === 'admin' && (
+        <div className="flex gap-2">
           <Button 
-            className="flex items-center gap-2 bg-nortech-purple hover:bg-nortech-purple/90"
-            onClick={() => setCreateSpaceOpen(true)}
+            className="flex items-center gap-2"
+            variant="outline"
+            onClick={() => setCreatePostOpen(true)}
           >
             <PlusCircle size={16} />
-            <span>Create Space</span>
+            <span>Create Post</span>
           </Button>
-        )}
+          
+          {viewAs === 'admin' && (
+            <Button 
+              className="flex items-center gap-2 bg-nortech-purple hover:bg-nortech-purple/90"
+              onClick={() => setCreateSpaceOpen(true)}
+            >
+              <PlusCircle size={16} />
+              <span>Create Space</span>
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -82,6 +95,11 @@ const Dashboard: React.FC = () => {
       <CreateSpaceDialog 
         open={createSpaceOpen} 
         onOpenChange={setCreateSpaceOpen} 
+      />
+      
+      <CreatePostDialog
+        open={createPostOpen}
+        onOpenChange={setCreatePostOpen}
       />
     </MainLayout>
   );
