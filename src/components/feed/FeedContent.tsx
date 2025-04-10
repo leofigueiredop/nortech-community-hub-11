@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PostProps } from '@/components/post/Post';
 import Post from '@/components/post/Post';
@@ -66,8 +65,6 @@ const FeedContent: React.FC<FeedContentProps> = ({
                 key={post.id} 
                 {...post} 
                 showAccessBadge={activeSegment !== 'all'}
-                accessBadge={activeSegment === 'premium' ? 'premium' : 
-                             activeSegment === 'free' ? 'free' : post.accessBadge}
               />
             ))}
           </div>

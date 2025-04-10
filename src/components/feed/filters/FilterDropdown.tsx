@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Filter, Check } from 'lucide-react';
+import { Filter } from 'lucide-react';
 
 interface FilterOption {
   id: string;
@@ -37,7 +37,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <Button variant="outline" className="flex items-center gap-2">
           <Filter size={16} />
           <span>Filter</span>
         </Button>
@@ -50,10 +50,9 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
             <DropdownMenuItem 
               key={type.id}
               onClick={() => setContentFilter(type.id)}
-              className="flex justify-between items-center"
+              className={contentFilter === type.id ? "bg-slate-100 dark:bg-slate-800" : ""}
             >
-              <span>{type.name}</span>
-              {contentFilter === type.id && <Check size={16} className="text-purple-600" />}
+              {type.name}
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
@@ -65,10 +64,9 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
             <DropdownMenuItem 
               key={type.id}
               onClick={() => setAccessFilter(type.id)}
-              className="flex justify-between items-center"
+              className={accessFilter === type.id ? "bg-slate-100 dark:bg-slate-800" : ""}
             >
-              <span>{type.name}</span>
-              {accessFilter === type.id && <Check size={16} className="text-purple-600" />}
+              {type.name}
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>

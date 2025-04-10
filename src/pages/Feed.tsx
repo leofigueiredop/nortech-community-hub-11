@@ -6,10 +6,16 @@ import FeedContent from '@/components/feed/FeedContent';
 import SettingsPopover from '@/components/feed/SettingsPopover';
 import ViewControls from '@/components/feed/ViewControls';
 import { useFeedData } from '@/components/feed/useFeedData';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Menu } from 'lucide-react';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { useIsMobile } from '@/hooks/use-mobile';
 import FeedSegmentTabs from '@/components/feed/FeedSegmentTabs';
 
 const Feed: React.FC = () => {
   const [createPostOpen, setCreatePostOpen] = useState(false);
+  const { isMobile } = useIsMobile();
   
   // Get the last selected feed segment from localStorage or default to 'all'
   const getInitialSegment = () => {
@@ -18,17 +24,6 @@ const Feed: React.FC = () => {
   };
   
   const [activeSegment, setActiveSegment] = useState(getInitialSegment());
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  
-  // In a real app, this would check the user's subscription status from the backend
-  useEffect(() => {
-    // Mock implementation - in a real app this would be an API call
-    // const response = await api.checkSubscription();
-    // setIsSubscribed(response.isSubscribed);
-    
-    // For demo purposes, let's assume the user is not subscribed
-    setIsSubscribed(false);
-  }, []);
   
   // Update localStorage when segment changes
   useEffect(() => {
@@ -55,7 +50,7 @@ const Feed: React.FC = () => {
     totalPages,
     hasFilters,
     clearAllFilters,
-  } = useFeedData(5, activeSegment);
+  } = useFeedData();
 
   // Set accessFilter based on activeSegment
   useEffect(() => {
@@ -75,27 +70,6 @@ const Feed: React.FC = () => {
   const handleSpaceChange = (space: string) => {
     setActiveSpace(space);
   };
-
-  // Prepare posts with proper access badges
-  const preparedPosts = filteredPosts.map(post => {
-    // Mark posts as premium in the premium segment if not subscribed
-    if (activeSegment === 'premium' && !isSubscribed) {
-      return {
-        ...post,
-        accessBadge: 'premium'
-      };
-    }
-    
-    // Add teaser to premium posts if they don't have one already
-    if (post.isPaid && !post.teaser) {
-      return {
-        ...post,
-        teaser: "This is a preview of premium content. Subscribe to see the full post."
-      };
-    }
-    
-    return post;
-  });
 
   return (
     <MainLayout title="Feed">
@@ -121,7 +95,7 @@ const Feed: React.FC = () => {
 
       <div className="w-full">
         <FeedContent
-          posts={preparedPosts}
+          posts={filteredPosts}
           contentFilter={contentFilter}
           setContentFilter={setContentFilter}
           accessFilter={accessFilter}

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import { useState } from 'react';
 import { PostProps } from '@/components/post/Post';
 import { samplePosts, spaceOptions } from './utils/feedConstants';
 import { useFilterState } from './hooks/useFilterState';
@@ -11,51 +12,29 @@ import {
   filterBySpace,
   sortPosts
 } from './utils/feedFilterUtils';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
 
 export const useFeedData = (postsPerPage: number = 5, initialSegment: string = 'all') => {
   const [currentView, setCurrentView] = useState('all');
   const [filterState, filterActions] = useFilterState(initialSegment);
-  const [hasSeenUpgradePrompt, setHasSeenUpgradePrompt] = useState(false);
-  const { toast } = useToast();
   
-  useEffect(() => {
-    const premiumInteractions = parseInt(localStorage.getItem('premiumInteractions') || '0');
-    
-    if (premiumInteractions >= 5 && !hasSeenUpgradePrompt && initialSegment === 'free') {
-      toast({
-        title: "Upgrade to Premium",
-        description: "You seem to enjoy our premium content. Unlock full access with a premium subscription!",
-        action: (
-          <Button 
-            onClick={() => window.location.href = '/settings/subscriptions'} 
-            variant="default" 
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            Learn More
-          </Button>
-        ),
-        duration: 8000,
-      });
-      setHasSeenUpgradePrompt(true);
-    }
-  }, [initialSegment, hasSeenUpgradePrompt, toast]);
-  
+  // Apply all filters to posts
   const applyFilters = () => {
     let filteredPosts = [...samplePosts];
     
+    // Apply each filter in sequence
     filteredPosts = filterBySpace(filteredPosts, filterState.activeSpace);
     filteredPosts = filterByContentType(filteredPosts, filterState.contentFilter);
     filteredPosts = filterByAccessLevel(filteredPosts, filterState.accessFilter);
     filteredPosts = filterByTags(filteredPosts, filterState.selectedTags);
     filteredPosts = filterBySearchQuery(filteredPosts, filterState.searchQuery);
     
+    // Sort posts (pinned first)
     return sortPosts(filteredPosts);
   };
   
   const sortedFilteredPosts = applyFilters();
   
+  // Setup pagination
   const { 
     currentPage, 
     setCurrentPage, 
@@ -73,8 +52,10 @@ export const useFeedData = (postsPerPage: number = 5, initialSegment: string = '
     ]
   );
   
+  // Get current page posts
   const currentPosts = paginatedItems(sortedFilteredPosts);
   
+  // Check if any filters are active
   const hasFilters = filterState.searchQuery !== '' || 
                      filterState.contentFilter !== 'all' || 
                      filterState.accessFilter !== 'all' || 
