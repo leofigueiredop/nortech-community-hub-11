@@ -8,7 +8,6 @@ import {
 import { Link } from 'react-router-dom';
 import HomeSection from './sidebar/HomeSection';
 import GetStartedSection from './sidebar/GetStartedSection';
-import SpacesSection from './sidebar/SpacesSection';
 import ContentSection from './sidebar/ContentSection';
 import CommunitySection from './sidebar/CommunitySection';
 import LinksSection from './sidebar/LinksSection';
@@ -33,10 +32,6 @@ const SidebarMenuContent: React.FC = () => {
         <SidebarSeparator className="my-3 bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-900 to-transparent h-px" />
         
         <GetStartedSection />
-        
-        <SidebarSeparator className="my-3 bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-900 to-transparent h-px" />
-        
-        <SpacesSection />
         
         <SidebarSeparator className="my-3 bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-900 to-transparent h-px" />
         

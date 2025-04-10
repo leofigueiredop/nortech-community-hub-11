@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { UnlockIcon, LockIcon, LayersIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Lock, Rss, Star, Users } from 'lucide-react';
 
 interface FeedSegmentTabsProps {
   activeSegment: string;
@@ -12,117 +11,71 @@ interface FeedSegmentTabsProps {
   onSpaceChange: (space: string) => void;
 }
 
-const FeedSegmentTabs: React.FC<FeedSegmentTabsProps> = ({ 
-  activeSegment, 
+const FeedSegmentTabs: React.FC<FeedSegmentTabsProps> = ({
+  activeSegment,
   setActiveSegment,
   spaceOptions,
   activeSpace,
   onSpaceChange
 }) => {
-  // Filter spaces based on segment
-  const getFilteredSpaces = () => {
-    if (activeSegment === 'free') {
-      return spaceOptions.filter(space => 
-        space.id === 'all' || 
-        space.id === 'announcements' || 
-        space.id === 'general' || 
-        space.id === 'free'
-      );
-    } else if (activeSegment === 'premium') {
-      return spaceOptions.filter(space => 
-        space.id === 'all' || 
-        space.id === 'premium' || 
-        space.id === 'mentorship'
-      );
-    }
-    return spaceOptions;
-  };
-
   return (
-    <div className="w-full mb-6">
+    <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
       <Tabs 
         value={activeSegment} 
         onValueChange={setActiveSegment}
         className="w-full"
       >
-        <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto bg-background border shadow-sm mb-4">
+        <TabsList className="w-full justify-start bg-transparent">
           <TabsTrigger 
             value="all" 
-            className="flex items-center gap-2 py-3 data-[state=active]:bg-nortech-purple data-[state=active]:text-white"
+            className="data-[state=active]:text-purple-600 data-[state=active]:border-b-2 data-[state=active]:border-purple-600 rounded-none px-4 py-2 h-12"
           >
-            <LayersIcon size={16} />
-            <span>All</span>
+            <Rss className="h-4 w-4 mr-2" />
+            All Content
           </TabsTrigger>
+          
           <TabsTrigger 
             value="free" 
-            className="flex items-center gap-2 py-3 data-[state=active]:bg-nortech-purple data-[state=active]:text-white"
+            className="data-[state=active]:text-purple-600 data-[state=active]:border-b-2 data-[state=active]:border-purple-600 rounded-none px-4 py-2 h-12"
           >
-            <UnlockIcon size={16} />
-            <span>Free</span>
+            <Users className="h-4 w-4 mr-2" />
+            Free Zone
           </TabsTrigger>
+          
           <TabsTrigger 
             value="premium" 
-            className="flex items-center gap-2 py-3 data-[state=active]:bg-nortech-purple data-[state=active]:text-white"
+            className="data-[state=active]:text-purple-600 data-[state=active]:border-b-2 data-[state=active]:border-purple-600 rounded-none px-4 py-2 h-12"
           >
-            <LockIcon size={16} />
-            <span>Premium</span>
+            <Lock className="h-4 w-4 mr-2" />
+            Premium Zone
+          </TabsTrigger>
+          
+          <TabsTrigger 
+            value="mentor" 
+            className="data-[state=active]:text-purple-600 data-[state=active]:border-b-2 data-[state=active]:border-purple-600 rounded-none px-4 py-2 h-12"
+          >
+            <Star className="h-4 w-4 mr-2" />
+            Mentor Zone
           </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="all" className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 p-2 flex flex-wrap gap-1">
-          {spaceOptions.map(space => (
-            <Button
-              key={space.id}
-              variant="ghost"
-              size="sm"
-              className={`mb-1 ${
-                activeSpace === space.id 
-                ? 'bg-gray-100 dark:bg-gray-700 font-medium' 
-                : 'hover:bg-gray-50 dark:hover:bg-gray-700/70'
-              }`}
-              onClick={() => onSpaceChange(space.id)}
-            >
-              {space.name}
-            </Button>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="free" className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 p-2 flex flex-wrap gap-1">
-          {getFilteredSpaces().filter(space => space.id === 'all' || space.id === 'announcements' || space.id === 'general' || space.id === 'free').map(space => (
-            <Button
-              key={space.id}
-              variant="ghost"
-              size="sm"
-              className={`mb-1 ${
-                activeSpace === space.id 
-                ? 'bg-gray-100 dark:bg-gray-700 font-medium' 
-                : 'hover:bg-gray-50 dark:hover:bg-gray-700/70'
-              }`}
-              onClick={() => onSpaceChange(space.id)}
-            >
-              {space.name}
-            </Button>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="premium" className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 p-2 flex flex-wrap gap-1">
-          {getFilteredSpaces().filter(space => space.id === 'all' || space.id === 'premium' || space.id === 'mentorship').map(space => (
-            <Button
-              key={space.id}
-              variant="ghost"
-              size="sm"
-              className={`mb-1 ${
-                activeSpace === space.id 
-                ? 'bg-gray-100 dark:bg-gray-700 font-medium' 
-                : 'hover:bg-gray-50 dark:hover:bg-gray-700/70'
-              }`}
-              onClick={() => onSpaceChange(space.id)}
-            >
-              {space.name}
-            </Button>
-          ))}
-        </TabsContent>
       </Tabs>
+      
+      {activeSegment === 'premium' && (
+        <div className="bg-purple-50 dark:bg-purple-900/20 p-3 mt-2 flex items-center justify-between">
+          <div className="flex items-center">
+            <Lock className="h-4 w-4 text-purple-600 mr-2" />
+            <span className="text-sm text-purple-700 dark:text-purple-400">
+              Premium content requires an active subscription
+            </span>
+          </div>
+          <a 
+            href="/settings/subscriptions" 
+            className="text-xs font-medium text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300"
+          >
+            View Plans
+          </a>
+        </div>
+      )}
     </div>
   );
 };

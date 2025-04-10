@@ -20,7 +20,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({
 }) => {
   return (
     <>
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-lg border shadow-sm">
+      <div className="bg-white dark:bg-gray-800 p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <TrendingUp size={16} className="text-purple-500" />
@@ -54,7 +54,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({
       
       {/* Only show active filters when there are any */}
       {selectedTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center mt-4">
+        <div className="flex flex-wrap gap-2 items-center mt-4 p-3 bg-gray-50 dark:bg-gray-900">
           <span className="text-sm font-medium">Active:</span>
           {selectedTags.map(tag => (
             <Badge 
@@ -71,7 +71,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-xs h-7 ml-auto"
+            className="text-xs h-7 ml-auto text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
             onClick={clearTags}
           >
             Clear All

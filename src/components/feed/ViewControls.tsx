@@ -27,7 +27,7 @@ const ViewControls: React.FC<ViewControlsProps> = ({
     <div className="flex items-center gap-3">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="bg-transparent border-gray-700 text-gray-200 flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <Eye size={16} />
             {!isMobile ? (
               <>
@@ -42,17 +42,17 @@ const ViewControls: React.FC<ViewControlsProps> = ({
             <ChevronDown size={14} />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="bg-gray-800 border-gray-700 text-gray-200">
-          <DropdownMenuItem onClick={() => onViewChange('all')} className="hover:bg-gray-700">
+        <DropdownMenuContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <DropdownMenuItem onClick={() => onViewChange('all')} className="hover:bg-gray-100 dark:hover:bg-gray-700">
             View All
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onViewChange('free')} className="hover:bg-gray-700">
+          <DropdownMenuItem onClick={() => onViewChange('free')} className="hover:bg-gray-100 dark:hover:bg-gray-700">
             View as Free Member
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onViewChange('premium')} className="hover:bg-gray-700">
+          <DropdownMenuItem onClick={() => onViewChange('premium')} className="hover:bg-gray-100 dark:hover:bg-gray-700">
             View as Premium Member
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onViewChange('mentor')} className="hover:bg-gray-700">
+          <DropdownMenuItem onClick={() => onViewChange('mentor')} className="hover:bg-gray-100 dark:hover:bg-gray-700">
             View as Mentor
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -60,7 +60,7 @@ const ViewControls: React.FC<ViewControlsProps> = ({
 
       <Button 
         onClick={onCreatePost}
-        className="bg-nortech-purple hover:bg-nortech-purple/90 text-white flex gap-2"
+        className="bg-purple-600 hover:bg-purple-700 text-white flex gap-2"
         size={isMobile ? "sm" : "default"}
       >
         <PlusCircle size={isMobile ? 16 : 18} />

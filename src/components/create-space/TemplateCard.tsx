@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { X } from 'lucide-react'; 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { X } from 'lucide-react';
 import { 
   AlertDialog, 
   AlertDialogAction, 
@@ -15,33 +15,27 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
-interface SidebarLinkProps {
-  to: string;
+interface TemplateCardProps {
   icon: React.ReactNode;
-  label: string;
-  additionalPaths?: string[];
-  canDelete?: boolean;
+  title: string;
+  description: string;
+  onClick?: () => void;
   onDelete?: () => void;
 }
 
-const SidebarLink: React.FC<SidebarLinkProps> = ({ 
-  to, 
+const TemplateCard: React.FC<TemplateCardProps> = ({ 
   icon, 
-  label, 
-  additionalPaths = [],
-  canDelete = false,
-  onDelete
+  title, 
+  description, 
+  onClick,
+  onDelete 
 }) => {
-  const location = useLocation();
   const [isHovering, setIsHovering] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteText, setDeleteText] = useState('');
   const { toast } = useToast();
 
-  const isActive = location.pathname === to || additionalPaths.includes(location.pathname);
-
   const handleDeleteClick = (e: React.MouseEvent) => {
-    e.preventDefault();
     e.stopPropagation();
     setShowDeleteDialog(true);
   };
@@ -52,8 +46,8 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({
       setShowDeleteDialog(false);
       setDeleteText('');
       toast({
-        title: "Item deleted",
-        description: `${label} has been removed successfully.`,
+        title: "Template deleted",
+        description: `${title} has been deleted successfully.`,
       });
     } else {
       toast({
@@ -66,40 +60,40 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({
 
   return (
     <>
-      <div 
-        className="relative"
+      <Card 
+        className={`cursor-pointer hover:border-nortech-purple transition-colors relative ${isHovering ? 'border-nortech-purple' : ''}`} 
+        onClick={onClick}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        <Link
-          to={to}
-          className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${
-            isActive 
-              ? "bg-nortech-purple/10 text-nortech-purple font-medium" 
-              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-nortech-purple transition-colors"
-          }`}
-        >
-          {icon}
-          <span>{label}</span>
-        </Link>
-        
-        {canDelete && isHovering && (
-          <button 
-            className="absolute top-1/2 right-2 -translate-y-1/2 p-1 bg-red-100 dark:bg-red-900 rounded-full hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+        {onDelete && isHovering && (
+          <div 
+            className="absolute top-2 right-2 z-10 p-1 bg-red-100 dark:bg-red-900 rounded-full hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
             onClick={handleDeleteClick}
           >
-            <X size={12} className="text-red-600 dark:text-red-300" />
-          </button>
+            <X size={14} className="text-red-600 dark:text-red-300" />
+          </div>
         )}
-      </div>
+        <CardHeader className="py-4">
+          <div className="flex items-center gap-2">
+            <div className="bg-nortech-purple/10 p-2 rounded-lg">
+              {icon}
+            </div>
+            <CardTitle className="text-base">{title}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <CardDescription className="text-xs line-clamp-2">{description}</CardDescription>
+        </CardContent>
+      </Card>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this item?</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure you want to delete this template?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently remove 
-              "{label}" from your sidebar.
+              This action cannot be undone. This will permanently delete the 
+              "{title}" template.
               <div className="mt-4">
                 <p className="mb-2 text-sm">Type <strong>delete</strong> to confirm:</p>
                 <Input 
@@ -118,7 +112,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({
               className="bg-red-600 hover:bg-red-700"
               disabled={deleteText.toLowerCase() !== 'delete'}
             >
-              Delete Item
+              Delete Template
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -127,4 +121,4 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({
   );
 };
 
-export default SidebarLink;
+export default TemplateCard;

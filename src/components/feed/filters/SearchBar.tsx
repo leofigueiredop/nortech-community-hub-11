@@ -21,7 +21,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         placeholder={placeholder}
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="pl-10 bg-background border-slate-200"
+        className="pl-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
       />
     </div>
   );
