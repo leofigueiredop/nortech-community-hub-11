@@ -3,6 +3,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Feed from './pages/Feed';
+import { PointsProvider } from './context/PointsContext';
+import { NotificationsProvider } from './context/NotificationsContext';
 
 // Create simple placeholder components for missing pages
 const Placeholder: React.FC<{ name: string }> = ({ name }) => {
@@ -23,18 +25,22 @@ const Activity = () => <Placeholder name="Activity" />;
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/explore" element={<Explore />} />
-        <Route path="/spaces" element={<Spaces />} />
-        <Route path="/feed" element={<Feed />} />
-        <Route path="/learning" element={<LearningPath />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/activity" element={<Activity />} />
-      </Routes>
-    </Router>
+    <NotificationsProvider>
+      <PointsProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/spaces" element={<Spaces />} />
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/learning" element={<LearningPath />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/activity" element={<Activity />} />
+          </Routes>
+        </Router>
+      </PointsProvider>
+    </NotificationsProvider>
   );
 }
 
