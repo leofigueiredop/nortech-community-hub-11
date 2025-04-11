@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   createBrowserRouter,
@@ -5,9 +6,6 @@ import {
 } from "react-router-dom";
 import './App.css';
 import Library from './pages/Library';
-import Home from './pages/Home';
-import Courses from './pages/Courses';
-import CourseDetails from './pages/CourseDetails';
 import Events from './pages/Events';
 import PointsDashboard from './pages/PointsDashboard';
 import PointsStore from './pages/PointsStore';
@@ -17,19 +15,11 @@ import ContentManagement from './pages/ContentManagement';
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <ContentCreatorDashboard />,
   },
   {
     path: "/library",
     element: <Library />,
-  },
-  {
-    path: "/courses",
-    element: <Courses />,
-  },
-  {
-    path: "/courses/:courseId",
-    element: <CourseDetails />,
   },
   {
     path: "/events",
