@@ -60,36 +60,10 @@ const LibraryTopBar: React.FC<LibraryTopBarProps> = ({
   return (
     <div className="sticky top-0 z-30 w-full bg-background/95 backdrop-blur supports-backdrop-blur:bg-background/60 border-b">
       <div className="container flex h-14 max-w-screen-2xl items-center">
-        <div className="mr-4 hidden md:flex">
+        <div className="mr-4 flex">
           <h1 className="text-xl font-semibold">Content Library</h1>
         </div>
         
-        <nav className="flex items-center space-x-2 lg:space-x-6 overflow-auto">
-          <Button 
-            variant={activeView === 'free' ? "default" : "ghost"} 
-            onClick={() => setActiveView('free')}
-            className="h-9"
-          >
-            Free
-          </Button>
-          
-          <Button 
-            variant={activeView === 'premium' ? "default" : "ghost"} 
-            onClick={() => setActiveView('premium')}
-            className="h-9"
-          >
-            Premium
-          </Button>
-          
-          <Button 
-            variant={activeView === 'unlockable' ? "default" : "ghost"} 
-            onClick={() => setActiveView('unlockable')}
-            className="h-9"
-          >
-            Unlockable
-          </Button>
-        </nav>
-
         <div className="flex-1"></div>
 
         <Drawer open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
