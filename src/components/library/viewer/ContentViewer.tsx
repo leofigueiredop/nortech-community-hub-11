@@ -30,7 +30,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
   const contentType = item.format;
   
   // Get content duration in a readable format
-  const duration = getContentDuration(item.duration);
+  const duration = getContentDuration(item.duration || 0);
   
   // Get completion criteria text
   const completionCriteria = getCompletionCriteria(item);
@@ -43,7 +43,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
   return (
     <Dialog open={!!item} onOpenChange={() => onClose()}>
       <DialogOverlay className="bg-black/80 backdrop-blur-sm" />
-      <DialogContent className="max-w-6xl max-h-[90vh] p-0 border-none overflow-hidden bg-background">
+      <DialogContent className="max-w-7xl max-h-[90vh] p-0 border-none overflow-hidden bg-background">
         <DialogTitle className="sr-only">{item.title}</DialogTitle>
         <div className="flex flex-col h-full max-h-[90vh]">
           <div className="p-4 sm:p-6">
@@ -64,7 +64,11 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
             <div className="w-full md:w-1/3 border-t md:border-t-0 md:border-l border-border/50">
               <ScrollArea className="h-[calc(100vh-15rem)] md:h-[60vh]">
                 <div className="p-4">
-                  <ContentDetails item={item} />
+                  <ContentDetails 
+                    item={item} 
+                    duration={duration}
+                    completionCriteria={completionCriteria}
+                  />
                   
                   <ContentProgress 
                     progress={30}

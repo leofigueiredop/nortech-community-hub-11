@@ -36,25 +36,26 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   // If layout is grid, render a grid of cards
   if (layout === 'grid') {
     return (
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">{title}</h2>
+      <div className="mb-12">
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-2xl sm:text-3xl font-semibold">{title}</h2>
           
           {viewAllUrl && (
             <Button variant="ghost" size="sm" className="flex items-center gap-1">
-              View All <ChevronRight size={16} />
+              Ver Todos <ChevronRight size={16} />
             </Button>
           )}
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {items.map((item, index) => (
-            <EnhancedContentCard
-              key={item.id}
-              item={item}
-              onClick={() => onItemSelect(item)}
-              rankNumber={isTopTen && index < 10 ? index + 1 : undefined}
-            />
+            <div key={item.id} className="aspect-[16/10]">
+              <EnhancedContentCard
+                item={item}
+                onClick={() => onItemSelect(item)}
+                rankNumber={isTopTen && index < 10 ? index + 1 : undefined}
+              />
+            </div>
           ))}
         </div>
       </div>
@@ -64,18 +65,18 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   // Default carousel layout
   return (
     <div 
-      className="mb-8 relative group"
+      className="mb-14 relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold group-hover:text-primary transition-colors duration-300">
+      <div className="flex justify-between items-center mb-5">
+        <h2 className="text-2xl sm:text-3xl font-semibold group-hover:text-primary transition-colors duration-300">
           {title}
         </h2>
         
         {viewAllUrl && (
           <Button variant="ghost" size="sm" className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            View All <ChevronRight size={16} />
+            Ver Todos <ChevronRight size={16} />
           </Button>
         )}
       </div>
@@ -87,21 +88,23 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-2 md:-ml-4">
+        <CarouselContent className="-ml-4 md:-ml-6">
           {items.map((item, index) => (
-            <CarouselItem key={item.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-              <EnhancedContentCard
-                item={item}
-                onClick={() => onItemSelect(item)}
-                rankNumber={isTopTen && index < 10 ? index + 1 : undefined}
-              />
+            <CarouselItem key={item.id} className="pl-4 md:pl-6 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+              <div className="aspect-[16/9]">
+                <EnhancedContentCard
+                  item={item}
+                  onClick={() => onItemSelect(item)}
+                  rankNumber={isTopTen && index < 10 ? index + 1 : undefined}
+                />
+              </div>
             </CarouselItem>
           ))}
         </CarouselContent>
         
         <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <CarouselPrevious className="left-1" />
-          <CarouselNext className="right-1" />
+          <CarouselPrevious className="left-1 h-10 w-10" />
+          <CarouselNext className="right-1 h-10 w-10" />
         </div>
       </Carousel>
     </div>

@@ -23,8 +23,8 @@ export const handleExternalContentAccess = (
         window.open(item.resourceUrl, '_blank');
       } else {
         toast({
-          title: "Resource not available",
-          description: "The resource URL is not available for this content.",
+          title: "Recurso não disponível",
+          description: "O URL do recurso não está disponível para este conteúdo.",
           variant: "destructive",
         });
       }
@@ -36,8 +36,8 @@ export const handleExternalContentAccess = (
         window.open(item.resourceUrl, '_blank');
       } else {
         toast({
-          title: "Link not available",
-          description: "The link is not available for this content.",
+          title: "Link não disponível",
+          description: "O link não está disponível para este conteúdo.",
           variant: "destructive",
         });
       }
@@ -46,8 +46,8 @@ export const handleExternalContentAccess = (
     default:
       // For other formats, just track the view
       toast({
-        title: "Content accessed",
-        description: "You are now viewing this content.",
+        title: "Conteúdo acessado",
+        description: "Você está visualizando este conteúdo.",
       });
       break;
   }
@@ -58,7 +58,7 @@ export const formatDuration = (seconds: number): string => {
   if (!seconds || isNaN(seconds)) return '0 sec';
   
   if (seconds < 60) {
-    return `${seconds} sec`;
+    return `${seconds} seg`;
   } else if (seconds < 3600) {
     const minutes = Math.floor(seconds / 60);
     return `${minutes} min`;
@@ -71,30 +71,31 @@ export const formatDuration = (seconds: number): string => {
 
 // Get content type name
 export const getContentTypeName = (format: string): string => {
-  if (!format) return 'Unknown';
+  if (!format) return 'Desconhecido';
   
   const formatMap: Record<string, string> = {
-    'video': 'Video',
-    'audio': 'Audio',
+    'video': 'Vídeo',
+    'audio': 'Áudio',
     'pdf': 'PDF',
-    'text': 'Article',
-    'url': 'Web Link',
+    'text': 'Artigo',
+    'url': 'Link Web',
     'youtube': 'YouTube',
     'vimeo': 'Vimeo',
     'gdoc': 'Google Doc',
-    'image': 'Image',
-    'course': 'Course',
+    'image': 'Imagem',
+    'course': 'Curso',
     'link': 'Link'
   };
   
-  return formatMap[format] || 'Unknown';
+  return formatMap[format] || 'Desconhecido';
 };
 
-// Add the missing functions
+// Function to get content duration
 export const getContentDuration = (seconds: number): string => {
   return formatDuration(seconds || 0);
 };
 
+// Function to get completion criteria
 export const getCompletionCriteria = (item: ContentItem): string => {
   if (item.completionCriteria) {
     return item.completionCriteria;
@@ -105,16 +106,24 @@ export const getCompletionCriteria = (item: ContentItem): string => {
     case 'video':
     case 'youtube':
     case 'vimeo':
-      return 'Watch 90% of the video';
+      return 'Assistir 90% do vídeo';
     case 'audio':
-      return 'Listen to the full audio';
+      return 'Ouvir o áudio completo';
     case 'pdf':
     case 'text':
     case 'gdoc':
-      return 'Read the document';
+      return 'Ler o documento';
     case 'course':
-      return 'Complete all modules';
+      return 'Completar todos os módulos';
     default:
-      return 'View the full content';
+      return 'Visualizar o conteúdo completo';
   }
+};
+
+// Safe way to check if a tag exists in an item
+export const hasTag = (item: ContentItem, tag: string): boolean => {
+  if (!item.tags || !Array.isArray(item.tags)) {
+    return false;
+  }
+  return item.tags.includes(tag);
 };

@@ -86,20 +86,20 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
   if (!hasContent) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-semibold mb-4">No content available</h2>
+        <h2 className="text-2xl font-semibold mb-4">Nenhum conteúdo disponível</h2>
         <p className="text-muted-foreground">
-          There's no content available for the selected filters.
+          Não há conteúdo disponível para os filtros selecionados.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-14 py-8">
       {/* Top trending row (always first when in 'all' view) */}
       {activeView === 'all' && topTrending.length > 0 && (
         <ContentSection 
-          title="Top Trending" 
+          title="Em Alta" 
           items={topTrending} 
           onItemSelect={onItemSelect}
           isTopTen={true}
@@ -109,7 +109,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {/* Recommended content (personalized, if any) */}
       {recommendedContent.length > 0 && (
         <ContentSection 
-          title="Recommended For You" 
+          title="Recomendado Para Você" 
           items={recommendedContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/recommended"
@@ -119,7 +119,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {/* New releases */}
       {newReleases.length > 0 && (
         <ContentSection 
-          title="New Releases" 
+          title="Lançamentos Recentes" 
           items={newReleases} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/new"
@@ -129,7 +129,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {/* Premium content showcase (only in all or premium views) */}
       {(activeView === 'all' || activeView === 'premium') && premiumShowcase.length > 0 && (
         <ContentSection 
-          title="Premium Content" 
+          title="Conteúdo Premium" 
           items={premiumShowcase} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/premium"
@@ -139,7 +139,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {/* Format-specific sections */}
       {videoContent.length > 0 && (
         <ContentSection 
-          title="Videos" 
+          title="Vídeos" 
           items={videoContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/videos"
@@ -148,7 +148,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       
       {courseContent.length > 0 && (
         <ContentSection 
-          title="Courses" 
+          title="Cursos" 
           items={courseContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/courses"
@@ -157,7 +157,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       
       {pdfContent.length > 0 && (
         <ContentSection 
-          title="PDF Guides & Documents" 
+          title="Guias & Documentos PDF" 
           items={pdfContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/documents"
@@ -166,7 +166,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       
       {audioContent.length > 0 && (
         <ContentSection 
-          title="Audio Content" 
+          title="Conteúdo em Áudio" 
           items={audioContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/audio"
@@ -176,7 +176,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {/* Most popular (if not already showing trending) */}
       {activeView !== 'all' && mostPopular.length > 0 && (
         <ContentSection 
-          title="Most Popular" 
+          title="Mais Populares" 
           items={mostPopular} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/popular"
@@ -186,7 +186,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {!hasSections && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
-            No content matches the current view settings.
+            Nenhum conteúdo corresponde às configurações de visualização atuais.
           </p>
         </div>
       )}

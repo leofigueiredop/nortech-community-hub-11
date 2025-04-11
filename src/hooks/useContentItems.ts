@@ -12,9 +12,9 @@ export const useContentItems = () => {
   const [sortBy, setSortBy] = useState<string>('newest');
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
 
-  // Get all unique tags from content items
+  // Get all unique tags from content items, safely handling undefined tags
   const allTags = Array.from(
-    new Set(content.flatMap(item => item.tags || []))
+    new Set(content.flatMap(item => (item.tags && Array.isArray(item.tags)) ? item.tags : []))
   ).sort();
 
   // Get all formats

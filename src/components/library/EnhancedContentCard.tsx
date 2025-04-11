@@ -23,8 +23,8 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
   const cardVariants = {
     initial: { y: 0, scale: 1, zIndex: 0 },
     hover: { 
-      y: -10, 
-      scale: 1.05, 
+      y: -16, 
+      scale: 1.08, 
       zIndex: 20,
       transition: { duration: 0.3 }
     }
@@ -47,12 +47,12 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
       >
         {/* Rank number display for top 10 items */}
         {rankNumber !== undefined && (
-          <div className="absolute -left-5 -top-1 z-10 font-bold text-[80px] select-none" 
+          <div className="absolute -left-5 -top-1 z-10 font-bold text-[100px] select-none" 
             style={{
               color: 'transparent',
-              WebkitTextStroke: '2px rgba(255,255,255,0.7)',
-              textShadow: '0 0 10px rgba(0,0,0,0.2)',
-              opacity: isHovered ? 0.4 : 0.8,
+              WebkitTextStroke: '2px rgba(255,255,255,0.8)',
+              textShadow: '0 0 10px rgba(0,0,0,0.3)',
+              opacity: isHovered ? 0.5 : 0.9,
               transition: 'opacity 0.3s ease'
             }}>
             {rankNumber}
