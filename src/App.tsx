@@ -34,6 +34,7 @@ import Leaderboard from "./pages/Leaderboard";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { PointsProvider } from "./context/PointsContext";
 import ContentManagement from "./pages/ContentManagement";
+import ContentCreatorDashboard from "./pages/ContentCreatorDashboard";
 import TagPage from "./pages/TagPage";
 import UserProfile from "./pages/UserProfile";
 import CreateEvent from "./pages/CreateEvent";
