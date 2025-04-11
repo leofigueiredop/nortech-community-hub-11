@@ -74,22 +74,10 @@ const ContentRow: React.FC<ContentRowProps> = ({ items, onItemSelect, isTopTen =
             key={item.id}
             className="flex-none w-[250px] md:w-[300px] relative"
           >
-            {/* Top 10 number badge */}
-            {isTopTen && (
-              <div 
-                className="absolute -left-4 -bottom-2 z-20 font-bold text-[90px] text-stroke-white text-transparent select-none" 
-                style={{ 
-                  textShadow: '-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff',
-                  opacity: 0.8
-                }}
-              >
-                {index + 1}
-              </div>
-            )}
-            
             <EnhancedContentCard 
               item={item}
               onClick={() => onItemSelect(item)}
+              rankNumber={isTopTen ? index + 1 : undefined}
             />
           </div>
         ))}

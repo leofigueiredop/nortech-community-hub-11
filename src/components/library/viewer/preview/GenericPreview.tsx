@@ -2,7 +2,7 @@
 import React from 'react';
 import { ContentItem } from '@/types/library';
 import { Button } from '@/components/ui/button';
-import { FileText, Lock, ExternalLink } from 'lucide-react';
+import { FileText, Lock, ExternalLink, Eye, Play, Headphones } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PremiumContentOverlay from '../../PremiumContentOverlay';
 
@@ -20,6 +20,35 @@ const GenericPreview: React.FC<GenericPreviewProps> = ({
   isFullscreen = false 
 }) => {
   const isPremium = item.accessLevel === 'premium';
+  
+  // Determine appropriate CTA text based on content format
+  const getCtaText = () => {
+    if (['video', 'youtube', 'vimeo'].includes(item.format)) {
+      return (
+        <>
+          <Play className="mr-2 h-4 w-4" /> Watch Now
+        </>
+      );
+    } else if (item.format === 'audio') {
+      return (
+        <>
+          <Headphones className="mr-2 h-4 w-4" /> Listen Now
+        </>
+      );
+    } else if (['pdf', 'text', 'gdoc'].includes(item.format)) {
+      return (
+        <>
+          <Eye className="mr-2 h-4 w-4" /> Read Now
+        </>
+      );
+    } else {
+      return (
+        <>
+          <ExternalLink className="mr-2 h-4 w-4" /> Access Content
+        </>
+      );
+    }
+  };
 
   return (
     <div className={`${isFullscreen ? 'h-[70vh]' : 'aspect-video'} bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center mb-6 relative overflow-hidden`}>
@@ -51,9 +80,7 @@ const GenericPreview: React.FC<GenericPreviewProps> = ({
                 <Lock className="mr-2 h-4 w-4" /> Unlock Premium Content
               </>
             ) : (
-              <>
-                <ExternalLink className="mr-2 h-4 w-4" /> Access Content
-              </>
+              getCtaText()
             )}
           </Button>
         </motion.div>

@@ -9,9 +9,14 @@ import ContentCardInfo from './card/ContentCardInfo';
 interface EnhancedContentCardProps {
   item: ContentItem;
   onClick: () => void;
+  rankNumber?: number; // New prop for top 10 ranking
 }
 
-const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ item, onClick }) => {
+const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ 
+  item, 
+  onClick, 
+  rankNumber 
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   
   // Card variants for hover animation
@@ -40,6 +45,20 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ item, onClick
         onMouseLeave={() => setIsHovered(false)}
         onClick={onClick}
       >
+        {/* Rank number display for top 10 items */}
+        {rankNumber !== undefined && (
+          <div className="absolute -left-4 -bottom-2 z-10 font-bold text-[90px] select-none" 
+            style={{
+              color: 'transparent',
+              WebkitTextStroke: '2px rgba(255,255,255,0.7)',
+              textShadow: '0 0 10px rgba(0,0,0,0.2)',
+              opacity: isHovered ? 0.4 : 0.8,
+              transition: 'opacity 0.3s ease'
+            }}>
+            {rankNumber}
+          </div>
+        )}
+        
         <ContentCardMedia 
           item={item} 
           isHovered={isHovered} 
