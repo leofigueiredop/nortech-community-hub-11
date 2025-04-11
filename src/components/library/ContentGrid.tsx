@@ -1,7 +1,7 @@
 
 import React from 'react';
-import ContentCard from './ContentCard';
 import { ContentItem } from '@/types/library';
+import EnhancedContentCard from './EnhancedContentCard';
 
 interface ContentGridProps {
   items: ContentItem[];
@@ -19,9 +19,9 @@ const ContentGrid: React.FC<ContentGridProps> = ({ items, onItemSelect }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {items.map((item) => (
-        <ContentCard
+        <EnhancedContentCard
           key={item.id}
           item={item}
           onClick={() => onItemSelect(item)}
