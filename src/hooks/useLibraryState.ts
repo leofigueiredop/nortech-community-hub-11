@@ -5,6 +5,7 @@ import { ContentItem } from '@/types/library';
 export const useLibraryState = () => {
   const [visitedTags, setVisitedTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(true);
+  const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
 
   // Simulate user interests based on local storage or default to some tags
   useEffect(() => {
@@ -18,6 +19,12 @@ export const useLibraryState = () => {
       setVisitedTags(defaultTags);
       localStorage.setItem('visitedTags', JSON.stringify(defaultTags));
     }
+
+    // Load recently viewed content
+    const storedRecentlyViewed = localStorage.getItem('recentlyViewed');
+    if (storedRecentlyViewed) {
+      setRecentlyViewed(JSON.parse(storedRecentlyViewed));
+    }
   }, []);
 
   // Helper to add a new tag to visited tags
@@ -29,6 +36,15 @@ export const useLibraryState = () => {
     }
   };
 
+  // Track viewed content
+  const trackContentView = (contentId: string) => {
+    if (!recentlyViewed.includes(contentId)) {
+      const updatedViewed = [contentId, ...recentlyViewed].slice(0, 10); // Keep last 10
+      setRecentlyViewed(updatedViewed);
+      localStorage.setItem('recentlyViewed', JSON.stringify(updatedViewed));
+    }
+  };
+
   const toggleFilters = () => {
     setShowFilters(!showFilters);
   };
@@ -36,7 +52,9 @@ export const useLibraryState = () => {
   return {
     visitedTags,
     showFilters,
+    recentlyViewed,
     addVisitedTag,
+    trackContentView,
     toggleFilters
   };
 };
