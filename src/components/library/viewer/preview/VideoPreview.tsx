@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ContentItem } from '@/types/library';
 import { Button } from '@/components/ui/button';
-import { FileVideo, Video, Lock } from 'lucide-react';
+import { FileVideo, Video, Lock, Maximize, Minimize } from 'lucide-react';
 import PremiumContentOverlay from '../../PremiumContentOverlay';
 
 interface VideoPreviewProps {
@@ -20,10 +20,17 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({
   isFullscreen = false,
   getEmbedUrl
 }) => {
+  const [localFullscreen, setLocalFullscreen] = useState(isFullscreen);
   const isPremium = item.accessLevel === 'premium';
-  const previewClass = isFullscreen 
+  const previewClass = localFullscreen 
     ? "w-full max-h-[70vh] bg-slate-900 rounded-lg flex items-center justify-center mb-6 relative overflow-hidden"
     : "aspect-video bg-slate-900 rounded-lg flex items-center justify-center mb-6 relative overflow-hidden";
+
+  const toggleFullscreen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setLocalFullscreen(!localFullscreen);
+  };
 
   if (item.resourceUrl.includes('youtube.com') || 
       item.resourceUrl.includes('youtu.be') || 
@@ -47,6 +54,14 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({
             onUsePoints={handleAccess}
           />
         )}
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          className="absolute bottom-4 right-4 opacity-80 hover:opacity-100"
+          onClick={toggleFullscreen}
+        >
+          {localFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+        </Button>
       </div>
     );
   }
