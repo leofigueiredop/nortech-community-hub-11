@@ -54,4 +54,5 @@ export interface ContentProgress {
   progress: number;
   completed: boolean;
   lastAccessedAt: string;
+  pointsAwarded?: boolean;
 }

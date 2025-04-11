@@ -417,7 +417,7 @@ const CreateContentModal: React.FC<CreateContentModalProps> = ({ isOpen, onClose
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           <SelectItem value="challenge-1">Beginner Developer Path</SelectItem>
                           <SelectItem value="challenge-2">AI Mastery Challenge</SelectItem>
                           <SelectItem value="challenge-3">Community Expert Badge</SelectItem>
