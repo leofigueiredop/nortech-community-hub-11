@@ -7,8 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Community from "./pages/onboarding/Community";
-import Profile from "./pages/onboarding/Profile";
-import Features from "./pages/onboarding/Features";
 import Creator from "./pages/onboarding/Creator";
 import Migration from "./pages/onboarding/Migration";
 import CommunityType from "./pages/onboarding/CommunityType";
@@ -83,8 +81,6 @@ const App = () => (
               <Route path="/onboarding/membership-plans" element={<MembershipPlans />} />
               <Route path="/onboarding/final-step" element={<FinalStep />} />
               <Route path="/onboarding/community" element={<Community />} />
-              <Route path="/onboarding/profile" element={<Profile />} />
-              <Route path="/onboarding/features" element={<Features />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/feed" element={<Feed />} />
               <Route path="/create-post" element={<CreatePost />} />

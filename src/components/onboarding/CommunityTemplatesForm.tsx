@@ -1,12 +1,17 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Check, ArrowRight, Star, Sparkles } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 interface Plan {
   id: string;
@@ -35,7 +40,6 @@ const CommunityTemplatesForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<'templates' | 'plans'>('templates');
 
   useEffect(() => {
-    // Get the community type from localStorage
     const storedType = localStorage.getItem('communityType');
     setCommunityType(storedType);
   }, []);
@@ -71,24 +75,19 @@ const CommunityTemplatesForm: React.FC = () => {
   };
 
   const handleContinue = () => {
-    // Store the selected template and plan
     localStorage.setItem('selectedTemplate', selectedTemplate);
     localStorage.setItem('selectedPlan', selectedPlan || 'free');
     localStorage.setItem('onboardingStep', '4');
     
-    // Show achievement badge
     setShowBadge(true);
     
-    // Show achievement toast
     toast({
       title: "🎖️ Achievement Unlocked!",
       description: "Community setup completed (+25 XP) - 66% completed!",
       duration: 3000,
     });
     
-    // In a real app, you would process payment for paid plans here
     if (selectedPlan && selectedPlan !== 'free') {
-      // Using the standard toast instead of toast.success
       toast({
         title: "Plan selected!",
         description: "In a real app, you would go to checkout now.",
@@ -97,7 +96,6 @@ const CommunityTemplatesForm: React.FC = () => {
     }
     
     setTimeout(() => {
-      // Navigate to member invites
       navigate('/onboarding/invite-members');
     }, 1500);
   };
