@@ -204,7 +204,7 @@ const ContentCreatorDashboard: React.FC = () => {
           pointsValue: 100,
           tags: tags,
           duration: values.duration || 0,
-          author: typeof values.author === 'string' ? values.author : values.author || 'Nortech', 
+          author: values.author || 'Nortech', 
           thumbnail: values.thumbnail || '/placeholder.svg',
           format: values.format as ContentFormat,
           accessLevel: values.accessLevel as 'free' | 'premium' | 'unlockable',

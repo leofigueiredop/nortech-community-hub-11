@@ -1,5 +1,4 @@
-
-import { ContentItem, ContentCategory, ContentFormat, Author } from '@/types/library';
+import { ContentItem, ContentCategory, ContentFormat } from '@/types/library';
 
 export const CATEGORIES: ContentCategory[] = [
   {
@@ -80,7 +79,7 @@ export const CONTENT_ITEMS: ContentItem[] = [
       id: 'u1',
       name: 'Mark Johnson',
       avatar: 'https://via.placeholder.com/100'
-    } as Author,
+    },
     tags: ['api', 'integration', 'tutorial'],
     createdAt: '2023-05-05T11:20:00Z',
     updatedAt: '2023-05-05T11:20:00Z',
@@ -132,7 +131,7 @@ export const CONTENT_ITEMS: ContentItem[] = [
       id: 'u2',
       name: 'Resource Team',
       avatar: 'https://via.placeholder.com/100'
-    } as Author,
+    },
     tags: ['resources', 'links', 'learning'],
     createdAt: '2023-03-20T13:15:00Z',
     updatedAt: '2023-05-12T10:20:00Z',
@@ -168,7 +167,7 @@ export const CONTENT_ITEMS: ContentItem[] = [
       id: 'u3',
       name: 'Support Team',
       avatar: 'https://via.placeholder.com/100'
-    } as Author,
+    },
     tags: ['troubleshooting', 'support', 'help'],
     createdAt: '2023-05-08T11:45:00Z',
     updatedAt: '2023-05-08T11:45:00Z',

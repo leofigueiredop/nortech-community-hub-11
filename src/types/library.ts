@@ -13,7 +13,7 @@ export interface ContentItem {
   description: string;
   format: ContentFormat;
   thumbnail: string;
-  author: string | Author; // Allow both string and Author object
+  author: Author | string; // Allow both Author object and string for flexibility
   tags: string[];
   createdAt: string;
   updatedAt: string;
