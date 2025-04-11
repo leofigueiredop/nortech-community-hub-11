@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Check, ArrowRight, Star } from 'lucide-react';
-import { toast } from 'sonner';
+import { Check, ArrowRight, Star, Sparkles } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
+import { Progress } from '@/components/ui/progress';
 
 interface Plan {
   id: string;
@@ -30,6 +31,8 @@ const CommunityTemplatesForm: React.FC = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<string>('template-1');
   const [communityType, setCommunityType] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [showBadge, setShowBadge] = useState(false);
+  const [currentStep, setCurrentStep] = useState<'templates' | 'plans'>('templates');
 
   useEffect(() => {
     // Get the community type from localStorage
@@ -71,14 +74,27 @@ const CommunityTemplatesForm: React.FC = () => {
     // Store the selected template and plan
     localStorage.setItem('selectedTemplate', selectedTemplate);
     localStorage.setItem('selectedPlan', selectedPlan || 'free');
+    localStorage.setItem('onboardingStep', '4');
+    
+    // Show achievement badge
+    setShowBadge(true);
+    
+    // Show achievement toast
+    toast({
+      title: "🎖️ Achievement Unlocked!",
+      description: "Community setup completed (+25 XP) - 66% completed!",
+      duration: 3000,
+    });
     
     // In a real app, you would process payment for paid plans here
     if (selectedPlan && selectedPlan !== 'free') {
       toast.success('Plan selected! In a real app, you would go to checkout now.');
     }
     
-    // Navigate to dashboard
-    navigate('/dashboard');
+    setTimeout(() => {
+      // Navigate to member invites
+      navigate('/onboarding/invite-members');
+    }, 1500);
   };
 
   const templates: TemplateOption[] = [
@@ -171,11 +187,22 @@ const CommunityTemplatesForm: React.FC = () => {
   ];
 
   return (
-    <Card className="w-full max-w-5xl mx-auto">
+    <Card className="w-full max-w-5xl mx-auto relative">
+      {showBadge && (
+        <div className="absolute -top-5 -right-5 bg-nortech-purple text-white p-2 rounded-full animate-bounce shadow-lg">
+          <Sparkles className="h-6 w-6" />
+        </div>
+      )}
+      
       <CardContent className="pt-6">
-        <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 bg-nortech-purple rounded-lg flex items-center justify-center">
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-20 h-20 bg-nortech-purple rounded-lg flex items-center justify-center mb-4">
             <span className="text-white text-4xl font-bold">N</span>
+          </div>
+          
+          <div className="w-full mb-6">
+            <Progress value={66.6} className="h-2 w-full" />
+            <p className="text-xs text-center text-muted-foreground mt-1">Step 4 of 6</p>
           </div>
         </div>
         
@@ -187,10 +214,10 @@ const CommunityTemplatesForm: React.FC = () => {
           </p>
         )}
         
-        <Tabs defaultValue="templates" className="mt-8">
+        <Tabs defaultValue="templates" value={currentStep} onValueChange={(value) => setCurrentStep(value as 'templates' | 'plans')} className="mt-8">
           <TabsList className="w-full mb-8">
-            <TabsTrigger value="templates" className="flex-1">Choose a Template</TabsTrigger>
-            <TabsTrigger value="plans" className="flex-1">Select a Plan</TabsTrigger>
+            <TabsTrigger value="templates" className="flex-1">1. Choose a Template</TabsTrigger>
+            <TabsTrigger value="plans" className="flex-1">2. Select a Plan</TabsTrigger>
           </TabsList>
           
           <TabsContent value="templates" className="space-y-6">
@@ -201,10 +228,22 @@ const CommunityTemplatesForm: React.FC = () => {
                   className={`border rounded-lg overflow-hidden cursor-pointer transition-all hover:shadow-md ${
                     selectedTemplate === template.id ? 'ring-2 ring-nortech-purple' : ''
                   }`}
-                  onClick={() => setSelectedTemplate(template.id)}
+                  onClick={() => {
+                    setSelectedTemplate(template.id);
+                    toast({
+                      title: "Template selected",
+                      description: `You've selected the ${template.title} template.`,
+                      duration: 1500,
+                    });
+                  }}
                 >
-                  <div className="h-40 bg-slate-100 flex items-center justify-center">
+                  <div className="h-40 bg-slate-100 flex items-center justify-center relative">
                     <img src={template.imageSrc} alt={template.title} className="h-32 w-auto" />
+                    {selectedTemplate === template.id && (
+                      <div className="absolute top-2 right-2 bg-nortech-purple text-white p-1 rounded-full">
+                        <Check className="h-4 w-4" />
+                      </div>
+                    )}
                   </div>
                   <div className="p-4">
                     <h3 className="font-medium mb-1">{template.title}</h3>
@@ -214,16 +253,24 @@ const CommunityTemplatesForm: React.FC = () => {
               ))}
             </div>
             
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-between pt-4">
+              <Button 
+                variant="outline"
+                onClick={() => navigate('/onboarding/community-type')}
+              >
+                Previous
+              </Button>
+              
               <Button 
                 variant="default"
                 className="bg-nortech-purple hover:bg-nortech-purple/90"
                 onClick={() => {
-                  // Find the plans tab trigger and properly cast it to HTMLElement before calling click
-                  const plansTab = document.querySelector('[data-value="plans"]');
-                  if (plansTab && plansTab instanceof HTMLElement) {
-                    plansTab.click();
-                  }
+                  setCurrentStep('plans');
+                  toast({
+                    title: "+10 XP Earned!",
+                    description: "Template selected successfully",
+                    duration: 1500,
+                  });
                 }}
               >
                 Continue to Plans <ArrowRight className="ml-2 h-4 w-4" />
@@ -239,7 +286,14 @@ const CommunityTemplatesForm: React.FC = () => {
                   className={`border rounded-lg p-6 relative cursor-pointer hover:shadow-md ${
                     selectedPlan === plan.id ? 'ring-2 ring-nortech-purple' : ''
                   } ${plan.recommended ? 'bg-slate-50' : ''}`}
-                  onClick={() => setSelectedPlan(plan.id)}
+                  onClick={() => {
+                    setSelectedPlan(plan.id);
+                    toast({
+                      title: "Plan selected",
+                      description: `You've selected the ${plan.name} plan.`,
+                      duration: 1500,
+                    });
+                  }}
                 >
                   {plan.recommended && (
                     <div className="absolute -top-2 -right-2 bg-nortech-purple text-white text-xs px-2 py-1 rounded-full">
@@ -265,11 +319,19 @@ const CommunityTemplatesForm: React.FC = () => {
               ))}
             </div>
             
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-between pt-4">
+              <Button 
+                variant="outline"
+                onClick={() => setCurrentStep('templates')}
+              >
+                Previous
+              </Button>
+              
               <Button 
                 variant="default"
                 className="bg-nortech-purple hover:bg-nortech-purple/90"
                 onClick={handleContinue}
+                disabled={!selectedPlan}
               >
                 Continue <ArrowRight className="ml-2 h-4 w-4" />
               </Button>

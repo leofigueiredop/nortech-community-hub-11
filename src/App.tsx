@@ -10,8 +10,12 @@ import Community from "./pages/onboarding/Community";
 import Profile from "./pages/onboarding/Profile";
 import Features from "./pages/onboarding/Features";
 import Creator from "./pages/onboarding/Creator";
+import Migration from "./pages/onboarding/Migration";
 import CommunityType from "./pages/onboarding/CommunityType";
 import CommunityTemplates from "./pages/onboarding/CommunityTemplates";
+import InviteMembers from "./pages/onboarding/InviteMembers";
+import MembershipPlans from "./pages/onboarding/MembershipPlans";
+import FinalStep from "./pages/onboarding/FinalStep";
 import Dashboard from "./pages/Dashboard";
 import Feed from "./pages/Feed";
 import CreatePost from "./pages/CreatePost";
@@ -55,7 +59,7 @@ import Legal from "./pages/settings/Legal";
 import Digest from "./pages/settings/Digest";
 import SSO from "./pages/settings/SSO";
 import Integration from "./pages/settings/Integration";
-import Migration from "./pages/settings/Migration";
+import MigrationSettings from "./pages/settings/Migration";
 import Paywall from "./pages/settings/Paywall";
 import PointsConfiguration from "./pages/settings/PointsConfiguration";
 
@@ -72,8 +76,12 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/onboarding/creator" element={<Creator />} />
+              <Route path="/onboarding/migration" element={<Migration />} />
               <Route path="/onboarding/community-type" element={<CommunityType />} />
               <Route path="/onboarding/community-templates" element={<CommunityTemplates />} />
+              <Route path="/onboarding/invite-members" element={<InviteMembers />} />
+              <Route path="/onboarding/membership-plans" element={<MembershipPlans />} />
+              <Route path="/onboarding/final-step" element={<FinalStep />} />
               <Route path="/onboarding/community" element={<Community />} />
               <Route path="/onboarding/profile" element={<Profile />} />
               <Route path="/onboarding/features" element={<Features />} />
@@ -122,7 +130,7 @@ const App = () => (
               <Route path="/settings/digest" element={<Digest />} />
               <Route path="/settings/sso" element={<SSO />} />
               <Route path="/settings/integration" element={<Integration />} />
-              <Route path="/settings/migration" element={<Migration />} />
+              <Route path="/settings/migration" element={<MigrationSettings />} />
               <Route path="/settings/paywall" element={<Paywall />} />
               <Route path="/settings/points" element={<PointsConfiguration />} />
               

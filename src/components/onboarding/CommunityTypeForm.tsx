@@ -5,11 +5,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { Progress } from '@/components/ui/progress';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowRight, BookOpen, Brain, Puzzle, Briefcase, Target } from 'lucide-react';
+import { ArrowRight, BookOpen, Brain, Puzzle, Briefcase, Target, Sparkles } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from '@/components/ui/use-toast';
 
 const formSchema = z.object({
   communityType: z.enum(['education', 'mastermind', 'product', 'internal', 'other']),
@@ -27,6 +29,8 @@ interface CommunityTypeOption {
 
 const CommunityTypeForm: React.FC = () => {
   const navigate = useNavigate();
+  const [showBadge, setShowBadge] = useState(false);
+  
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -72,16 +76,41 @@ const CommunityTypeForm: React.FC = () => {
     console.log('Form data:', data);
     // Store the community type selection in localStorage
     localStorage.setItem('communityType', data.communityType);
-    // Go to templates selection
-    navigate('/onboarding/community-templates');
+    localStorage.setItem('onboardingStep', '3');
+    
+    // Show achievement badge
+    setShowBadge(true);
+    
+    // Show achievement toast
+    toast({
+      title: "🎖️ Achievement Unlocked!",
+      description: "Community type selected (+15 XP) - 50% completed!",
+      duration: 3000,
+    });
+    
+    setTimeout(() => {
+      // Go to templates selection
+      navigate('/onboarding/community-templates');
+    }, 1500);
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
+    <Card className="w-full max-w-3xl mx-auto relative">
+      {showBadge && (
+        <div className="absolute -top-5 -right-5 bg-nortech-purple text-white p-2 rounded-full animate-bounce shadow-lg">
+          <Sparkles className="h-6 w-6" />
+        </div>
+      )}
+      
       <CardContent className="pt-6">
-        <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 bg-nortech-purple rounded-lg flex items-center justify-center">
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-20 h-20 bg-nortech-purple rounded-lg flex items-center justify-center mb-4">
             <span className="text-white text-4xl font-bold">N</span>
+          </div>
+          
+          <div className="w-full mb-6">
+            <Progress value={50} className="h-2 w-full" />
+            <p className="text-xs text-center text-muted-foreground mt-1">Step 3 of 6</p>
           </div>
         </div>
         
@@ -113,7 +142,7 @@ const CommunityTypeForm: React.FC = () => {
                         </FormControl>
                         <FormLabel
                           htmlFor={type.value}
-                          className="flex flex-1 items-start space-x-4 p-4 border rounded-lg hover:bg-slate-50 cursor-pointer peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:border-primary"
+                          className="flex flex-1 items-start space-x-4 p-4 border rounded-lg hover:bg-slate-50 cursor-pointer peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:border-primary transition-all"
                         >
                           <div className="flex-shrink-0">
                             {type.icon}

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -5,10 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Progress } from '@/components/ui/progress';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { User, Mail, Lock, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 const formSchema = z.object({
   fullName: z.string().min(2, 'Nome completo é obrigatório'),
@@ -20,6 +23,8 @@ type FormData = z.infer<typeof formSchema>;
 
 const CreatorForm: React.FC = () => {
   const navigate = useNavigate();
+  const [showBadge, setShowBadge] = useState(false);
+  
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,21 +36,66 @@ const CreatorForm: React.FC = () => {
 
   const onSubmit = (data: FormData) => {
     console.log('Form data:', data);
-    navigate('/onboarding/community-type');
+    
+    // Store user data in localStorage
+    localStorage.setItem('userData', JSON.stringify(data));
+    localStorage.setItem('onboardingStep', '1');
+    
+    // Show achievement badge
+    setShowBadge(true);
+    
+    setTimeout(() => {
+      // Navigate to migration question
+      navigate('/onboarding/migration');
+    }, 1500);
+    
+    // Show achievement toast
+    toast({
+      title: "🎖️ Achievement Unlocked!",
+      description: "First step completed: Account Created (+15 XP)",
+      duration: 3000,
+    });
   };
 
   const handleGoogleSignIn = () => {
-    // Integraria com Google Auth aqui
+    // Integrate with Google Auth here
     console.log('Google sign-in clicked');
-    navigate('/onboarding/community-type');
+    
+    // Store onboarding step
+    localStorage.setItem('onboardingStep', '1');
+    
+    // Show achievement badge
+    setShowBadge(true);
+    
+    setTimeout(() => {
+      navigate('/onboarding/migration');
+    }, 1500);
+    
+    // Show achievement toast
+    toast({
+      title: "🎖️ Achievement Unlocked!",
+      description: "First step completed: Account Created (+15 XP)",
+      duration: 3000,
+    });
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto relative">
+      {showBadge && (
+        <div className="absolute -top-5 -right-5 bg-nortech-purple text-white p-2 rounded-full animate-bounce shadow-lg">
+          <Sparkles className="h-6 w-6" />
+        </div>
+      )}
+      
       <CardContent className="pt-6">
-        <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 bg-nortech-purple rounded-lg flex items-center justify-center">
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-20 h-20 bg-nortech-purple rounded-lg flex items-center justify-center mb-4">
             <span className="text-white text-4xl font-bold">N</span>
+          </div>
+          
+          <div className="w-full mb-6">
+            <Progress value={16.6} className="h-2 w-full" />
+            <p className="text-xs text-center text-muted-foreground mt-1">Step 1 of 6</p>
           </div>
         </div>
         
