@@ -4,7 +4,7 @@ import { ContentItem } from '@/types/library';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Play, Lock, FileText, Download, Clock, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Lock, FileText, Download, Clock, Eye, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ContentRowProps {
@@ -116,6 +116,7 @@ const ContentRow: React.FC<ContentRowProps> = ({ items, onItemSelect, isTopTen =
             const isHovered = hoveredItemId === item.id;
             const isTapped = tappedItemId === item.id;
             const showDetails = isHovered || isTapped;
+            const isPremium = item.accessLevel === 'premium';
             
             return (
               <motion.div
@@ -141,16 +142,34 @@ const ContentRow: React.FC<ContentRowProps> = ({ items, onItemSelect, isTopTen =
                   <img
                     src={item.thumbnailUrl || '/placeholder.svg'}
                     alt={item.title}
-                    className={`w-full h-full object-cover transition-all duration-300 ${showDetails ? 'brightness-50 scale-110' : ''}`}
+                    className={`w-full h-full object-cover transition-all duration-300 ${
+                      showDetails ? 'brightness-50 scale-110' : ''
+                    } ${
+                      isPremium && !showDetails ? 'brightness-50 blur-[1px]' : ''
+                    }`}
                   />
+                  
+                  {/* Premium content lock overlay (when not hovered) */}
+                  {isPremium && !showDetails && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <Lock className="h-6 w-6 text-amber-500" />
+                    </div>
+                  )}
                   
                   {/* Hover/tap overlay */}
                   {showDetails && (
                     <>
                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                        <div className="w-12 h-12 rounded-full bg-nortech-purple/90 flex items-center justify-center">
-                          {getContentIcon(item.format)}
-                        </div>
+                        {!isPremium && (
+                          <div className="w-12 h-12 rounded-full bg-nortech-purple/90 flex items-center justify-center">
+                            {getContentIcon(item.format)}
+                          </div>
+                        )}
+                        {isPremium && (
+                          <div className="w-12 h-12 rounded-full bg-amber-500/90 flex items-center justify-center">
+                            <Lock className="h-8 w-8 text-white" />
+                          </div>
+                        )}
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black to-transparent">
                         <h3 className="text-white font-medium line-clamp-1">{item.title}</h3>
@@ -164,21 +183,41 @@ const ContentRow: React.FC<ContentRowProps> = ({ items, onItemSelect, isTopTen =
                           )}
                         </div>
                         <p className="text-white/70 text-xs mt-1 line-clamp-3">{item.description}</p>
-                        <Button 
-                          size="sm"
-                          className="w-full mt-2 bg-nortech-purple hover:bg-nortech-purple/90 text-xs py-1"
-                        >
-                          {item.accessLevel === 'premium' ? 'Subscribe to Unlock' : `${getActionText(item.format)} Now`}
-                        </Button>
+                        
+                        {isPremium ? (
+                          <Button 
+                            size="sm"
+                            className="w-full mt-2 bg-amber-500 hover:bg-amber-600 text-white text-xs py-1"
+                          >
+                            <Lock className="h-3 w-3 mr-1" /> Subscribe to Unlock
+                          </Button>
+                        ) : (
+                          <Button 
+                            size="sm"
+                            className="w-full mt-2 bg-nortech-purple hover:bg-nortech-purple/90 text-xs py-1"
+                          >
+                            {getActionText(item.format)} Now
+                          </Button>
+                        )}
+                        
+                        {isPremium && item.pointsEnabled && (
+                          <Button 
+                            variant="outline"
+                            size="sm"
+                            className="w-full mt-1 border-white/30 text-white hover:bg-white/10 text-xs py-1"
+                          >
+                            Unlock with {item.pointsValue} Points
+                          </Button>
+                        )}
                       </div>
                     </>
                   )}
                   
                   {/* Premium badge */}
-                  {item.accessLevel === 'premium' && (
+                  {isPremium && (
                     <div className="absolute top-2 right-2">
                       <Badge variant="secondary" className="bg-amber-500 text-white text-xs">
-                        <Lock size={10} className="mr-1" /> Premium
+                        <Crown size={10} className="mr-1" /> Premium
                       </Badge>
                     </div>
                   )}
