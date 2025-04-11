@@ -55,7 +55,7 @@ const ContentProgress: React.FC = () => {
                         <div>
                           <h4 className="font-medium">{content.title}</h4>
                           <p className="text-xs text-muted-foreground">
-                            Last viewed {formatDistanceToNow(new Date(progress.lastInteractedAt), { addSuffix: true })}
+                            Last viewed {formatDistanceToNow(new Date(progress.lastAccessed), { addSuffix: true })}
                           </p>
                         </div>
                       </div>
@@ -94,7 +94,7 @@ const ContentProgress: React.FC = () => {
                         <div>
                           <h4 className="font-medium">{content.title}</h4>
                           <p className="text-xs text-muted-foreground">
-                            Completed {formatDistanceToNow(new Date(progress.lastInteractedAt), { addSuffix: true })}
+                            Completed {formatDistanceToNow(new Date(progress.lastAccessed), { addSuffix: true })}
                           </p>
                         </div>
                       </div>

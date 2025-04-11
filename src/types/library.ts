@@ -35,6 +35,8 @@ export interface ContentItem {
   fileSize?: string;
   author?: string;
   allowComments?: boolean;
+  // Add visibility property
+  visibility?: 'public' | 'premium' | 'points' | 'hidden' | 'vip-only' | 'limited-time';
 }
 
 export type ContentFormat = 
@@ -44,13 +46,15 @@ export type ContentFormat =
   | 'pdf'
   | 'text'
   | 'gdoc'
+  | 'gdrive'  // Added gdrive
   | 'audio'
   | 'image'
-  | 'link';
+  | 'link'
+  | 'course';  // Added course
 
 export type AccessLevel = 'free' | 'premium';
 
-export type ContentVisibility = 'public' | 'premium' | 'points' | 'hidden';
+export type ContentVisibility = 'public' | 'premium' | 'points' | 'hidden' | 'vip-only' | 'limited-time';
 
 export interface ContentProgress {
   userId: string;
@@ -58,6 +62,7 @@ export interface ContentProgress {
   progress: number;
   completed: boolean;
   lastAccessed: string;
+  pointsAwarded?: boolean;  // Add pointsAwarded property
 }
 
 // Course interface is kept for backward compatibility

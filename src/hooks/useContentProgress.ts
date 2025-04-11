@@ -9,7 +9,7 @@ const MOCK_PROGRESS: ContentProgress[] = [
     contentId: '1',
     progress: 100,
     completed: true,
-    lastInteractedAt: new Date().toISOString(),
+    lastAccessed: new Date().toISOString(),
     pointsAwarded: true
   },
   {
@@ -17,7 +17,7 @@ const MOCK_PROGRESS: ContentProgress[] = [
     contentId: '3',
     progress: 45,
     completed: false,
-    lastInteractedAt: new Date().toISOString(),
+    lastAccessed: new Date().toISOString(),
     pointsAwarded: false
   },
 ];
@@ -40,7 +40,7 @@ export const useContentProgress = () => {
                 ...item, 
                 progress, 
                 completed: completed || progress === 100,
-                lastInteractedAt: new Date().toISOString()
+                lastAccessed: new Date().toISOString()
               } 
             : item
         );
@@ -50,7 +50,7 @@ export const useContentProgress = () => {
           contentId,
           progress,
           completed: completed || progress === 100,
-          lastInteractedAt: new Date().toISOString(),
+          lastAccessed: new Date().toISOString(),
           pointsAwarded: false
         }];
       }

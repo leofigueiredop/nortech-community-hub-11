@@ -50,11 +50,14 @@ const CategoriesManagement: React.FC = () => {
       return;
     }
     
+    const now = new Date().toISOString();
+    
     if (editingCategory) {
       updateCategory({
         ...editingCategory,
         name: categoryName,
-        description: categoryDescription || undefined
+        description: categoryDescription || undefined,
+        updatedAt: now
       });
       toast({
         title: "Category updated",
@@ -65,7 +68,9 @@ const CategoriesManagement: React.FC = () => {
         id: `cat-${Date.now()}`,
         name: categoryName,
         description: categoryDescription || undefined,
-        count: 0
+        count: 0,
+        createdAt: now,
+        updatedAt: now
       });
       toast({
         title: "Category created",

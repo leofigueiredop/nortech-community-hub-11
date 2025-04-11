@@ -1,3 +1,4 @@
+
 import { ContentItem, ContentCategory, Course } from '@/types/library';
 
 // Mock data for the library
@@ -139,12 +140,54 @@ export const CONTENT_ITEMS: ContentItem[] = [
 ];
 
 export const CATEGORIES: ContentCategory[] = [
-  { id: '1', name: 'Web3', description: 'Blockchain and decentralized technologies', count: 3 },
-  { id: '2', name: 'Finance', description: 'Financial education and wealth building', count: 3 },
-  { id: '3', name: 'Mindset', description: 'Personal development and mental strategies', count: 3 },
-  { id: '4', name: 'Design', description: 'UI/UX and visual design principles', count: 1 },
-  { id: '5', name: 'Business', description: 'Business growth and strategy', count: 1 },
-  { id: '6', name: 'Development', description: 'Software and web development', count: 2 }
+  { 
+    id: '1', 
+    name: 'Web3', 
+    description: 'Blockchain and decentralized technologies', 
+    count: 3,
+    createdAt: '2023-08-15T10:30:00Z',
+    updatedAt: '2023-08-15T10:30:00Z'
+  },
+  { 
+    id: '2', 
+    name: 'Finance', 
+    description: 'Financial education and wealth building', 
+    count: 3,
+    createdAt: '2023-08-15T10:30:00Z',
+    updatedAt: '2023-08-15T10:30:00Z'
+  },
+  { 
+    id: '3', 
+    name: 'Mindset', 
+    description: 'Personal development and mental strategies', 
+    count: 3,
+    createdAt: '2023-08-15T10:30:00Z',
+    updatedAt: '2023-08-15T10:30:00Z'
+  },
+  { 
+    id: '4', 
+    name: 'Design', 
+    description: 'UI/UX and visual design principles', 
+    count: 1,
+    createdAt: '2023-08-15T10:30:00Z',
+    updatedAt: '2023-08-15T10:30:00Z'
+  },
+  { 
+    id: '5', 
+    name: 'Business', 
+    description: 'Business growth and strategy', 
+    count: 1,
+    createdAt: '2023-08-15T10:30:00Z',
+    updatedAt: '2023-08-15T10:30:00Z'
+  },
+  { 
+    id: '6', 
+    name: 'Development', 
+    description: 'Software and web development', 
+    count: 2,
+    createdAt: '2023-08-15T10:30:00Z',
+    updatedAt: '2023-08-15T10:30:00Z'
+  }
 ];
 
 // Mock data for courses
