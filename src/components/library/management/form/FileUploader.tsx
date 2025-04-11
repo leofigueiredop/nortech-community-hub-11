@@ -1,16 +1,16 @@
 
-import React, { useState } from 'react';
-import { FormLabel } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Upload, X } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { UploadCloud, X } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface FileUploaderProps {
   label: string;
   onFileChange: (file: File | null) => void;
+  onPreviewChange?: (previewUrl: string | null) => void;
+  previewImage?: string | null;
   accept?: string;
   id: string;
-  previewImage?: string | null;
-  onPreviewChange?: (preview: string | null) => void;
   placeholder?: string;
   helpText?: string;
 }
@@ -18,70 +18,132 @@ interface FileUploaderProps {
 const FileUploader: React.FC<FileUploaderProps> = ({
   label,
   onFileChange,
-  accept,
-  id,
-  previewImage,
   onPreviewChange,
+  previewImage,
+  accept = '*',
+  id,
   placeholder = 'Click to upload',
-  helpText = 'Supports standard file formats'
+  helpText
 }) => {
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      onFileChange(file);
-      
-      if (onPreviewChange) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          onPreviewChange(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      }
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(previewImage || null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
-  
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = (file: File) => {
+    // Simulate upload process
+    setIsUploading(true);
+    setTimeout(() => {
+      onFileChange(file);
+      setIsUploading(false);
+      
+      // If it's an image, show preview
+      if (file.type.startsWith('image/')) {
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+        if (onPreviewChange) {
+          onPreviewChange(url);
+        }
+      }
+    }, 1000);
+  };
+
+  const clearFile = () => {
+    onFileChange(null);
+    setPreviewUrl(null);
+    if (onPreviewChange) {
+      onPreviewChange(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
-    <div className="mt-4">
-      <FormLabel>{label}</FormLabel>
-      <div className="border-2 border-dashed border-slate-300 rounded-md p-6 mt-1 text-center">
-        {previewImage ? (
+    <div className="space-y-2 mt-6">
+      <div className="text-sm font-medium">{label}</div>
+      
+      <div
+        className={`border-2 border-dashed rounded-lg p-4 ${
+          isDragging ? 'border-primary bg-primary/10' : 'border-input'
+        } transition-colors cursor-pointer relative`}
+        onClick={handleClick}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleFileChange}
+          accept={accept}
+          id={id}
+        />
+        
+        {isUploading ? (
+          <div className="flex flex-col items-center justify-center py-4">
+            <Loader2 className="h-10 w-10 text-primary animate-spin mb-2" />
+            <p className="text-sm text-muted-foreground">Uploading...</p>
+          </div>
+        ) : previewUrl ? (
           <div className="relative">
-            <img 
-              src={previewImage} 
-              alt="Preview" 
-              className="mx-auto max-h-40 object-contain" 
+            <img
+              src={previewUrl}
+              alt="Preview"
+              className="max-h-40 mx-auto rounded-md object-contain"
             />
-            <button
+            <Button
               type="button"
-              onClick={() => {
-                onFileChange(null);
-                if (onPreviewChange) {
-                  onPreviewChange(null);
-                }
+              variant="destructive"
+              size="icon"
+              className="absolute top-0 right-0 h-6 w-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                clearFile();
               }}
-              className="absolute top-1 right-1 bg-red-500 rounded-full p-1 text-white"
             >
-              <X size={14} />
-            </button>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         ) : (
-          <>
-            <Input 
-              type="file" 
-              accept={accept}
-              onChange={handleFileChange}
-              className="hidden"
-              id={id}
-            />
-            <label 
-              htmlFor={id}
-              className="cursor-pointer flex flex-col items-center justify-center"
-            >
-              <Upload className="h-8 w-8 text-slate-400 mb-2" />
-              <span className="text-sm font-medium text-slate-900">{placeholder}</span>
-              <span className="text-xs text-slate-500 mt-1">{helpText}</span>
-            </label>
-          </>
+          <div className="flex flex-col items-center justify-center py-4">
+            <UploadCloud className="h-10 w-10 text-muted-foreground mb-2" />
+            <p className="text-sm text-muted-foreground">{placeholder}</p>
+            {helpText && (
+              <p className="text-xs text-muted-foreground mt-1">{helpText}</p>
+            )}
+          </div>
         )}
       </div>
     </div>

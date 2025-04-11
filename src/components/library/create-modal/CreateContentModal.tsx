@@ -82,12 +82,14 @@ const CreateContentModal: React.FC<CreateContentModalProps> = ({ isOpen, onClose
       createdAt: now,
       updatedAt: now,
       views: 0,
+      duration: 0, // Adding the required duration property
+      author: 'System User', // Adding the required author property
       featured: values.featured,
       pointsEnabled: values.accessLevel === 'unlockable' || values.pointsEnabled,
       pointsValue: values.pointsValue,
-      visibility: values.accessLevel as any,
+      visibility: values.accessLevel,
       resourceUrl: file ? `mock-file-path/${file.name}` : '',
-      completionCriteria: 'view' as any,
+      completionCriteria: 'view',
       completionThreshold: 80,
     };
     

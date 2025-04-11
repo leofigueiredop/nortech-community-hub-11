@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
-import { Switch } from '@/components/ui/switch';
+import { FormField, FormItem, FormLabel, FormControl, FormDescription } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { UseFormReturn } from 'react-hook-form';
 
 interface AccessOptionsProps {
@@ -11,24 +11,32 @@ interface AccessOptionsProps {
 
 const AccessOptions: React.FC<AccessOptionsProps> = ({ form }) => {
   return (
-    <>
+    <div className="space-y-4 mt-6">
+      <h3 className="text-base font-medium">Access & Visibility</h3>
+      
       <FormField
         control={form.control}
         name="accessLevel"
         render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-between mt-4 p-4 rounded-lg border">
-            <div className="space-y-0.5">
-              <FormLabel>Premium Content</FormLabel>
-              <p className="text-xs text-slate-500">
-                Only accessible by premium subscribers
-              </p>
-            </div>
-            <FormControl>
-              <Switch
-                checked={field.value === 'premium'}
-                onCheckedChange={(checked) => field.onChange(checked ? 'premium' : 'free')}
-              />
-            </FormControl>
+          <FormItem>
+            <FormLabel>Access Level</FormLabel>
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select access level" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="free">Free (Everyone)</SelectItem>
+                <SelectItem value="premium">Premium (Paid Members)</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormDescription>
+              Determines who can access this content
+            </FormDescription>
           </FormItem>
         )}
       />
@@ -37,7 +45,7 @@ const AccessOptions: React.FC<AccessOptionsProps> = ({ form }) => {
         control={form.control}
         name="visibility"
         render={({ field }) => (
-          <FormItem className="mt-4">
+          <FormItem>
             <FormLabel>Visibility</FormLabel>
             <Select
               onValueChange={field.onChange}
@@ -49,19 +57,42 @@ const AccessOptions: React.FC<AccessOptionsProps> = ({ form }) => {
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="public">Public</SelectItem>
-                <SelectItem value="premium">Premium Only</SelectItem>
-                <SelectItem value="points">Points Unlockable</SelectItem>
+                <SelectItem value="public">Public (In Library)</SelectItem>
+                <SelectItem value="premium">Premium Section</SelectItem>
+                <SelectItem value="points">Points Shop</SelectItem>
+                <SelectItem value="hidden">Hidden (Direct Link Only)</SelectItem>
                 <SelectItem value="vip-only">VIP Members Only</SelectItem>
-                <SelectItem value="limited-time">Limited Time</SelectItem>
-                <SelectItem value="hidden">Hidden</SelectItem>
+                <SelectItem value="limited-time">Limited Time Offer</SelectItem>
               </SelectContent>
             </Select>
-            <FormControl />
+            <FormDescription>
+              Controls where this content appears
+            </FormDescription>
           </FormItem>
         )}
       />
-    </>
+      
+      <FormField
+        control={form.control}
+        name="featured"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+            <div className="space-y-0.5">
+              <FormLabel>Featured Content</FormLabel>
+              <FormDescription>
+                Highlight this content in featured sections
+              </FormDescription>
+            </div>
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+    </div>
   );
 };
 

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ContentFormat } from '@/types/library';
-import { ContentFormatOptions } from '../constants/contentFormOptions';
+import { contentFormatOptions } from '../constants/contentFormOptions';
 import { ContentCategory } from '@/types/library';
 import { UseFormReturn } from 'react-hook-form';
 import { Card } from '@/components/ui/card';
@@ -49,7 +49,7 @@ const ContentBasicInfo: React.FC<ContentBasicInfoProps> = ({ form, categories })
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {ContentFormatOptions.map(option => (
+                {contentFormatOptions.map(option => (
                   <SelectItem key={option.value} value={option.value} className="flex items-center gap-2">
                     {option.icon} {option.label}
                   </SelectItem>

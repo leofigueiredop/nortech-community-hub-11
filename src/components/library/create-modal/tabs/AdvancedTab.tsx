@@ -1,37 +1,40 @@
 
 import React from 'react';
-import { TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UseFormReturn } from 'react-hook-form';
-import { Calendar, Trophy, FileText } from 'lucide-react';
-import { ContentFormValues } from '../schema';
+import { TabsContent } from '@/components/ui/tabs';
+import { CalendarIcon } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 
 interface AdvancedTabProps {
-  form: UseFormReturn<ContentFormValues>;
+  form: UseFormReturn<any>;
   setActiveTab: (tab: string) => void;
 }
 
-const AdvancedTab: React.FC<AdvancedTabProps> = ({ form, setActiveTab }) => {
+const AdvancedTab: React.FC<AdvancedTabProps> = ({
+  form,
+  setActiveTab
+}) => {
+  const scheduleDate = form.watch('scheduleDate');
+
   return (
-    <TabsContent value="advanced" className="space-y-4 pt-4">
+    <TabsContent value="advanced" className="space-y-4 py-4">
       <FormField
         control={form.control}
-        name="scheduleDate"
+        name="linkToCourse"
         render={({ field }) => (
-          <FormItem className="flex flex-col space-y-2">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <FormLabel>Schedule Publish Date (Optional)</FormLabel>
-            </div>
+          <FormItem>
+            <FormLabel>Link to Course</FormLabel>
             <FormControl>
-              <Input type="datetime-local" {...field} />
+              <Input placeholder="Select related course" {...field} />
             </FormControl>
             <FormDescription>
-              Leave empty to publish immediately
+              Optionally link this content to a course
             </FormDescription>
           </FormItem>
         )}
@@ -41,27 +44,49 @@ const AdvancedTab: React.FC<AdvancedTabProps> = ({ form, setActiveTab }) => {
         control={form.control}
         name="attachToChallenge"
         render={({ field }) => (
-          <FormItem className="flex flex-col space-y-2">
-            <div className="flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-muted-foreground" />
-              <FormLabel>Attach to Challenge (Optional)</FormLabel>
-            </div>
-            <Select
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a challenge" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                <SelectItem value="challenge-1">Beginner Developer Path</SelectItem>
-                <SelectItem value="challenge-2">AI Mastery Challenge</SelectItem>
-                <SelectItem value="challenge-3">Community Expert Badge</SelectItem>
-              </SelectContent>
-            </Select>
+          <FormItem>
+            <FormLabel>Attach to Challenge</FormLabel>
+            <FormControl>
+              <Input placeholder="Select challenge" {...field} />
+            </FormControl>
+            <FormDescription>
+              Optionally link this content to a challenge
+            </FormDescription>
+          </FormItem>
+        )}
+      />
+      
+      <FormField
+        control={form.control}
+        name="scheduleDate"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Schedule Publication</FormLabel>
+            <FormControl>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                    type="button"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {scheduleDate ? format(new Date(scheduleDate), 'PPP') : "Schedule for later"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={scheduleDate ? new Date(scheduleDate) : undefined}
+                    onSelect={(date) => field.onChange(date ? date.toISOString() : '')}
+                    disabled={(date) => date < new Date()}
+                  />
+                </PopoverContent>
+              </Popover>
+            </FormControl>
+            <FormDescription>
+              Leave blank to publish immediately
+            </FormDescription>
           </FormItem>
         )}
       />
@@ -70,20 +95,24 @@ const AdvancedTab: React.FC<AdvancedTabProps> = ({ form, setActiveTab }) => {
         control={form.control}
         name="internalNotes"
         render={({ field }) => (
-          <FormItem className="flex flex-col space-y-2">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-muted-foreground" />
-              <FormLabel>Internal Notes (Not visible to users)</FormLabel>
-            </div>
+          <FormItem>
+            <FormLabel>Internal Notes</FormLabel>
             <FormControl>
-              <Textarea className="h-24" placeholder="Add private notes for team members" {...field} />
+              <Textarea placeholder="Add internal notes (not visible to users)" {...field} />
             </FormControl>
+            <FormDescription>
+              These notes are only visible to admins
+            </FormDescription>
           </FormItem>
         )}
       />
       
-      <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={() => setActiveTab('visibility')}>
+      <div className="flex justify-between pt-6">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setActiveTab('visibility')}
+        >
           Back
         </Button>
         <Button type="submit">

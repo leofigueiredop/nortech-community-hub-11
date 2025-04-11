@@ -1,137 +1,87 @@
 
-import { ContentItem, ContentFormat } from '@/types/library';
+import { ContentItem } from '@/types/library';
 import { toast } from '@/hooks/use-toast';
 
-export const getContentTypeIcon = (format: ContentFormat): string => {
-  switch (format) {
-    case 'video':
-      return 'video';
-    case 'youtube':
-    case 'vimeo':
-      return 'video';
-    case 'audio':
-      return 'headphones';
-    case 'pdf':
-      return 'file-text';
-    case 'text':
-      return 'file-text';
-    case 'gdoc':
-      return 'file-text';
-    case 'image':
-      return 'image';
-    case 'course':
-      return 'book';
-    case 'url':
-    case 'link':
-      return 'link';
-    default:
-      return 'file';
-  }
-};
-
-export const getContentTypeName = (format: ContentFormat): string => {
-  switch (format) {
-    case 'video':
-      return 'Video';
-    case 'youtube':
-      return 'YouTube Video';
-    case 'vimeo':
-      return 'Vimeo Video';
-    case 'audio':
-      return 'Audio';
-    case 'pdf':
-      return 'PDF Document';
-    case 'text':
-      return 'Text';
-    case 'gdoc':
-      return 'Google Document';
-    case 'image':
-      return 'Image';
-    case 'course':
-      return 'Course';
-    case 'url':
-    case 'link':
-      return 'External Link';
-    default:
-      return 'Document';
-  }
-};
-
-export const formatDuration = (seconds: number): string => {
-  if (seconds < 60) {
-    return `${seconds} sec${seconds !== 1 ? 's' : ''}`;
-  } else if (seconds < 3600) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes} min${minutes !== 1 ? 's' : ''}${remainingSeconds > 0 ? ` ${remainingSeconds} sec${remainingSeconds !== 1 ? 's' : ''}` : ''}`;
-  } else {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours} hr${hours !== 1 ? 's' : ''}${minutes > 0 ? ` ${minutes} min${minutes !== 1 ? 's' : ''}` : ''}`;
-  }
-};
-
-export const isContentPlayable = (item: ContentItem): boolean => {
-  return ['video', 'youtube', 'vimeo', 'audio'].includes(item.format);
-};
-
-export const isContentReadable = (item: ContentItem): boolean => {
-  return ['pdf', 'text', 'gdoc'].includes(item.format);
-};
-
-export const isContentInteractive = (item: ContentItem): boolean => {
-  return item.format === 'course';
-};
-
-export const isContentViewable = (item: ContentItem): boolean => {
-  return item.format === 'image';
-};
-
-export const isContentLinkable = (item: ContentItem): boolean => {
-  return ['url', 'link'].includes(item.format);
-};
-
-// Add the missing function for handling external content access
+// Handle external content access
 export const handleExternalContentAccess = (
   item: ContentItem | null, 
   onContentView: () => void
-): void => {
+) => {
   if (!item) return;
-
-  // Track content view
+  
+  // Log access attempt
+  console.log(`Accessing external content: ${item.title}`);
+  
+  // Call the content view handler
   onContentView();
-
-  // Handle different formats differently
-  if (isContentLinkable(item) && item.resourceUrl) {
-    // For external links, open in a new tab
-    window.open(item.resourceUrl, '_blank');
-    
-    toast({
-      title: "External link opened",
-      description: "The content has been opened in a new tab",
-    });
-  } else if (item.resourceUrl) {
-    // For downloadable content like PDFs
-    if (item.format === 'pdf') {
-      window.open(item.resourceUrl, '_blank');
+  
+  // Based on format, perform different actions
+  switch (item.format) {
+    case 'pdf':
+    case 'image':
+      if (item.resourceUrl) {
+        window.open(item.resourceUrl, '_blank');
+      } else {
+        toast({
+          title: "Resource not available",
+          description: "The resource URL is not available for this content.",
+          variant: "destructive",
+        });
+      }
+      break;
       
-      toast({
-        title: "PDF opened",
-        description: "The PDF document has been opened in a new tab",
-      });
-    } else {
-      // For other content types, could be handled based on specific requirements
+    case 'link':
+    case 'url':
+      if (item.resourceUrl) {
+        window.open(item.resourceUrl, '_blank');
+      } else {
+        toast({
+          title: "Link not available",
+          description: "The link is not available for this content.",
+          variant: "destructive",
+        });
+      }
+      break;
+      
+    default:
+      // For other formats, just track the view
       toast({
         title: "Content accessed",
-        description: `You're now viewing ${getContentTypeName(item.format)}`,
+        description: "You are now viewing this content.",
       });
-    }
-  } else {
-    // For content without a resource URL
-    toast({
-      title: "Content unavailable",
-      description: "This content doesn't have an associated resource",
-      variant: "destructive",
-    });
+      break;
   }
+};
+
+// Format duration from seconds to readable format
+export const formatDuration = (seconds: number): string => {
+  if (seconds < 60) {
+    return `${seconds} sec`;
+  } else if (seconds < 3600) {
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes} min`;
+  } else {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  }
+};
+
+// Get content type name
+export const getContentTypeName = (format: string): string => {
+  const formatMap: Record<string, string> = {
+    'video': 'Video',
+    'audio': 'Audio',
+    'pdf': 'PDF',
+    'text': 'Article',
+    'url': 'Web Link',
+    'youtube': 'YouTube',
+    'vimeo': 'Vimeo',
+    'gdoc': 'Google Doc',
+    'image': 'Image',
+    'course': 'Course',
+    'link': 'Link'
+  };
+  
+  return formatMap[format] || 'Unknown';
 };

@@ -1,10 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import { FormLabel } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { X, Tag } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { X, Plus } from 'lucide-react';
 
 interface TagsInputProps {
   selectedTags: string[];
@@ -12,111 +11,86 @@ interface TagsInputProps {
   allTags: string[];
 }
 
-const TagsInput: React.FC<TagsInputProps> = ({
-  selectedTags,
-  setSelectedTags,
-  allTags
-}) => {
+const TagsInput: React.FC<TagsInputProps> = ({ selectedTags, setSelectedTags, allTags }) => {
   const [tagInput, setTagInput] = useState('');
-  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
-  
-  // Auto-suggest tags based on input
-  useEffect(() => {
-    if (tagInput.trim()) {
-      const inputLower = tagInput.toLowerCase();
-      const filtered = allTags.filter(tag => 
-        tag.toLowerCase().includes(inputLower) && 
-        !selectedTags.includes(tag)
-      );
-      setSuggestedTags(filtered.slice(0, 5)); // Limit to 5 suggestions
-    } else {
-      // When input is empty, show popular tags that aren't already selected
-      const popularTags = allTags
-        .filter(tag => !selectedTags.includes(tag))
-        .slice(0, 5);
-      setSuggestedTags(popularTags);
-    }
-  }, [tagInput, allTags, selectedTags]);
-  
-  const addTag = () => {
+
+  const handleAddTag = () => {
     if (tagInput.trim() && !selectedTags.includes(tagInput.trim())) {
       setSelectedTags([...selectedTags, tagInput.trim()]);
       setTagInput('');
     }
   };
-  
-  const removeTag = (tag: string) => {
-    setSelectedTags(selectedTags.filter((t) => t !== tag));
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddTag();
+    }
   };
-  
-  const handleSelectTag = (tag: string) => {
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleSuggestionClick = (tag: string) => {
     if (!selectedTags.includes(tag)) {
       setSelectedTags([...selectedTags, tag]);
     }
   };
-  
+
+  // Suggestions are tags from allTags that aren't already selected
+  const suggestions = allTags.filter(tag => !selectedTags.includes(tag)).slice(0, 5);
+
   return (
-    <div className="mt-4">
-      <div className="flex items-center mb-2">
-        <FormLabel className="flex items-center">
-          <Tag size={16} className="mr-2 text-purple-500" />
-          Tags
-        </FormLabel>
-      </div>
+    <div className="space-y-2 mt-6">
+      <div className="text-sm font-medium">Tags</div>
       
-      <div className="flex flex-wrap gap-2 mb-3">
+      <div className="flex flex-wrap gap-2 mb-2">
         {selectedTags.map(tag => (
-          <Badge 
-            key={tag} 
-            variant="default" 
-            className="flex items-center gap-1 bg-purple-500 hover:bg-purple-600"
-          >
-            #{tag}
-            <button
-              type="button"
-              onClick={() => removeTag(tag)}
-              className="text-white opacity-70 hover:opacity-100"
-              aria-label={`Remove ${tag} tag`}
+          <Badge key={tag} variant="secondary" className="pl-2 pr-1 py-1">
+            {tag}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-4 w-4 ml-1 hover:bg-transparent"
+              onClick={() => handleRemoveTag(tag)}
             >
-              <X size={14} />
-            </button>
+              <X className="h-3 w-3" />
+            </Button>
           </Badge>
         ))}
       </div>
       
-      <div className="flex">
+      <div className="flex gap-2">
         <Input
-          placeholder="Add a tag (e.g., AI, Finance, Crypto)"
           value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              addTag();
-            }
-          }}
-          className="mr-2"
+          onChange={e => setTagInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Add a tag"
+          className="flex-grow"
         />
-        <Button type="button" onClick={addTag} variant="outline">
-          Add
+        <Button
+          type="button"
+          size="icon"
+          onClick={handleAddTag}
+          disabled={!tagInput.trim()}
+        >
+          <Plus className="h-4 w-4" />
         </Button>
       </div>
       
-      {suggestedTags.length > 0 && (
-        <div className="mt-3">
-          <p className="text-xs text-slate-500 mb-2">Suggested tags:</p>
+      {suggestions.length > 0 && (
+        <div className="mt-2">
+          <p className="text-xs text-muted-foreground mb-1">Suggestions:</p>
           <div className="flex flex-wrap gap-1">
-            {suggestedTags.map(tag => (
-              <Badge 
-                key={tag} 
-                variant="outline" 
-                className="cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900 border-purple-300"
-                onClick={() => {
-                  handleSelectTag(tag);
-                  setTagInput('');
-                }}
+            {suggestions.map(tag => (
+              <Badge
+                key={tag}
+                variant="outline"
+                className="cursor-pointer hover:bg-secondary"
+                onClick={() => handleSuggestionClick(tag)}
               >
-                #{tag}
+                {tag}
               </Badge>
             ))}
           </div>

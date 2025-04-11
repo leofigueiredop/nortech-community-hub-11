@@ -1,78 +1,74 @@
 
 import React from 'react';
-import { ContentProgress } from '@/types/library';
-import { formatDistanceToNow } from 'date-fns';
-import { CheckCircle, Circle, Clock } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
-interface ContentProgressItemProps {
-  progress: ContentProgress;
-  contentTitle: string;
+export interface ContentProgressItem {
+  id: string;
+  contentId: string;
+  progress: number;
+  completed: boolean;
+  lastAccessedAt: string;
 }
-
-export const ContentProgressItem: React.FC<ContentProgressItemProps> = ({
-  progress,
-  contentTitle,
-}) => {
-  return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 border rounded-md bg-card hover:bg-accent/50 transition-colors">
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          {progress.completed ? (
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          ) : (
-            <Circle className="h-4 w-4 text-muted-foreground" />
-          )}
-          <h4 className="font-medium text-sm">{contentTitle}</h4>
-        </div>
-        
-        <div className="flex items-center text-xs text-muted-foreground mb-2">
-          <Clock className="h-3 w-3 mr-1" />
-          <span>
-            Last accessed {formatDistanceToNow(new Date(progress.lastAccessedAt))} ago
-          </span>
-          {progress.pointsAwarded && (
-            <span className="ml-2 bg-primary/10 text-primary px-1.5 rounded text-[10px] font-medium">
-              Points Awarded
-            </span>
-          )}
-        </div>
-        
-        <Progress value={progress.progress} className="h-1.5" />
-      </div>
-    </div>
-  );
-};
 
 export interface ContentProgressListProps {
-  progressItems: ContentProgress[];
-  getContentTitle: (contentId: string) => string;
+  progressItems: ContentProgressItem[];
+  getContentTitle: (id: string) => string;
 }
 
-const ContentProgressList: React.FC<ContentProgressListProps> = ({
-  progressItems,
-  getContentTitle,
+const ContentProgressList: React.FC<ContentProgressListProps> = ({ 
+  progressItems, 
+  getContentTitle 
 }) => {
-  if (progressItems.length === 0) {
+  // Sort items by last accessed date (most recent first)
+  const sortedItems = [...progressItems].sort((a, b) => 
+    new Date(b.lastAccessedAt).getTime() - new Date(a.lastAccessedAt).getTime()
+  );
+
+  if (sortedItems.length === 0) {
     return (
-      <div className="text-center py-8 px-4">
-        <p className="text-muted-foreground">No content progress yet</p>
+      <div className="text-center py-12 text-muted-foreground">
+        <p>You haven't started any content yet.</p>
+        <p className="mt-2">Explore the library to find interesting content!</p>
       </div>
     );
   }
 
-  const sortedItems = [...progressItems].sort(
-    (a, b) => new Date(b.lastAccessedAt).getTime() - new Date(a.lastAccessedAt).getTime()
-  );
-
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       {sortedItems.map((item) => (
-        <ContentProgressItem 
-          key={item.id} 
-          progress={item} 
-          contentTitle={getContentTitle(item.contentId)}
-        />
+        <div key={item.id} className="bg-card p-4 rounded-lg border">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-medium truncate">{getContentTitle(item.contentId)}</h3>
+            {item.completed ? (
+              <Badge variant="default" className="bg-green-500 text-white hover:bg-green-600">
+                Completed
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-amber-300">
+                In Progress
+              </Badge>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Progress</span>
+              <span>{item.progress}%</span>
+            </div>
+            <Progress value={item.progress} className="h-2" />
+            <div className="flex justify-between items-center mt-3">
+              <span className="text-xs text-muted-foreground">
+                Last accessed: {new Date(item.lastAccessedAt).toLocaleDateString()}
+              </span>
+              <Button variant="ghost" size="sm" className="text-xs h-7 px-2.5">
+                Resume <ArrowRight className="ml-1 h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+        </div>
       ))}
     </div>
   );

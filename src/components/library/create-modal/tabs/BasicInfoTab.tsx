@@ -1,18 +1,17 @@
 
 import React from 'react';
-import { TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ContentFormatOptions } from '../../management/constants/contentFormOptions';
-import TagsInput from '../../management/form/TagsInput';
 import { UseFormReturn } from 'react-hook-form';
-import { ContentFormValues } from '../schema';
+import { TabsContent } from '@/components/ui/tabs';
+import { contentFormatOptions } from '../../management/constants/contentFormOptions';
+import TagsInput from '../../management/form/TagsInput';
 
 interface BasicInfoTabProps {
-  form: UseFormReturn<ContentFormValues>;
+  form: UseFormReturn<any>;
   selectedTags: string[];
   setSelectedTags: (tags: string[]) => void;
   allTags: string[];
@@ -20,16 +19,16 @@ interface BasicInfoTabProps {
   setActiveTab: (tab: string) => void;
 }
 
-const BasicInfoTab: React.FC<BasicInfoTabProps> = ({ 
-  form, 
-  selectedTags, 
-  setSelectedTags, 
+const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
+  form,
+  selectedTags,
+  setSelectedTags,
   allTags,
   isBasicInfoValid,
   setActiveTab
 }) => {
   return (
-    <TabsContent value="basic" className="space-y-4 pt-4">
+    <TabsContent value="basic" className="space-y-4 py-4">
       <FormField
         control={form.control}
         name="title"
@@ -37,8 +36,9 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
           <FormItem>
             <FormLabel>Title</FormLabel>
             <FormControl>
-              <Input placeholder="Enter title" {...field} />
+              <Input placeholder="Enter content title" {...field} />
             </FormControl>
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -50,8 +50,9 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea placeholder="Enter a short description" className="h-24" {...field} />
+              <Textarea placeholder="Enter description" className="min-h-[120px]" {...field} />
             </FormControl>
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -61,29 +62,31 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
         name="format"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Content Type</FormLabel>
+            <FormLabel>Content Format</FormLabel>
             <Select
               onValueChange={field.onChange}
               defaultValue={field.value}
             >
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select content type" />
+                  <SelectValue placeholder="Select content format" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {ContentFormatOptions.map(option => (
+                {contentFormatOptions.map(option => (
                   <SelectItem key={option.value} value={option.value} className="flex items-center gap-2">
                     {option.icon} {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            <FormMessage />
           </FormItem>
         )}
       />
       
       <div>
+        <FormLabel>Tags</FormLabel>
         <TagsInput
           selectedTags={selectedTags}
           setSelectedTags={setSelectedTags}
@@ -91,9 +94,13 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
         />
       </div>
       
-      <div className="flex justify-end">
-        <Button type="button" onClick={() => setActiveTab('media')} disabled={!isBasicInfoValid}>
-          Next
+      <div className="flex justify-end pt-4">
+        <Button
+          type="button"
+          onClick={() => setActiveTab('media')}
+          disabled={!isBasicInfoValid}
+        >
+          Next: Media
         </Button>
       </div>
     </TabsContent>

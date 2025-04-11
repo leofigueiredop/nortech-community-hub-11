@@ -7,12 +7,47 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
 import { usePoints } from '@/context/PointsContext';
 import PointsHistory from './PointsHistory';
-import ContentProgress from './ContentProgress';
+import ContentProgressList, { ContentProgressItem } from './ContentProgressList';
 import { Award, Gift, ChevronRight, Trophy, BookOpen, Star } from 'lucide-react';
 
 const PointsDashboard: React.FC = () => {
   const { totalPoints, getUserLevel } = usePoints();
   const { level, nextLevel, progress } = getUserLevel();
+
+  // Mock progress items for demonstration
+  const mockProgressItems: ContentProgressItem[] = [
+    {
+      id: 'p1',
+      contentId: 'c1',
+      progress: 100,
+      completed: true,
+      lastAccessedAt: new Date().toISOString(),
+    },
+    {
+      id: 'p2',
+      contentId: 'c2',
+      progress: 45,
+      completed: false,
+      lastAccessedAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    },
+    {
+      id: 'p3',
+      contentId: 'c3',
+      progress: 75,
+      completed: false,
+      lastAccessedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+    }
+  ];
+
+  // Function to get content title by ID (mock implementation)
+  const getContentTitle = (id: string): string => {
+    const titles: Record<string, string> = {
+      'c1': 'Getting Started with Our Platform',
+      'c2': 'Advanced User Management Techniques',
+      'c3': 'Building Your First Integration',
+    };
+    return titles[id] || 'Unknown Content';
+  };
 
   const badges = [
     { name: "Early Adopter", description: "Joined during beta", icon: <Star className="h-8 w-8 text-amber-500" /> },
@@ -96,7 +131,10 @@ const PointsDashboard: React.FC = () => {
         </TabsList>
         
         <TabsContent value="content">
-          <ContentProgress />
+          <ContentProgressList 
+            progressItems={mockProgressItems}
+            getContentTitle={getContentTitle}
+          />
         </TabsContent>
         
         <TabsContent value="rewards" className="space-y-4">
