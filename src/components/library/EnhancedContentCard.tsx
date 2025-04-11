@@ -4,8 +4,9 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ContentItem } from '@/types/library';
-import { Play, Lock, FileText, Download, Eye, Clock, Calendar, Crown } from 'lucide-react';
+import { Play, Lock, FileText, Download, Eye, Clock, Calendar, Crown, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import PremiumContentOverlay from './PremiumContentOverlay';
 
 interface EnhancedContentCardProps {
   item: ContentItem;
@@ -66,7 +67,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ item, onClick
       className="h-full"
     >
       <Card 
-        className="overflow-hidden border-2 transition-all duration-300 h-full cursor-pointer group"
+        className="overflow-hidden border-2 transition-all duration-300 h-full cursor-pointer group relative"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => {
@@ -104,61 +105,49 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ item, onClick
             </div>
           )}
           
-          {/* Overlay on hover */}
-          <div className={`absolute inset-0 bg-black/70 flex flex-col justify-between p-4 transition-opacity duration-300 ${
-            isHovered ? 'opacity-100' : 'opacity-0'
-          }`}>
-            <div className="flex justify-between">
-              <Badge className="bg-nortech-purple text-white">
-                {item.format.toUpperCase()}
-              </Badge>
-              
-              {isPremium && (
-                <Badge variant="outline" className="border-amber-500 text-amber-500 bg-black/50">
-                  <Crown className="mr-1 h-3 w-3" /> Premium
-                </Badge>
-              )}
+          {/* Overlay on hover for premium content */}
+          {isHovered && isPremium && (
+            <div className="absolute inset-0">
+              <PremiumContentOverlay
+                pointsEnabled={item.pointsEnabled}
+                pointsValue={item.pointsValue}
+                freeAccessLeft={item.freeAccessesLeft}
+                onSubscribe={onClick}
+                onUsePoints={onClick}
+              />
             </div>
-            
-            <div>
-              <h3 className="text-white font-semibold mb-1">{item.title}</h3>
-              <p className="text-white/80 text-sm line-clamp-3 mb-3">{item.description}</p>
-              
-              <div className="flex flex-wrap gap-1 mb-3">
-                {item.tags.slice(0, 3).map(tag => (
-                  <Badge key={tag} variant="outline" className="border-white/30 text-white/80 text-xs">
-                    {tag}
-                  </Badge>
-                ))}
+          )}
+          
+          {/* Overlay on hover for free content */}
+          {isHovered && !isPremium && (
+            <div className="absolute inset-0 bg-black/70 flex flex-col justify-between p-4 transition-opacity duration-300">
+              <div className="flex justify-between">
+                <Badge className="bg-nortech-purple text-white">
+                  {item.format.toUpperCase()}
+                </Badge>
               </div>
               
-              {isPremium ? (
-                <Button 
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-white"
-                  size="sm"
-                >
-                  <Lock className="h-3 w-3 mr-1" /> Subscribe to Unlock
-                </Button>
-              ) : (
+              <div>
+                <h3 className="text-white font-semibold mb-1">{item.title}</h3>
+                <p className="text-white/80 text-sm line-clamp-3 mb-3">{item.description}</p>
+                
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {item.tags.slice(0, 3).map(tag => (
+                    <Badge key={tag} variant="outline" className="border-white/30 text-white/80 text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+                
                 <Button 
                   className="w-full bg-nortech-purple hover:bg-nortech-purple/90"
                   size="sm"
                 >
                   {getActionText(item.format)} Now
                 </Button>
-              )}
-
-              {isPremium && item.pointsEnabled && (
-                <Button
-                  variant="outline"
-                  className="w-full mt-2 border-white/30 text-white hover:bg-white/10"
-                  size="sm"
-                >
-                  Unlock with {item.pointsValue} Points
-                </Button>
-              )}
+              </div>
             </div>
-          </div>
+          )}
           
           {/* Play button overlay for videos (visible when not hovered) */}
           {['video', 'youtube', 'vimeo'].includes(item.format) && !isHovered && !isPremium && (
@@ -174,6 +163,15 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ item, onClick
             <div className="absolute top-2 right-2">
               <Badge variant="secondary" className="bg-amber-500 text-white">
                 <Lock size={12} className="mr-1" /> Premium
+              </Badge>
+            </div>
+          )}
+
+          {/* Free access badge if applicable */}
+          {isPremium && item.freeAccessesLeft > 0 && !isHovered && (
+            <div className="absolute bottom-2 right-2">
+              <Badge className="bg-gradient-to-r from-amber-400 to-amber-500 text-white px-2 py-1 text-xs">
+                {item.freeAccessesLeft} Free {item.freeAccessesLeft === 1 ? 'Access' : 'Accesses'} Left
               </Badge>
             </div>
           )}
