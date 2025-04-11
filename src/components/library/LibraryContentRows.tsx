@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ContentItem, ContentFormat } from '@/types/library';
+import { ContentItem } from '@/types/library';
 import ContentSection from './ContentSection';
 
 interface LibraryContentRowsProps {
@@ -85,7 +85,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
 
   if (!hasContent) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-8 px-4">
         <h2 className="text-2xl font-semibold mb-4">Nenhum conteúdo disponível</h2>
         <p className="text-muted-foreground">
           Não há conteúdo disponível para os filtros selecionados.
@@ -95,7 +95,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
   }
 
   return (
-    <div className="space-y-14 py-8">
+    <div className="space-y-4 py-6">
       {/* Top trending row (always first when in 'all' view) */}
       {activeView === 'all' && topTrending.length > 0 && (
         <ContentSection 
@@ -106,16 +106,6 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
         />
       )}
       
-      {/* Recommended content (personalized, if any) */}
-      {recommendedContent.length > 0 && (
-        <ContentSection 
-          title="Recomendado Para Você" 
-          items={recommendedContent} 
-          onItemSelect={onItemSelect}
-          viewAllUrl="/library/recommended"
-        />
-      )}
-      
       {/* New releases */}
       {newReleases.length > 0 && (
         <ContentSection 
@@ -123,6 +113,16 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
           items={newReleases} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/new"
+        />
+      )}
+      
+      {/* Recommended content (personalized, if any) */}
+      {recommendedContent.length > 0 && (
+        <ContentSection 
+          title="Recomendado Para Você" 
+          items={recommendedContent} 
+          onItemSelect={onItemSelect}
+          viewAllUrl="/library/recommended"
         />
       )}
       
@@ -184,7 +184,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       )}
       
       {!hasSections && (
-        <div className="text-center py-12">
+        <div className="text-center py-8">
           <p className="text-muted-foreground">
             Nenhum conteúdo corresponde às configurações de visualização atuais.
           </p>

@@ -1,80 +1,34 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { ContentItem } from '@/types/library';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import EnhancedContentCard from './EnhancedContentCard';
+import ContentSection from './ContentSection';
 
 interface ContentRowProps {
   items: ContentItem[];
   onItemSelect: (item: ContentItem) => void;
   isTopTen?: boolean;
+  title: string;
 }
 
-const ContentRow: React.FC<ContentRowProps> = ({ items, onItemSelect, isTopTen = false }) => {
-  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      const width = scrollRef.current.clientWidth;
-      scrollRef.current.scrollBy({ left: -width * 0.75, behavior: 'smooth' });
-    }
-  };
-  
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      const width = scrollRef.current.clientWidth;
-      scrollRef.current.scrollBy({ left: width * 0.75, behavior: 'smooth' });
-    }
-  };
-
-  if (items.length === 0) return null;
-
+const ContentRow: React.FC<ContentRowProps> = ({ 
+  items, 
+  onItemSelect, 
+  isTopTen = false,
+  title 
+}) => {
+  // Now using the ContentSection component which handles all the layout and animations
   return (
-    <div className="relative group py-6">
-      {/* Netflix-style side navigation arrows */}
-      <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-background to-transparent z-10 flex items-center justify-start opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="rounded-full bg-background/80 hover:bg-background w-12 h-12"
-          onClick={scrollLeft}
-        >
-          <ChevronLeft className="h-7 w-7" />
-        </Button>
-      </div>
-      
-      <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent z-10 flex items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="rounded-full bg-background/80 hover:bg-background w-12 h-12"
-          onClick={scrollRight}
-        >
-          <ChevronRight className="h-7 w-7" />
-        </Button>
-      </div>
-      
-      <div ref={scrollRef} className="flex space-x-8 overflow-x-auto py-8 pb-12 scrollbar-hide">
-        {items.map((item, index) => (
-          <div 
-            key={item.id}
-            className="flex-none w-72 md:w-80 relative"
-          >
-            <EnhancedContentCard 
-              item={item}
-              onClick={() => onItemSelect(item)}
-              rankNumber={isTopTen ? index + 1 : undefined}
-            />
-          </div>
-        ))}
-      </div>
-      <ScrollBar orientation="horizontal" className="opacity-0 group-hover:opacity-100 transition-opacity" />
-    </div>
+    <ContentSection
+      title={title}
+      items={items}
+      onItemSelect={onItemSelect}
+      isTopTen={isTopTen}
+    />
   );
 };
 

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { ContentItem } from '@/types/library';
 import EnhancedContentCard from './EnhancedContentCard';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { 
   Carousel,
   CarouselContent,
@@ -36,7 +36,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   // If layout is grid, render a grid of cards
   if (layout === 'grid') {
     return (
-      <div className="mb-16">
+      <div className="mb-12">
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-2xl sm:text-3xl font-semibold">{title}</h2>
           
@@ -47,7 +47,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
           )}
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {items.map((item, index) => (
             <div key={item.id} className="h-full">
               <EnhancedContentCard
@@ -65,17 +65,17 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   // Default carousel layout
   return (
     <div 
-      className="mb-16 relative group"
+      className="mb-12 px-1 py-2" 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex justify-between items-center mb-5">
-        <h2 className="text-2xl sm:text-3xl font-semibold group-hover:text-primary transition-colors duration-300">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold group-hover:text-primary transition-colors duration-300">
           {title}
         </h2>
         
         {viewAllUrl && (
-          <Button variant="ghost" size="sm" className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button variant="ghost" size="sm" className="flex items-center gap-1">
             Ver Todos <ChevronRight size={16} />
           </Button>
         )}
@@ -88,9 +88,9 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-8">
+        <CarouselContent className="-ml-4">
           {items.map((item, index) => (
-            <CarouselItem key={item.id} className="pl-8 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+            <CarouselItem key={item.id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
               <div className="h-full">
                 <EnhancedContentCard
                   item={item}
@@ -103,8 +103,8 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         </CarouselContent>
         
         <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <CarouselPrevious className="left-1 h-12 w-12" />
-          <CarouselNext className="right-1 h-12 w-12" />
+          <CarouselPrevious className="h-8 w-8 -left-4" />
+          <CarouselNext className="h-8 w-8 -right-4" />
         </div>
       </Carousel>
     </div>

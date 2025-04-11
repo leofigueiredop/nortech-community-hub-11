@@ -22,18 +22,21 @@ export const useContentItems = () => {
     new Set(content.map(item => item.format))
   );
 
-  // Filter content based on current filters
+  // Filter content based on current filters, with safe handling of potentially undefined fields
   const filteredContent = content.filter(item => {
+    // Format filter
     const matchesFormat = formatFilter === 'all' || item.format === formatFilter;
     
-    // Safe handling for tagFilter
+    // Tag filter - safely handle potentially undefined tags
     const matchesTag = tagFilter === 'all' || 
-                       (item.tags && Array.isArray(item.tags) && item.tags.includes(tagFilter));
+                     (item.tags && Array.isArray(item.tags) && item.tags.includes(tagFilter));
     
+    // Access level filter
     const matchesAccess = accessFilter === 'all' || 
-                          item.accessLevel === accessFilter ||
-                          (accessFilter === 'unlockable' && item.pointsEnabled);
+                        item.accessLevel === accessFilter ||
+                        (accessFilter === 'unlockable' && item.pointsEnabled);
     
+    // Search query
     const matchesSearch = !searchQuery || 
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));

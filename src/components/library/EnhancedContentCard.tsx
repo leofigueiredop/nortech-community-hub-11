@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import ContentCardMedia from './card/ContentCardMedia';
 import ContentCardInfo from './card/ContentCardInfo';
 import ContentFreeOverlay from './card/ContentFreeOverlay';
+import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
 
 interface EnhancedContentCardProps {
   item: ContentItem;
@@ -20,14 +21,13 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   
-  // Enhanced card variants for more dramatic hover animation
+  // Enhanced card variants for more elegant hover animation
   const cardVariants = {
-    initial: { y: 0, scale: 1, zIndex: 0 },
+    initial: { scale: 1, zIndex: 1 },
     hover: { 
-      y: -16, 
-      scale: 1.15, 
-      zIndex: 50,
-      transition: { duration: 0.3 }
+      scale: 1.05, 
+      zIndex: 10,
+      transition: { duration: 0.2 }
     }
   };
   
@@ -38,23 +38,20 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
       initial="initial"
       animate={isHovered ? "hover" : "initial"}
       variants={cardVariants}
-      className="h-full cursor-pointer w-full"
+      className="h-full cursor-pointer w-full relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <Card 
-        className="overflow-hidden border border-border/40 transition-all duration-300 h-full group relative shadow-sm hover:shadow-2xl"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        className="overflow-hidden border-0 h-full shadow-md rounded-xl transition-all duration-200"
         onClick={onClick}
       >
         {/* Rank number display for top 10 items */}
         {rankNumber !== undefined && (
-          <div className="absolute -left-6 -top-5 z-10 font-bold text-[120px] select-none" 
+          <div className="absolute -left-2 -top-2 z-10 font-bold text-6xl select-none" 
             style={{
-              color: 'transparent',
-              WebkitTextStroke: '2px rgba(255,255,255,0.8)',
-              textShadow: '0 0 10px rgba(0,0,0,0.3)',
-              opacity: isHovered ? 0.5 : 0.9,
-              transition: 'opacity 0.3s ease'
+              color: 'white',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
             }}>
             {rankNumber}
           </div>
@@ -67,7 +64,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
         />
         
         {/* Content info below image (visible when not hovered) */}
-        <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-0 absolute' : 'opacity-100'}`}>
+        <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
           <ContentCardInfo item={item} />
         </div>
         
