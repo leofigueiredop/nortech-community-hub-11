@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 // Define the types for points transactions
 export interface PointsActivity {
   id: string;
-  type: 'content_view' | 'content_completion' | 'login_bonus' | 'profile_update' | 'challenge_completion' | 'quiz_completion' | 'reward_redemption';
+  type: string;
   points: number;
   description: string;
   timestamp: string;
@@ -19,15 +19,24 @@ export const POINTS_VALUES = {
   challenge_completion: 50,
   quiz_completion: 25,
   reward_redemption: -50,
+  login: 2,
+  comment: 3,
+  like: 1,
+  course_completion: 20,
+  event_participation: 15,
+  referral: 25
 };
 
 // Define the structure of the Points context
 export interface PointsContextType {
   totalPoints: number;
-  awardPoints: (points: number, description?: string) => void;
+  points: number;
+  awardPoints: (pointsData: { type: string; description: string; points: number }) => void;
+  addPoints: (pointsData: { type: string; description: string; points: number }) => void;
   deductPoints: (points: number, description?: string) => void;
   getUserLevel: () => { level: number; nextLevel: number; progress: number };
   pointsHistory: PointsActivity[];
+  awardBadge: (badge: { name: string; description: string; category: string }) => void;
 }
 
 // Create the context
@@ -55,18 +64,23 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // Calculate total points
   const totalPoints = pointsHistory.reduce((sum, activity) => sum + activity.points, 0);
 
-  // Award points to the user
-  const awardPoints = useCallback((points: number, description = '') => {
+  // Award points to the user (new version using object parameter)
+  const awardPoints = useCallback((pointsData: { type: string; description: string; points: number }) => {
     const newActivity: PointsActivity = {
       id: Date.now().toString(),
-      type: 'content_completion',
-      points,
-      description,
+      type: pointsData.type,
+      points: pointsData.points,
+      description: pointsData.description,
       timestamp: new Date().toISOString(),
     };
     
     setPointsHistory(prev => [newActivity, ...prev]);
   }, []);
+
+  // Legacy support for the original addPoints method
+  const addPoints = useCallback((pointsData: { type: string; description: string; points: number }) => {
+    awardPoints(pointsData);
+  }, [awardPoints]);
 
   // Deduct points from the user
   const deductPoints = useCallback((points: number, description = '') => {
@@ -79,6 +93,12 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
     
     setPointsHistory(prev => [newActivity, ...prev]);
+  }, []);
+
+  // Award badge (simplified implementation)
+  const awardBadge = useCallback((badge: { name: string; description: string; category: string }) => {
+    console.log(`Badge awarded: ${badge.name} (${badge.category})`);
+    // In a real implementation, this would save the badge to user's profile
   }, []);
 
   // Calculate user level based on total points
@@ -95,10 +115,13 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   return (
     <PointsContext.Provider value={{
       totalPoints,
+      points: totalPoints, // For backward compatibility
       awardPoints,
+      addPoints,
       deductPoints,
       getUserLevel,
       pointsHistory,
+      awardBadge
     }}>
       {children}
     </PointsContext.Provider>

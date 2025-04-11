@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,15 +11,36 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { ArrowRight, Trophy, Clock, BadgeCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ContentProgress } from '@/types/library';
+
+const mockContentProgress: ContentProgress[] = [
+  {
+    id: 'progress1',
+    userId: 'user1',
+    contentId: 'content1',
+    progress: 100,
+    completed: true,
+    lastAccessedAt: new Date().toISOString(),
+    pointsAwarded: true
+  },
+  {
+    id: 'progress2',
+    userId: 'user1',
+    contentId: 'content2',
+    progress: 50,
+    completed: false,
+    lastAccessedAt: new Date().toISOString(),
+    pointsAwarded: false
+  }
+];
 
 const PointsDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { points, pointsHistory, awardPoints } = usePoints();
-  const { contentProgress } = useContentProgress();
+  const contentProgressData = mockContentProgress;
   const { content } = useLibraryContent();
 
-  // Calculate statistics
-  const completedItems = contentProgress.filter(item => item.completed).length;
+  const completedItems = contentProgressData.filter(item => item.completed).length;
   const totalPoints = pointsHistory.reduce((sum, entry) => sum + entry.points, 0);
   const pointsThisWeek = pointsHistory
     .filter(entry => {
@@ -31,20 +51,30 @@ const PointsDashboard = () => {
     })
     .reduce((sum, entry) => sum + entry.points, 0);
 
-  // For demonstration purposes
   const handleDemoPoints = () => {
-    awardPoints(50, 'Demonstration points');
+    awardPoints({
+      type: 'demo',
+      description: 'Demonstration points',
+      points: 50
+    });
     toast({
       title: 'Points Awarded!',
       description: 'You received 50 points for testing',
     });
   };
 
-  // Get content title by ID
   const getContentTitle = (contentId: string) => {
     const contentItem = content.find(item => item.id === contentId);
     return contentItem ? contentItem.title : 'Unknown Content';
   };
+
+  const progressItems = contentProgressData.map(item => ({
+    id: item.id,
+    contentId: item.contentId,
+    progress: item.progress,
+    completed: item.completed,
+    lastAccessedAt: item.lastAccessedAt
+  }));
 
   return (
     <MainLayout title="Points Dashboard">
@@ -191,7 +221,7 @@ const PointsDashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <PointsHistory history={pointsHistory} />
+                <PointsHistory />
               </CardContent>
             </Card>
           </TabsContent>
@@ -206,7 +236,7 @@ const PointsDashboard = () => {
               </CardHeader>
               <CardContent>
                 <ContentProgressList 
-                  progressItems={contentProgress} 
+                  progressItems={progressItems} 
                   getContentTitle={getContentTitle} 
                 />
               </CardContent>

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import {
   Dialog,
@@ -138,7 +137,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
   if (!item) return null;
 
   // Determine the appropriate CTA text based on format and access level
-  const getCtaText = () => {
+  const getCtaText = (item: ContentItem) => {
     if (item.accessLevel === 'premium') {
       return 'Unlock Premium Content';
     }
@@ -160,7 +159,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
   };
 
   // Determine the CTA icon based on format
-  const getCtaIcon = () => {
+  const getCtaIcon = (item: ContentItem) => {
     if (item.accessLevel === 'premium') {
       return <Lock className="mr-2 h-4 w-4" />;
     }
@@ -273,8 +272,8 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
               onClick={handleAccessContent}
               className="bg-primary hover:bg-primary/90"
             >
-              {getCtaIcon()}
-              {getCtaText()}
+              {getCtaIcon(item)}
+              {getCtaText(item)}
             </Button>
           </div>
         </DialogFooter>

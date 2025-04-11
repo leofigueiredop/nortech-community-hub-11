@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
@@ -96,7 +96,6 @@ const ContentCreatorDashboard: React.FC = () => {
     deleteCategory,
   } = useLibraryContent();
 
-  // Zod schema for category form
   const categorySchema = z.object({
     name: z.string().min(2, {
       message: "Category name must be at least 2 characters.",
@@ -105,7 +104,6 @@ const ContentCreatorDashboard: React.FC = () => {
     icon: z.string().optional(),
   })
 
-  // useForm hook for category form
   const categoryForm = useForm<z.infer<typeof categorySchema>>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
@@ -115,7 +113,6 @@ const ContentCreatorDashboard: React.FC = () => {
     },
   })
 
-  // Zod schema for content form
   const contentSchema = z.object({
     title: z.string().min(2, {
       message: "Content title must be at least 2 characters.",
@@ -135,7 +132,6 @@ const ContentCreatorDashboard: React.FC = () => {
     tags: z.string().optional(),
   })
 
-  // useForm hook for content form
   const contentForm = useForm<z.infer<typeof contentSchema>>({
     resolver: zodResolver(contentSchema),
     defaultValues: {
@@ -152,18 +148,21 @@ const ContentCreatorDashboard: React.FC = () => {
     },
   })
 
-  // Function to handle category creation/edit form submission
   const handleCategorySubmit = async (values: z.infer<typeof categorySchema>) => {
     try {
       if (selectedCategory) {
-        // Update existing category
         updateCategory({ ...selectedCategory, ...values });
         toast({
           title: "Category updated successfully.",
         })
       } else {
-        // Create new category
-        addCategory({ id: uuidv4(), itemCount: 0, ...values });
+        addCategory({ 
+          id: uuidv4(), 
+          itemCount: 0, 
+          name: values.name || 'New Category',
+          description: values.description || '',
+          icon: values.icon
+        });
         toast({
           title: "Category created successfully.",
         })
@@ -178,17 +177,22 @@ const ContentCreatorDashboard: React.FC = () => {
     }
   }
 
-  // Function to handle content creation/edit form submission
   const handleContentSubmit = async (values: z.infer<typeof contentSchema>) => {
     try {
       if (selectedContent) {
-        // Update existing content
-        updateContent({ ...selectedContent, ...values, tags: values.tags ? values.tags.split(',') : [] });
+        const tags = typeof values.tags === 'string' ? values.tags.split(',') : values.tags || [];
+        updateContent({ 
+          ...selectedContent, 
+          ...values,
+          format: values.format as ContentFormat,
+          accessLevel: values.accessLevel as 'free' | 'premium' | 'unlockable',
+          tags: tags 
+        });
         toast({
           title: "Content updated successfully.",
         })
       } else {
-        // Create new content
+        const tags = typeof values.tags === 'string' ? values.tags.split(',') : [];
         addContent({
           id: uuidv4(),
           createdAt: new Date().toISOString(),
@@ -197,12 +201,16 @@ const ContentCreatorDashboard: React.FC = () => {
           featured: false,
           pointsEnabled: false,
           pointsValue: 100,
-          tags: values.tags ? values.tags.split(',') : [],
-          duration: 0,
-          author: 'Nortech',
-          thumbnail: '/placeholder.svg',
-          description: '',
-          ...values,
+          tags: tags,
+          duration: values.duration || 0,
+          author: values.author || 'Nortech', 
+          thumbnail: values.thumbnail || '/placeholder.svg',
+          format: values.format as ContentFormat,
+          accessLevel: values.accessLevel as 'free' | 'premium' | 'unlockable',
+          title: values.title,
+          description: values.description || '',
+          resourceUrl: values.resourceUrl,
+          categoryId: values.categoryId
         });
         toast({
           title: "Content created successfully.",
@@ -210,6 +218,7 @@ const ContentCreatorDashboard: React.FC = () => {
       }
       closeContentDrawer();
     } catch (error) {
+      console.error("Error submitting content:", error);
       toast({
         variant: "destructive",
         title: "Error!",
@@ -218,7 +227,6 @@ const ContentCreatorDashboard: React.FC = () => {
     }
   }
 
-  // Function to toggle featured status
   const toggleFeatured = (id: string) => {
     const contentToUpdate = content.find(c => c.id === id);
     if (contentToUpdate) {
@@ -229,7 +237,6 @@ const ContentCreatorDashboard: React.FC = () => {
     }
   };
 
-  // Function to toggle points enabled status
   const togglePointsEnabled = (id: string) => {
     const contentToUpdate = content.find(c => c.id === id);
     if (contentToUpdate) {
@@ -240,7 +247,6 @@ const ContentCreatorDashboard: React.FC = () => {
     }
   };
 
-  // Function to handle content deletion
   const handleContentDelete = (id: string) => {
     deleteContent(id);
     toast({
@@ -248,7 +254,6 @@ const ContentCreatorDashboard: React.FC = () => {
     })
   };
 
-  // Function to handle category deletion
   const handleCategoryDelete = (id: string) => {
     deleteCategory(id);
     toast({
@@ -256,7 +261,6 @@ const ContentCreatorDashboard: React.FC = () => {
     })
   };
 
-  // Function to handle content cloning
   const handleContentClone = (item: ContentItem) => {
     const clonedItem = { ...item, id: uuidv4(), title: `${item.title} (Clone)` };
     addContent(clonedItem);
@@ -265,7 +269,6 @@ const ContentCreatorDashboard: React.FC = () => {
     })
   };
 
-  // Function to handle category cloning
   const handleCategoryClone = (item: ContentCategory) => {
     const clonedItem = { ...item, id: uuidv4(), name: `${item.name} (Clone)` };
     addCategory(clonedItem);
@@ -274,7 +277,6 @@ const ContentCreatorDashboard: React.FC = () => {
     })
   };
 
-  // Function to handle content editing
   const handleContentEdit = (item: ContentItem) => {
     setSelectedContent(item);
     contentForm.reset({
@@ -292,7 +294,6 @@ const ContentCreatorDashboard: React.FC = () => {
     openContentDrawer();
   };
 
-  // Function to handle category editing
   const handleCategoryEdit = (item: ContentCategory) => {
     setSelectedCategory(item);
     categoryForm.reset({
@@ -303,13 +304,11 @@ const ContentCreatorDashboard: React.FC = () => {
     openCategoryDrawer();
   };
 
-  // Function to get category name by id
   const getCategoryName = (id: string) => {
     const category = categories.find(c => c.id === id);
     return category ? category.name : 'N/A';
   };
 
-  // Function to handle sorting
   const sortedContent = React.useMemo(() => {
     let sortableItems = [...content];
     if (sortConfig !== null) {
@@ -326,7 +325,6 @@ const ContentCreatorDashboard: React.FC = () => {
     return sortableItems;
   }, [content, sortConfig]);
 
-  // Function to handle category sorting
   const sortedCategories = React.useMemo(() => {
     let sortableItems = [...categories];
     if (categorySortConfig !== null) {
@@ -343,7 +341,6 @@ const ContentCreatorDashboard: React.FC = () => {
     return sortableItems;
   }, [categories, categorySortConfig]);
 
-  // Function to request sort change
   const requestSort = (key: string) => {
     let direction = 'asc';
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -352,7 +349,6 @@ const ContentCreatorDashboard: React.FC = () => {
     setSortConfig({ key, direction });
   }
 
-  // Function to request category sort change
   const requestCategorySort = (key: string) => {
     let direction = 'asc';
     if (categorySortConfig && categorySortConfig.key === key && categorySortConfig.direction === 'asc') {
@@ -361,7 +357,6 @@ const ContentCreatorDashboard: React.FC = () => {
     setCategorySortConfig({ key, direction });
   }
 
-  // Function to render sort arrow
   const renderSortArrow = (key: string) => {
     if (!sortConfig || sortConfig.key !== key) {
       return null;
@@ -369,7 +364,6 @@ const ContentCreatorDashboard: React.FC = () => {
     return sortConfig.direction === 'asc' ? <ArrowUp className="inline-block w-4 h-4 ml-1" /> : <ArrowDown className="inline-block w-4 h-4 ml-1" />;
   }
 
-  // Function to render category sort arrow
   const renderCategorySortArrow = (key: string) => {
     if (!categorySortConfig || categorySortConfig.key !== key) {
       return null;
@@ -377,48 +371,40 @@ const ContentCreatorDashboard: React.FC = () => {
     return categorySortConfig.direction === 'asc' ? <ArrowUp className="inline-block w-4 h-4 ml-1" /> : <ArrowDown className="inline-block w-4 h-4 ml-1" />;
   }
 
-  // Function to open content modal
   const openContentModal = () => {
     setSelectedContent(null);
     setIsContentModalOpen(true);
   };
 
-  // Function to close content modal
   const closeContentModal = () => {
     setIsContentModalOpen(false);
     setSelectedContent(null);
   };
 
-  // Function to open category modal
   const openCategoryModal = () => {
     setSelectedCategory(null);
     setIsCategoryModalOpen(true);
   };
 
-  // Function to close category modal
   const closeCategoryModal = () => {
     setIsCategoryModalOpen(false);
     setSelectedCategory(null);
   };
 
-  // Function to open content drawer
   const openContentDrawer = () => {
     setIsDrawerOpen(true);
   };
 
-  // Function to close content drawer
   const closeContentDrawer = () => {
     setIsDrawerOpen(false);
     setSelectedContent(null);
     contentForm.reset();
   };
 
-  // Function to open category drawer
   const openCategoryDrawer = () => {
     setIsCategoryDrawerOpen(true);
   };
 
-  // Function to close category drawer
   const closeCategoryDrawer = () => {
     setIsCategoryDrawerOpen(false);
     setSelectedCategory(null);
@@ -434,7 +420,6 @@ const ContentCreatorDashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Content List */}
           <div className="bg-white rounded-lg shadow-md p-4">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Content List</h2>
@@ -511,7 +496,6 @@ const ContentCreatorDashboard: React.FC = () => {
             </ScrollArea>
           </div>
 
-          {/* Category List */}
           <div className="bg-white rounded-lg shadow-md p-4">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Category List</h2>
@@ -580,7 +564,6 @@ const ContentCreatorDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Content Drawer */}
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerTrigger asChild>
           <Button>Open</Button>
@@ -766,7 +749,6 @@ const ContentCreatorDashboard: React.FC = () => {
         </DrawerContent>
       </Drawer>
 
-      {/* Category Drawer */}
       <Drawer open={isCategoryDrawerOpen} onOpenChange={setIsCategoryDrawerOpen}>
         <DrawerTrigger asChild>
           <Button>Open</Button>

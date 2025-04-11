@@ -1,75 +1,58 @@
 
 import { useState, useCallback } from 'react';
-import { toast } from '@/hooks/use-toast';
-
-// Define the ContentProgress interface
-interface ContentProgress {
-  id: string;
-  userId: string;
-  contentId: string;
-  progress: number;
-  completed: boolean;
-  lastAccessedAt: string;
-  pointsAwarded: boolean;
-}
-
-// Mock initial progress data
-const initialProgressData: ContentProgress[] = [
-  {
-    id: 'progress-1',
-    userId: 'user-1',
-    contentId: 'c1',
-    progress: 100,
-    completed: true,
-    lastAccessedAt: new Date().toISOString(),
-    pointsAwarded: true
-  },
-  {
-    id: 'progress-2',
-    userId: 'user-1',
-    contentId: 'c2',
-    progress: 45,
-    completed: false,
-    lastAccessedAt: new Date(Date.now() - 86400000).toISOString(),
-    pointsAwarded: false
-  }
-];
+import { ContentProgress } from '@/types/library';
 
 export const useContentProgress = () => {
-  const [progressData, setProgressData] = useState<ContentProgress[]>(initialProgressData);
+  // Mock state for demonstration
+  const [progress, setProgress] = useState<ContentProgress[]>([
+    {
+      id: 'progress1',
+      userId: 'user1',
+      contentId: 'content1', 
+      progress: 100,
+      completed: true,
+      lastAccessedAt: new Date().toISOString(),
+      pointsAwarded: true
+    },
+    {
+      id: 'progress2',
+      userId: 'user1',
+      contentId: 'content2',
+      progress: 50,
+      completed: false,
+      lastAccessedAt: new Date().toISOString(),
+      pointsAwarded: false
+    }
+  ]);
 
-  // Add a new content item to progress tracking
   const addProgress = useCallback((contentId: string) => {
-    setProgressData(prev => {
-      // Check if progress already exists
-      const exists = prev.some(p => p.contentId === contentId);
-      if (exists) return prev;
+    setProgress(prev => {
+      // Skip if content already has progress
+      if (prev.some(p => p.contentId === contentId)) {
+        return prev;
+      }
       
-      // Create new progress entry
-      const newProgress: ContentProgress = {
+      // Add new progress entry
+      return [...prev, {
         id: `progress-${Date.now()}`,
-        userId: 'user-1', // Mock user ID
+        userId: 'user1', // In a real app, this would come from an auth context
         contentId,
         progress: 0,
         completed: false,
         lastAccessedAt: new Date().toISOString(),
         pointsAwarded: false
-      };
-      
-      return [...prev, newProgress];
+      }];
     });
   }, []);
 
-  // Update progress for a content item
   const updateProgress = useCallback((contentId: string, newProgress: number) => {
-    setProgressData(prev => {
+    setProgress(prev => {
       return prev.map(p => {
         if (p.contentId === contentId) {
-          const completed = newProgress >= 100;
           return {
             ...p,
             progress: newProgress,
-            completed,
+            completed: newProgress >= 100,
             lastAccessedAt: new Date().toISOString()
           };
         }
@@ -78,21 +61,27 @@ export const useContentProgress = () => {
     });
   }, []);
 
-  // Get progress for a content item
   const getProgress = useCallback((contentId: string) => {
-    return progressData.find(p => p.contentId === contentId);
-  }, [progressData]);
+    const item = progress.find(p => p.contentId === contentId);
+    if (!item) {
+      // Return default values if no progress found
+      return {
+        id: '',
+        userId: 'user1',
+        contentId,
+        progress: 0,
+        completed: false,
+        lastAccessedAt: new Date().toISOString(),
+        pointsAwarded: false
+      };
+    }
+    return item;
+  }, [progress]);
 
-  // Award points for a content item
   const awardPoints = useCallback((contentId: string) => {
-    setProgressData(prev => {
+    setProgress(prev => {
       return prev.map(p => {
-        if (p.contentId === contentId && !p.pointsAwarded) {
-          toast({
-            title: "Points Awarded!",
-            description: "You've earned points for completing this content.",
-          });
-          
+        if (p.contentId === contentId) {
           return {
             ...p,
             pointsAwarded: true
@@ -103,12 +92,13 @@ export const useContentProgress = () => {
     });
   }, []);
 
-  // Get all progress items
   const getAllProgress = useCallback(() => {
-    return progressData;
-  }, [progressData]);
+    return progress;
+  }, [progress]);
 
+  // This hook now matches the expectations of components that use it
   return {
+    contentProgress: progress,
     addProgress,
     updateProgress,
     getProgress,

@@ -1,95 +1,37 @@
 
 import React from 'react';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from '@/components/ui/badge';
-import { usePoints } from '@/context/PointsContext';
+import { PointsActivity, usePoints } from '@/context/PointsContext';
 
 const PointsHistory: React.FC = () => {
   const { pointsHistory } = usePoints();
-
-  // Format date for display
-  const formatDate = (isoDate: string): string => {
-    const date = new Date(isoDate);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  // Get badge color based on transaction type
-  const getBadgeVariant = (points: number): "default" | "secondary" | "destructive" | "outline" => {
-    if (points > 0) return "default";
-    if (points < 0) return "destructive";
-    return "secondary";
-  };
-
-  // Get badge text based on transaction type
-  const getBadgeText = (type: string): string => {
-    const typeMap: Record<string, string> = {
-      'content_view': 'Content View',
-      'content_completion': 'Completion',
-      'login_bonus': 'Login',
-      'profile_update': 'Profile',
-      'challenge_completion': 'Challenge',
-      'quiz_completion': 'Quiz',
-      'reward_redemption': 'Redemption'
-    };
-    
-    return typeMap[type] || type;
-  };
-
+  
   if (pointsHistory.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <p>No points activity yet.</p>
-        <p className="mt-2">Complete activities to earn points!</p>
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">No points activity yet.</p>
       </div>
     );
   }
 
   return (
-    <Table>
-      <TableCaption>Your points history</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Date</TableHead>
-          <TableHead>Activity</TableHead>
-          <TableHead>Description</TableHead>
-          <TableHead className="text-right">Points</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {pointsHistory.map((activity) => (
-          <TableRow key={activity.id}>
-            <TableCell className="text-xs md:text-sm font-medium">
-              {formatDate(activity.timestamp)}
-            </TableCell>
-            <TableCell>
-              <Badge variant="outline" className="bg-muted">
-                {getBadgeText(activity.type)}
-              </Badge>
-            </TableCell>
-            <TableCell className="text-xs md:text-sm max-w-[200px] truncate">
-              {activity.description}
-            </TableCell>
-            <TableCell className={`text-right font-medium ${activity.points > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {activity.points > 0 ? `+${activity.points}` : activity.points}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div className="space-y-4">
+      {pointsHistory.map((entry, index) => (
+        <div 
+          key={entry.id || index} 
+          className="flex justify-between items-center p-3 rounded-md border"
+        >
+          <div>
+            <p className="font-medium">{entry.description}</p>
+            <p className="text-sm text-muted-foreground">
+              {new Date(entry.timestamp).toLocaleString()}
+            </p>
+          </div>
+          <div className={`font-bold ${entry.points >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {entry.points >= 0 ? '+' : ''}{entry.points}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
 

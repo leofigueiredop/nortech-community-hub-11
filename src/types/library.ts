@@ -1,3 +1,4 @@
+
 export type ContentFormat = 'audio' | 'pdf' | 'text' | 'url' | 'youtube' | 'vimeo' | 'gdoc' | 'image' | 'course' | 'link' | 'video';
 
 export interface Author {
@@ -42,6 +43,7 @@ export interface ContentCategory {
   icon?: string;
   count?: number; // For backward compatibility
   updatedAt?: string; // For tracking when category was last updated
+  createdAt?: string; // When the category was created
 }
 
 export interface ContentProgress {
