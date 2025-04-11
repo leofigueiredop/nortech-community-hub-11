@@ -12,7 +12,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } fr
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowRight, Sparkles, Plus, Dollar, CheckCircle2, X, Trash2 } from 'lucide-react';
+import { ArrowRight, Sparkles, Plus, DollarSign, CheckCircle2, X, Trash2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 const formSchema = z.object({
@@ -61,20 +61,16 @@ const MembershipPlansForm: React.FC = () => {
   };
   
   const onSubmit = (data: FormData) => {
-    // Add the features to the form data
     form.setValue('features', planFeatures);
     data.features = planFeatures;
     
     console.log('Membership plans data:', data);
     
-    // Store membership plans data
     localStorage.setItem('membershipPlansData', JSON.stringify(data));
     localStorage.setItem('onboardingStep', '6');
     
-    // Show achievement badge
     setShowBadge(true);
     
-    // Show achievement toast
     toast({
       title: "🎖️ Achievement Unlocked!",
       description: "Membership plans configured (+15 XP) - 100% completed!",
@@ -190,7 +186,7 @@ const MembershipPlansForm: React.FC = () => {
                       <FormLabel>Plan Price</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Dollar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <Input 
                             type="number"
                             placeholder="9.99" 
