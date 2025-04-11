@@ -218,7 +218,13 @@ const CommunityTemplatesForm: React.FC = () => {
               <Button 
                 variant="default"
                 className="bg-nortech-purple hover:bg-nortech-purple/90"
-                onClick={() => document.querySelector('[data-value="plans"]')?.click()}
+                onClick={() => {
+                  // Find the plans tab trigger and properly cast it to HTMLElement before calling click
+                  const plansTab = document.querySelector('[data-value="plans"]');
+                  if (plansTab && plansTab instanceof HTMLElement) {
+                    plansTab.click();
+                  }
+                }}
               >
                 Continue to Plans <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
