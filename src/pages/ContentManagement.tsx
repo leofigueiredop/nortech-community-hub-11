@@ -1,21 +1,22 @@
 
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, FolderPlus, List, Grid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ContentUploadForm from '@/components/library/management/ContentUploadForm';
-import ContentList from '@/components/library/management/ContentList';
-import CategoriesManagement from '@/components/library/management/CategoriesManagement';
-import { ContentItem } from '@/types/library';
+import { Plus } from 'lucide-react';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { useToast } from '@/hooks/use-toast';
+import { ContentItem, ContentCategory } from '@/types/library';
+import ContentList from '@/components/library/management/ContentList';
+import CategoriesList from '@/components/library/management/CategoriesList';
+import ContentUploadForm from '@/components/library/management/ContentUploadForm';
+import CategoryFormDialog from '@/components/library/management/CategoryFormDialog';
 
 const ContentManagement: React.FC = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<ContentItem | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const { content, categories, addContent, updateContent, deleteContent } = useLibraryContent();
+  const [editingCategory, setEditingCategory] = useState<ContentCategory | null>(null);
+  const { content, categories, addContent, updateContent, deleteContent, addCategory, updateCategory, deleteCategory } = useLibraryContent();
   const { toast } = useToast();
 
   const handleSaveContent = (newContent: ContentItem) => {
@@ -41,68 +42,79 @@ const ContentManagement: React.FC = () => {
     setIsUploadOpen(true);
   };
 
-  const handleDeleteContent = (id: string) => {
-    deleteContent(id);
-    toast({
-      title: "Content deleted",
-      description: "The content has been removed from your library."
-    });
+  const handleSaveCategory = (category: ContentCategory) => {
+    if (editingCategory) {
+      updateCategory(category);
+      toast({
+        title: "Category updated",
+        description: `"${category.name}" has been updated successfully.`
+      });
+    } else {
+      addCategory(category);
+      toast({
+        title: "Category added",
+        description: `"${category.name}" has been added successfully.`
+      });
+    }
+    setIsCategoryFormOpen(false);
+    setEditingCategory(null);
+  };
+
+  const handleEditCategory = (category: ContentCategory) => {
+    setEditingCategory(category);
+    setIsCategoryFormOpen(true);
   };
 
   return (
     <MainLayout title="Content Management">
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Content Management</h1>
-          <div className="flex gap-2">
-            <Button onClick={() => setViewMode('list')} variant={viewMode === 'list' ? 'default' : 'outline'}>
-              <List size={16} />
-            </Button>
-            <Button onClick={() => setViewMode('grid')} variant={viewMode === 'grid' ? 'default' : 'outline'}>
-              <Grid size={16} />
-            </Button>
-          </div>
+      <div className="container py-6 mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Content Management</h1>
+          <Button onClick={() => {
+            setEditingContent(null);
+            setIsUploadOpen(true);
+          }} className="bg-purple-500 hover:bg-purple-600">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Content
+          </Button>
         </div>
 
-        <Tabs defaultValue="content" className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <TabsList>
-              <TabsTrigger value="content" className="gap-2">
-                <List size={16} /> Content
-              </TabsTrigger>
-              <TabsTrigger value="categories" className="gap-2">
-                <FolderPlus size={16} /> Categories
-              </TabsTrigger>
-            </TabsList>
-
-            <Button 
-              onClick={() => {
-                setEditingContent(null);
-                setIsUploadOpen(true);
-              }}
-              className="flex items-center gap-2"
-            >
-              <Plus size={16} />
-              Add Content
-            </Button>
-          </div>
-          
-          <TabsContent value="content">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Content List Section */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Content List</h2>
+            </div>
             <ContentList 
               items={content}
-              viewMode={viewMode}
               onEdit={handleEditContent}
-              onDelete={handleDeleteContent}
+              onDelete={deleteContent}
               categories={categories}
             />
-          </TabsContent>
-          
-          <TabsContent value="categories">
-            <CategoriesManagement />
-          </TabsContent>
-        </Tabs>
+          </div>
+
+          {/* Categories Section */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Category List</h2>
+              <Button onClick={() => {
+                setEditingCategory(null);
+                setIsCategoryFormOpen(true);
+              }} className="bg-purple-500 hover:bg-purple-600">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Category
+              </Button>
+            </div>
+            <CategoriesList 
+              categories={categories}
+              onEdit={handleEditCategory}
+              onDelete={deleteCategory}
+            />
+          </div>
+        </div>
       </div>
 
+      {/* Modals */}
       <ContentUploadForm 
         isOpen={isUploadOpen}
         editItem={editingContent}
@@ -111,6 +123,16 @@ const ContentManagement: React.FC = () => {
           setEditingContent(null);
         }}
         onSave={handleSaveContent}
+      />
+
+      <CategoryFormDialog
+        isOpen={isCategoryFormOpen}
+        editCategory={editingCategory}
+        onClose={() => {
+          setIsCategoryFormOpen(false);
+          setEditingCategory(null);
+        }}
+        onSave={handleSaveCategory}
       />
     </MainLayout>
   );
