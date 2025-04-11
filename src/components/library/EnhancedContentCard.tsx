@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ContentItem } from '@/types/library';
 import { Play, Lock, FileText, Download, Eye, Clock, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface EnhancedContentCardProps {
   item: ContentItem;
@@ -46,97 +47,128 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ item, onClick
     }
   };
   
+  // Card variants for hover animation
+  const cardVariants = {
+    initial: { boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" },
+    hover: { 
+      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)",
+      borderColor: "var(--nortech-purple)" // Apply purple highlight border
+    }
+  };
+  
+  // On mobile, tap will trigger the hover state
+  // This is handled by the onClick handler activating after onMouseEnter
+  
   return (
-    <Card 
-      className="overflow-hidden border-none shadow-md group cursor-pointer transition-all duration-300 hover:shadow-xl"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={onClick}
+    <motion.div
+      initial="initial"
+      animate={isHovered ? "hover" : "initial"}
+      variants={cardVariants}
+      className="h-full"
     >
-      <div className="relative aspect-video overflow-hidden">
-        <img 
-          src={item.thumbnailUrl || '/placeholder.svg'} 
-          alt={item.title}
-          className={`w-full h-full object-cover transition-transform duration-500 ${
-            isHovered ? 'scale-110' : 'scale-100'
-          }`}
-        />
-        
-        {/* Overlay on hover */}
-        <div className={`absolute inset-0 bg-black/70 flex flex-col justify-between p-4 transition-opacity duration-300 ${
-          isHovered ? 'opacity-100' : 'opacity-0'
-        }`}>
-          <div className="flex justify-between">
-            <Badge className="bg-nortech-purple text-white">
-              {item.format.toUpperCase()}
-            </Badge>
-            
-            {item.accessLevel === 'premium' && (
-              <Badge variant="outline" className="border-amber-500 text-amber-500">
-                <Lock className="mr-1 h-3 w-3" /> Premium
+      <Card 
+        className="overflow-hidden border-2 transition-all duration-300 h-full cursor-pointer group"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => {
+          if (!isHovered) {
+            // On mobile, first tap shows hover state
+            setIsHovered(true);
+            // Add a small delay before allowing the actual click to happen on second tap
+            setTimeout(() => {
+              const isMobile = window.innerWidth < 768;
+              if (!isMobile) onClick();
+            }, 50);
+          } else {
+            onClick();
+          }
+        }}
+      >
+        <div className="relative aspect-video overflow-hidden">
+          <img 
+            src={item.thumbnailUrl || '/placeholder.svg'} 
+            alt={item.title}
+            className={`w-full h-full object-cover transition-transform duration-500 ${
+              isHovered ? 'scale-110 brightness-50' : 'scale-100'
+            }`}
+          />
+          
+          {/* Overlay on hover */}
+          <div className={`absolute inset-0 bg-black/70 flex flex-col justify-between p-4 transition-opacity duration-300 ${
+            isHovered ? 'opacity-100' : 'opacity-0'
+          }`}>
+            <div className="flex justify-between">
+              <Badge className="bg-nortech-purple text-white">
+                {item.format.toUpperCase()}
               </Badge>
-            )}
+              
+              {item.accessLevel === 'premium' && (
+                <Badge variant="outline" className="border-amber-500 text-amber-500">
+                  <Lock className="mr-1 h-3 w-3" /> Premium
+                </Badge>
+              )}
+            </div>
+            
+            <div>
+              <h3 className="text-white font-semibold mb-1">{item.title}</h3>
+              <p className="text-white/80 text-sm line-clamp-3 mb-3">{item.description}</p>
+              
+              <div className="flex flex-wrap gap-1 mb-3">
+                {item.tags.slice(0, 3).map(tag => (
+                  <Badge key={tag} variant="outline" className="border-white/30 text-white/80 text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+              
+              <Button 
+                className="w-full bg-nortech-purple hover:bg-nortech-purple/90"
+                size="sm"
+              >
+                {item.accessLevel === 'premium' ? 'Subscribe to Unlock' : `${getActionText(item.format)} Now`}
+              </Button>
+            </div>
           </div>
           
-          <div>
-            <h3 className="text-white font-semibold mb-1">{item.title}</h3>
-            <p className="text-white/80 text-sm line-clamp-2 mb-3">{item.description}</p>
-            
-            <div className="flex flex-wrap gap-1 mb-3">
-              {item.tags.slice(0, 3).map(tag => (
-                <Badge key={tag} variant="outline" className="border-white/30 text-white/80 text-xs">
-                  {tag}
-                </Badge>
-              ))}
+          {/* Play button overlay for videos (visible when not hovered) */}
+          {['video', 'youtube', 'vimeo'].includes(item.format) && !isHovered && (
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="w-12 h-12 bg-nortech-purple rounded-full flex items-center justify-center">
+                <Play className="text-white ml-1" size={24} />
+              </div>
             </div>
-            
-            <Button 
-              className="w-full bg-nortech-purple hover:bg-nortech-purple/90"
-              size="sm"
-            >
-              {getActionText(item.format)} Now
-            </Button>
-          </div>
-        </div>
-        
-        {/* Play button overlay for videos */}
-        {['video', 'youtube', 'vimeo'].includes(item.format) && !isHovered && (
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-12 h-12 bg-nortech-purple rounded-full flex items-center justify-center">
-              <Play className="text-white ml-1" size={24} />
+          )}
+          
+          {/* Premium overlay for locked content */}
+          {item.accessLevel === 'premium' && !isHovered && (
+            <div className="absolute top-2 right-2">
+              <Badge variant="secondary" className="bg-amber-500 text-white">
+                <Lock size={12} className="mr-1" /> Premium
+              </Badge>
             </div>
-          </div>
-        )}
-        
-        {/* Premium overlay for locked content */}
-        {item.accessLevel === 'premium' && !isHovered && (
-          <div className="absolute top-2 right-2">
-            <Badge variant="secondary" className="bg-amber-500 text-white">
-              <Lock size={12} className="mr-1" /> Premium
-            </Badge>
-          </div>
-        )}
-      </div>
-      
-      {/* Content info below image (visible when not hovered) */}
-      <div className={`p-3 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
-        <h3 className="font-medium text-base line-clamp-1">{item.title}</h3>
-        
-        <div className="flex items-center text-xs text-muted-foreground mt-1">
-          <span className="capitalize mr-2">{item.format}</span>
-          <span className="flex items-center">
-            <Eye className="h-3 w-3 mr-1" />
-            {item.views}
-          </span>
-          {item.duration && (
-            <span className="flex items-center ml-2">
-              <Clock className="h-3 w-3 mr-1" />
-              {item.duration}
-            </span>
           )}
         </div>
-      </div>
-    </Card>
+        
+        {/* Content info below image (visible when not hovered) */}
+        <div className={`p-3 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+          <h3 className="font-medium text-base line-clamp-1">{item.title}</h3>
+          
+          <div className="flex items-center text-xs text-muted-foreground mt-1">
+            <span className="capitalize mr-2">{item.format}</span>
+            <span className="flex items-center">
+              <Eye className="h-3 w-3 mr-1" />
+              {item.views}
+            </span>
+            {item.duration && (
+              <span className="flex items-center ml-2">
+                <Clock className="h-3 w-3 mr-1" />
+                {item.duration}
+              </span>
+            )}
+          </div>
+        </div>
+      </Card>
+    </motion.div>
   );
 };
 
