@@ -1,19 +1,20 @@
 
-import React from 'react';
-import { 
-  Dialog,
-  DialogContent,
-  DialogOverlay,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ContentItem } from '@/types/library';
-import ContentHeader from './ContentHeader';
-import ContentPreview from './ContentPreview';
-import ContentDetails from './ContentDetails';
-import ContentComments from './ContentComments';
-import ContentProgress from './ContentProgress';
+import { useContentProgress } from '@/hooks/useContentProgress';
+import { usePoints } from '@/context/PointsContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { getCompletionCriteria, getContentDuration } from './contentViewerUtils';
+import ContentHeader from '@/components/library/viewer/ContentHeader';
+import ContentPreview from '@/components/library/viewer/ContentPreview';
+import ContentDetails from '@/components/library/viewer/ContentDetails';
+import ContentComments from '@/components/library/viewer/ContentComments';
+import ContentProgress from '@/components/library/viewer/ContentProgress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  getContentDuration, 
+  getCompletionCriteria 
+} from './contentViewerUtils';
 
 interface ContentViewerProps {
   item: ContentItem | null;
@@ -21,68 +22,178 @@ interface ContentViewerProps {
 }
 
 const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
-  if (!item) return null;
-  
-  // Determine if content is free or premium
-  const isPremium = item.accessLevel === 'premium';
-  
-  // Determine content type for appropriate preview component
-  const contentType = item.format;
-  
-  // Get content duration in a readable format
-  const duration = getContentDuration(item.duration || 0);
-  
-  // Get completion criteria text
-  const completionCriteria = getCompletionCriteria(item);
-  
-  // Handle content view action
+  const [activeTab, setActiveTab] = useState('details');
+  const [hasAccess, setHasAccess] = useState(false);
+  const { addProgress, updateProgress, getProgress, awardPoints } = useContentProgress();
+  const { awardPoints: addUserPoints } = usePoints();
+  const [viewStartTime, setViewStartTime] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (item) {
+      // Reset state when item changes
+      setActiveTab('details');
+      
+      // Check if user has free access to this content
+      const hasFreeAccess = 
+        item.accessLevel === 'free' || 
+        (item.accessLevel === 'premium' && item.freeAccessesLeft && item.freeAccessesLeft > 0);
+      
+      setHasAccess(hasFreeAccess);
+      
+      // Add to progress tracking if not already there
+      addProgress(item.id);
+    }
+  }, [item, addProgress]);
+
+  // Dialog open state
+  const isOpen = !!item;
+
+  // Handle content view
   const handleContentView = () => {
-    console.log('Content viewed:', item.title);
+    if (!item) return;
+    
+    // Set view start time
+    setViewStartTime(Date.now());
+    
+    // Add initial progress if needed
+    const progress = getProgress(item.id);
+    if (!progress || progress.progress === 0) {
+      updateProgress(item.id, 10); // Start with 10% progress
+    }
   };
 
+  // Handle content progress (called from content preview components)
+  const handleProgress = (progressPercentage: number) => {
+    if (!item) return;
+    
+    updateProgress(item.id, progressPercentage);
+    
+    // Award points if applicable and completed
+    if (progressPercentage >= 100 && item.pointsEnabled) {
+      const progress = getProgress(item.id);
+      if (progress && !progress.pointsAwarded) {
+        awardPoints(item.id);
+        if (item.pointsValue) {
+          addUserPoints({
+            type: 'content_completion',
+            description: `Completed "${item.title}"`,
+            points: item.pointsValue
+          });
+        }
+      }
+    }
+  };
+
+  // Calculate time spent viewing content
+  const calculateTimeSpent = () => {
+    if (!viewStartTime) return 0;
+    return Math.floor((Date.now() - viewStartTime) / 1000); // in seconds
+  };
+
+  // Handle content access (e.g., unlocking premium content)
+  const handleAccess = () => {
+    setHasAccess(true);
+  };
+
+  // Handle dialog close
+  const handleClose = () => {
+    if (!item) return;
+    
+    // Save progress before closing
+    const timeSpent = calculateTimeSpent();
+    if (timeSpent > 10) { // Only count if more than 10 seconds spent
+      const currentProgress = getProgress(item.id);
+      if (currentProgress) {
+        // Increase progress based on time spent (simplified logic)
+        const newProgress = Math.min(
+          100, 
+          currentProgress.progress + Math.floor(timeSpent / 10)
+        );
+        updateProgress(item.id, newProgress);
+      }
+    }
+    
+    // Reset state
+    setViewStartTime(null);
+    
+    // Call parent close handler
+    onClose();
+  };
+
+  if (!item) return null;
+
+  const progress = getProgress(item.id)?.progress || 0;
+  const isCompleted = progress >= 100;
+
   return (
-    <Dialog open={!!item} onOpenChange={() => onClose()}>
-      <DialogOverlay className="bg-black/80 backdrop-blur-sm" />
-      <DialogContent className="max-w-7xl max-h-[90vh] p-0 border-none overflow-hidden bg-background">
-        <DialogTitle className="sr-only">{item.title}</DialogTitle>
-        <div className="flex flex-col h-full max-h-[90vh]">
-          <div className="p-4 sm:p-6">
-            <ContentHeader item={item} onBack={onClose} />
-          </div>
-          
-          <div className="flex-1 flex flex-col md:flex-row min-h-0">
-            {/* Content preview area (left/top) */}
-            <div className="w-full md:w-2/3 p-4">
-              <ContentPreview 
-                item={item}
-                onContentView={handleContentView}
-                hasAccess={!isPremium}
-              />
-            </div>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden" onPointerDownOutside={(e) => e.preventDefault()}>
+        <ScrollArea className="h-[calc(100vh-10rem)]">
+          <div className="p-6">
+            <ContentHeader item={item} onBack={handleClose} />
             
-            {/* Content details and comments (right/bottom) */}
-            <div className="w-full md:w-1/3 border-t md:border-t-0 md:border-l border-border/50">
-              <ScrollArea className="h-[calc(100vh-15rem)] md:h-[60vh]">
-                <div className="p-4">
-                  <ContentDetails 
-                    item={item} 
-                    duration={duration}
-                    completionCriteria={completionCriteria}
-                  />
-                  
-                  <ContentProgress 
-                    progress={30}
-                    showProgress={true}
-                    pointsValue={item.pointsValue || 0}
-                    pointsEnabled={!!item.pointsEnabled}
-                  />
-                  
+            <ContentPreview 
+              item={item} 
+              hasAccess={hasAccess}
+              onContentView={handleContentView}
+              onProgress={handleProgress}
+              handleAccess={handleAccess}
+            />
+            
+            <ContentProgress 
+              progress={progress}
+              showProgress={true}
+              pointsValue={item.pointsValue || 0}
+              pointsEnabled={!!item.pointsEnabled}
+              isCompleted={isCompleted}
+            />
+            
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
+              <TabsList className="w-full">
+                <TabsTrigger value="details" className="flex-1">Details</TabsTrigger>
+                {item.format === 'video' && (
+                  <TabsTrigger value="transcript" className="flex-1">Transcript</TabsTrigger>
+                )}
+                {item.allowComments !== false && (
+                  <TabsTrigger value="comments" className="flex-1">Comments</TabsTrigger>
+                )}
+                {item.format === 'course' && (
+                  <TabsTrigger value="modules" className="flex-1">Modules</TabsTrigger>
+                )}
+              </TabsList>
+              
+              <TabsContent value="details">
+                <ContentDetails 
+                  item={item} 
+                  duration={getContentDuration(item.duration || 0)} 
+                  completionCriteria={getCompletionCriteria(item)} 
+                />
+              </TabsContent>
+              
+              {item.format === 'video' && (
+                <TabsContent value="transcript">
+                  <div className="text-sm text-muted-foreground">
+                    <p className="mb-4">Transcript not available for this content.</p>
+                  </div>
+                </TabsContent>
+              )}
+              
+              {item.allowComments !== false && (
+                <TabsContent value="comments">
                   <ContentComments itemId={item.id} />
-                </div>
-              </ScrollArea>
-            </div>
+                </TabsContent>
+              )}
+              
+              {item.format === 'course' && (
+                <TabsContent value="modules">
+                  <div className="text-sm text-muted-foreground">
+                    <p className="mb-4">This course has no modules yet.</p>
+                  </div>
+                </TabsContent>
+              )}
+            </Tabs>
           </div>
-        </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

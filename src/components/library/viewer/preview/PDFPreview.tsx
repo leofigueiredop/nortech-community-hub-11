@@ -30,9 +30,10 @@ const PDFPreview: React.FC<PDFPreviewProps> = ({
     setLocalFullscreen(!localFullscreen);
   };
 
-  const filename = getFilenameFromUrl(item.resourceUrl);
+  const filename = getFilenameFromUrl(item.resourceUrl || '');
 
   if (item.accessLevel === 'free' && 
+      item.resourceUrl && 
       (item.resourceUrl.endsWith('.pdf') || item.resourceUrl.includes('drive.google.com'))) {
     return (
       <div className={`${localFullscreen ? 'h-[70vh]' : 'aspect-[3/4]'} bg-slate-100 dark:bg-slate-800 rounded-lg mb-6 relative overflow-hidden`}>

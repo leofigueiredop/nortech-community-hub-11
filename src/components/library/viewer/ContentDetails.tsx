@@ -1,26 +1,10 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { ContentItem } from '@/types/library';
-import { formatDistanceToNow } from 'date-fns';
-import { 
-  Clock, 
-  Calendar, 
-  Eye, 
-  ExternalLink, 
-  FileText, 
-  Download, 
-  Tag,
-  Crown
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Accordion, 
-  AccordionContent, 
-  AccordionItem, 
-  AccordionTrigger 
-} from '@/components/ui/accordion';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { FileText, Clock, Calendar, User, Tag, Eye, Award } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface ContentDetailsProps {
   item: ContentItem;
@@ -30,162 +14,83 @@ interface ContentDetailsProps {
 
 const ContentDetails: React.FC<ContentDetailsProps> = ({ 
   item, 
-  duration: providedDuration,
-  completionCriteria: providedCompletionCriteria 
+  duration,
+  completionCriteria 
 }) => {
-  const [showMore, setShowMore] = useState(false);
+  const createdAt = new Date(item.createdAt);
+  const formattedDate = formatDistanceToNow(createdAt, { 
+    addSuffix: true,
+    locale: ptBR
+  });
   
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
+  // Safely extract author name
+  const authorName = typeof item.author === 'string' 
+    ? item.author 
+    : item.author?.name || 'Unknown';
   
-  // Use provided duration or calculate from item
-  const duration = providedDuration || formatDuration(item.duration);
-  
-  // Use provided completion criteria or default from item
-  const completionCriteria = providedCompletionCriteria || (
-    item.completionCriteria ? item.completionCriteria : "View the content"
-  );
-  
-  const renderAuthor = () => {
-    if (typeof item.author === 'string') {
-      return (
-        <div className="flex items-center">
-          <Avatar className="h-8 w-8 mr-2">
-            <AvatarFallback>{item.author.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-sm font-medium">{item.author}</p>
-            <p className="text-xs text-muted-foreground">Creator</p>
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex items-center">
-          <Avatar className="h-8 w-8 mr-2">
-            <AvatarImage src={item.author.avatar} alt={item.author.name} />
-            <AvatarFallback>{item.author.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-sm font-medium">{item.author.name}</p>
-            <p className="text-xs text-muted-foreground">Creator</p>
-          </div>
-        </div>
-      );
-    }
-  };
-
   return (
-    <div className="space-y-6">
-      <div className="bg-accent/50 p-4 rounded-lg">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Content Details</h3>
-            <ul className="space-y-2">
-              <li className="flex items-center text-sm">
-                <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-muted-foreground">Published:</span>
-                <span className="ml-1">
-                  {formatDistanceToNow(new Date(item.createdAt))} ago
-                </span>
-              </li>
-              <li className="flex items-center text-sm">
-                <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-muted-foreground">Duration:</span>
-                <span className="ml-1">{duration}</span>
-              </li>
-              <li className="flex items-center text-sm">
-                <Eye className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-muted-foreground">Views:</span>
-                <span className="ml-1">{item.views.toLocaleString()}</span>
-              </li>
-              {item.resourceUrl && (
-                <li className="flex items-center text-sm">
-                  <ExternalLink className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span className="text-muted-foreground">Source:</span>
-                  <Button variant="link" size="sm" className="h-auto p-0 ml-1">
-                    External Link
-                  </Button>
-                </li>
-              )}
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Access Information</h3>
-            <ul className="space-y-2">
-              <li className="flex items-center text-sm">
-                <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-muted-foreground">Format:</span>
-                <span className="ml-1 capitalize">{item.format}</span>
-              </li>
-              <li className="flex items-center text-sm">
-                <Crown className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-muted-foreground">Access Level:</span>
-                <span className="ml-1 capitalize">{item.accessLevel}</span>
-              </li>
-              <li className="flex items-center text-sm">
-                <span className="mr-2 text-muted-foreground">🎯</span>
-                <span className="text-muted-foreground">Completion:</span>
-                <span className="ml-1">{completionCriteria}</span>
-              </li>
-              {item.pointsEnabled && (
-                <li className="flex items-center text-sm">
-                  <span className="mr-2 text-muted-foreground">🔥</span>
-                  <span className="text-muted-foreground">Points:</span>
-                  <span className="ml-1">{item.pointsValue} points when completed</span>
-                </li>
-              )}
-            </ul>
-          </div>
-        </div>
+    <div className="space-y-6 mb-8">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">{item.title}</h2>
+        <p className="text-muted-foreground">{item.description}</p>
       </div>
       
-      <Accordion type="single" collapsible className="w-full">
-        <AccordionItem value="description">
-          <AccordionTrigger>Description</AccordionTrigger>
-          <AccordionContent>
-            <p className="text-sm leading-relaxed whitespace-pre-line">
-              {item.description}
-            </p>
-          </AccordionContent>
-        </AccordionItem>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <User className="h-4 w-4" />
+          <span>Author: <span className="font-medium text-foreground">{authorName}</span></span>
+        </div>
         
-        <AccordionItem value="author">
-          <AccordionTrigger>About the Creator</AccordionTrigger>
-          <AccordionContent>
-            <div className="p-2">
-              {renderAuthor()}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Calendar className="h-4 w-4" />
+          <span>Published: <span className="font-medium text-foreground">{formattedDate}</span></span>
+        </div>
+        
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Eye className="h-4 w-4" />
+          <span>Views: <span className="font-medium text-foreground">{item.views || 0}</span></span>
+        </div>
+        
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Clock className="h-4 w-4" />
+          <span>Duration: <span className="font-medium text-foreground">{duration || 'N/A'}</span></span>
+        </div>
+        
+        {completionCriteria && (
+          <div className="flex items-center gap-2 text-muted-foreground sm:col-span-2">
+            <Award className="h-4 w-4" />
+            <span>Completion: <span className="font-medium text-foreground">{completionCriteria}</span></span>
+          </div>
+        )}
+        
+        {item.format && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <FileText className="h-4 w-4" />
+            <span>Format: <span className="font-medium text-foreground">{item.format.charAt(0).toUpperCase() + item.format.slice(1)}</span></span>
+          </div>
+        )}
+        
+        {item.pointsEnabled && item.pointsValue && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Award className="h-4 w-4 text-amber-500" />
+            <span>Earn <span className="font-medium text-amber-500">{item.pointsValue} points</span> when completed</span>
+          </div>
+        )}
+      </div>
       
       {item.tags && item.tags.length > 0 && (
-        <div>
-          <div className="flex items-center mb-2">
-            <Tag className="h-4 w-4 mr-2 text-muted-foreground" />
-            <h3 className="text-sm font-semibold">Tags</h3>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-muted-foreground text-sm">
+            <Tag className="h-4 w-4" />
+            <span>Tags:</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {item.tags.map((tag) => (
-              <Badge key={tag} variant="outline" className="text-xs">
+            {item.tags.map(tag => (
+              <Badge key={tag} variant="secondary" className="text-xs">
                 #{tag}
               </Badge>
             ))}
           </div>
-        </div>
-      )}
-      
-      {["pdf", "audio"].includes(item.format) && (
-        <div className="pt-2">
-          <Button className="w-full sm:w-auto">
-            <Download className="h-4 w-4 mr-2" />
-            Download {item.format.toUpperCase()}
-          </Button>
         </div>
       )}
     </div>

@@ -47,9 +47,9 @@ const ContentSection: React.FC<ContentSectionProps> = ({
           )}
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {items.map((item, index) => (
-            <div key={item.id} className="aspect-[16/10] h-full">
+            <div key={item.id} className="h-full">
               <EnhancedContentCard
                 item={item}
                 onClick={() => onItemSelect(item)}
@@ -88,10 +88,10 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-6 md:-ml-8">
+        <CarouselContent className="-ml-8">
           {items.map((item, index) => (
-            <CarouselItem key={item.id} className="pl-6 md:pl-8 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-              <div className="aspect-video h-full">
+            <CarouselItem key={item.id} className="pl-8 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+              <div className="h-full">
                 <EnhancedContentCard
                   item={item}
                   onClick={() => onItemSelect(item)}
@@ -103,8 +103,8 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         </CarouselContent>
         
         <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <CarouselPrevious className="left-1 h-10 w-10" />
-          <CarouselNext className="right-1 h-10 w-10" />
+          <CarouselPrevious className="left-1 h-12 w-12" />
+          <CarouselNext className="right-1 h-12 w-12" />
         </div>
       </Carousel>
     </div>

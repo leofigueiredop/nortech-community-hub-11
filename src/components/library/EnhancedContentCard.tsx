@@ -5,6 +5,7 @@ import { ContentItem } from '@/types/library';
 import { motion } from 'framer-motion';
 import ContentCardMedia from './card/ContentCardMedia';
 import ContentCardInfo from './card/ContentCardInfo';
+import ContentFreeOverlay from './card/ContentFreeOverlay';
 
 interface EnhancedContentCardProps {
   item: ContentItem;
@@ -24,7 +25,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
     initial: { y: 0, scale: 1, zIndex: 0 },
     hover: { 
       y: -16, 
-      scale: 1.12, 
+      scale: 1.15, 
       zIndex: 50,
       transition: { duration: 0.3 }
     }
@@ -69,6 +70,11 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
         <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-0 absolute' : 'opacity-100'}`}>
           <ContentCardInfo item={item} />
         </div>
+        
+        {/* Overlay with description and actions (visible when hovered) */}
+        {isHovered && (
+          <ContentFreeOverlay item={item} />
+        )}
       </Card>
     </motion.div>
   );

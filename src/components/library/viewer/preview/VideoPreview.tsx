@@ -32,28 +32,20 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({
     setLocalFullscreen(!localFullscreen);
   };
 
-  if (item.resourceUrl.includes('youtube.com') || 
-      item.resourceUrl.includes('youtu.be') || 
-      item.resourceUrl.includes('vimeo.com')) {
+  if (item.accessLevel === 'free' && 
+      (item.resourceUrl?.includes('youtube.com') || 
+      item.resourceUrl?.includes('youtu.be') || 
+      item.resourceUrl?.includes('vimeo.com'))) {
     return (
       <div className={previewClass}>
         <iframe 
-          src={getEmbedUrl(item.resourceUrl)}
+          src={getEmbedUrl(item.resourceUrl || '')}
           className="w-full h-full rounded-lg"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           title={item.title}
           onLoad={onContentView}
         />
-        {isPremium && (
-          <PremiumContentOverlay 
-            pointsEnabled={item.pointsEnabled}
-            pointsValue={item.pointsValue}
-            freeAccessLeft={item.freeAccessesLeft}
-            onSubscribe={handleAccess}
-            onUsePoints={handleAccess}
-          />
-        )}
         <Button 
           variant="secondary" 
           size="icon" 
