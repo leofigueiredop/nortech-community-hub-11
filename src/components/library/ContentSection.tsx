@@ -36,7 +36,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   // If layout is grid, render a grid of cards
   if (layout === 'grid') {
     return (
-      <div className="mb-12">
+      <div className="mb-16">
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-2xl sm:text-3xl font-semibold">{title}</h2>
           
@@ -47,9 +47,9 @@ const ContentSection: React.FC<ContentSectionProps> = ({
           )}
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
           {items.map((item, index) => (
-            <div key={item.id} className="aspect-[16/10]">
+            <div key={item.id} className="aspect-[16/10] h-full">
               <EnhancedContentCard
                 item={item}
                 onClick={() => onItemSelect(item)}
@@ -65,7 +65,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   // Default carousel layout
   return (
     <div 
-      className="mb-14 relative group"
+      className="mb-16 relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -84,14 +84,14 @@ const ContentSection: React.FC<ContentSectionProps> = ({
       <Carousel
         opts={{
           align: "start",
-          loop: items.length > 6,
+          loop: items.length > 4,
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-4 md:-ml-6">
+        <CarouselContent className="-ml-6 md:-ml-8">
           {items.map((item, index) => (
-            <CarouselItem key={item.id} className="pl-4 md:pl-6 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-              <div className="aspect-[16/9]">
+            <CarouselItem key={item.id} className="pl-6 md:pl-8 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+              <div className="aspect-video h-full">
                 <EnhancedContentCard
                   item={item}
                   onClick={() => onItemSelect(item)}

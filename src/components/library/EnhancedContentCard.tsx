@@ -19,13 +19,13 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   
-  // Card variants for hover animation
+  // Enhanced card variants for more dramatic hover animation
   const cardVariants = {
     initial: { y: 0, scale: 1, zIndex: 0 },
     hover: { 
       y: -16, 
-      scale: 1.08, 
-      zIndex: 20,
+      scale: 1.12, 
+      zIndex: 50,
       transition: { duration: 0.3 }
     }
   };
@@ -37,17 +37,17 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
       initial="initial"
       animate={isHovered ? "hover" : "initial"}
       variants={cardVariants}
-      className="h-full cursor-pointer"
+      className="h-full cursor-pointer w-full"
     >
       <Card 
-        className="overflow-hidden border border-border/40 transition-all duration-300 h-full group relative shadow-sm hover:shadow-xl"
+        className="overflow-hidden border border-border/40 transition-all duration-300 h-full group relative shadow-sm hover:shadow-2xl"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={onClick}
       >
         {/* Rank number display for top 10 items */}
         {rankNumber !== undefined && (
-          <div className="absolute -left-5 -top-1 z-10 font-bold text-[100px] select-none" 
+          <div className="absolute -left-6 -top-5 z-10 font-bold text-[120px] select-none" 
             style={{
               color: 'transparent',
               WebkitTextStroke: '2px rgba(255,255,255,0.8)',
@@ -66,7 +66,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
         />
         
         {/* Content info below image (visible when not hovered) */}
-        <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+        <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-0 absolute' : 'opacity-100'}`}>
           <ContentCardInfo item={item} />
         </div>
       </Card>

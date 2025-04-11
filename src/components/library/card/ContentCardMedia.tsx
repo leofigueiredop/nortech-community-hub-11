@@ -32,16 +32,16 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
       />
       
       {/* Content format badge - positioned at top left */}
-      <div className="absolute top-2 left-2 z-10">
-        <Badge variant="secondary" className="bg-black/60 text-white border-none font-medium px-2">
+      <div className="absolute top-3 left-3 z-10">
+        <Badge variant="secondary" className="bg-black/70 text-white border-none font-medium px-3 py-1">
           {item.format.charAt(0).toUpperCase() + item.format.slice(1)}
         </Badge>
       </div>
       
       {/* "New" badge - positioned at top right, only if item is new */}
       {item.isNew && (
-        <div className="absolute top-2 right-2 z-10">
-          <Badge className="bg-purple-600 text-white border-none px-2 py-0.5">
+        <div className="absolute top-3 right-3 z-10">
+          <Badge className="bg-purple-600 text-white border-none px-3 py-1">
             New
           </Badge>
         </div>
@@ -49,14 +49,14 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
       
       {/* Premium content overlay when not hovered */}
       {isPremium && !isHovered && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-black/60 to-black/20 transition-opacity duration-300">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-black/70 to-black/20 transition-opacity duration-300">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="w-10 h-10 bg-amber-500/90 rounded-full flex items-center justify-center mb-2 shadow-md"
+            className="w-12 h-12 bg-amber-500/90 rounded-full flex items-center justify-center mb-3 shadow-md"
           >
-            <Lock className="h-5 w-5 text-white" />
+            <Lock className="h-6 w-6 text-white" />
           </motion.div>
           <motion.div
             initial={{ y: 10, opacity: 0 }}
@@ -94,21 +94,21 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
           className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
           whileHover={{ scale: 1.1 }}
         >
-          <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
-            <Play className="text-white ml-1" size={24} />
+          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg">
+            <Play className="text-white ml-1" size={28} />
           </div>
         </motion.div>
       )}
 
       {/* Free access badge if applicable */}
       {isPremium && item.freeAccessesLeft && item.freeAccessesLeft > 0 && !isHovered && (
-        <div className="absolute bottom-2 right-2">
+        <div className="absolute bottom-3 right-3">
           <motion.div
             initial={{ y: 5, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <Badge className="bg-gradient-to-r from-amber-400 to-amber-500 text-white px-2 py-1 text-xs shadow-md">
+            <Badge className="bg-gradient-to-r from-amber-400 to-amber-500 text-white px-3 py-1 text-sm shadow-md">
               {item.freeAccessesLeft} Free {item.freeAccessesLeft === 1 ? 'Access' : 'Accesses'} Left
             </Badge>
           </motion.div>

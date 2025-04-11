@@ -28,40 +28,40 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
   // Organize content into sections
   const newReleases = [...viewFilteredContent]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 12);
+    .slice(0, 10);
   
   const mostPopular = [...viewFilteredContent]
     .sort((a, b) => b.views - a.views)
-    .slice(0, 12);
+    .slice(0, 10);
   
   // Videos
   const videoContent = viewFilteredContent.filter(
     item => item.format === 'video' || item.format === 'youtube' || item.format === 'vimeo'
-  ).slice(0, 12);
+  ).slice(0, 10);
   
   // PDFs
   const pdfContent = viewFilteredContent.filter(
     item => item.format === 'pdf' || item.format === 'text' || item.format === 'gdoc'
-  ).slice(0, 12);
+  ).slice(0, 10);
   
   // Audio
   const audioContent = viewFilteredContent.filter(
     item => item.format === 'audio'
-  ).slice(0, 12);
+  ).slice(0, 10);
   
   // Courses
   const courseContent = viewFilteredContent.filter(
     item => item.format === 'course'
-  ).slice(0, 12);
+  ).slice(0, 10);
   
   // Personalized recommendations (based on visited tags)
   const recommendedContent = viewFilteredContent.filter(item => 
     item.tags && Array.isArray(item.tags) && item.tags.some(tag => visitedTags.includes(tag))
-  ).slice(0, 12);
+  ).slice(0, 10);
 
   // Premium showcase (only show in 'all' or 'premium' views)
   const premiumShowcase = activeView === 'all' || activeView === 'premium' 
-    ? viewFilteredContent.filter(item => item.accessLevel === 'premium').slice(0, 12)
+    ? viewFilteredContent.filter(item => item.accessLevel === 'premium').slice(0, 10)
     : [];
   
   // Top trending

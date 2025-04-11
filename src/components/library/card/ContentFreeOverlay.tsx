@@ -54,7 +54,7 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
   };
 
   return (
-    <div className="absolute inset-0 flex flex-col justify-between p-4 bg-gradient-to-t from-black/90 via-black/70 to-black/20">
+    <div className="absolute inset-0 flex flex-col justify-between p-5 bg-gradient-to-t from-black/90 via-black/70 to-black/20">
       {/* Content metadata */}
       <div className="flex justify-between items-start">
         <Badge className="bg-primary/80">{item.format.charAt(0).toUpperCase() + item.format.slice(1)}</Badge>
@@ -68,9 +68,9 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
       </div>
       
       {/* Content description and info shown on hover */}
-      <div className="mt-auto space-y-2">
+      <div className="mt-auto space-y-3">
         <motion.h3 
-          className="text-base sm:text-lg font-semibold text-white mb-1"
+          className="text-lg sm:text-xl font-semibold text-white mb-2"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.2 }}
@@ -79,7 +79,7 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
         </motion.h3>
         
         <motion.p 
-          className="text-xs text-white/80 mb-3 line-clamp-2"
+          className="text-sm text-white/80 mb-4 line-clamp-3"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.2, delay: 0.1 }}
@@ -87,7 +87,7 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
           {item.description}
         </motion.p>
         
-        <motion.div className="flex items-center text-xs text-white/70 mb-2"
+        <motion.div className="flex items-center text-xs text-white/70 mb-3"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.2, delay: 0.15 }}
