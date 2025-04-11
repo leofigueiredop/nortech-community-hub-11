@@ -34,6 +34,11 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
   // Get completion criteria text
   const completionCriteria = getCompletionCriteria(item);
   
+  // Handle content view action
+  const handleContentView = () => {
+    console.log('Content viewed:', item.title);
+  };
+
   return (
     <Dialog open={!!item} onOpenChange={() => onClose()}>
       <DialogOverlay className="bg-black/80 backdrop-blur-sm" />
@@ -47,8 +52,9 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
             {/* Content preview area (left/top) */}
             <div className="w-full md:w-2/3 p-4">
               <ContentPreview 
-                item={item} 
-                isPremium={isPremium} 
+                item={item}
+                onContentView={handleContentView}
+                hasAccess={!isPremium}
               />
             </div>
             
@@ -56,15 +62,13 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
             <div className="w-full md:w-1/3 border-t md:border-t-0 md:border-l border-border/50">
               <ScrollArea className="h-[calc(100vh-15rem)] md:h-[60vh]">
                 <div className="p-4">
-                  <ContentDetails 
-                    item={item}
-                    duration={duration}
-                    completionCriteria={completionCriteria}
-                  />
+                  <ContentDetails item={item} />
                   
                   <ContentProgress 
-                    item={item}
-                    isPremium={isPremium}
+                    progress={30}
+                    showProgress={true}
+                    pointsValue={item.pointsValue}
+                    pointsEnabled={item.pointsEnabled}
                   />
                   
                   <ContentComments itemId={item.id} />

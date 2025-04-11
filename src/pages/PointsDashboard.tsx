@@ -8,17 +8,52 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
-import { usePointsContext } from '@/context/PointsContext';
+import { usePoints } from '@/context/PointsContext';
 import { Link } from 'react-router-dom';
 
 const PointsDashboard: React.FC = () => {
   const { 
-    userPoints, 
-    userLevel, 
-    pointsToNextLevel,
-    pointsHistory,
-    contentProgress 
-  } = usePointsContext();
+    totalPoints, 
+    getUserLevel, 
+    pointsHistory
+  } = usePoints();
+  
+  const { level, nextLevel, progress } = getUserLevel();
+  
+  // Mock content progress items
+  const contentProgress = [
+    {
+      id: 'p1',
+      contentId: 'c1',
+      progress: 100,
+      completed: true,
+      lastAccessedAt: new Date().toISOString(),
+    },
+    {
+      id: 'p2',
+      contentId: 'c2',
+      progress: 45,
+      completed: false,
+      lastAccessedAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    },
+    {
+      id: 'p3',
+      contentId: 'c3',
+      progress: 75,
+      completed: false,
+      lastAccessedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+    }
+  ];
+  
+  // Function to get content title by ID
+  const getContentTitle = (id: string): string => {
+    const titles: Record<string, string> = {
+      'c1': 'Getting Started with Our Platform',
+      'c2': 'Advanced User Management Techniques',
+      'c3': 'Building Your First Integration',
+    };
+    return titles[id] || 'Unknown Content';
+  };
 
   return (
     <MainLayout title="Points & Progress">
@@ -34,23 +69,19 @@ const PointsDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col md:flex-row items-center gap-6">
-                <PointsBadge 
-                  points={userPoints} 
-                  level={userLevel} 
-                  size="lg" 
-                />
+                <PointsBadge size="lg" />
                 
                 <div className="flex-1 space-y-2">
-                  <h3 className="text-xl font-bold">{userPoints} Points</h3>
+                  <h3 className="text-xl font-bold">{totalPoints} Points</h3>
                   <p className="text-muted-foreground">
-                    Level {userLevel} • {pointsToNextLevel} points to next level
+                    Level {level} • {progress} points to next level
                   </p>
                   <div className="h-2 bg-secondary rounded-full w-full overflow-hidden">
                     <div 
                       className="h-full bg-primary rounded-full" 
                       style={{ 
                         width: `${Math.min(
-                          ((userPoints % 1000) / 1000) * 100, 
+                          ((totalPoints % 1000) / 1000) * 100, 
                           100
                         )}%` 
                       }}
@@ -79,7 +110,7 @@ const PointsDashboard: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-muted p-3 rounded-lg">
                   <p className="text-sm text-muted-foreground">Points Earned</p>
-                  <p className="text-2xl font-bold">{userPoints}</p>
+                  <p className="text-2xl font-bold">{totalPoints}</p>
                 </div>
                 <div className="bg-muted p-3 rounded-lg">
                   <p className="text-sm text-muted-foreground">Items Completed</p>
@@ -117,6 +148,7 @@ const PointsDashboard: React.FC = () => {
               <CardContent>
                 <ContentProgressList 
                   progressItems={contentProgress}
+                  getContentTitle={getContentTitle}
                 />
               </CardContent>
             </Card>
@@ -131,9 +163,7 @@ const PointsDashboard: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <PointsHistory 
-                  history={pointsHistory}
-                />
+                <PointsHistory />
               </CardContent>
             </Card>
           </TabsContent>

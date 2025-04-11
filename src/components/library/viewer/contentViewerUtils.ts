@@ -85,3 +85,32 @@ export const getContentTypeName = (format: string): string => {
   
   return formatMap[format] || 'Unknown';
 };
+
+// Add the missing functions
+export const getContentDuration = (seconds: number): string => {
+  return formatDuration(seconds);
+};
+
+export const getCompletionCriteria = (item: ContentItem): string => {
+  if (item.completionCriteria) {
+    return item.completionCriteria;
+  }
+  
+  // Generate default completion criteria based on content format
+  switch (item.format) {
+    case 'video':
+    case 'youtube':
+    case 'vimeo':
+      return 'Watch 90% of the video';
+    case 'audio':
+      return 'Listen to the full audio';
+    case 'pdf':
+    case 'text':
+    case 'gdoc':
+      return 'Read the document';
+    case 'course':
+      return 'Complete all modules';
+    default:
+      return 'View the full content';
+  }
+};

@@ -26,7 +26,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { ContentItem, ContentFormat, Author } from '@/types/library';
 
-// Define form schema
 const formSchema = z.object({
   title: z.string().min(2, {
     message: "Title must be at least 2 characters.",
@@ -50,7 +49,6 @@ const ContentCreatorDashboard: React.FC = () => {
   const { addContent } = useLibraryContent();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   
-  // Form setup
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,7 +59,6 @@ const ContentCreatorDashboard: React.FC = () => {
     },
   });
   
-  // Handle thumbnail file change
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -73,11 +70,9 @@ const ContentCreatorDashboard: React.FC = () => {
     }
   };
   
-  // Handle form submission
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const now = new Date().toISOString();
     
-    // Create new content item
     const newContent: ContentItem = {
       id: uuidv4(),
       title: values.title,
@@ -85,7 +80,6 @@ const ContentCreatorDashboard: React.FC = () => {
       format: values.format as ContentFormat,
       thumbnail: previewUrl || '/placeholder.svg',
       thumbnailUrl: previewUrl || '/placeholder.svg',
-      // Handle the author field to support both string and Author type
       author: values.author ? values.author : "Anonymous",
       tags: values.tags ? values.tags.split(',').map(tag => tag.trim()) : [],
       createdAt: now,
@@ -99,21 +93,17 @@ const ContentCreatorDashboard: React.FC = () => {
       pointsValue: values.pointsValue || 0,
     };
     
-    // Add content to library
     addContent(newContent);
     
-    // Show success toast
     toast({
       title: 'Content Created',
       description: 'Your content has been successfully created and published.',
     });
     
-    // Reset form
     form.reset();
     setPreviewUrl(null);
   };
   
-  // UI components
   return (
     <MainLayout title="Content Creator Dashboard">
       <div className="container py-6 space-y-8">
@@ -336,10 +326,11 @@ const ContentCreatorDashboard: React.FC = () => {
                             </FormDescription>
                           </div>
                           <FormControl>
-                            <Input
+                            <input
                               type="checkbox"
                               checked={field.value}
-                              onCheckedChange={field.onChange}
+                              onChange={field.onChange}
+                              className="h-4 w-4"
                             />
                           </FormControl>
                         </FormItem>
@@ -358,10 +349,11 @@ const ContentCreatorDashboard: React.FC = () => {
                             </FormDescription>
                           </div>
                           <FormControl>
-                            <Input
+                            <input
                               type="checkbox"
                               checked={field.value}
-                              onCheckedChange={field.onChange}
+                              onChange={field.onChange}
+                              className="h-4 w-4"
                             />
                           </FormControl>
                         </FormItem>

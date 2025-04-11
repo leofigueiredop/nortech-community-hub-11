@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ContentItem } from '@/types/library';
 import { formatDistanceToNow } from 'date-fns';
@@ -29,14 +28,12 @@ interface ContentDetailsProps {
 const ContentDetails: React.FC<ContentDetailsProps> = ({ item }) => {
   const [showMore, setShowMore] = useState(false);
   
-  // Format duration from seconds to minutes and seconds
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
   
-  // Function to render author
   const renderAuthor = () => {
     if (typeof item.author === 'string') {
       return (
