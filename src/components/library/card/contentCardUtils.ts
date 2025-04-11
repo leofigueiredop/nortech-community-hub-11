@@ -10,13 +10,13 @@ export const getContentIcon = (format: string) => {
     case 'video':
     case 'youtube':
     case 'vimeo':
-      return <Play className="h-8 w-8 text-white" />;
+      return React.createElement(Play, { className: "h-8 w-8 text-white" });
     case 'pdf':
     case 'text':
     case 'gdoc':
-      return <FileText className="h-8 w-8 text-white" />;
+      return React.createElement(FileText, { className: "h-8 w-8 text-white" });
     default:
-      return <Download className="h-8 w-8 text-white" />;
+      return React.createElement(Download, { className: "h-8 w-8 text-white" });
   }
 };
 
