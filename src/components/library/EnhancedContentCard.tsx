@@ -35,7 +35,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ item, onClick
       className="h-full cursor-pointer"
     >
       <Card 
-        className="overflow-hidden border border-border/40 transition-all duration-300 h-full group relative"
+        className="overflow-hidden border border-border/40 transition-all duration-300 h-full group relative shadow-sm hover:shadow-xl"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={onClick}

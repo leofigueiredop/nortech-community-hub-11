@@ -4,6 +4,8 @@ import { ContentItem } from '@/types/library';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import LibraryContentRows from '@/components/library/LibraryContentRows';
 import FeaturedContentCarousel from '@/components/library/FeaturedContentCarousel';
+import { motion } from 'framer-motion';
+import EnhancedContentCard from './EnhancedContentCard';
 
 interface LibraryContentAreaProps {
   isSearchActive: boolean;
@@ -26,6 +28,24 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
   visitedTags,
   onItemSelect
 }) => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1
+    }
+  };
+
   return (
     <ScrollArea className="flex-1">
       <div className="container py-6 max-w-screen-2xl space-y-8">
@@ -41,29 +61,27 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
             <h2 className="text-2xl font-semibold">
               Search Results: {filteredContent.length} items
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div 
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {filteredContent.map(item => (
-                <div 
-                  key={item.id} 
-                  className="cursor-pointer"
-                  onClick={() => onItemSelect(item)}
-                >
-                  <div className="aspect-video relative overflow-hidden rounded-lg mb-2">
-                    <img 
-                      src={item.thumbnailUrl || '/placeholder.svg'} 
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="font-medium line-clamp-1">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
-                </div>
+                <motion.div key={item.id} variants={itemVariants}>
+                  <EnhancedContentCard item={item} onClick={() => onItemSelect(item)} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
             {filteredContent.length === 0 && (
-              <div className="text-center py-12">
+              <motion.div 
+                className="text-center py-12"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
                 <p className="text-muted-foreground">No results found for "{searchQuery}"</p>
-              </div>
+              </motion.div>
             )}
           </div>
         ) : (

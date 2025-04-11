@@ -22,7 +22,7 @@ const PremiumContentOverlay: React.FC<PremiumContentOverlayProps> = ({
 }) => {
   return (
     <motion.div 
-      className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/70 to-black/50 flex flex-col items-center justify-center p-6 text-white"
+      className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/70 to-black/50 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-white"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -33,33 +33,57 @@ const PremiumContentOverlay: React.FC<PremiumContentOverlayProps> = ({
         whileHover={{ scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
-        <div className="w-16 h-16 bg-amber-500/90 rounded-full flex items-center justify-center mb-3">
+        <motion.div 
+          className="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center mb-3 shadow-lg"
+          whileHover={{ scale: 1.05 }}
+          animate={{ 
+            boxShadow: ["0px 0px 0px rgba(251, 191, 36, 0)", "0px 0px 20px rgba(251, 191, 36, 0.5)", "0px 0px 0px rgba(251, 191, 36, 0)"],
+          }}
+          transition={{
+            repeat: Infinity,
+            duration: 2,
+          }}
+        >
           <Lock className="h-8 w-8 text-white" />
-        </div>
+        </motion.div>
         
         <h3 className="text-2xl font-bold mb-1">Premium Content</h3>
-        <p className="text-white/80 mb-6">Subscribe to unlock this content and gain access to our entire premium library.</p>
+        <p className="text-white/80 mb-2">Part of the VIP Mentorship Library</p>
+        <p className="text-white/70 text-sm mb-6">Subscribe to unlock this content and gain access to our entire premium library.</p>
         
         <div className="space-y-3 w-full">
-          <Button 
-            onClick={onSubscribe}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center gap-2"
-            size="lg"
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <Crown className="h-5 w-5" />
-            Subscribe for Full Access
-          </Button>
-          
-          {pointsEnabled && (
             <Button 
-              onClick={onUsePoints}
-              variant="outline" 
-              className="w-full border-white/30 text-white hover:bg-white/10 flex items-center justify-center gap-2"
+              onClick={onSubscribe}
+              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white flex items-center justify-center gap-2 shadow-lg"
               size="lg"
             >
-              <Sparkles className="h-5 w-5" />
-              Unlock with {pointsValue} Points
+              <Crown className="h-5 w-5" />
+              Subscribe to Unlock
             </Button>
+          </motion.div>
+          
+          {pointsEnabled && (
+            <motion.div
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Button 
+                onClick={onUsePoints}
+                variant="outline" 
+                className="w-full border-white/30 text-white hover:bg-white/10 flex items-center justify-center gap-2"
+                size="lg"
+              >
+                <Sparkles className="h-5 w-5" />
+                Use {pointsValue} Points
+              </Button>
+            </motion.div>
           )}
         </div>
       </motion.div>
@@ -72,7 +96,7 @@ const PremiumContentOverlay: React.FC<PremiumContentOverlayProps> = ({
           transition={{ delay: 0.2 }}
           whileHover={{ y: -5, scale: 1.05 }}
         >
-          <Badge className="bg-gradient-to-r from-amber-400 to-amber-500 text-white px-3 py-1.5 text-xs font-semibold">
+          <Badge className="bg-gradient-to-r from-amber-400 to-amber-500 text-white px-3 py-1.5 text-xs font-semibold shadow-md">
             {freeAccessLeft} Free {freeAccessLeft === 1 ? 'Access' : 'Accesses'} Left
           </Badge>
         </motion.div>
