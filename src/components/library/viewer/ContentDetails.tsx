@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ContentItem } from '@/types/library';
 import { formatDistanceToNow } from 'date-fns';
@@ -23,9 +24,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ContentDetailsProps {
   item: ContentItem;
+  duration?: string;
+  completionCriteria?: string;
 }
 
-const ContentDetails: React.FC<ContentDetailsProps> = ({ item }) => {
+const ContentDetails: React.FC<ContentDetailsProps> = ({ 
+  item, 
+  duration: providedDuration,
+  completionCriteria: providedCompletionCriteria 
+}) => {
   const [showMore, setShowMore] = useState(false);
   
   const formatDuration = (seconds: number) => {
@@ -33,6 +40,14 @@ const ContentDetails: React.FC<ContentDetailsProps> = ({ item }) => {
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
+  
+  // Use provided duration or calculate from item
+  const duration = providedDuration || formatDuration(item.duration);
+  
+  // Use provided completion criteria or default from item
+  const completionCriteria = providedCompletionCriteria || (
+    item.completionCriteria ? item.completionCriteria : "View the content"
+  );
   
   const renderAuthor = () => {
     if (typeof item.author === 'string') {
@@ -80,7 +95,7 @@ const ContentDetails: React.FC<ContentDetailsProps> = ({ item }) => {
               <li className="flex items-center text-sm">
                 <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
                 <span className="text-muted-foreground">Duration:</span>
-                <span className="ml-1">{formatDuration(item.duration)}</span>
+                <span className="ml-1">{duration}</span>
               </li>
               <li className="flex items-center text-sm">
                 <Eye className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -111,6 +126,11 @@ const ContentDetails: React.FC<ContentDetailsProps> = ({ item }) => {
                 <Crown className="h-4 w-4 mr-2 text-muted-foreground" />
                 <span className="text-muted-foreground">Access Level:</span>
                 <span className="ml-1 capitalize">{item.accessLevel}</span>
+              </li>
+              <li className="flex items-center text-sm">
+                <span className="mr-2 text-muted-foreground">🎯</span>
+                <span className="text-muted-foreground">Completion:</span>
+                <span className="ml-1">{completionCriteria}</span>
               </li>
               {item.pointsEnabled && (
                 <li className="flex items-center text-sm">
@@ -144,7 +164,7 @@ const ContentDetails: React.FC<ContentDetailsProps> = ({ item }) => {
         </AccordionItem>
       </Accordion>
       
-      {item.tags.length > 0 && (
+      {item.tags && item.tags.length > 0 && (
         <div>
           <div className="flex items-center mb-2">
             <Tag className="h-4 w-4 mr-2 text-muted-foreground" />
