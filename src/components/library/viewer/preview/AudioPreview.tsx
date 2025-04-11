@@ -1,216 +1,238 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { ContentItem } from '@/types/library';
-import { 
-  Play, 
-  Pause, 
-  SkipBack, 
-  SkipForward, 
-  Volume2,
-  Volume1,
-  VolumeX 
-} from 'lucide-react';
+import { Play, Pause, Volume2, Volume1, VolumeX, SkipBack, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { formatDuration } from '../contentViewerUtils';
 
-interface AudioPreviewProps {
+export interface AudioPreviewProps {
   item: ContentItem;
+  handleAccess: () => void;
 }
 
-const AudioPreview: React.FC<AudioPreviewProps> = ({ item }) => {
+const AudioPreview: React.FC<AudioPreviewProps> = ({ item, handleAccess }) => {
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
-  const audioRef = useRef<HTMLAudioElement>(null);
-
+  
   useEffect(() => {
+    // Reset state when audio changes
+    setIsPlaying(false);
+    setCurrentTime(0);
+    
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = volume;
+      
+      // Listen for audio events
+      const setAudioData = () => {
+        setDuration(audio.duration);
+      };
+      
+      const setAudioTime = () => {
+        setCurrentTime(audio.currentTime);
+      };
+      
+      const onEnded = () => {
+        setIsPlaying(false);
+        setCurrentTime(0);
+      };
+      
+      // Add event listeners
+      audio.addEventListener('loadedmetadata', setAudioData);
+      audio.addEventListener('timeupdate', setAudioTime);
+      audio.addEventListener('ended', onEnded);
+      
+      // Clean up event listeners
+      return () => {
+        audio.removeEventListener('loadedmetadata', setAudioData);
+        audio.removeEventListener('timeupdate', setAudioTime);
+        audio.removeEventListener('ended', onEnded);
+      };
+    }
+  }, [item, volume]);
+  
+  const togglePlayPause = () => {
     const audio = audioRef.current;
     if (!audio) return;
-
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const updateDuration = () => setDuration(audio.duration);
-    const onEnded = () => setIsPlaying(false);
-
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', updateDuration);
-    audio.addEventListener('ended', onEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', updateDuration);
-      audio.removeEventListener('ended', onEnded);
-    };
-  }, []);
-
-  // Format time from seconds to MM:SS format
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
-  // Toggle play/pause
-  const togglePlayPause = () => {
+    
     if (isPlaying) {
-      audioRef.current?.pause();
+      audio.pause();
     } else {
-      audioRef.current?.play();
+      audio.play();
     }
+    
     setIsPlaying(!isPlaying);
   };
-
-  // Handle seek
-  const handleSeek = (value: number[]) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = value[0];
-      setCurrentTime(value[0]);
+  
+  const handleTimeChange = (newTime: number[]) => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = newTime[0];
+      setCurrentTime(newTime[0]);
     }
   };
-
-  // Handle volume change
-  const handleVolumeChange = (value: number[]) => {
-    const newVolume = value[0];
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
-    setVolume(newVolume);
-  };
-
-  // Skip backward 10 seconds
-  const skipBackward = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = Math.max(0, currentTime - 10);
+  
+  const handleVolumeChange = (newVolume: number[]) => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = newVolume[0];
+      setVolume(newVolume[0]);
     }
   };
-
-  // Skip forward 10 seconds
+  
+  const toggleMute = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      if (audio.volume > 0) {
+        audio.volume = 0;
+        setVolume(0);
+      } else {
+        audio.volume = 0.7;
+        setVolume(0.7);
+      }
+    }
+  };
+  
+  const restartAudio = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = 0;
+      setCurrentTime(0);
+      if (!isPlaying) {
+        audio.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+  
   const skipForward = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = Math.min(duration, currentTime + 10);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+      setCurrentTime(audio.currentTime);
     }
   };
-
-  // Render author avatar/image
-  const renderAuthorAvatar = () => {
-    if (typeof item.author === 'string') {
-      return (
-        <Avatar className="h-16 w-16">
-          <AvatarFallback>{item.author.charAt(0)}</AvatarFallback>
-        </Avatar>
-      );
-    } else {
-      return (
-        <Avatar className="h-16 w-16">
-          <AvatarImage src={item.author.avatar} alt={item.author.name} />
-          <AvatarFallback>{item.author.name.charAt(0)}</AvatarFallback>
-        </Avatar>
-      );
-    }
+  
+  const formatTime = (time: number) => {
+    if (isNaN(time)) return '0:00';
+    
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
-
-  // Get volume icon based on volume level
-  const getVolumeIcon = () => {
-    if (volume === 0) return <VolumeX size={16} />;
-    if (volume < 0.5) return <Volume1 size={16} />;
-    return <Volume2 size={16} />;
+  
+  const VolumeIcon = () => {
+    if (volume === 0) return <VolumeX className="h-4 w-4" />;
+    if (volume < 0.5) return <Volume1 className="h-4 w-4" />;
+    return <Volume2 className="h-4 w-4" />;
   };
 
   return (
-    <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
-      <audio ref={audioRef} src={item.resourceUrl} preload="metadata" />
+    <div className="bg-black/5 rounded-lg p-6 my-4">
+      {/* Audio player */}
+      <audio 
+        ref={audioRef} 
+        src={item.resourceUrl || ''}
+        preload="metadata"
+        className="hidden"
+      />
       
-      <div className="p-6 flex flex-col md:flex-row items-center gap-6">
-        {/* Album art or podcast cover */}
-        <div className="flex-shrink-0">
-          {item.thumbnail ? (
-            <img 
-              src={item.thumbnail} 
-              alt={item.title} 
-              className="w-24 h-24 md:w-32 md:h-32 rounded-lg object-cover"
-            />
-          ) : (
-            renderAuthorAvatar()
-          )}
-        </div>
+      <div className="flex items-center mb-4">
+        <img 
+          src={item.thumbnail || 'https://via.placeholder.com/400x400'} 
+          alt={item.title}
+          className="w-16 h-16 rounded-md mr-4 object-cover"
+        />
         
-        <div className="flex-1 w-full">
-          <div className="flex flex-col items-center md:items-start space-y-4 w-full">
-            {/* Title and author */}
-            <div className="text-center md:text-left">
-              <h3 className="text-lg font-semibold">{item.title}</h3>
-              <p className="text-sm text-muted-foreground">
-                {typeof item.author === 'string' ? item.author : item.author.name}
-              </p>
-            </div>
-            
-            {/* Time slider */}
-            <div className="w-full space-y-2">
-              <Slider 
-                value={[currentTime]} 
-                max={duration || 100}
-                step={0.1}
-                onValueChange={handleSeek}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(duration)}</span>
-              </div>
-            </div>
-            
-            {/* Controls */}
-            <div className="flex items-center justify-center space-x-4">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={skipBackward}
-                className="h-8 w-8"
-              >
-                <SkipBack size={16} />
-              </Button>
-              
-              <Button 
-                variant="default" 
-                size="icon" 
-                onClick={togglePlayPause}
-                className="h-12 w-12 rounded-full"
-              >
-                {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-1" />}
-              </Button>
-              
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={skipForward}
-                className="h-8 w-8"
-              >
-                <SkipForward size={16} />
-              </Button>
-            </div>
-            
-            {/* Volume control */}
-            <div className="flex items-center space-x-2 w-full max-w-[200px]">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8"
-                onClick={() => setVolume(volume === 0 ? 0.7 : 0)}
-              >
-                {getVolumeIcon()}
-              </Button>
-              <Slider 
-                value={[volume]} 
-                max={1}
-                step={0.01}
-                onValueChange={handleVolumeChange}
-                className="w-full"
-              />
-            </div>
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold">{item.title}</h3>
+          <p className="text-sm text-muted-foreground mb-1">
+            {typeof item.author === 'string' ? item.author : item.author.name}
+          </p>
+          <div className="flex gap-2">
+            <Badge variant="outline">Audio</Badge>
+            <Badge variant="outline">{formatDuration(item.duration)}</Badge>
           </div>
         </div>
       </div>
+      
+      {/* Time slider */}
+      <div className="mb-4">
+        <Slider 
+          value={[currentTime]} 
+          max={duration || 100}
+          step={0.1}
+          onValueChange={handleTimeChange}
+          className="my-2"
+        />
+        
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
+        </div>
+      </div>
+      
+      {/* Controls */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={restartAudio}
+          >
+            <SkipBack className="h-5 w-5" />
+          </Button>
+          
+          <Button 
+            size="icon" 
+            variant="default"
+            className="h-10 w-10 rounded-full"
+            onClick={togglePlayPause}
+          >
+            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={skipForward}
+          >
+            <SkipForward className="h-5 w-5" />
+          </Button>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={toggleMute}>
+            <VolumeIcon />
+          </Button>
+          
+          <Slider 
+            value={[volume]} 
+            max={1} 
+            step={0.01}
+            onValueChange={handleVolumeChange}
+            className="w-24"
+          />
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleAccess}
+          >
+            Listen Full Audio
+          </Button>
+        </div>
+      </div>
+      
+      {/* Preview note */}
+      <p className="text-xs text-center mt-4 text-muted-foreground">
+        This is a preview. Click "Listen Full Audio" to access the complete content.
+      </p>
     </div>
   );
 };

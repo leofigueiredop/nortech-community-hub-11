@@ -1,5 +1,6 @@
 
 import { ContentItem, ContentFormat } from '@/types/library';
+import { toast } from '@/hooks/use-toast';
 
 export const getContentTypeIcon = (format: ContentFormat): string => {
   switch (format) {
@@ -88,4 +89,49 @@ export const isContentViewable = (item: ContentItem): boolean => {
 
 export const isContentLinkable = (item: ContentItem): boolean => {
   return ['url', 'link'].includes(item.format);
+};
+
+// Add the missing function for handling external content access
+export const handleExternalContentAccess = (
+  item: ContentItem | null, 
+  onContentView: () => void
+): void => {
+  if (!item) return;
+
+  // Track content view
+  onContentView();
+
+  // Handle different formats differently
+  if (isContentLinkable(item) && item.resourceUrl) {
+    // For external links, open in a new tab
+    window.open(item.resourceUrl, '_blank');
+    
+    toast({
+      title: "External link opened",
+      description: "The content has been opened in a new tab",
+    });
+  } else if (item.resourceUrl) {
+    // For downloadable content like PDFs
+    if (item.format === 'pdf') {
+      window.open(item.resourceUrl, '_blank');
+      
+      toast({
+        title: "PDF opened",
+        description: "The PDF document has been opened in a new tab",
+      });
+    } else {
+      // For other content types, could be handled based on specific requirements
+      toast({
+        title: "Content accessed",
+        description: `You're now viewing ${getContentTypeName(item.format)}`,
+      });
+    }
+  } else {
+    // For content without a resource URL
+    toast({
+      title: "Content unavailable",
+      description: "This content doesn't have an associated resource",
+      variant: "destructive",
+    });
+  }
 };

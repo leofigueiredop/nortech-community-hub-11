@@ -67,9 +67,10 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
     if (progressPercentage >= 100 && item.pointsEnabled) {
       const progress = getProgress(item.id);
       if (progress && !progress.pointsAwarded) {
-        const pointsToAward = item.pointsValue || 10;
-        addUserPoints(pointsToAward, `Completed: ${item.title}`);
         awardPoints(item.id);
+        if (item.pointsValue) {
+          addUserPoints(item.pointsValue, `Completed: ${item.title}`);
+        }
       }
     }
   };

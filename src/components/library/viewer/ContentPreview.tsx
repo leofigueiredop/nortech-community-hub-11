@@ -13,19 +13,29 @@ import ImagePreview from './preview/ImagePreview';
 import DocumentPreview from './preview/DocumentPreview';
 import GenericPreview from './preview/GenericPreview';
 
-interface ContentPreviewProps {
+export interface ContentPreviewProps {
   item: ContentItem;
   onContentView: () => void;
   isFullscreen?: boolean;
+  hasAccess?: boolean;
+  onProgress?: (progressPercentage: number) => void;
+  handleAccess?: () => void;
 }
 
 const ContentPreview: React.FC<ContentPreviewProps> = ({ 
   item, 
   onContentView, 
-  isFullscreen = false 
+  isFullscreen = false,
+  hasAccess = true,
+  onProgress,
+  handleAccess
 }) => {
-  const handleAccess = () => {
-    handleExternalContentAccess(item, onContentView);
+  const handleContentAccess = () => {
+    if (handleAccess) {
+      handleAccess();
+    } else {
+      handleExternalContentAccess(item, onContentView);
+    }
   };
 
   // Render different preview types based on content format
@@ -36,7 +46,7 @@ const ContentPreview: React.FC<ContentPreviewProps> = ({
           <CoursePreview 
             item={item} 
             onContentView={onContentView} 
-            handleAccess={handleAccess} 
+            handleAccess={handleContentAccess} 
             isFullscreen={isFullscreen} 
           />
         );
@@ -48,7 +58,7 @@ const ContentPreview: React.FC<ContentPreviewProps> = ({
           <VideoPreview
             item={item}
             onContentView={onContentView}
-            handleAccess={handleAccess}
+            handleAccess={handleContentAccess}
             isFullscreen={isFullscreen}
             getEmbedUrl={getEmbedUrl}
           />
@@ -59,7 +69,7 @@ const ContentPreview: React.FC<ContentPreviewProps> = ({
           <PDFPreview
             item={item}
             onContentView={onContentView}
-            handleAccess={handleAccess}
+            handleAccess={handleContentAccess}
             isFullscreen={isFullscreen}
             getEmbedUrl={getEmbedUrl}
           />
@@ -69,8 +79,7 @@ const ContentPreview: React.FC<ContentPreviewProps> = ({
         return (
           <AudioPreview
             item={item}
-            onContentView={onContentView}
-            handleAccess={handleAccess}
+            handleAccess={handleContentAccess}
           />
         );
         
@@ -79,18 +88,18 @@ const ContentPreview: React.FC<ContentPreviewProps> = ({
           <ImagePreview
             item={item}
             onContentView={onContentView}
-            handleAccess={handleAccess}
+            handleAccess={handleContentAccess}
             isFullscreen={isFullscreen}
           />
         );
         
+      case 'text':
       case 'gdoc':
-      case 'gdrive':
         return (
           <DocumentPreview
             item={item}
             onContentView={onContentView}
-            handleAccess={handleAccess}
+            handleAccess={handleContentAccess}
             isFullscreen={isFullscreen}
             getEmbedUrl={getEmbedUrl}
           />
@@ -101,7 +110,7 @@ const ContentPreview: React.FC<ContentPreviewProps> = ({
           <GenericPreview
             item={item}
             onContentView={onContentView}
-            handleAccess={handleAccess}
+            handleAccess={handleContentAccess}
             isFullscreen={isFullscreen}
           />
         );

@@ -1,127 +1,90 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { Send } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
 
-interface Comment {
-  id: string;
-  author: {
-    name: string;
-    avatar?: string;
-  };
-  text: string;
-  date: Date;
+export interface ContentCommentsProps {
+  itemId: string;
 }
 
-interface ContentCommentsProps {
-  contentId: string;
-}
-
-const ContentComments: React.FC<ContentCommentsProps> = ({ contentId }) => {
-  const [comments, setComments] = useState<Comment[]>([
+const ContentComments: React.FC<ContentCommentsProps> = ({ itemId }) => {
+  const [comment, setComment] = useState('');
+  
+  // Mock comments data
+  const comments = [
     {
       id: '1',
-      author: {
-        name: 'Alex Johnson',
-        avatar: 'https://i.pravatar.cc/150?img=1',
+      user: {
+        name: 'Sarah Johnson',
+        avatar: 'https://via.placeholder.com/40'
       },
-      text: 'This was incredibly helpful! I especially liked the section on implementation.',
-      date: new Date(Date.now() - 86400000), // 1 day ago
+      text: 'This was really helpful! I especially liked the section on performance optimization.',
+      date: '2 days ago',
     },
     {
       id: '2',
-      author: {
-        name: 'Taylor Smith',
-        avatar: 'https://i.pravatar.cc/150?img=2',
+      user: {
+        name: 'Mike Thompson',
+        avatar: 'https://via.placeholder.com/40'
       },
-      text: 'Great resource. Would love to see more examples like this.',
-      date: new Date(Date.now() - 3600000), // 1 hour ago
-    },
-  ]);
+      text: 'Great content! Would love to see a follow-up on advanced techniques.',
+      date: '1 week ago',
+    }
+  ];
   
-  const [newComment, setNewComment] = useState('');
-
-  const handleSubmitComment = () => {
-    if (!newComment.trim()) return;
-    
-    // In a real app, this would be an API call
-    const comment: Comment = {
-      id: Date.now().toString(),
-      author: {
-        name: 'Current User',
-        avatar: 'https://i.pravatar.cc/150?img=3',
-      },
-      text: newComment,
-      date: new Date(),
-    };
-    
-    setComments([...comments, comment]);
-    setNewComment('');
-    
-    toast({
-      title: 'Comment added',
-      description: 'Your comment has been added successfully.',
-    });
-  };
-
-  const formatDate = (date: Date) => {
-    const now = new Date();
-    const diffInMs = now.getTime() - date.getTime();
-    const diffInSecs = Math.floor(diffInMs / 1000);
-    const diffInMins = Math.floor(diffInSecs / 60);
-    const diffInHours = Math.floor(diffInMins / 60);
-    const diffInDays = Math.floor(diffInHours / 24);
-    
-    if (diffInSecs < 60) return 'just now';
-    if (diffInMins === 1) return '1 minute ago';
-    if (diffInMins < 60) return `${diffInMins} minutes ago`;
-    if (diffInHours === 1) return '1 hour ago';
-    if (diffInHours < 24) return `${diffInHours} hours ago`;
-    if (diffInDays === 1) return 'yesterday';
-    if (diffInDays < 30) return `${diffInDays} days ago`;
-    
-    return date.toLocaleDateString();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (comment.trim()) {
+      console.log('Submitting comment for item', itemId, ':', comment);
+      // Here you would typically send the comment to an API
+      setComment('');
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-medium">Comments ({comments.length})</h3>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Comments ({comments.length})</h3>
       
-      <div className="space-y-6">
-        {comments.map(comment => (
-          <div key={comment.id} className="flex gap-4">
-            <Avatar>
-              <AvatarImage src={comment.author.avatar} />
-              <AvatarFallback>{comment.author.name.charAt(0)}</AvatarFallback>
+      <form onSubmit={handleSubmit} className="flex gap-3">
+        <Avatar className="h-8 w-8">
+          <AvatarImage src="https://via.placeholder.com/40" alt="Your avatar" />
+          <AvatarFallback>YA</AvatarFallback>
+        </Avatar>
+        <div className="flex-1 space-y-2">
+          <Textarea 
+            placeholder="Add a comment..." 
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            className="min-h-[80px]"
+          />
+          <div className="flex justify-end">
+            <Button type="submit" disabled={!comment.trim()}>
+              Post Comment
+            </Button>
+          </div>
+        </div>
+      </form>
+      
+      <Separator className="my-4" />
+      
+      <div className="space-y-4">
+        {comments.map((comment) => (
+          <div key={comment.id} className="flex gap-3">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={comment.user.avatar} alt={comment.user.name} />
+              <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <div className="flex justify-between items-center mb-1">
-                <p className="font-medium">{comment.author.name}</p>
-                <span className="text-xs text-muted-foreground">{formatDate(comment.date)}</span>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-medium">{comment.user.name}</span>
+                <span className="text-xs text-muted-foreground">{comment.date}</span>
               </div>
               <p className="text-sm">{comment.text}</p>
             </div>
           </div>
         ))}
-      </div>
-      
-      <Separator />
-      
-      <div className="flex gap-2">
-        <Input 
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Add a comment..."
-          className="flex-1"
-          onKeyDown={(e) => e.key === 'Enter' && handleSubmitComment()}
-        />
-        <Button onClick={handleSubmitComment} size="icon">
-          <Send className="h-4 w-4" />
-        </Button>
       </div>
     </div>
   );
