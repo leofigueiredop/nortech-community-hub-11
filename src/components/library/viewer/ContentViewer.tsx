@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,17 +9,25 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Lock, Maximize, MessageSquare } from 'lucide-react';
+import { 
+  ExternalLink, 
+  Lock, 
+  Share2, 
+  Bookmark, 
+  Flag,
+  Download,
+  PlayCircle
+} from 'lucide-react';
 import { ContentItem } from '@/types/library';
+import { toast } from '@/hooks/use-toast';
 import { usePoints } from '@/context/PointsContext';
 import ContentPreview from './ContentPreview';
 import ContentDetails from './ContentDetails';
 import ContentProgress from './ContentProgress';
 import ContentHeader from './ContentHeader';
-import ContentComments from './ContentComments';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { handleExternalContentAccess } from './contentViewerUtils';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { ContentFormatIcon } from '../management/utils/ContentFormatIcon';
 
 interface ContentViewerProps {
   item: ContentItem | null;
@@ -30,13 +38,11 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
   const { awardPoints } = usePoints();
   const [progress, setProgress] = useState(0);
   const [pointsAwarded, setPointsAwarded] = useState(false);
-  const [showComments, setShowComments] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const timeSpentRef = useRef(0);
+  const intervalRef = useRef<number | null>(null);
   
-  const timeSpentRef = React.useRef(0);
-  const intervalRef = React.useRef<number | null>(null);
-  
-  React.useEffect(() => {
+  useEffect(() => {
     if (item) {
       setProgress(0);
       setPointsAwarded(false);
@@ -53,9 +59,15 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
             awardPoints({
               type: 'content_completion',
               description: `Completed "${item.title}"`,
-              points: item.pointsValue
+              points: item.pointsValue || 0
             });
             setPointsAwarded(true);
+            
+            toast({
+              title: "Points Awarded!",
+              description: `You earned ${item.pointsValue} points for completing this content.`,
+              variant: "default",
+            });
           }
         }
       }, 1000);
@@ -75,10 +87,16 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
       awardPoints({
         type: 'content_view',
         description: `Viewed "${item.title}"`,
-        points: item.pointsValue
+        points: item.pointsValue || 0
       });
       setPointsAwarded(true);
       setProgress(100);
+      
+      toast({
+        title: "Points Awarded!",
+        description: `You earned ${item.pointsValue} points for viewing this content.`,
+        variant: "default",
+      });
     }
   };
   
@@ -96,53 +114,134 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
       awardPoints({
         type: 'content_completion',
         description: `Read through "${item.title}"`,
-        points: item.pointsValue
+        points: item.pointsValue || 0
       });
       setPointsAwarded(true);
       setProgress(100);
+      
+      toast({
+        title: "Points Awarded!",
+        description: `You earned ${item.pointsValue} points for reading through this content.`,
+        variant: "default",
+      });
     }
-  };
-
-  const handleFullscreenToggle = () => {
-    setIsFullscreen(!isFullscreen);
   };
 
   const handleAccessContent = () => {
     handleExternalContentAccess(item, handleContentView);
   };
 
-  const toggleComments = () => {
-    setShowComments(!showComments);
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
   };
 
   if (!item) return null;
 
+  // Determine the appropriate CTA text based on format and access level
+  const getCtaText = () => {
+    if (item.accessLevel === 'premium') {
+      return 'Unlock Premium Content';
+    }
+    
+    switch (item.format) {
+      case 'video':
+      case 'youtube':
+      case 'vimeo':
+        return 'Watch Full Video';
+      case 'pdf':
+        return 'Download PDF';
+      case 'audio':
+        return 'Listen Now';
+      case 'course':
+        return 'Start Course';
+      default:
+        return 'View Content';
+    }
+  };
+
+  // Determine the CTA icon based on format
+  const getCtaIcon = () => {
+    if (item.accessLevel === 'premium') {
+      return <Lock className="mr-2 h-4 w-4" />;
+    }
+    
+    switch (item.format) {
+      case 'video':
+      case 'youtube':
+      case 'vimeo':
+        return <PlayCircle className="mr-2 h-4 w-4" />;
+      case 'pdf':
+        return <Download className="mr-2 h-4 w-4" />;
+      default:
+        return <ExternalLink className="mr-2 h-4 w-4" />;
+    }
+  };
+
   return (
-    <Dialog 
-      open={!!item} 
-      onOpenChange={(open) => !open && onClose()}
-    >
+    <Dialog open={!!item} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
-        className={`${isFullscreen ? 'max-w-full max-h-full h-screen m-0 p-6 rounded-none' : 'max-w-3xl max-h-[90vh]'} overflow-y-auto`} 
+        className={`${isFullscreen ? 'max-w-[90vw] h-[90vh]' : 'max-w-3xl max-h-[90vh]'} overflow-y-auto`} 
         onScroll={handleScroll}
       >
-        <div className="flex justify-between items-start">
-          <DialogHeader className="flex-grow">
-            <DialogTitle className="text-xl font-bold">{item.title}</DialogTitle>
+        <DialogHeader className="flex flex-row items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <ContentFormatIcon format={item.format} size={20} className="text-primary" />
+              <DialogTitle className="text-xl font-bold">{item.title}</DialogTitle>
+            </div>
             <DialogDescription>
               <ContentHeader item={item} />
             </DialogDescription>
-          </DialogHeader>
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleFullscreenToggle}
-            className="ml-auto"
-          >
-            <Maximize className="h-5 w-5" />
-          </Button>
-        </div>
+          </div>
+          <div className="flex gap-1 mt-1">
+            <Button variant="ghost" size="icon" onClick={() => {
+              toast({
+                title: "Content saved",
+                description: "Added to your library",
+              });
+            }} title="Save">
+              <Bookmark className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => {
+              toast({
+                title: "Share link copied",
+                description: "Link copied to clipboard",
+              });
+            }} title="Share">
+              <Share2 className="h-4 w-4" />
+            </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" title="Report">
+                  <Flag className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <h3 className="text-lg font-semibold mb-4">Report Content</h3>
+                <p className="text-muted-foreground mb-4">
+                  Please let us know why you're reporting this content.
+                </p>
+                <div className="space-y-2">
+                  {['Inappropriate content', 'Copyright violation', 'Misleading information', 'Other'].map(reason => (
+                    <Button 
+                      key={reason} 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => {
+                        toast({
+                          title: "Content Reported",
+                          description: "Thank you for helping keep our platform safe.",
+                        });
+                      }}
+                    >
+                      {reason}
+                    </Button>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </DialogHeader>
 
         <ContentPreview 
           item={item} 
@@ -152,45 +251,32 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
 
         <ContentProgress 
           progress={progress} 
-          showProgress={item.pointsEnabled}
+          showProgress={item.pointsEnabled || item.format === 'video' || item.format === 'course'}
+          pointsValue={item.pointsValue}
+          pointsEnabled={item.pointsEnabled}
+          isCompleted={progress >= 100}
         />
 
-        <Tabs defaultValue="details" className="w-full">
-          <TabsList className="mb-4">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="comments" className="flex items-center gap-1" onClick={toggleComments}>
-              <MessageSquare className="h-4 w-4" /> Comments
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="details">
-            <ScrollArea className={isFullscreen ? 'h-[calc(100vh-350px)]' : 'max-h-[300px]'}>
-              <ContentDetails item={item} />
-            </ScrollArea>
-          </TabsContent>
-          
-          <TabsContent value="comments">
-            <ScrollArea className={isFullscreen ? 'h-[calc(100vh-350px)]' : 'max-h-[300px]'}>
-              {showComments && <ContentComments contentId={item.id} />}
-            </ScrollArea>
-          </TabsContent>
-        </Tabs>
+        <ContentDetails item={item} />
 
-        <DialogFooter className="mt-6">
+        <DialogFooter className="mt-6 flex justify-between items-center">
           <Button variant="outline" onClick={onClose}>
             Close
           </Button>
-          <Button onClick={handleAccessContent}>
-            {item.accessLevel === 'premium' ? (
-              <>
-                <Lock className="mr-2 h-4 w-4" /> Unlock Premium Content
-              </>
-            ) : (
-              <>
-                <ExternalLink className="mr-2 h-4 w-4" /> Access Content
-              </>
-            )}
-          </Button>
+          
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={toggleFullscreen}>
+              {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+            </Button>
+            
+            <Button 
+              onClick={handleAccessContent}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {getCtaIcon()}
+              {getCtaText()}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
