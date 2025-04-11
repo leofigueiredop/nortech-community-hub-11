@@ -5,6 +5,7 @@ import WelcomeCard from '@/components/dashboard/WelcomeCard';
 import SetupChecklist from '@/components/dashboard/SetupChecklist';
 import QuickActions from '@/components/dashboard/QuickActions';
 import CreateSpaceDialog from '@/components/dashboard/CreateSpaceDialog';
+import GuidedTour from '@/components/dashboard/GuidedTour';
 import { Button } from '@/components/ui/button';
 import { Eye, PlusCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
@@ -83,6 +84,9 @@ const Dashboard: React.FC = () => {
         open={createSpaceOpen} 
         onOpenChange={setCreateSpaceOpen} 
       />
+
+      {/* Add the guided tour component */}
+      <GuidedTour />
     </MainLayout>
   );
 };
