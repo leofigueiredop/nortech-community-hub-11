@@ -1,68 +1,91 @@
 
-import { ContentItem } from '@/types/library';
-import { toast } from '@/hooks/use-toast';
+import { ContentItem, ContentFormat } from '@/types/library';
 
-export const handleExternalContentAccess = (item: ContentItem | null, onContentView: () => void) => {
-  if (!item) return;
-
-  if (item.accessLevel === 'premium') {
-    toast({
-      title: 'Premium Content',
-      description: 'This content requires a premium subscription.',
-      variant: 'destructive',
-    });
-    return;
-  }
-  
-  // Track content view
-  onContentView();
-  
-  // Handle different content types
-  switch (item.format) {
-    case 'pdf':
-    case 'audio':
-    case 'image':
-      toast({
-        title: 'Downloading Content',
-        description: `Downloading ${item.title}`,
-      });
-      window.open(item.resourceUrl, '_blank');
-      break;
-    
-    case 'course':
-      toast({
-        title: 'Opening Course',
-        description: `Opening ${item.title}`,
-      });
-      // In a real app, navigate to course page
-      window.open(`/courses/${item.id}`, '_blank');
-      break;
-      
+export const getContentTypeIcon = (format: ContentFormat): string => {
+  switch (format) {
+    case 'video':
+      return 'video';
     case 'youtube':
     case 'vimeo':
+      return 'video';
+    case 'audio':
+      return 'headphones';
+    case 'pdf':
+      return 'file-text';
+    case 'text':
+      return 'file-text';
     case 'gdoc':
-    case 'gdrive':
+      return 'file-text';
+    case 'image':
+      return 'image';
+    case 'course':
+      return 'book';
+    case 'url':
     case 'link':
+      return 'link';
     default:
-      toast({
-        title: 'Opening Content',
-        description: `Opening ${item.title}`,
-      });
-      window.open(item.resourceUrl, '_blank');
-      break;
+      return 'file';
   }
 };
 
-// Helper to determine content type from URL
-export const getContentTypeFromUrl = (url: string): string => {
-  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'YouTube';
-  if (url.includes('vimeo.com')) return 'Vimeo';
-  if (url.includes('drive.google.com/file')) return 'Google Drive';
-  if (url.includes('docs.google.com')) return 'Google Doc';
-  if (url.endsWith('.pdf')) return 'PDF';
-  if (url.endsWith('.mp3') || url.endsWith('.wav')) return 'Audio';
-  if (url.endsWith('.mp4') || url.endsWith('.mov')) return 'Video';
-  if (url.endsWith('.jpg') || url.endsWith('.png') || url.endsWith('.gif')) return 'Image';
-  
-  return 'External Link';
+export const getContentTypeName = (format: ContentFormat): string => {
+  switch (format) {
+    case 'video':
+      return 'Video';
+    case 'youtube':
+      return 'YouTube Video';
+    case 'vimeo':
+      return 'Vimeo Video';
+    case 'audio':
+      return 'Audio';
+    case 'pdf':
+      return 'PDF Document';
+    case 'text':
+      return 'Text';
+    case 'gdoc':
+      return 'Google Document';
+    case 'image':
+      return 'Image';
+    case 'course':
+      return 'Course';
+    case 'url':
+    case 'link':
+      return 'External Link';
+    default:
+      return 'Document';
+  }
+};
+
+export const formatDuration = (seconds: number): string => {
+  if (seconds < 60) {
+    return `${seconds} sec${seconds !== 1 ? 's' : ''}`;
+  } else if (seconds < 3600) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes} min${minutes !== 1 ? 's' : ''}${remainingSeconds > 0 ? ` ${remainingSeconds} sec${remainingSeconds !== 1 ? 's' : ''}` : ''}`;
+  } else {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours} hr${hours !== 1 ? 's' : ''}${minutes > 0 ? ` ${minutes} min${minutes !== 1 ? 's' : ''}` : ''}`;
+  }
+};
+
+export const isContentPlayable = (item: ContentItem): boolean => {
+  return ['video', 'youtube', 'vimeo', 'audio'].includes(item.format);
+};
+
+export const isContentReadable = (item: ContentItem): boolean => {
+  return ['pdf', 'text', 'gdoc'].includes(item.format);
+};
+
+export const isContentInteractive = (item: ContentItem): boolean => {
+  return item.format === 'course';
+};
+
+export const isContentViewable = (item: ContentItem): boolean => {
+  return item.format === 'image';
+};
+
+export const isContentLinkable = (item: ContentItem): boolean => {
+  return ['url', 'link'].includes(item.format);
 };

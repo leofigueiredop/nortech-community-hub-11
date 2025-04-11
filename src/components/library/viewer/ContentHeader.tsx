@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-interface ContentHeaderProps {
+export interface ContentHeaderProps {
   item: ContentItem;
   onBack: () => void;
 }

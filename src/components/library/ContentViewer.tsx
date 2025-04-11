@@ -1,23 +1,15 @@
 
-import React, { useEffect, useState, useRef } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ExternalLink, Lock } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ContentItem } from '@/types/library';
-import { toast } from '@/hooks/use-toast';
+import { useContentProgress } from '@/hooks/useContentProgress';
 import { usePoints } from '@/context/PointsContext';
-import ContentPreview from './viewer/ContentPreview';
-import ContentDetails from './viewer/ContentDetails';
-import ContentProgress from './viewer/ContentProgress';
-import ContentHeader from './viewer/ContentHeader';
-import { handleExternalContentAccess } from './viewer/contentViewerUtils';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import ContentHeader from '@/components/library/viewer/ContentHeader';
+import ContentPreview from '@/components/library/viewer/ContentPreview';
+import ContentDetails from '@/components/library/viewer/ContentDetails';
+import ContentComments from '@/components/library/viewer/ContentComments';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ContentViewerProps {
   item: ContentItem | null;
@@ -25,138 +17,158 @@ interface ContentViewerProps {
 }
 
 const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
-  const { awardPoints } = usePoints();
-  const [progress, setProgress] = useState(0);
-  const [pointsAwarded, setPointsAwarded] = useState(false);
-  const timeSpentRef = useRef(0);
-  const intervalRef = useRef<number | null>(null);
-  
+  const [activeTab, setActiveTab] = useState('details');
+  const [hasAccess, setHasAccess] = useState(false);
+  const { addProgress, updateProgress, getProgress, awardPoints } = useContentProgress();
+  const { awardPoints: addUserPoints } = usePoints();
+  const [viewStartTime, setViewStartTime] = useState<number | null>(null);
+
   useEffect(() => {
     if (item) {
-      setProgress(0);
-      setPointsAwarded(false);
-      timeSpentRef.current = 0;
+      // Reset state when item changes
+      setActiveTab('details');
       
-      intervalRef.current = window.setInterval(() => {
-        timeSpentRef.current += 1;
-        
-        if (item.completionCriteria === 'time_spent' && item.completionThreshold) {
-          const newProgress = Math.min(Math.floor((timeSpentRef.current / item.completionThreshold) * 100), 100);
-          setProgress(newProgress);
-          
-          if (newProgress >= 100 && !pointsAwarded && item.pointsEnabled) {
-            awardPoints({
-              type: 'content_completion',
-              description: `Completed "${item.title}"`,
-              points: item.pointsValue
-            });
-            setPointsAwarded(true);
-            
-            toast({
-              title: "Points Awarded!",
-              description: `You earned ${item.pointsValue} points for completing this content.`,
-              variant: "default",
-            });
-          }
-        }
-      }, 1000);
+      // Check if user has free access to this content
+      const hasFreeAccess = 
+        item.accessLevel === 'free' || 
+        (item.accessLevel === 'premium' && item.freeAccessesLeft && item.freeAccessesLeft > 0);
+      
+      setHasAccess(hasFreeAccess);
+      
+      // Add to progress tracking if not already there
+      addProgress(item.id);
     }
-    
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [item, awardPoints]);
-  
+  }, [item, addProgress]);
+
+  // Dialog open state
+  const isOpen = !!item;
+
+  // Handle content view
   const handleContentView = () => {
-    if (!item || pointsAwarded || !item.pointsEnabled) return;
+    if (!item) return;
     
-    if (item.completionCriteria === 'view' || !item.completionCriteria) {
-      awardPoints({
-        type: 'content_view',
-        description: `Viewed "${item.title}"`,
-        points: item.pointsValue
-      });
-      setPointsAwarded(true);
-      setProgress(100);
-      
-      toast({
-        title: "Points Awarded!",
-        description: `You earned ${item.pointsValue} points for viewing this content.`,
-        variant: "default",
-      });
-    }
-  };
-  
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (!item || pointsAwarded || !item.pointsEnabled || item.completionCriteria !== 'scroll_end') return;
+    // Set view start time
+    setViewStartTime(Date.now());
     
-    const target = e.currentTarget;
-    const scrollPosition = target.scrollTop + target.clientHeight;
-    const scrollHeight = target.scrollHeight;
-    const scrollPercentage = (scrollPosition / scrollHeight) * 100;
-    
-    setProgress(Math.min(Math.floor(scrollPercentage), 100));
-    
-    if (scrollPercentage > 90 && !pointsAwarded) {
-      awardPoints({
-        type: 'content_completion',
-        description: `Read through "${item.title}"`,
-        points: item.pointsValue
-      });
-      setPointsAwarded(true);
-      setProgress(100);
-      
-      toast({
-        title: "Points Awarded!",
-        description: `You earned ${item.pointsValue} points for reading through this content.`,
-        variant: "default",
-      });
+    // Add initial progress if needed
+    const progress = getProgress(item.id);
+    if (!progress || progress.progress === 0) {
+      updateProgress(item.id, 10); // Start with 10% progress
     }
   };
 
-  const handleAccessContent = () => {
-    handleExternalContentAccess(item, handleContentView);
+  // Handle content progress (called from content preview components)
+  const handleProgress = (progressPercentage: number) => {
+    if (!item) return;
+    
+    updateProgress(item.id, progressPercentage);
+    
+    // Award points if applicable and completed
+    if (progressPercentage >= 100 && item.pointsEnabled) {
+      const progress = getProgress(item.id);
+      if (progress && !progress.pointsAwarded) {
+        const pointsToAward = item.pointsValue || 10;
+        addUserPoints(pointsToAward, `Completed: ${item.title}`);
+        awardPoints(item.id);
+      }
+    }
+  };
+
+  // Calculate time spent viewing content
+  const calculateTimeSpent = () => {
+    if (!viewStartTime) return 0;
+    return Math.floor((Date.now() - viewStartTime) / 1000); // in seconds
+  };
+
+  // Handle content access (e.g., unlocking premium content)
+  const handleAccess = () => {
+    setHasAccess(true);
+  };
+
+  // Handle dialog close
+  const handleClose = () => {
+    if (!item) return;
+    
+    // Save progress before closing
+    const timeSpent = calculateTimeSpent();
+    if (timeSpent > 10) { // Only count if more than 10 seconds spent
+      const currentProgress = getProgress(item.id);
+      if (currentProgress) {
+        // Increase progress based on time spent (simplified logic)
+        const newProgress = Math.min(
+          100, 
+          currentProgress.progress + Math.floor(timeSpent / (item.duration / 100))
+        );
+        updateProgress(item.id, newProgress);
+      }
+    }
+    
+    // Reset state
+    setViewStartTime(null);
+    
+    // Call parent close handler
+    onClose();
   };
 
   if (!item) return null;
 
   return (
-    <Dialog open={!!item} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" onScroll={handleScroll}>
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">{item.title}</DialogTitle>
-          <DialogDescription>
-            <ContentHeader item={item} />
-          </DialogDescription>
-        </DialogHeader>
-
-        <ContentPreview item={item} onContentView={handleContentView} />
-
-        <ContentProgress 
-          progress={progress} 
-          showProgress={item.pointsEnabled}
-        />
-
-        <ContentDetails item={item} />
-
-        <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={onClose}>
-            Close
-          </Button>
-          <Button onClick={handleAccessContent}>
-            {item.accessLevel === 'premium' ? (
-              <>
-                <Lock className="mr-2 h-4 w-4" /> Unlock Premium Content
-              </>
-            ) : (
-              <>
-                <ExternalLink className="mr-2 h-4 w-4" /> Access Content
-              </>
-            )}
-          </Button>
-        </DialogFooter>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden" onPointerDownOutside={(e) => e.preventDefault()}>
+        <ScrollArea className="h-[calc(100vh-10rem)]">
+          <div className="p-6">
+            <ContentHeader item={item} onBack={handleClose} />
+            
+            <ContentPreview 
+              item={item} 
+              hasAccess={hasAccess}
+              onContentView={handleContentView}
+              onProgress={handleProgress}
+              handleAccess={handleAccess}
+            />
+            
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
+              <TabsList className="w-full">
+                <TabsTrigger value="details" className="flex-1">Details</TabsTrigger>
+                {item.format === 'video' && (
+                  <TabsTrigger value="transcript" className="flex-1">Transcript</TabsTrigger>
+                )}
+                {item.allowComments !== false && (
+                  <TabsTrigger value="comments" className="flex-1">Comments</TabsTrigger>
+                )}
+                {item.format === 'course' && (
+                  <TabsTrigger value="modules" className="flex-1">Modules</TabsTrigger>
+                )}
+              </TabsList>
+              
+              <TabsContent value="details">
+                <ContentDetails item={item} />
+              </TabsContent>
+              
+              {item.format === 'video' && (
+                <TabsContent value="transcript">
+                  <div className="text-sm text-muted-foreground">
+                    <p className="mb-4">Transcript not available for this content.</p>
+                  </div>
+                </TabsContent>
+              )}
+              
+              {item.allowComments !== false && (
+                <TabsContent value="comments">
+                  <ContentComments itemId={item.id} />
+                </TabsContent>
+              )}
+              
+              {item.format === 'course' && (
+                <TabsContent value="modules">
+                  <div className="text-sm text-muted-foreground">
+                    <p className="mb-4">This course has no modules yet.</p>
+                  </div>
+                </TabsContent>
+              )}
+            </Tabs>
+          </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

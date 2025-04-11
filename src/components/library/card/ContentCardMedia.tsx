@@ -21,7 +21,7 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
   return (
     <div className="relative aspect-video overflow-hidden rounded-t-md">
       <motion.img 
-        src={item.thumbnailUrl || '/placeholder.svg'} 
+        src={item.thumbnailUrl || item.thumbnail || '/placeholder.svg'} 
         alt={item.title}
         className={`w-full h-full object-cover transition-all duration-500 ${
           isHovered ? 'scale-110' : 'scale-100'
@@ -60,7 +60,7 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
           <PremiumContentOverlay
             pointsEnabled={item.pointsEnabled}
             pointsValue={item.pointsValue}
-            freeAccessLeft={item.freeAccessesLeft}
+            freeAccessLeft={item.freeAccessesLeft || 0}
             onSubscribe={() => {}}
             onUsePoints={() => {}}
           />
@@ -100,7 +100,7 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
       )}
 
       {/* Free access badge if applicable */}
-      {isPremium && item.freeAccessesLeft > 0 && !isHovered && (
+      {isPremium && item.freeAccessesLeft && item.freeAccessesLeft > 0 && !isHovered && (
         <div className="absolute bottom-2 right-2">
           <motion.div
             initial={{ y: 5, opacity: 0 }}

@@ -1,5 +1,4 @@
-
-export type ContentFormat = 'audio' | 'pdf' | 'text' | 'url' | 'youtube' | 'vimeo' | 'gdoc' | 'image' | 'course' | 'link';
+export type ContentFormat = 'audio' | 'pdf' | 'text' | 'url' | 'youtube' | 'vimeo' | 'gdoc' | 'image' | 'course' | 'link' | 'video';
 
 export interface Author {
   id: string;
@@ -29,6 +28,10 @@ export interface ContentItem {
   completionCriteria?: string; // Watch, read, etc.
   completionThreshold?: number; // Percentage or time needed for completion
   addToCarousel?: boolean;
+  thumbnailUrl?: string; // For consistent image usage
+  fileSize?: number; // Size of the content file
+  allowComments?: boolean; // Whether comments are allowed
+  freeAccessesLeft?: number; // Number of free accesses for premium content
 }
 
 export interface ContentCategory {
@@ -37,6 +40,8 @@ export interface ContentCategory {
   description?: string;
   itemCount: number;
   icon?: string;
+  count?: number; // For backward compatibility
+  updatedAt?: string; // For tracking when category was last updated
 }
 
 export interface ContentProgress {

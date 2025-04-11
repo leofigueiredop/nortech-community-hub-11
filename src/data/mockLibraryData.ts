@@ -1,7 +1,6 @@
-
 import { ContentItem, ContentCategory, ContentFormat } from '@/types/library';
 
-export const CONTENT_CATEGORIES: ContentCategory[] = [
+export const CATEGORIES: ContentCategory[] = [
   {
     id: 'cat1',
     name: 'Getting Started',
@@ -48,7 +47,9 @@ export const CONTENT_ITEMS: ContentItem[] = [
     duration: 732, // Duration in seconds
     accessLevel: 'free',
     featured: true,
-    categoryId: 'cat1'
+    categoryId: 'cat1',
+    allowComments: true,
+    freeAccessesLeft: 0
   },
   {
     id: 'c2',
@@ -64,7 +65,9 @@ export const CONTENT_ITEMS: ContentItem[] = [
     duration: 900, // Estimated reading time in seconds
     accessLevel: 'premium',
     featured: false,
-    categoryId: 'cat3'
+    categoryId: 'cat3',
+    allowComments: true,
+    freeAccessesLeft: 2
   },
   {
     id: 'c3',

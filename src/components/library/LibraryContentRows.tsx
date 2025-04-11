@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { ContentItem } from '@/types/library';
+import { ContentItem, ContentFormat } from '@/types/library';
 import ContentSection from './ContentSection';
 
 interface LibraryContentRowsProps {

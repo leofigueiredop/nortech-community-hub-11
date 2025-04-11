@@ -32,7 +32,7 @@ export const useCategories = () => {
     setCategories(prev => 
       prev.map(cat => 
         cat.id === categoryId 
-          ? { ...cat, count: cat.count + 1, updatedAt: new Date().toISOString() } 
+          ? { ...cat, itemCount: cat.itemCount + 1, updatedAt: new Date().toISOString() } 
           : cat
       )
     );
@@ -44,7 +44,7 @@ export const useCategories = () => {
     setCategories(prev => 
       prev.map(cat => 
         cat.id === categoryId 
-          ? { ...cat, count: Math.max(0, cat.count - 1), updatedAt: new Date().toISOString() } 
+          ? { ...cat, itemCount: Math.max(0, cat.itemCount - 1), updatedAt: new Date().toISOString() } 
           : cat
       )
     );
