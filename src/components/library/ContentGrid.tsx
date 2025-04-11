@@ -42,11 +42,11 @@ const ContentGrid: React.FC<ContentGridProps> = ({ items, onItemSelect }) => {
       initial="hidden"
       animate="show"
     >
-      {items.map((item, index) => (
-        <motion.div key={item.id} variants={item}>
+      {items.map((contentItem, index) => (
+        <motion.div key={contentItem.id} variants={item}>
           <EnhancedContentCard
-            item={item}
-            onClick={() => onItemSelect(item)}
+            item={contentItem}
+            onClick={() => onItemSelect(contentItem)}
           />
         </motion.div>
       ))}
