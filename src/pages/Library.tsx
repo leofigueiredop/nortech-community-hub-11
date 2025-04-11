@@ -8,6 +8,7 @@ import CreateContentModal from '@/components/library/CreateContentModal';
 import LibraryTopBar from '@/components/library/LibraryTopBar';
 import LibraryContentArea from '@/components/library/LibraryContentArea';
 import CreateContentButton from '@/components/library/CreateContentButton';
+import ContentFilters from '@/components/library/ContentFilters';
 
 const Library: React.FC = () => {
   const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('all');
@@ -74,6 +75,21 @@ const Library: React.FC = () => {
           allFormats={allFormats}
           setFormatFilter={setFormatFilter}
           setTagFilter={setTagFilter}
+          setSortBy={setSortBy}
+        />
+
+        <ContentFilters 
+          formatFilter={formatFilter}
+          tagFilter={tagFilter}
+          accessFilter={accessFilter}
+          searchQuery={searchQuery}
+          sortBy={sortBy}
+          allFormats={allFormats}
+          allTags={allTags}
+          setFormatFilter={setFormatFilter}
+          setTagFilter={setTagFilter}
+          setAccessFilter={setAccessFilter}
+          setSearchQuery={setSearchQuery}
           setSortBy={setSortBy}
         />
 

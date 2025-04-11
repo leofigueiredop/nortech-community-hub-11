@@ -54,6 +54,9 @@ const LibraryTopBar: React.FC<LibraryTopBarProps> = ({
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, setGlobalSearchQuery]);
 
+  const hasActiveFilters = formatFilter !== 'all' || tagFilter !== 'all' || sortBy !== 'newest';
+  const activeFiltersCount = (formatFilter !== 'all' ? 1 : 0) + (tagFilter !== 'all' ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0);
+
   return (
     <div className="sticky top-0 z-30 w-full bg-background/95 backdrop-blur supports-backdrop-blur:bg-background/60 border-b">
       <div className="container flex h-14 max-w-screen-2xl items-center">
@@ -97,50 +100,28 @@ const LibraryTopBar: React.FC<LibraryTopBarProps> = ({
 
         <div className="flex-1"></div>
 
-        <div className="relative w-full max-w-sm mr-2">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search content..."
-            className="w-full pl-8 h-9"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {isSearchActive && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-0 top-0 h-9 w-9 p-0"
-              onClick={() => setSearchQuery('')}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-
         <Drawer open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
           <DrawerTrigger asChild>
             <Button 
               variant="outline" 
               size="sm"
               className={cn(
-                "flex items-center gap-2 h-9",
-                (formatFilter !== 'all' || tagFilter !== 'all' || sortBy !== 'newest') && 
-                "border-primary text-primary"
+                "flex items-center gap-2 h-9 mr-2",
+                hasActiveFilters && "border-primary text-primary"
               )}
             >
               <Filter size={16} />
-              <span>Filters</span>
-              {(formatFilter !== 'all' || tagFilter !== 'all' || sortBy !== 'newest') && (
-                <span className="ml-1 rounded-full bg-primary w-4 h-4 flex items-center justify-center text-[10px] text-white">
-                  {(formatFilter !== 'all' ? 1 : 0) + (tagFilter !== 'all' ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0)}
+              <span>Advanced Filters</span>
+              {hasActiveFilters && (
+                <span className="ml-1 rounded-full bg-primary w-5 h-5 flex items-center justify-center text-[10px] text-primary-foreground">
+                  {activeFiltersCount}
                 </span>
               )}
             </Button>
           </DrawerTrigger>
           <DrawerContent className="max-h-[85vh]">
             <div className="px-4 py-6 max-w-md mx-auto">
-              <h3 className="text-lg font-semibold mb-4">Content Filters</h3>
+              <h3 className="text-lg font-semibold mb-4">Advanced Filters</h3>
               <LibraryFiltersSidebar
                 formatFilter={formatFilter}
                 tagFilter={tagFilter}
