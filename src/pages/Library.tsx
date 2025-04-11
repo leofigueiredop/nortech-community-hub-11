@@ -11,7 +11,7 @@ import CreateContentButton from '@/components/library/CreateContentButton';
 import ContentFilters from '@/components/library/ContentFilters';
 
 const Library: React.FC = () => {
-  const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('all');
+  const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('free'); // Changed default to 'free'
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateContentOpen, setIsCreateContentOpen] = useState(false);
   

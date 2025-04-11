@@ -66,14 +66,6 @@ const LibraryTopBar: React.FC<LibraryTopBarProps> = ({
         
         <nav className="flex items-center space-x-2 lg:space-x-6 overflow-auto">
           <Button 
-            variant={activeView === 'all' ? "default" : "ghost"} 
-            onClick={() => setActiveView('all')}
-            className="h-9"
-          >
-            All Content
-          </Button>
-          
-          <Button 
             variant={activeView === 'free' ? "default" : "ghost"} 
             onClick={() => setActiveView('free')}
             className="h-9"
