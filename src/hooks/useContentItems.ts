@@ -14,7 +14,7 @@ export const useContentItems = () => {
 
   // Get all unique tags from content items
   const allTags = Array.from(
-    new Set(content.flatMap(item => item.tags))
+    new Set(content.flatMap(item => item.tags || []))
   ).sort();
 
   // Get all formats
@@ -25,13 +25,18 @@ export const useContentItems = () => {
   // Filter content based on current filters
   const filteredContent = content.filter(item => {
     const matchesFormat = formatFilter === 'all' || item.format === formatFilter;
-    const matchesTag = tagFilter === 'all' || item.tags.includes(tagFilter);
+    
+    // Safe handling for tagFilter
+    const matchesTag = tagFilter === 'all' || 
+                       (item.tags && Array.isArray(item.tags) && item.tags.includes(tagFilter));
+    
     const matchesAccess = accessFilter === 'all' || 
                           item.accessLevel === accessFilter ||
                           (accessFilter === 'unlockable' && item.pointsEnabled);
+    
     const matchesSearch = !searchQuery || 
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
     
     return matchesFormat && matchesTag && matchesAccess && matchesSearch;
   }).sort((a, b) => {

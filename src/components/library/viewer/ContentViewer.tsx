@@ -3,7 +3,8 @@ import React from 'react';
 import { 
   Dialog,
   DialogContent,
-  DialogOverlay
+  DialogOverlay,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { ContentItem } from '@/types/library';
 import ContentHeader from './ContentHeader';
@@ -43,6 +44,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
     <Dialog open={!!item} onOpenChange={() => onClose()}>
       <DialogOverlay className="bg-black/80 backdrop-blur-sm" />
       <DialogContent className="max-w-6xl max-h-[90vh] p-0 border-none overflow-hidden bg-background">
+        <DialogTitle className="sr-only">{item.title}</DialogTitle>
         <div className="flex flex-col h-full max-h-[90vh]">
           <div className="p-4 sm:p-6">
             <ContentHeader item={item} onBack={onClose} />
@@ -67,8 +69,8 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
                   <ContentProgress 
                     progress={30}
                     showProgress={true}
-                    pointsValue={item.pointsValue}
-                    pointsEnabled={item.pointsEnabled}
+                    pointsValue={item.pointsValue || 0}
+                    pointsEnabled={!!item.pointsEnabled}
                   />
                   
                   <ContentComments itemId={item.id} />

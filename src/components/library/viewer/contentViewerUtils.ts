@@ -55,6 +55,8 @@ export const handleExternalContentAccess = (
 
 // Format duration from seconds to readable format
 export const formatDuration = (seconds: number): string => {
+  if (!seconds || isNaN(seconds)) return '0 sec';
+  
   if (seconds < 60) {
     return `${seconds} sec`;
   } else if (seconds < 3600) {
@@ -69,6 +71,8 @@ export const formatDuration = (seconds: number): string => {
 
 // Get content type name
 export const getContentTypeName = (format: string): string => {
+  if (!format) return 'Unknown';
+  
   const formatMap: Record<string, string> = {
     'video': 'Video',
     'audio': 'Audio',
@@ -88,7 +92,7 @@ export const getContentTypeName = (format: string): string => {
 
 // Add the missing functions
 export const getContentDuration = (seconds: number): string => {
-  return formatDuration(seconds);
+  return formatDuration(seconds || 0);
 };
 
 export const getCompletionCriteria = (item: ContentItem): string => {

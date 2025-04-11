@@ -21,7 +21,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
     if (activeView === 'all') return true;
     if (activeView === 'free') return item.accessLevel === 'free';
     if (activeView === 'premium') return item.accessLevel === 'premium';
-    if (activeView === 'unlockable') return item.pointsEnabled;
+    if (activeView === 'unlockable') return !!item.pointsEnabled;
     return true;
   });
 
@@ -56,7 +56,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
   
   // Personalized recommendations (based on visited tags)
   const recommendedContent = viewFilteredContent.filter(item => 
-    item.tags.some(tag => visitedTags.includes(tag))
+    item.tags && Array.isArray(item.tags) && item.tags.some(tag => visitedTags.includes(tag))
   ).slice(0, 12);
 
   // Premium showcase (only show in 'all' or 'premium' views)
