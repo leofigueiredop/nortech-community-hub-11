@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import Community from "./pages/onboarding/Community";
 import Profile from "./pages/onboarding/Profile";
 import Features from "./pages/onboarding/Features";
+import Creator from "./pages/onboarding/Creator";
 import Dashboard from "./pages/Dashboard";
 import Feed from "./pages/Feed";
 import CreatePost from "./pages/CreatePost";
@@ -68,6 +69,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/onboarding/creator" element={<Creator />} />
               <Route path="/onboarding/community" element={<Community />} />
               <Route path="/onboarding/profile" element={<Profile />} />
               <Route path="/onboarding/features" element={<Features />} />
