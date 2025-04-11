@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ContentItem } from '@/types/library';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -9,10 +9,24 @@ import { ChevronLeft, ChevronRight, Play, Lock, FileText, Download, Clock, Eye }
 interface ContentRowProps {
   items: ContentItem[];
   onItemSelect: (item: ContentItem) => void;
+  isTopTen?: boolean;
 }
 
-const ContentRow: React.FC<ContentRowProps> = ({ items, onItemSelect }) => {
+const ContentRow: React.FC<ContentRowProps> = ({ items, onItemSelect, isTopTen = false }) => {
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -600, behavior: 'smooth' });
+    }
+  };
+  
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 600, behavior: 'smooth' });
+    }
+  };
 
   const getContentIcon = (format: string) => {
     switch (format) {
@@ -48,17 +62,49 @@ const ContentRow: React.FC<ContentRowProps> = ({ items, onItemSelect }) => {
 
   return (
     <div className="relative group">
+      {/* Netflix-style side navigation arrows */}
+      <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-background to-transparent z-10 flex items-center justify-start opacity-0 group-hover:opacity-100 transition-opacity">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="rounded-full bg-background/80 hover:bg-background w-10 h-10"
+          onClick={scrollLeft}
+        >
+          <ChevronLeft />
+        </Button>
+      </div>
+      
+      <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent z-10 flex items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="rounded-full bg-background/80 hover:bg-background w-10 h-10"
+          onClick={scrollRight}
+        >
+          <ChevronRight />
+        </Button>
+      </div>
+      
       <ScrollArea className="w-full whitespace-nowrap">
-        <div className="flex space-x-4 pb-4">
-          {items.map((item) => (
+        <div ref={scrollRef} className="flex space-x-4 pb-4">
+          {items.map((item, index) => (
             <div
               key={item.id}
-              className="relative flex-none w-[250px] transition-transform duration-300 hover:scale-105 hover:z-10"
+              className={`relative flex-none transition-transform duration-300 hover:scale-105 hover:z-10 ${
+                isTopTen ? 'w-[300px]' : 'w-[250px]'
+              }`}
               onMouseEnter={() => setHoveredItemId(item.id)}
               onMouseLeave={() => setHoveredItemId(null)}
               onClick={() => onItemSelect(item)}
             >
-              <div className="relative h-[140px] rounded-md overflow-hidden cursor-pointer">
+              {/* Top 10 number badge */}
+              {isTopTen && (
+                <div className="absolute -left-4 -bottom-4 z-20 font-bold text-[90px] text-stroke-white text-transparent" style={{ textShadow: '-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}>
+                  {index + 1}
+                </div>
+              )}
+
+              <div className={`relative ${isTopTen ? 'h-[169px]' : 'h-[140px]'} rounded-md overflow-hidden cursor-pointer`}>
                 <img
                   src={item.thumbnailUrl || '/placeholder.svg'}
                   alt={item.title}

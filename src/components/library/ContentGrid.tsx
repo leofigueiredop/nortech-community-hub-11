@@ -2,6 +2,7 @@
 import React from 'react';
 import { ContentItem } from '@/types/library';
 import EnhancedContentCard from './EnhancedContentCard';
+import { motion } from 'framer-motion';
 
 interface ContentGridProps {
   items: ContentItem[];
@@ -18,16 +19,38 @@ const ContentGrid: React.FC<ContentGridProps> = ({ items, onItemSelect }) => {
     );
   }
 
+  // Netflix-style staggered animation for grid items
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1 }
+  };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {items.map((item) => (
-        <EnhancedContentCard
-          key={item.id}
-          item={item}
-          onClick={() => onItemSelect(item)}
-        />
+    <motion.div 
+      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      {items.map((item, index) => (
+        <motion.div key={item.id} variants={item}>
+          <EnhancedContentCard
+            item={item}
+            onClick={() => onItemSelect(item)}
+          />
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 };
 

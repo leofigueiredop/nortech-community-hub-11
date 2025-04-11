@@ -10,8 +10,13 @@ import ContentFilters from '@/components/library/ContentFilters';
 import PremiumContentUpgrade from '@/components/feed/PremiumContentUpgrade';
 import { ContentFormat } from '@/types/library';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useTheme } from 'next-themes';
+import { Button } from '@/components/ui/button';
+import { Sun, Moon } from 'lucide-react';
 
 const Library: React.FC = () => {
+  const { theme, setTheme } = useTheme();
+  
   const {
     content,
     filteredContent,
@@ -78,22 +83,43 @@ const Library: React.FC = () => {
 
   // Premium content showcase
   const premiumContent = content.filter(item => item.accessLevel === 'premium');
+  
+  // Top 10 trending content
+  const topTenContent = [...content]
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 10);
 
   // Handle filter toggle
   const toggleFilters = () => {
     setShowFilters(!showFilters);
   };
+  
+  // Toggle theme
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   return (
     <MainLayout title="Content Library">
       <div className="relative">
-        <LibraryHeader 
-          premiumContentCount={premiumContent.length} 
-          onToggleFilters={toggleFilters}
-        />
+        <div className="flex justify-between items-center mb-4">
+          <LibraryHeader 
+            premiumContentCount={premiumContent.length} 
+            onToggleFilters={toggleFilters}
+          />
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleTheme} 
+            className="rounded-full"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </Button>
+        </div>
 
         {showFilters && (
-          <div className="sticky top-0 z-10 bg-background pb-2 border-b">
+          <div className="sticky top-0 z-10 bg-background pb-2 border-b mb-4">
             <ContentFilters
               formatFilter={formatFilter}
               tagFilter={tagFilter}
@@ -111,7 +137,7 @@ const Library: React.FC = () => {
 
         <ScrollArea className="h-[calc(100vh-10rem)]">
           {/* Hero Featured Content */}
-          {featuredContent.length > 0 && (
+          {featuredContent.length > 0 && !searchQuery && tagFilter === 'all' && formatFilter === 'all' && (
             <FeaturedContentCarousel 
               items={featuredContent}
               onItemSelect={setSelectedItem}
@@ -122,15 +148,24 @@ const Library: React.FC = () => {
           {!searchQuery && tagFilter === 'all' && formatFilter === 'all' && (
             <>
               <ContentSection 
+                title="Top 10 Trending" 
+                items={topTenContent} 
+                onItemSelect={setSelectedItem}
+                isTopTen={true}
+              />
+            
+              <ContentSection 
                 title="New Releases" 
                 items={newReleases} 
                 onItemSelect={setSelectedItem}
+                viewAllUrl="/library/new"
               />
 
               <ContentSection 
                 title="Most Popular" 
                 items={mostPopular} 
                 onItemSelect={setSelectedItem}
+                viewAllUrl="/library/popular"
               />
 
               {recommendedContent.length > 0 && (
@@ -138,6 +173,7 @@ const Library: React.FC = () => {
                   title="Recommended for You" 
                   items={recommendedContent} 
                   onItemSelect={setSelectedItem}
+                  viewAllUrl="/library/recommended"
                 />
               )}
 
@@ -146,6 +182,7 @@ const Library: React.FC = () => {
                   title="Courses & Masterclasses" 
                   items={courseContent} 
                   onItemSelect={setSelectedItem}
+                  viewAllUrl="/library/courses"
                 />
               )}
 
@@ -154,6 +191,7 @@ const Library: React.FC = () => {
                   title="PDF Guides" 
                   items={pdfContent} 
                   onItemSelect={setSelectedItem}
+                  viewAllUrl="/library/pdfs"
                 />
               )}
 
@@ -162,6 +200,7 @@ const Library: React.FC = () => {
                   title="Audio Series" 
                   items={audioContent} 
                   onItemSelect={setSelectedItem}
+                  viewAllUrl="/library/audio"
                 />
               )}
 
