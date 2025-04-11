@@ -16,10 +16,12 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ item, onClick
   
   // Card variants for hover animation
   const cardVariants = {
-    initial: { boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" },
+    initial: { y: 0, scale: 1, zIndex: 0 },
     hover: { 
-      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)",
-      borderColor: "var(--nortech-purple)" // Apply purple highlight border
+      y: -10, 
+      scale: 1.05, 
+      zIndex: 20,
+      transition: { duration: 0.3 }
     }
   };
   
@@ -30,25 +32,13 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ item, onClick
       initial="initial"
       animate={isHovered ? "hover" : "initial"}
       variants={cardVariants}
-      className="h-full"
+      className="h-full cursor-pointer"
     >
       <Card 
-        className="overflow-hidden border-2 transition-all duration-300 h-full cursor-pointer group relative"
+        className="overflow-hidden border border-border/40 transition-all duration-300 h-full group relative"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onClick={() => {
-          if (!isHovered) {
-            // On mobile, first tap shows hover state
-            setIsHovered(true);
-            // Add a small delay before allowing the actual click to happen on second tap
-            setTimeout(() => {
-              const isMobile = window.innerWidth < 768;
-              if (!isMobile) onClick();
-            }, 50);
-          } else {
-            onClick();
-          }
-        }}
+        onClick={onClick}
       >
         <ContentCardMedia 
           item={item} 

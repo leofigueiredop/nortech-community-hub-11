@@ -1,42 +1,56 @@
 
 import React from 'react';
 import { ContentItem } from '@/types/library';
-import { Badge } from '@/components/ui/badge';
+import { Play, Download, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getContentActionText } from './contentCardUtils';
 
 interface ContentFreeOverlayProps {
   item: ContentItem;
 }
 
 const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
+  const getContentIcon = (format: string) => {
+    switch (format) {
+      case 'video':
+      case 'youtube':
+      case 'vimeo':
+        return <Play className="h-10 w-10 text-white" />;
+      case 'pdf':
+      case 'text':
+      case 'gdoc':
+        return <FileText className="h-10 w-10 text-white" />;
+      default:
+        return <Download className="h-10 w-10 text-white" />;
+    }
+  };
+
+  const getActionText = (format: string) => {
+    switch (format) {
+      case 'video':
+      case 'youtube':
+      case 'vimeo':
+        return 'Watch Now';
+      case 'pdf':
+      case 'text':
+      case 'gdoc':
+        return 'Read Now';
+      case 'audio':
+        return 'Listen Now';
+      default:
+        return 'View Now';
+    }
+  };
+
   return (
-    <div className="absolute inset-0 bg-black/70 flex flex-col justify-between p-4 transition-opacity duration-300">
-      <div className="flex justify-between">
-        <Badge className="bg-nortech-purple text-white">
-          {item.format.toUpperCase()}
-        </Badge>
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 transition-opacity duration-300">
+      <div className="w-16 h-16 bg-nortech-purple rounded-full flex items-center justify-center mb-4">
+        {getContentIcon(item.format)}
       </div>
-      
-      <div>
-        <h3 className="text-white font-semibold mb-1">{item.title}</h3>
-        <p className="text-white/80 text-sm line-clamp-3 mb-3">{item.description}</p>
-        
-        <div className="flex flex-wrap gap-1 mb-3">
-          {item.tags.slice(0, 3).map(tag => (
-            <Badge key={tag} variant="outline" className="border-white/30 text-white/80 text-xs">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-        
-        <Button 
-          className="w-full bg-nortech-purple hover:bg-nortech-purple/90"
-          size="sm"
-        >
-          {getContentActionText(item.format)} Now
-        </Button>
-      </div>
+      <Button 
+        className="bg-nortech-purple hover:bg-nortech-purple/90 text-white font-medium px-6"
+      >
+        {getActionText(item.format)}
+      </Button>
     </div>
   );
 };

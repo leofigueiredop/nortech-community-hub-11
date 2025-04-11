@@ -57,94 +57,92 @@ const FeaturedContentCarousel: React.FC<FeaturedContentCarouselProps> = ({ items
   };
 
   return (
-    <div className="mb-16">
-      <Carousel className="w-full">
-        <CarouselContent>
-          {items.map((item) => (
-            <CarouselItem key={item.id}>
-              <div 
-                className="relative aspect-[21/9] overflow-hidden rounded-xl"
-                onMouseEnter={() => setHoveredItem(item.id)}
-                onMouseLeave={() => setHoveredItem(null)}
-              >
-                {/* Image with overlay */}
-                <div className="absolute inset-0">
-                  <img 
-                    src={item.thumbnailUrl || '/placeholder.svg'} 
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                </div>
-
-                {/* Featured badge */}
-                <div className="absolute top-4 left-4">
-                  <Badge className="bg-nortech-purple text-white">
-                    Featured
-                  </Badge>
-                  
-                  {item.accessLevel === 'premium' && (
-                    <Badge variant="outline" className="ml-2 border-amber-500 text-amber-500 bg-black/50">
-                      <Lock className="mr-1 h-3 w-3" /> Premium
-                    </Badge>
-                  )}
-                </div>
-
-                {/* Content info */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                  <div className="flex items-center text-sm mb-2">
-                    {getContentTypeIcon(item.format)}
-                    <span className="uppercase text-xs font-medium tracking-wider mr-3">
-                      {item.format}
-                    </span>
-                    
-                    {item.duration && (
-                      <span className="flex items-center text-xs mr-3">
-                        <Clock className="mr-1 h-3 w-3" />
-                        {item.duration}
-                      </span>
-                    )}
-                    
-                    <span className="flex items-center text-xs">
-                      <Eye className="mr-1 h-3 w-3" />
-                      {item.views} views
-                    </span>
-                  </div>
-                  
-                  <h2 className="text-2xl md:text-4xl font-bold mb-2">{item.title}</h2>
-                  
-                  <p className={`text-sm text-gray-300 mb-4 line-clamp-2 transition-all duration-300 ${
-                    hoveredItem === item.id ? 'line-clamp-3' : 'line-clamp-2'
-                  }`}>
-                    {item.description}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {item.tags.slice(0, 3).map(tag => (
-                      <Badge key={tag} variant="secondary" className="bg-white/10 hover:bg-white/20 text-white">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                  
-                  <Button 
-                    onClick={() => onItemSelect(item)}
-                    className="bg-nortech-purple hover:bg-nortech-purple/90"
-                  >
-                    {getContentTypeIcon(item.format)}
-                    {getActionText(item.format)}
-                  </Button>
-                </div>
+    <Carousel className="w-full">
+      <CarouselContent>
+        {items.map((item) => (
+          <CarouselItem key={item.id}>
+            <div 
+              className="relative aspect-[21/9] overflow-hidden rounded-xl"
+              onMouseEnter={() => setHoveredItem(item.id)}
+              onMouseLeave={() => setHoveredItem(null)}
+            >
+              {/* Image with overlay */}
+              <div className="absolute inset-0">
+                <img 
+                  src={item.thumbnailUrl || '/placeholder.svg'} 
+                  alt={item.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
               </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <div className="flex justify-center gap-2 mt-4">
-          <CarouselPrevious className="relative static left-0 translate-y-0 rounded-full" />
-          <CarouselNext className="relative static right-0 translate-y-0 rounded-full" />
-        </div>
-      </Carousel>
-    </div>
+
+              {/* Featured badge */}
+              <div className="absolute top-4 left-4">
+                <Badge className="bg-primary text-primary-foreground">
+                  Featured
+                </Badge>
+                
+                {item.accessLevel === 'premium' && (
+                  <Badge variant="outline" className="ml-2 border-amber-500 text-amber-500 bg-black/50">
+                    <Lock className="mr-1 h-3 w-3" /> Premium
+                  </Badge>
+                )}
+              </div>
+
+              {/* Content info */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <div className="flex items-center text-sm mb-2">
+                  {getContentTypeIcon(item.format)}
+                  <span className="uppercase text-xs font-medium tracking-wider mr-3">
+                    {item.format}
+                  </span>
+                  
+                  {item.duration && (
+                    <span className="flex items-center text-xs mr-3">
+                      <Clock className="mr-1 h-3 w-3" />
+                      {item.duration}
+                    </span>
+                  )}
+                  
+                  <span className="flex items-center text-xs">
+                    <Eye className="mr-1 h-3 w-3" />
+                    {item.views} views
+                  </span>
+                </div>
+                
+                <h2 className="text-2xl md:text-4xl font-bold mb-2">{item.title}</h2>
+                
+                <p className={`text-sm text-gray-300 mb-4 line-clamp-2 transition-all duration-300 ${
+                  hoveredItem === item.id ? 'line-clamp-3' : 'line-clamp-2'
+                }`}>
+                  {item.description}
+                </p>
+                
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {item.tags.slice(0, 3).map(tag => (
+                    <Badge key={tag} variant="secondary" className="bg-white/10 hover:bg-white/20 text-white">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+                
+                <Button 
+                  onClick={() => onItemSelect(item)}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  {getContentTypeIcon(item.format)}
+                  {getActionText(item.format)}
+                </Button>
+              </div>
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <div className="flex justify-center gap-2 mt-4">
+        <CarouselPrevious className="relative static left-0 translate-y-0 rounded-md" />
+        <CarouselNext className="relative static right-0 translate-y-0 rounded-md" />
+      </div>
+    </Carousel>
   );
 };
 
