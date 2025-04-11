@@ -16,10 +16,10 @@ const CreateContentButton: React.FC<CreateContentButtonProps> = ({ onClick }) =>
           <TooltipTrigger asChild>
             <Button 
               onClick={onClick} 
-              size="lg" 
-              className="rounded-full w-14 h-14 shadow-lg"
+              size="icon" 
+              className="rounded-full w-12 h-12 shadow-lg"
             >
-              <Plus className="h-6 w-6" />
+              <Plus className="h-5 w-5" />
               <span className="sr-only">Create Content</span>
             </Button>
           </TooltipTrigger>

@@ -88,6 +88,7 @@ const App = () => (
               
               <Route path="/library" element={<Library />} />
               <Route path="/library/manage" element={<ContentManagement />} />
+              <Route path="/content-creator-dashboard" element={<ContentCreatorDashboard />} />
               <Route path="/events" element={<Events />} />
               <Route path="/events/weekly" element={<EventsWeekly />} />
               <Route path="/events/calendar" element={<EventsCalendar />} />

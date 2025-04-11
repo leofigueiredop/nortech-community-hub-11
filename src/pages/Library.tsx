@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { useLibraryState } from '@/hooks/useLibraryState';
@@ -9,9 +10,11 @@ import LibraryTopBar from '@/components/library/LibraryTopBar';
 import LibraryContentArea from '@/components/library/LibraryContentArea';
 import CreateContentButton from '@/components/library/CreateContentButton';
 import ContentFilters from '@/components/library/ContentFilters';
+import { Button } from '@/components/ui/button';
+import { Settings } from 'lucide-react';
 
 const Library: React.FC = () => {
-  const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('free'); // Changed default to 'free'
+  const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('free'); // Default to 'free'
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateContentOpen, setIsCreateContentOpen] = useState(false);
   
@@ -62,21 +65,32 @@ const Library: React.FC = () => {
   return (
     <MainLayout title="Content Library">
       <div className="relative min-h-screen flex flex-col">
-        <LibraryTopBar
-          formatFilter={formatFilter}
-          tagFilter={tagFilter}
-          sortBy={sortBy}
-          activeView={activeView}
-          searchQuery={searchQuery}
-          setActiveView={setActiveView}
-          setSearchQuery={setSearchQuery}
-          setGlobalSearchQuery={setGlobalSearchQuery}
-          allTags={allTags}
-          allFormats={allFormats}
-          setFormatFilter={setFormatFilter}
-          setTagFilter={setTagFilter}
-          setSortBy={setSortBy}
-        />
+        <div className="sticky top-0 z-30 w-full">
+          <LibraryTopBar
+            formatFilter={formatFilter}
+            tagFilter={tagFilter}
+            sortBy={sortBy}
+            activeView={activeView}
+            searchQuery={searchQuery}
+            setActiveView={setActiveView}
+            setSearchQuery={setSearchQuery}
+            setGlobalSearchQuery={setGlobalSearchQuery}
+            allTags={allTags}
+            allFormats={allFormats}
+            setFormatFilter={setFormatFilter}
+            setTagFilter={setTagFilter}
+            setSortBy={setSortBy}
+          />
+
+          <div className="container flex justify-end py-2 max-w-screen-2xl">
+            <Link to="/content-creator-dashboard">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Settings size={14} />
+                <span>Creator Dashboard</span>
+              </Button>
+            </Link>
+          </div>
+        </div>
 
         <ContentFilters 
           formatFilter={formatFilter}
