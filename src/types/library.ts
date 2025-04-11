@@ -1,58 +1,73 @@
 
-export type ContentFormat = 'video' | 'audio' | 'pdf' | 'text' | 'url' | 'youtube' | 'vimeo' | 'gdoc' | 'image' | 'link' | 'gdrive' | 'course';
+export type ContentFormat = 'audio' | 'pdf' | 'text' | 'url' | 'youtube' | 'vimeo' | 'gdoc' | 'image' | 'course' | 'link';
 
-export type AccessLevel = 'free' | 'premium' | 'unlockable';
-export type ContentVisibility = 'public' | 'premium' | 'points' | 'hidden' | 'vip-only' | 'limited-time';
-
-export interface ContentCategory {
+export interface Author {
   id: string;
   name: string;
-  description: string;
-  count: number;
-  createdAt: string;
-  updatedAt: string;
+  avatar?: string;
 }
 
 export interface ContentItem {
   id: string;
   title: string;
   description: string;
-  thumbnail?: string;
-  thumbnailUrl?: string; // For backward compatibility
-  content?: string;
   format: ContentFormat;
+  thumbnail: string;
+  author: Author | string;
   tags: string[];
-  accessLevel: AccessLevel;
-  featured?: boolean;
-  isTopTen?: boolean; // Field for top 10 content
   createdAt: string;
   updatedAt: string;
   views: number;
-  author?: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  duration?: number | string;
-  fileSize?: number | string;
-  downloadUrl?: string;
+  duration: number;
+  accessLevel: 'free' | 'premium' | 'unlockable';
+  featured: boolean;
   categoryId?: string;
   pointsEnabled?: boolean;
   pointsValue?: number;
-  freeAccessesLeft?: number;
-  resourceUrl?: string;
-  visibility?: ContentVisibility;
-  completionCriteria?: 'view' | 'scroll_end' | 'watch_percent' | 'time_spent';
-  completionThreshold?: number;
-  allowComments?: boolean;
+  resourceUrl?: string; // URL for the content resource
+  visibility?: string; // Public, premium-only, etc.
+  completionCriteria?: string; // Watch, read, etc.
+  completionThreshold?: number; // Percentage or time needed for completion
+  addToCarousel?: boolean;
+}
+
+export interface ContentCategory {
+  id: string;
+  name: string;
+  description?: string;
+  itemCount: number;
+  icon?: string;
 }
 
 export interface ContentProgress {
   id: string;
-  contentId: string;
   userId: string;
+  contentId: string;
   progress: number;
   completed: boolean;
   lastAccessedAt: string;
-  pointsAwarded?: boolean;
+  pointsAwarded: boolean;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  modules: CourseModule[];
+  accessLevel: 'free' | 'premium';
+}
+
+export interface CourseModule {
+  id: string;
+  title: string;
+  items: CourseModuleItem[];
+}
+
+export interface CourseModuleItem {
+  id: string;
+  title: string;
+  type: 'video' | 'quiz' | 'text' | 'assignment';
+  contentId?: string;
+  completed?: boolean;
 }

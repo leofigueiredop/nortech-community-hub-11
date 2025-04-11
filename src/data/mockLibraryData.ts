@@ -1,254 +1,211 @@
 
-import { ContentItem, ContentCategory, Course } from '@/types/library';
+import { ContentItem, ContentCategory, ContentFormat } from '@/types/library';
 
-// Mock data for the library
+export const CONTENT_CATEGORIES: ContentCategory[] = [
+  {
+    id: 'cat1',
+    name: 'Getting Started',
+    description: 'Introduction to the platform and basic concepts',
+    itemCount: 5,
+    icon: 'rocket'
+  },
+  {
+    id: 'cat2',
+    name: 'Tutorials',
+    description: 'Step-by-step guides for common tasks',
+    itemCount: 8,
+    icon: 'book-open'
+  },
+  {
+    id: 'cat3',
+    name: 'Advanced Topics',
+    description: 'Deep dives into complex subjects',
+    itemCount: 3,
+    icon: 'zap'
+  },
+  {
+    id: 'cat4',
+    name: 'Community Resources',
+    description: 'Content created by community members',
+    itemCount: 6,
+    icon: 'users'
+  }
+];
+
+// Mock content items for the library
 export const CONTENT_ITEMS: ContentItem[] = [
   {
-    id: '1',
-    title: 'Introduction to Web3 Development',
-    description: 'Learn the basics of Web3 development and blockchain technology',
-    format: 'video',
-    thumbnailUrl: '/placeholder.svg',
-    resourceUrl: 'https://example.com/video1',
-    tags: ['Web3', 'Development', 'Blockchain'],
+    id: 'c1',
+    title: 'Getting Started with Our Platform',
+    description: 'A comprehensive introduction to the platform features and capabilities.',
+    format: 'video' as ContentFormat,
+    thumbnail: 'https://via.placeholder.com/800x450',
+    author: 'John Doe',
+    tags: ['beginner', 'intro', 'tutorial'],
+    createdAt: '2023-05-15T10:30:00Z',
+    updatedAt: '2023-05-15T10:30:00Z',
+    views: 1547,
+    duration: 732, // Duration in seconds
     accessLevel: 'free',
-    createdAt: '2023-09-15T10:30:00Z',
-    updatedAt: '2023-09-15T10:30:00Z',
-    duration: '45:21',
-    views: 1243,
     featured: true,
-    pointsEnabled: true,
-    pointsValue: 10,
-    completionCriteria: 'watch_percent',
-    completionThreshold: 80
+    categoryId: 'cat1'
   },
   {
-    id: '2',
-    title: 'Advanced Smart Contract Patterns',
-    description: 'Deep dive into advanced smart contract patterns and best practices',
-    format: 'pdf',
-    thumbnailUrl: '/placeholder.svg',
-    resourceUrl: 'https://example.com/pdf1',
-    tags: ['Web3', 'Smart Contracts', 'Solidity'],
+    id: 'c2',
+    title: 'Advanced User Management Techniques',
+    description: 'Learn how to effectively manage users and permissions in complex organizations.',
+    format: 'pdf' as ContentFormat,
+    thumbnail: 'https://via.placeholder.com/800x450',
+    author: 'Jane Smith',
+    tags: ['advanced', 'management', 'permissions'],
+    createdAt: '2023-04-22T14:45:00Z',
+    updatedAt: '2023-05-10T09:15:00Z',
+    views: 986,
+    duration: 900, // Estimated reading time in seconds
     accessLevel: 'premium',
-    createdAt: '2023-10-02T14:15:00Z',
-    updatedAt: '2023-10-05T09:20:00Z',
-    fileSize: '3.2 MB',
-    views: 765,
-    pointsEnabled: true,
-    pointsValue: 15
+    featured: false,
+    categoryId: 'cat3'
   },
   {
-    id: '3',
-    title: 'Financial Freedom Blueprint',
-    description: 'A comprehensive guide to achieving financial independence',
-    format: 'pdf',
-    thumbnailUrl: '/placeholder.svg',
-    resourceUrl: 'https://example.com/pdf2',
-    tags: ['Finance', 'Wealth Building'],
+    id: 'c3',
+    title: 'Building Your First Integration',
+    description: 'Step-by-step guide to creating your first API integration with our platform.',
+    format: 'audio' as ContentFormat,
+    thumbnail: 'https://via.placeholder.com/800x450',
+    author: {
+      id: 'u1',
+      name: 'Mark Johnson',
+      avatar: 'https://via.placeholder.com/100'
+    },
+    tags: ['api', 'integration', 'tutorial'],
+    createdAt: '2023-05-05T11:20:00Z',
+    updatedAt: '2023-05-05T11:20:00Z',
+    views: 753,
+    duration: 1845, // Duration in seconds
     accessLevel: 'free',
-    createdAt: '2023-08-20T08:45:00Z',
-    updatedAt: '2023-08-22T11:30:00Z',
-    fileSize: '4.7 MB',
-    views: 2187,
-    pointsEnabled: true,
-    pointsValue: 10,
-    completionCriteria: 'scroll_end'
-  },
-  {
-    id: '4',
-    title: 'Mindset Mastery Audio Series',
-    description: 'Transform your mindset with this powerful audio series',
-    format: 'audio',
-    thumbnailUrl: '/placeholder.svg',
-    resourceUrl: 'https://example.com/audio1',
-    tags: ['Mindset', 'Personal Development'],
-    accessLevel: 'premium',
-    createdAt: '2023-07-10T16:20:00Z',
-    updatedAt: '2023-07-12T13:10:00Z',
-    duration: '3:15:42',
-    views: 894,
-    pointsEnabled: false,
-    pointsValue: 0
-  },
-  {
-    id: '5',
-    title: 'Growth Strategy Resources',
-    description: 'Collection of essential resources for business growth',
-    format: 'link',
-    thumbnailUrl: '/placeholder.svg',
-    resourceUrl: 'https://example.com/resources',
-    tags: ['Business', 'Growth', 'Strategy'],
-    accessLevel: 'free',
-    createdAt: '2023-11-05T09:30:00Z',
-    updatedAt: '2023-11-05T09:30:00Z',
-    views: 567,
-    pointsEnabled: true,
-    pointsValue: 5,
-    completionCriteria: 'view'
-  },
-  {
-    id: '6',
-    title: 'UI/UX Design Principles',
-    description: 'Learn the fundamentals of creating user-friendly interfaces',
-    format: 'video',
-    thumbnailUrl: '/placeholder.svg',
-    resourceUrl: 'https://example.com/video2',
-    tags: ['Design', 'UI/UX'],
-    accessLevel: 'free',
-    createdAt: '2023-10-18T13:45:00Z',
-    updatedAt: '2023-10-20T10:15:00Z',
-    duration: '37:52',
-    views: 1089,
-    pointsEnabled: true,
-    pointsValue: 8,
-    completionCriteria: 'watch_percent',
-    completionThreshold: 75
-  },
-  {
-    id: '7',
-    title: 'Crypto Market Analysis',
-    description: 'In-depth analysis of current cryptocurrency market trends',
-    format: 'image',
-    thumbnailUrl: '/placeholder.svg',
-    resourceUrl: 'https://example.com/image1',
-    tags: ['Crypto', 'Finance', 'Analysis'],
-    accessLevel: 'premium',
-    createdAt: '2023-11-10T11:20:00Z',
-    updatedAt: '2023-11-10T11:20:00Z',
-    views: 432,
-    pointsEnabled: false,
-    pointsValue: 0
-  },
-  {
-    id: '8',
-    title: 'Productivity Framework',
-    description: 'A step-by-step framework to 10x your productivity',
-    format: 'text',
-    thumbnailUrl: '/placeholder.svg',
-    resourceUrl: 'https://example.com/text1',
-    tags: ['Productivity', 'Mindset'],
-    accessLevel: 'free',
-    createdAt: '2023-09-28T15:10:00Z',
-    updatedAt: '2023-09-30T09:45:00Z',
-    views: 876,
-    pointsEnabled: true,
-    pointsValue: 5,
-    completionCriteria: 'time_spent',
-    completionThreshold: 120
-  }
-];
-
-export const CATEGORIES: ContentCategory[] = [
-  { 
-    id: '1', 
-    name: 'Web3', 
-    description: 'Blockchain and decentralized technologies', 
-    count: 3,
-    createdAt: '2023-08-15T10:30:00Z',
-    updatedAt: '2023-08-15T10:30:00Z'
-  },
-  { 
-    id: '2', 
-    name: 'Finance', 
-    description: 'Financial education and wealth building', 
-    count: 3,
-    createdAt: '2023-08-15T10:30:00Z',
-    updatedAt: '2023-08-15T10:30:00Z'
-  },
-  { 
-    id: '3', 
-    name: 'Mindset', 
-    description: 'Personal development and mental strategies', 
-    count: 3,
-    createdAt: '2023-08-15T10:30:00Z',
-    updatedAt: '2023-08-15T10:30:00Z'
-  },
-  { 
-    id: '4', 
-    name: 'Design', 
-    description: 'UI/UX and visual design principles', 
-    count: 1,
-    createdAt: '2023-08-15T10:30:00Z',
-    updatedAt: '2023-08-15T10:30:00Z'
-  },
-  { 
-    id: '5', 
-    name: 'Business', 
-    description: 'Business growth and strategy', 
-    count: 1,
-    createdAt: '2023-08-15T10:30:00Z',
-    updatedAt: '2023-08-15T10:30:00Z'
-  },
-  { 
-    id: '6', 
-    name: 'Development', 
-    description: 'Software and web development', 
-    count: 2,
-    createdAt: '2023-08-15T10:30:00Z',
-    updatedAt: '2023-08-15T10:30:00Z'
-  }
-];
-
-// Mock data for courses
-export const COURSES: Course[] = [
-  {
-    id: '1',
-    title: 'Complete Web3 Development Bootcamp',
-    description: 'Comprehensive course covering the fundamentals of Web3 development',
-    thumbnailUrl: '/placeholder.svg',
-    modules: [
-      {
-        id: '1-1',
-        title: 'Introduction to Blockchain',
-        description: 'Learn the basics of blockchain technology',
-        contentItems: ['1', '2'],
-        order: 1,
-        duration: '1:30:00'
-      },
-      {
-        id: '1-2',
-        title: 'Smart Contract Development',
-        description: 'Building and deploying smart contracts',
-        contentItems: ['3', '4'],
-        order: 2,
-        duration: '2:15:00'
-      }
-    ],
-    accessLevel: 'premium',
-    createdAt: '2023-10-20T14:30:00Z',
-    updatedAt: '2023-11-05T09:45:00Z',
-    views: 876,
     featured: true,
-    tags: ['Web3', 'Development', 'Blockchain', 'Smart Contracts']
+    categoryId: 'cat2'
   },
   {
-    id: '2',
-    title: 'Financial Freedom Masterclass',
-    description: 'Step-by-step guide to achieving financial independence',
-    thumbnailUrl: '/placeholder.svg',
-    modules: [
-      {
-        id: '2-1',
-        title: 'Wealth Building Foundations',
-        description: 'Core principles of building lasting wealth',
-        contentItems: ['5'],
-        order: 1,
-        duration: '1:15:00'
-      },
-      {
-        id: '2-2',
-        title: 'Investment Strategies',
-        description: 'Advanced investment techniques for growth',
-        contentItems: ['6', '7'],
-        order: 2,
-        duration: '1:45:00'
-      }
-    ],
+    id: 'c4',
+    title: 'Performance Optimization Strategies',
+    description: 'Discover techniques to improve system performance and reduce latency.',
+    format: 'video' as ContentFormat,
+    thumbnail: 'https://via.placeholder.com/800x450',
+    author: 'Sarah Williams',
+    tags: ['performance', 'optimization', 'advanced'],
+    createdAt: '2023-04-10T08:30:00Z',
+    updatedAt: '2023-04-15T16:40:00Z',
+    views: 1254,
+    duration: 1200, // Duration in seconds
+    accessLevel: 'premium',
+    featured: false,
+    categoryId: 'cat3'
+  },
+  {
+    id: 'c5',
+    title: 'Community Guidelines and Best Practices',
+    description: 'An overview of our community guidelines and recommended practices.',
+    format: 'pdf' as ContentFormat,
+    thumbnail: 'https://via.placeholder.com/800x450',
+    author: 'Community Team',
+    tags: ['community', 'guidelines'],
+    createdAt: '2023-05-01T09:00:00Z',
+    updatedAt: '2023-05-01T09:00:00Z',
+    views: 632,
+    duration: 600, // Estimated reading time in seconds
     accessLevel: 'free',
-    createdAt: '2023-09-10T11:20:00Z',
-    updatedAt: '2023-10-15T13:30:00Z',
-    views: 1245,
-    tags: ['Finance', 'Wealth Building', 'Investment']
+    featured: false,
+    categoryId: 'cat4'
+  },
+  {
+    id: 'c6',
+    title: 'External Resources Compilation',
+    description: 'A curated list of external resources to complement your learning journey.',
+    format: 'link' as ContentFormat,
+    thumbnail: 'https://via.placeholder.com/800x450',
+    author: {
+      id: 'u2',
+      name: 'Resource Team',
+      avatar: 'https://via.placeholder.com/100'
+    },
+    tags: ['resources', 'links', 'learning'],
+    createdAt: '2023-03-20T13:15:00Z',
+    updatedAt: '2023-05-12T10:20:00Z',
+    views: 879,
+    duration: 300, // Estimated exploration time in seconds
+    accessLevel: 'free',
+    featured: false,
+    categoryId: 'cat4'
+  },
+  {
+    id: 'c7',
+    title: 'Security Best Practices',
+    description: 'Learn how to secure your applications and protect user data.',
+    format: 'video' as ContentFormat,
+    thumbnail: 'https://via.placeholder.com/800x450',
+    author: 'Alex Chen',
+    tags: ['security', 'privacy', 'best-practices'],
+    createdAt: '2023-04-28T15:30:00Z',
+    updatedAt: '2023-04-28T15:30:00Z',
+    views: 1032,
+    duration: 1560, // Duration in seconds
+    accessLevel: 'premium',
+    featured: true,
+    categoryId: 'cat2'
+  },
+  {
+    id: 'c8',
+    title: 'Troubleshooting Common Issues',
+    description: 'Solutions to common problems encountered by users.',
+    format: 'image' as ContentFormat,
+    thumbnail: 'https://via.placeholder.com/800x450',
+    author: {
+      id: 'u3',
+      name: 'Support Team',
+      avatar: 'https://via.placeholder.com/100'
+    },
+    tags: ['troubleshooting', 'support', 'help'],
+    createdAt: '2023-05-08T11:45:00Z',
+    updatedAt: '2023-05-08T11:45:00Z',
+    views: 1476,
+    duration: 900, // Estimated reading time in seconds
+    accessLevel: 'free',
+    featured: false,
+    categoryId: 'cat1'
+  },
+  {
+    id: 'c9',
+    title: 'Advanced Analytics Dashboard',
+    description: 'How to leverage our advanced analytics dashboard for business insights.',
+    format: 'course' as ContentFormat,
+    thumbnail: 'https://via.placeholder.com/800x450',
+    author: 'Data Insights Team',
+    tags: ['analytics', 'dashboard', 'data'],
+    createdAt: '2023-04-18T09:20:00Z',
+    updatedAt: '2023-05-20T14:15:00Z',
+    views: 896,
+    duration: 2700, // Duration in seconds
+    accessLevel: 'premium',
+    featured: true,
+    categoryId: 'cat3',
+    pointsEnabled: true,
+    pointsValue: 200
+  },
+  {
+    id: 'c10',
+    title: 'Quick Start Guide for New Users',
+    description: 'Get up and running with our platform in less than 10 minutes.',
+    format: 'pdf' as ContentFormat,
+    thumbnail: 'https://via.placeholder.com/800x450',
+    author: 'Onboarding Team',
+    tags: ['quick-start', 'beginner'],
+    createdAt: '2023-05-17T08:10:00Z',
+    updatedAt: '2023-05-17T08:10:00Z',
+    views: 2134,
+    duration: 480, // Estimated reading time in seconds
+    accessLevel: 'free',
+    featured: false,
+    categoryId: 'cat1'
   }
 ];

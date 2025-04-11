@@ -1,7 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Filter, X, Search, Plus } from 'lucide-react';
+import { 
+  Filter, 
+  Settings, 
+  Search
+} from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { 
   Drawer,
@@ -10,6 +14,7 @@ import {
 } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 import LibraryFiltersSidebar from './LibraryFiltersSidebar';
+import { Link } from 'react-router-dom';
 
 interface LibraryTopBarProps {
   formatFilter: string;
@@ -59,49 +64,56 @@ const LibraryTopBar: React.FC<LibraryTopBarProps> = ({
 
   return (
     <div className="sticky top-0 z-30 w-full bg-background/95 backdrop-blur supports-backdrop-blur:bg-background/60 border-b">
-      <div className="container flex h-14 max-w-screen-2xl items-center">
-        <div className="mr-4 flex">
+      <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4">
+        <div className="flex items-center">
           <h1 className="text-xl font-semibold">Content Library</h1>
         </div>
         
-        <div className="flex-1"></div>
+        <div className="flex items-center gap-2">
+          <Drawer open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+            <DrawerTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={cn(
+                  "flex items-center gap-2 h-9",
+                  hasActiveFilters && "border-primary text-primary"
+                )}
+              >
+                <Filter size={16} />
+                <span>Advanced Filters</span>
+                {hasActiveFilters && (
+                  <span className="ml-1 rounded-full bg-primary w-5 h-5 flex items-center justify-center text-[10px] text-primary-foreground">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="max-h-[85vh]">
+              <div className="px-4 py-6 max-w-md mx-auto">
+                <h3 className="text-lg font-semibold mb-4">Advanced Filters</h3>
+                <LibraryFiltersSidebar
+                  formatFilter={formatFilter}
+                  tagFilter={tagFilter}
+                  sortBy={sortBy}
+                  allFormats={allFormats}
+                  allTags={allTags}
+                  setFormatFilter={setFormatFilter}
+                  setTagFilter={setTagFilter}
+                  setSortBy={setSortBy}
+                  onClose={() => setIsFiltersOpen(false)}
+                />
+              </div>
+            </DrawerContent>
+          </Drawer>
 
-        <Drawer open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-          <DrawerTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className={cn(
-                "flex items-center gap-2 h-9 mr-2",
-                hasActiveFilters && "border-primary text-primary"
-              )}
-            >
-              <Filter size={16} />
-              <span>Advanced Filters</span>
-              {hasActiveFilters && (
-                <span className="ml-1 rounded-full bg-primary w-5 h-5 flex items-center justify-center text-[10px] text-primary-foreground">
-                  {activeFiltersCount}
-                </span>
-              )}
+          <Link to="/content-creator-dashboard">
+            <Button variant="outline" size="sm" className="gap-2 ml-2">
+              <Settings size={16} />
+              <span className="hidden sm:inline">Creator Dashboard</span>
             </Button>
-          </DrawerTrigger>
-          <DrawerContent className="max-h-[85vh]">
-            <div className="px-4 py-6 max-w-md mx-auto">
-              <h3 className="text-lg font-semibold mb-4">Advanced Filters</h3>
-              <LibraryFiltersSidebar
-                formatFilter={formatFilter}
-                tagFilter={tagFilter}
-                sortBy={sortBy}
-                allFormats={allFormats}
-                allTags={allTags}
-                setFormatFilter={setFormatFilter}
-                setTagFilter={setTagFilter}
-                setSortBy={setSortBy}
-                onClose={() => setIsFiltersOpen(false)}
-              />
-            </div>
-          </DrawerContent>
-        </Drawer>
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -1,138 +1,175 @@
 
 import React, { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { ContentItem } from '@/types/library';
+import { formatDistanceToNow } from 'date-fns';
 import { 
-  Calendar, 
   Clock, 
-  User, 
+  Calendar, 
+  Eye, 
+  ExternalLink, 
+  FileText, 
   Download, 
-  Tag, 
-  ChevronDown,
-  ChevronUp,
-  FileText,
-  Eye
+  Tag,
+  Crown
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { getContentTypeFromUrl } from './contentViewerUtils';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Accordion, 
+  AccordionContent, 
+  AccordionItem, 
+  AccordionTrigger 
+} from '@/components/ui/accordion';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ContentDetailsProps {
   item: ContentItem;
 }
 
 const ContentDetails: React.FC<ContentDetailsProps> = ({ item }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   
+  // Format duration from seconds to minutes and seconds
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+  
+  // Function to render author
+  const renderAuthor = () => {
+    if (typeof item.author === 'string') {
+      return (
+        <div className="flex items-center">
+          <Avatar className="h-8 w-8 mr-2">
+            <AvatarFallback>{item.author.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="text-sm font-medium">{item.author}</p>
+            <p className="text-xs text-muted-foreground">Creator</p>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="flex items-center">
+          <Avatar className="h-8 w-8 mr-2">
+            <AvatarImage src={item.author.avatar} alt={item.author.name} />
+            <AvatarFallback>{item.author.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="text-sm font-medium">{item.author.name}</p>
+            <p className="text-xs text-muted-foreground">Creator</p>
+          </div>
+        </div>
+      );
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="font-medium mb-2">About this content</h3>
-        <div className={!isExpanded ? "line-clamp-3" : ""}>
-          <p className="text-muted-foreground text-sm">{item.description}</p>
-        </div>
-        {item.description && item.description.length > 150 && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="mt-2 h-7 px-2"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? (
-              <>
-                <ChevronUp className="h-3 w-3 mr-1" /> Show less
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-3 w-3 mr-1" /> Read more
-              </>
-            )}
-          </Button>
-        )}
-      </div>
-
-      <Separator />
-
-      <div>
-        <h3 className="font-medium mb-2">Categories</h3>
-        <div className="flex flex-wrap gap-2">
-          {item.tags.map(tag => (
-            <Badge key={tag} variant="outline" className="flex items-center gap-1 hover:bg-primary/10 transition-colors">
-              <Tag className="h-3 w-3" />
-              {tag}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      <Separator />
-
-      <Collapsible defaultOpen className="space-y-4">
-        <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer">
-            <h3 className="font-medium">Content Details</h3>
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+      <div className="bg-accent/50 p-4 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Content Details</h3>
+            <ul className="space-y-2">
+              <li className="flex items-center text-sm">
+                <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="text-muted-foreground">Published:</span>
+                <span className="ml-1">
+                  {formatDistanceToNow(new Date(item.createdAt))} ago
+                </span>
+              </li>
+              <li className="flex items-center text-sm">
+                <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="text-muted-foreground">Duration:</span>
+                <span className="ml-1">{formatDuration(item.duration)}</span>
+              </li>
+              <li className="flex items-center text-sm">
+                <Eye className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="text-muted-foreground">Views:</span>
+                <span className="ml-1">{item.views.toLocaleString()}</span>
+              </li>
+              {item.resourceUrl && (
+                <li className="flex items-center text-sm">
+                  <ExternalLink className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <span className="text-muted-foreground">Source:</span>
+                  <Button variant="link" size="sm" className="h-auto p-0 ml-1">
+                    External Link
+                  </Button>
+                </li>
+              )}
+            </ul>
           </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 rounded-lg bg-muted/50 p-3">
-            {item.fileSize && (
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Download className="h-4 w-4 mr-2 text-primary/70" />
-                File size: {item.fileSize}
-              </div>
-            )}
-            
-            {item.duration && (
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Clock className="h-4 w-4 mr-2 text-primary/70" />
-                Duration: {item.duration}
-              </div>
-            )}
-            
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4 mr-2 text-primary/70" />
-              Created: {format(new Date(item.createdAt), 'MMM d, yyyy')}
-            </div>
-            
-            <div className="flex items-center text-sm text-muted-foreground">
-              <FileText className="h-4 w-4 mr-2 text-primary/70" />
-              Format: {getContentTypeFromUrl(item.resourceUrl)}
-            </div>
-            
-            <div className="flex items-center text-sm text-muted-foreground">
-              <User className="h-4 w-4 mr-2 text-primary/70" />
-              Author: {item.author || 'Unknown'}
-            </div>
-            
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Eye className="h-4 w-4 mr-2 text-primary/70" />
-              Views: {item.views.toLocaleString()}
-            </div>
+          
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Access Information</h3>
+            <ul className="space-y-2">
+              <li className="flex items-center text-sm">
+                <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="text-muted-foreground">Format:</span>
+                <span className="ml-1 capitalize">{item.format}</span>
+              </li>
+              <li className="flex items-center text-sm">
+                <Crown className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="text-muted-foreground">Access Level:</span>
+                <span className="ml-1 capitalize">{item.accessLevel}</span>
+              </li>
+              {item.pointsEnabled && (
+                <li className="flex items-center text-sm">
+                  <span className="mr-2 text-muted-foreground">🔥</span>
+                  <span className="text-muted-foreground">Points:</span>
+                  <span className="ml-1">{item.pointsValue} points when completed</span>
+                </li>
+              )}
+            </ul>
           </div>
-        </CollapsibleContent>
-      </Collapsible>
+        </div>
+      </div>
       
-      {item.pointsEnabled && (
-        <>
-          <Separator />
-          <div className="rounded-lg bg-primary/10 p-4 border border-primary/20">
-            <h3 className="font-medium mb-2 text-primary">Achievement</h3>
-            <p className="text-sm text-muted-foreground mb-2">
-              Complete this content to earn {item.pointsValue} points and unlock rewards!
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="description">
+          <AccordionTrigger>Description</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-sm leading-relaxed whitespace-pre-line">
+              {item.description}
             </p>
-            <div className="flex items-center justify-center">
-              <Badge className="bg-primary text-white">
-                <svg className="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 15L8.5359 17.1524L9.33126 13.1762L6.66253 10.3476L10.268 9.67376L12 6L13.732 9.67376L17.3375 10.3476L14.6687 13.1762L15.4641 17.1524L12 15Z" fill="currentColor" />
-                </svg>
-                {item.pointsValue} Points
-              </Badge>
+          </AccordionContent>
+        </AccordionItem>
+        
+        <AccordionItem value="author">
+          <AccordionTrigger>About the Creator</AccordionTrigger>
+          <AccordionContent>
+            <div className="p-2">
+              {renderAuthor()}
             </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+      
+      {item.tags.length > 0 && (
+        <div>
+          <div className="flex items-center mb-2">
+            <Tag className="h-4 w-4 mr-2 text-muted-foreground" />
+            <h3 className="text-sm font-semibold">Tags</h3>
           </div>
-        </>
+          <div className="flex flex-wrap gap-2">
+            {item.tags.map((tag) => (
+              <Badge key={tag} variant="outline" className="text-xs">
+                #{tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {["pdf", "audio"].includes(item.format) && (
+        <div className="pt-2">
+          <Button className="w-full sm:w-auto">
+            <Download className="h-4 w-4 mr-2" />
+            Download {item.format.toUpperCase()}
+          </Button>
+        </div>
       )}
     </div>
   );

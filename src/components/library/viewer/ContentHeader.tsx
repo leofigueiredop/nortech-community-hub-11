@@ -1,92 +1,117 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Eye, Lock, Trophy, MessageSquare, User, Download } from 'lucide-react';
 import { ContentItem } from '@/types/library';
 import { formatDistanceToNow } from 'date-fns';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  Calendar, 
+  Clock, 
+  MessageSquare, 
+  Share2, 
+  ThumbsUp, 
+  Bookmark,
+  Crown 
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface ContentHeaderProps {
   item: ContentItem;
+  onBack: () => void;
 }
 
-const ContentHeader: React.FC<ContentHeaderProps> = ({ item }) => {
+const ContentHeader: React.FC<ContentHeaderProps> = ({ item, onBack }) => {
+  // Function to render author
+  const renderAuthor = () => {
+    if (typeof item.author === 'string') {
+      return (
+        <div className="flex items-center">
+          <Avatar className="h-6 w-6 mr-2">
+            <AvatarFallback>{item.author.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <span className="text-sm font-medium">{item.author}</span>
+        </div>
+      );
+    } else {
+      return (
+        <div className="flex items-center">
+          <Avatar className="h-6 w-6 mr-2">
+            <AvatarImage src={item.author.avatar} alt={item.author.name} />
+            <AvatarFallback>{item.author.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <span className="text-sm font-medium">{item.author.name}</span>
+        </div>
+      );
+    }
+  };
+
   return (
-    <div className="flex flex-wrap items-center gap-2 mt-2">
-      <Badge 
-        variant={item.accessLevel === 'premium' ? 'default' : 'outline'}
-        className={item.accessLevel === 'premium' ? 'bg-amber-500 hover:bg-amber-600 border-none text-white' : ''}
-      >
-        {item.accessLevel === 'premium' ? (
-          <>
-            <Lock size={12} className="mr-1" /> Premium
-          </>
-        ) : (
-          'Free'
-        )}
-      </Badge>
+    <div className="border-b pb-4">
+      <div className="flex items-center justify-between mb-3">
+        <Button variant="ghost" size="sm" onClick={onBack}>
+          ← Back
+        </Button>
+        
+        <div className="flex items-center gap-2">
+          {item.accessLevel === 'premium' && (
+            <Badge variant="secondary" className="bg-amber-500 text-white">
+              <Crown className="h-3 w-3 mr-1" /> Premium
+            </Badge>
+          )}
+          {item.format && (
+            <Badge variant="outline">
+              {item.format.charAt(0).toUpperCase() + item.format.slice(1)}
+            </Badge>
+          )}
+        </div>
+      </div>
       
-      {item.pointsEnabled && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge variant="outline" className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-300">
-                <Trophy size={12} className="mr-1" /> {item.pointsValue} pts
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Complete to earn {item.pointsValue} points</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
+      <h1 className="text-2xl font-bold mb-2">{item.title}</h1>
       
-      {item.format === 'pdf' && item.fileSize && (
-        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-          <Download size={12} className="mr-1" /> {item.fileSize}
-        </Badge>
-      )}
+      <div className="text-sm text-muted-foreground mb-4">
+        {item.description}
+      </div>
       
-      {item.allowComments && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                <MessageSquare size={12} className="mr-1" /> Comments
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Comments are enabled for this content</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-      
-      <div className="flex-grow"></div>
-      
-      <span className="text-muted-foreground text-sm flex items-center">
-        <Calendar className="inline h-3 w-3 mr-1" />
-        {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
-      </span>
-      
-      <span className="text-muted-foreground text-sm flex items-center">
-        <Eye className="inline h-3 w-3 mr-1" />
-        {item.views.toLocaleString()}
-      </span>
-      
-      {item.duration && (
-        <span className="text-muted-foreground text-sm flex items-center">
-          <Clock className="inline h-3 w-3 mr-1" />
-          {item.duration}
-        </span>
-      )}
-      
-      {item.author && (
-        <span className="text-muted-foreground text-sm flex items-center">
-          <User className="inline h-3 w-3 mr-1" />
-          {item.author}
-        </span>
-      )}
+      <div className="flex flex-wrap items-center justify-between gap-y-3">
+        <div className="flex items-center gap-4">
+          {renderAuthor()}
+          
+          <div className="flex items-center text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3 mr-1" />
+            <span>{formatDistanceToNow(new Date(item.createdAt))} ago</span>
+          </div>
+          
+          <div className="flex items-center text-xs text-muted-foreground">
+            <Clock className="h-3 w-3 mr-1" />
+            <span>{Math.floor(item.duration / 60)}m</span>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" className="h-8 px-2">
+            <ThumbsUp className="h-4 w-4 mr-1" />
+            <span className="text-xs">Like</span>
+          </Button>
+          
+          {/* Only show comments button if allowed */}
+          {item.allowComments !== false && (
+            <Button variant="ghost" size="sm" className="h-8 px-2">
+              <MessageSquare className="h-4 w-4 mr-1" />
+              <span className="text-xs">Comment</span>
+            </Button>
+          )}
+          
+          <Button variant="ghost" size="sm" className="h-8 px-2">
+            <Share2 className="h-4 w-4 mr-1" />
+            <span className="text-xs">Share</span>
+          </Button>
+          
+          <Button variant="ghost" size="sm" className="h-8 px-2">
+            <Bookmark className="h-4 w-4 mr-1" />
+            <span className="text-xs">Save</span>
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

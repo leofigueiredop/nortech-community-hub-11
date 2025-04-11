@@ -1,335 +1,837 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
+import { ContentItem, ContentCategory } from '@/types/library';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Plus, Edit, Trash2, Copy, ArrowDown, ArrowUp } from 'lucide-react';
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/table"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { MoreVerticalIcon } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ContentItem } from '@/types/library';
-import { useToast } from '@/hooks/use-toast';
-import CreateContentModal from '@/components/library/CreateContentModal';
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+import { v4 as uuidv4 } from 'uuid';
+import { ContentFormatIcon } from '@/components/library/management/utils/ContentFormatIcon';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Separator } from "@/components/ui/separator"
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
 
-const ContentCreatorDashboard = () => {
-  const { content, updateContent, deleteContent } = useLibraryContent();
-  const [search, setSearch] = useState('');
-  const [formatFilter, setFormatFilter] = useState<string>('all');
-  const [editItem, setEditItem] = useState<ContentItem | null>(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+const ContentCreatorDashboard: React.FC = () => {
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isContentModalOpen, setIsContentModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<ContentCategory | null>(null);
+  const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+  const [categorySortConfig, setCategorySortConfig] = useState({ key: 'name', direction: 'asc' });
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
+
   const { toast } = useToast();
+  const {
+    content,
+    categories,
+    addContent,
+    updateContent,
+    deleteContent,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+  } = useLibraryContent();
 
-  // Filter content based on search and format
-  const filteredContent = content.filter((item) => {
-    const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase()) ||
-      item.description.toLowerCase().includes(search.toLowerCase());
-    const matchesFormat = formatFilter === 'all' || item.format === formatFilter;
-    return matchesSearch && matchesFormat;
-  });
+  // Zod schema for category form
+  const categorySchema = z.object({
+    name: z.string().min(2, {
+      message: "Category name must be at least 2 characters.",
+    }),
+    description: z.string().optional(),
+    icon: z.string().optional(),
+  })
 
-  const handleTopTenToggle = (item: ContentItem) => {
-    updateContent({
-      ...item,
-      isTopTen: !item.isTopTen,
-    });
-    
-    toast({
-      title: item.isTopTen ? "Removed from Top 10" : "Added to Top 10",
-      description: `"${item.title}" has been ${item.isTopTen ? "removed from" : "added to"} the Top 10 section.`
-    });
-  };
+  // useForm hook for category form
+  const categoryForm = useForm<z.infer<typeof categorySchema>>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      icon: "",
+    },
+  })
 
-  const handleFeaturedToggle = (item: ContentItem) => {
-    updateContent({
-      ...item,
-      featured: !item.featured,
-    });
-    
-    toast({
-      title: item.featured ? "Removed from Featured" : "Added to Featured",
-      description: `"${item.title}" has been ${item.featured ? "removed from" : "added to"} the Featured section.`
-    });
-  };
+  // Zod schema for content form
+  const contentSchema = z.object({
+    title: z.string().min(2, {
+      message: "Content title must be at least 2 characters.",
+    }),
+    description: z.string().optional(),
+    format: z.string().min(1, {
+      message: "Content format must be selected.",
+    }),
+    accessLevel: z.string().min(1, {
+      message: "Access level must be selected.",
+    }),
+    duration: z.number().optional(),
+    author: z.string().optional(),
+    thumbnail: z.string().optional(),
+    resourceUrl: z.string().optional(),
+    categoryId: z.string().optional(),
+    tags: z.string().optional(),
+  })
 
-  const handleEdit = (item: ContentItem) => {
-    setEditItem(item);
-    setIsCreateModalOpen(true);
-  };
+  // useForm hook for content form
+  const contentForm = useForm<z.infer<typeof contentSchema>>({
+    resolver: zodResolver(contentSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      format: "",
+      accessLevel: "",
+      duration: 0,
+      author: "",
+      thumbnail: "",
+      resourceUrl: "",
+      categoryId: "",
+      tags: "",
+    },
+  })
 
-  const handleDelete = (item: ContentItem) => {
-    if (window.confirm(`Are you sure you want to delete "${item.title}"?`)) {
-      deleteContent(item.id);
-      
+  // Function to handle category creation/edit form submission
+  const handleCategorySubmit = async (values: z.infer<typeof categorySchema>) => {
+    try {
+      if (selectedCategory) {
+        // Update existing category
+        updateCategory({ ...selectedCategory, ...values });
+        toast({
+          title: "Category updated successfully.",
+        })
+      } else {
+        // Create new category
+        addCategory({ id: uuidv4(), itemCount: 0, ...values });
+        toast({
+          title: "Category created successfully.",
+        })
+      }
+      closeCategoryDrawer();
+    } catch (error) {
       toast({
-        title: "Content deleted",
-        description: `"${item.title}" has been removed from your library.`
-      });
+        variant: "destructive",
+        title: "Error!",
+        description: "Failed to save category. Please try again.",
+      })
+    }
+  }
+
+  // Function to handle content creation/edit form submission
+  const handleContentSubmit = async (values: z.infer<typeof contentSchema>) => {
+    try {
+      if (selectedContent) {
+        // Update existing content
+        updateContent({ ...selectedContent, ...values, tags: values.tags ? values.tags.split(',') : [] });
+        toast({
+          title: "Content updated successfully.",
+        })
+      } else {
+        // Create new content
+        addContent({
+          id: uuidv4(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          views: 0,
+          featured: false,
+          pointsEnabled: false,
+          pointsValue: 100,
+          tags: values.tags ? values.tags.split(',') : [],
+          duration: 0,
+          author: 'Nortech',
+          thumbnail: '/placeholder.svg',
+          description: '',
+          ...values,
+        });
+        toast({
+          title: "Content created successfully.",
+        })
+      }
+      closeContentDrawer();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error!",
+        description: "Failed to save content. Please try again.",
+      })
+    }
+  }
+
+  // Function to toggle featured status
+  const toggleFeatured = (id: string) => {
+    const contentToUpdate = content.find(c => c.id === id);
+    if (contentToUpdate) {
+      updateContent({ ...contentToUpdate, featured: !contentToUpdate.featured });
+      toast({
+        title: "Content updated successfully.",
+      })
     }
   };
 
-  const handleDuplicate = (item: ContentItem) => {
-    const duplicate = {
-      ...item,
-      id: `${item.id}-copy-${Date.now()}`,
-      title: `${item.title} (Copy)`,
-      views: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    
-    // You'd typically call an API to create the duplicate
-    // For this mockup, we'll use the existing content management function
-    updateContent(duplicate);
-    
+  // Function to toggle points enabled status
+  const togglePointsEnabled = (id: string) => {
+    const contentToUpdate = content.find(c => c.id === id);
+    if (contentToUpdate) {
+      updateContent({ ...contentToUpdate, pointsEnabled: !contentToUpdate.pointsEnabled });
+      toast({
+        title: "Content updated successfully.",
+      })
+    }
+  };
+
+  // Function to handle content deletion
+  const handleContentDelete = (id: string) => {
+    deleteContent(id);
     toast({
-      title: "Content duplicated",
-      description: `"${item.title}" has been duplicated.`
+      title: "Content deleted successfully.",
+    })
+  };
+
+  // Function to handle category deletion
+  const handleCategoryDelete = (id: string) => {
+    deleteCategory(id);
+    toast({
+      title: "Category deleted successfully.",
+    })
+  };
+
+  // Function to handle content cloning
+  const handleContentClone = (item: ContentItem) => {
+    const clonedItem = { ...item, id: uuidv4(), title: `${item.title} (Clone)` };
+    addContent(clonedItem);
+    toast({
+      title: "Content cloned successfully.",
+    })
+  };
+
+  // Function to handle category cloning
+  const handleCategoryClone = (item: ContentCategory) => {
+    const clonedItem = { ...item, id: uuidv4(), name: `${item.name} (Clone)` };
+    addCategory(clonedItem);
+    toast({
+      title: "Category cloned successfully.",
+    })
+  };
+
+  // Function to handle content editing
+  const handleContentEdit = (item: ContentItem) => {
+    setSelectedContent(item);
+    contentForm.reset({
+      title: item.title,
+      description: item.description,
+      format: item.format,
+      accessLevel: item.accessLevel,
+      duration: item.duration,
+      author: item.author,
+      thumbnail: item.thumbnail,
+      resourceUrl: item.resourceUrl,
+      categoryId: item.categoryId,
+      tags: item.tags.join(','),
     });
+    openContentDrawer();
+  };
+
+  // Function to handle category editing
+  const handleCategoryEdit = (item: ContentCategory) => {
+    setSelectedCategory(item);
+    categoryForm.reset({
+      name: item.name,
+      description: item.description,
+      icon: item.icon,
+    });
+    openCategoryDrawer();
+  };
+
+  // Function to get category name by id
+  const getCategoryName = (id: string) => {
+    const category = categories.find(c => c.id === id);
+    return category ? category.name : 'N/A';
+  };
+
+  // Function to handle sorting
+  const sortedContent = React.useMemo(() => {
+    let sortableItems = [...content];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [content, sortConfig]);
+
+  // Function to handle category sorting
+  const sortedCategories = React.useMemo(() => {
+    let sortableItems = [...categories];
+    if (categorySortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        if (a.name < b.name) {
+          return categorySortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (a.name > b.name) {
+          return categorySortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [categories, categorySortConfig]);
+
+  // Function to request sort change
+  const requestSort = (key: string) => {
+    let direction = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  }
+
+  // Function to request category sort change
+  const requestCategorySort = (key: string) => {
+    let direction = 'asc';
+    if (categorySortConfig && categorySortConfig.key === key && categorySortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setCategorySortConfig({ key, direction });
+  }
+
+  // Function to render sort arrow
+  const renderSortArrow = (key: string) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return null;
+    }
+    return sortConfig.direction === 'asc' ? <ArrowUp className="inline-block w-4 h-4 ml-1" /> : <ArrowDown className="inline-block w-4 h-4 ml-1" />;
+  }
+
+  // Function to render category sort arrow
+  const renderCategorySortArrow = (key: string) => {
+    if (!categorySortConfig || categorySortConfig.key !== key) {
+      return null;
+    }
+    return categorySortConfig.direction === 'asc' ? <ArrowUp className="inline-block w-4 h-4 ml-1" /> : <ArrowDown className="inline-block w-4 h-4 ml-1" />;
+  }
+
+  // Function to open content modal
+  const openContentModal = () => {
+    setSelectedContent(null);
+    setIsContentModalOpen(true);
+  };
+
+  // Function to close content modal
+  const closeContentModal = () => {
+    setIsContentModalOpen(false);
+    setSelectedContent(null);
+  };
+
+  // Function to open category modal
+  const openCategoryModal = () => {
+    setSelectedCategory(null);
+    setIsCategoryModalOpen(true);
+  };
+
+  // Function to close category modal
+  const closeCategoryModal = () => {
+    setIsCategoryModalOpen(false);
+    setSelectedCategory(null);
+  };
+
+  // Function to open content drawer
+  const openContentDrawer = () => {
+    setIsDrawerOpen(true);
+  };
+
+  // Function to close content drawer
+  const closeContentDrawer = () => {
+    setIsDrawerOpen(false);
+    setSelectedContent(null);
+    contentForm.reset();
+  };
+
+  // Function to open category drawer
+  const openCategoryDrawer = () => {
+    setIsCategoryDrawerOpen(true);
+  };
+
+  // Function to close category drawer
+  const closeCategoryDrawer = () => {
+    setIsCategoryDrawerOpen(false);
+    setSelectedCategory(null);
+    categoryForm.reset();
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Content Manager</h1>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Add New Content</Button>
-      </div>
-      
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <Input
-            placeholder="Search content..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full"
-          />
+    <MainLayout title="Content Creator Dashboard">
+      <div className="container mx-auto py-10">
+        <div className="mb-8 flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Content Management</h1>
+          <Button onClick={openContentDrawer}><Plus className="w-4 h-4 mr-2" /> Add Content</Button>
         </div>
-        <div className="w-full md:w-56">
-          <Select value={formatFilter} onValueChange={setFormatFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by format" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Formats</SelectItem>
-              <SelectItem value="video">Video</SelectItem>
-              <SelectItem value="audio">Audio</SelectItem>
-              <SelectItem value="pdf">PDF</SelectItem>
-              <SelectItem value="text">Text</SelectItem>
-              <SelectItem value="url">URL</SelectItem>
-              <SelectItem value="image">Image</SelectItem>
-              <SelectItem value="course">Course</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      
-      <Tabs defaultValue="list" className="w-full">
-        <TabsList>
-          <TabsTrigger value="list">List View</TabsTrigger>
-          <TabsTrigger value="grid">Grid View</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="list" className="bg-white rounded-md shadow">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Format</TableHead>
-                  <TableHead>Visibility</TableHead>
-                  <TableHead className="text-center">Views</TableHead>
-                  <TableHead className="text-center">Top 10</TableHead>
-                  <TableHead className="text-center">Featured</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredContent.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium max-w-xs truncate">{item.title}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="capitalize">
-                        {item.format}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        className={
-                          item.accessLevel === 'free' 
-                            ? 'bg-green-100 text-green-800' 
-                            : item.accessLevel === 'premium' 
-                              ? 'bg-purple-100 text-purple-800' 
-                              : 'bg-amber-100 text-amber-800'
-                        }
-                      >
-                        {item.accessLevel}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center">{item.views}</TableCell>
-                    <TableCell className="text-center">
-                      <Switch 
-                        checked={item.isTopTen || false} 
-                        onCheckedChange={() => handleTopTenToggle(item)} 
-                      />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Switch 
-                        checked={item.featured || false} 
-                        onCheckedChange={() => handleFeaturedToggle(item)} 
-                      />
-                    </TableCell>
-                    <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVerticalIcon />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(item)}>
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDuplicate(item)}>
-                            Duplicate
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            className="text-red-600"
-                            onClick={() => handleDelete(item)}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                
-                {filteredContent.length === 0 && (
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Content List */}
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Content List</h2>
+            </div>
+            <ScrollArea className="h-[500px] w-full rounded-md border">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-6 text-gray-500">
-                      No content found. Try adjusting your search or filters.
-                    </TableCell>
+                    <TableHead className="w-[50px]">Type</TableHead>
+                    <TableHead onClick={() => requestSort('title')} className="cursor-pointer">
+                      Title {renderSortArrow('title')}
+                    </TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Access</TableHead>
+                    <TableHead>Featured</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {sortedContent.map((content) => (
+                    <TableRow key={content.id}>
+                      <TableCell><ContentFormatIcon format={content.format} /></TableCell>
+                      <TableCell>{content.title}</TableCell>
+                      <TableCell>{content.categoryId ? getCategoryName(content.categoryId) : 'N/A'}</TableCell>
+                      <TableCell>{content.accessLevel}</TableCell>
+                      <TableCell>
+                        <Switch 
+                          checked={content.featured} 
+                          onCheckedChange={() => toggleFeatured(content.id)}
+                        />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => handleContentEdit(content)}>
+                              <Edit className="w-4 h-4 mr-2" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleContentClone(content)}>
+                              <Copy className="w-4 h-4 mr-2" /> Clone
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem>
+                                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete this content from our servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleContentDelete(content.id)}>Continue</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ScrollArea>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="grid" className="bg-white rounded-md shadow p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredContent.map((item) => (
-              <div key={item.id} className="border rounded-lg overflow-hidden bg-white shadow-sm">
-                <div className="aspect-video bg-gray-100 relative">
-                  <img 
-                    src={item.thumbnailUrl || '/placeholder.svg'} 
-                    alt={item.title}
-                    className="w-full h-full object-cover"
+
+          {/* Category List */}
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Category List</h2>
+              <Button onClick={openCategoryDrawer}><Plus className="w-4 h-4 mr-2" /> Add Category</Button>
+            </div>
+            <ScrollArea className="h-[500px] w-full rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead onClick={() => requestCategorySort('name')} className="cursor-pointer">
+                      Name {renderCategorySortArrow('name')}
+                    </TableHead>
+                    <TableHead>Item Count</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedCategories.map((category) => (
+                    <TableRow key={category.id}>
+                      <TableCell>{category.name}</TableCell>
+                      <TableCell>{category.itemCount}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => handleCategoryEdit(category)}>
+                              <Edit className="w-4 h-4 mr-2" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleCategoryClone(category)}>
+                              <Copy className="w-4 h-4 mr-2" /> Clone
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem>
+                                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete this category from our servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleCategoryDelete(category.id)}>Continue</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ScrollArea>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Drawer */}
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <DrawerTrigger asChild>
+          <Button>Open</Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{selectedContent ? 'Edit Content' : 'Create Content'}</DrawerTitle>
+            <DrawerDescription>
+              {selectedContent ? 'Edit the content details here.' : 'Create new content by filling out the form below.'}
+            </DrawerDescription>
+          </DrawerHeader>
+          <ScrollArea className="h-[500px] w-full rounded-md">
+            <div className="p-4">
+              <Form {...contentForm}>
+                <form onSubmit={contentForm.handleSubmit(handleContentSubmit)} className="space-y-4">
+                  <FormField
+                    control={contentForm.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Title</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Content Title" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <Badge 
-                    className={`absolute top-2 right-2 
-                      ${item.accessLevel === 'free' 
-                        ? 'bg-green-100 text-green-800' 
-                        : item.accessLevel === 'premium' 
-                          ? 'bg-purple-100 text-purple-800' 
-                          : 'bg-amber-100 text-amber-800'
-                      }`
-                    }
-                  >
-                    {item.accessLevel}
-                  </Badge>
-                </div>
-                
-                <div className="p-4">
-                  <h3 className="font-medium truncate">{item.title}</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {item.views} views · {new Date(item.createdAt).toLocaleDateString()}
-                  </p>
-                  
-                  <div className="flex justify-between items-center mt-4">
-                    <div className="flex space-x-4">
-                      <div className="flex flex-col items-center">
-                        <span className="text-xs text-gray-500 mb-1">Top 10</span>
-                        <Switch 
-                          checked={item.isTopTen || false} 
-                          onCheckedChange={() => handleTopTenToggle(item)}
-                          size="sm"
-                        />
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <span className="text-xs text-gray-500 mb-1">Featured</span>
-                        <Switch 
-                          checked={item.featured || false} 
-                          onCheckedChange={() => handleFeaturedToggle(item)}
-                          size="sm"
-                        />
-                      </div>
-                    </div>
-                    
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVerticalIcon />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(item)}>
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDuplicate(item)}>
-                          Duplicate
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          className="text-red-600"
-                          onClick={() => handleDelete(item)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            {filteredContent.length === 0 && (
-              <div className="col-span-full text-center py-10 text-gray-500">
-                No content found. Try adjusting your search or filters.
-              </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
-      
-      {isCreateModalOpen && (
-        <CreateContentModal 
-          isOpen={isCreateModalOpen} 
-          onClose={() => {
-            setIsCreateModalOpen(false);
-            setEditItem(null);
-          }}
-        />
-      )}
-    </div>
+                  <FormField
+                    control={contentForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Content Description" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={contentForm.control}
+                    name="format"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Format</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a format" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="video">Video</SelectItem>
+                            <SelectItem value="pdf">PDF</SelectItem>
+                            <SelectItem value="audio">Audio</SelectItem>
+                            <SelectItem value="link">Link</SelectItem>
+                            <SelectItem value="course">Course</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={contentForm.control}
+                    name="accessLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Access Level</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select access level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="free">Free</SelectItem>
+                            <SelectItem value="premium">Premium</SelectItem>
+                            <SelectItem value="unlockable">Unlockable</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={contentForm.control}
+                    name="duration"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Duration (seconds)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="Content Duration" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={contentForm.control}
+                    name="author"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Author</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Content Author" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={contentForm.control}
+                    name="thumbnail"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Thumbnail URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Content Thumbnail URL" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={contentForm.control}
+                    name="resourceUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Resource URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Content Resource URL" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={contentForm.control}
+                    name="categoryId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Category</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={contentForm.control}
+                    name="tags"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tags (comma separated)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Content Tags" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">Submit</Button>
+                </form>
+              </Form>
+            </div>
+          </ScrollArea>
+          <DrawerFooter>
+            <Button variant="outline" onClick={closeContentDrawer}>Cancel</Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Category Drawer */}
+      <Drawer open={isCategoryDrawerOpen} onOpenChange={setIsCategoryDrawerOpen}>
+        <DrawerTrigger asChild>
+          <Button>Open</Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{selectedCategory ? 'Edit Category' : 'Create Category'}</DrawerTitle>
+            <DrawerDescription>
+              {selectedCategory ? 'Edit the category details here.' : 'Create new category by filling out the form below.'}
+            </DrawerDescription>
+          </DrawerHeader>
+          <ScrollArea className="h-[500px] w-full rounded-md">
+            <div className="p-4">
+              <Form {...categoryForm}>
+                <form onSubmit={categoryForm.handleSubmit(handleCategorySubmit)} className="space-y-4">
+                  <FormField
+                    control={categoryForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Category Name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={categoryForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Category Description" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={categoryForm.control}
+                    name="icon"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Icon</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Category Icon" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">Submit</Button>
+                </form>
+              </Form>
+            </div>
+          </ScrollArea>
+          <DrawerFooter>
+            <Button variant="outline" onClick={closeCategoryDrawer}>Cancel</Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </MainLayout>
   );
 };
 

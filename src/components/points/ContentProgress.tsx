@@ -1,127 +1,81 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
+import { ContentProgress } from '@/types/library';
 import { formatDistanceToNow } from 'date-fns';
-import { CheckCircle2, Clock, Eye } from 'lucide-react';
-import { useContentProgress } from '@/hooks/useContentProgress';
-import { useLibraryContent } from '@/hooks/useLibraryContent';
-import { ContentFormatIcon } from '../library/management/utils/ContentFormatIcon';
+import { CheckCircle, Circle, Clock } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
-const ContentProgress: React.FC = () => {
-  const { getCompletedContent, getInProgressContent } = useContentProgress();
-  const { content } = useLibraryContent();
-  
-  const completedItems = getCompletedContent().map(progressItem => {
-    const contentItem = content.find(item => item.id === progressItem.contentId);
-    return { progress: progressItem, content: contentItem };
-  }).filter(item => item.content); // Filter out any items that don't exist in content
-  
-  const inProgressItems = getInProgressContent().map(progressItem => {
-    const contentItem = content.find(item => item.id === progressItem.contentId);
-    return { progress: progressItem, content: contentItem };
-  }).filter(item => item.content); // Filter out any items that don't exist in content
-  
+interface ContentProgressItemProps {
+  progress: ContentProgress;
+  contentTitle: string;
+}
+
+export const ContentProgressItem: React.FC<ContentProgressItemProps> = ({
+  progress,
+  contentTitle,
+}) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Content Progress</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="in-progress">
-          <TabsList className="mb-4">
-            <TabsTrigger value="in-progress" className="flex items-center gap-1">
-              <Clock size={14} /> In Progress
-              {inProgressItems.length > 0 && <Badge variant="secondary" className="ml-1">{inProgressItems.length}</Badge>}
-            </TabsTrigger>
-            <TabsTrigger value="completed" className="flex items-center gap-1">
-              <CheckCircle2 size={14} /> Completed
-              {completedItems.length > 0 && <Badge variant="secondary" className="ml-1">{completedItems.length}</Badge>}
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="in-progress">
-            {inProgressItems.length > 0 ? (
-              <div className="space-y-4">
-                {inProgressItems.map(({ progress, content }) => content && (
-                  <div key={progress.contentId} className="border rounded-md p-3 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded">
-                          <ContentFormatIcon format={content.format} />
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{content.title}</h4>
-                          <p className="text-xs text-muted-foreground">
-                            Last viewed {formatDistanceToNow(new Date(progress.lastAccessed), { addSuffix: true })}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        {content.format.charAt(0).toUpperCase() + content.format.slice(1)}
-                      </Badge>
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Progress</span>
-                        <span>{progress.progress}%</span>
-                      </div>
-                      <Progress value={progress.progress} className="h-1" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6 text-muted-foreground">
-                <p>You have no content in progress.</p>
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="completed">
-            {completedItems.length > 0 ? (
-              <div className="space-y-4">
-                {completedItems.map(({ progress, content }) => content && (
-                  <div key={progress.contentId} className="border rounded-md p-3 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded">
-                          <ContentFormatIcon format={content.format} />
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{content.title}</h4>
-                          <p className="text-xs text-muted-foreground">
-                            Completed {formatDistanceToNow(new Date(progress.lastAccessed), { addSuffix: true })}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <Badge variant="outline" className="text-xs">
-                          {content.format.charAt(0).toUpperCase() + content.format.slice(1)}
-                        </Badge>
-                        {content.pointsEnabled && progress.pointsAwarded && (
-                          <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-300 text-xs">
-                            +{content.pointsValue} points
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6 text-muted-foreground">
-                <p>You haven't completed any content yet.</p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 border rounded-md bg-card hover:bg-accent/50 transition-colors">
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-1">
+          {progress.completed ? (
+            <CheckCircle className="h-4 w-4 text-green-500" />
+          ) : (
+            <Circle className="h-4 w-4 text-muted-foreground" />
+          )}
+          <h4 className="font-medium text-sm">{contentTitle}</h4>
+        </div>
+        
+        <div className="flex items-center text-xs text-muted-foreground mb-2">
+          <Clock className="h-3 w-3 mr-1" />
+          <span>
+            Last accessed {formatDistanceToNow(new Date(progress.lastAccessedAt))} ago
+          </span>
+          {progress.pointsAwarded && (
+            <span className="ml-2 bg-primary/10 text-primary px-1.5 rounded text-[10px] font-medium">
+              Points Awarded
+            </span>
+          )}
+        </div>
+        
+        <Progress value={progress.progress} className="h-1.5" />
+      </div>
+    </div>
   );
 };
 
-export default ContentProgress;
+interface ContentProgressListProps {
+  progressItems: ContentProgress[];
+  getContentTitle: (contentId: string) => string;
+}
+
+export const ContentProgressList: React.FC<ContentProgressListProps> = ({
+  progressItems,
+  getContentTitle,
+}) => {
+  if (progressItems.length === 0) {
+    return (
+      <div className="text-center py-8 px-4">
+        <p className="text-muted-foreground">No content progress yet</p>
+      </div>
+    );
+  }
+
+  const sortedItems = [...progressItems].sort(
+    (a, b) => new Date(b.lastAccessedAt).getTime() - new Date(a.lastAccessedAt).getTime()
+  );
+
+  return (
+    <div className="space-y-2">
+      {sortedItems.map((item) => (
+        <ContentProgressItem 
+          key={item.id} 
+          progress={item} 
+          contentTitle={getContentTitle(item.contentId)}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default ContentProgressList;
