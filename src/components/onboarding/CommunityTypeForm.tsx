@@ -8,7 +8,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowRight, BookOpen, Brain, PuzzlePiece, Briefcase, Target } from 'lucide-react';
+import { ArrowRight, BookOpen, Brain, Puzzle, Briefcase, Target } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 
 const formSchema = z.object({
@@ -51,7 +51,7 @@ const CommunityTypeForm: React.FC = () => {
     {
       value: 'product',
       label: '🧩 Product or SaaS Community',
-      icon: <PuzzlePiece className="h-6 w-6 text-green-500" />,
+      icon: <Puzzle className="h-6 w-6 text-green-500" />,
       description: 'For product users, customers, and fans of your brand or service.'
     },
     {
