@@ -88,7 +88,12 @@ const CommunityTemplatesForm: React.FC = () => {
     
     // In a real app, you would process payment for paid plans here
     if (selectedPlan && selectedPlan !== 'free') {
-      toast.success('Plan selected! In a real app, you would go to checkout now.');
+      // Using the standard toast instead of toast.success
+      toast({
+        title: "Plan selected!",
+        description: "In a real app, you would go to checkout now.",
+        duration: 3000,
+      });
     }
     
     setTimeout(() => {
