@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,13 +31,13 @@ const CreatorForm: React.FC = () => {
 
   const onSubmit = (data: FormData) => {
     console.log('Form data:', data);
-    navigate('/onboarding/community');
+    navigate('/onboarding/community-type');
   };
 
   const handleGoogleSignIn = () => {
     // Integraria com Google Auth aqui
     console.log('Google sign-in clicked');
-    navigate('/onboarding/community');
+    navigate('/onboarding/community-type');
   };
 
   return (

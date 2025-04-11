@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -56,6 +55,7 @@ import Integration from "./pages/settings/Integration";
 import Migration from "./pages/settings/Migration";
 import Paywall from "./pages/settings/Paywall";
 import PointsConfiguration from "./pages/settings/PointsConfiguration";
+import CommunityType from "./pages/onboarding/CommunityType";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +70,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/onboarding/creator" element={<Creator />} />
+              <Route path="/onboarding/community-type" element={<CommunityType />} />
               <Route path="/onboarding/community" element={<Community />} />
               <Route path="/onboarding/profile" element={<Profile />} />
               <Route path="/onboarding/features" element={<Features />} />
