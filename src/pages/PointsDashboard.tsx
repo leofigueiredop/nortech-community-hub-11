@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -36,12 +37,11 @@ const mockContentProgress: ContentProgress[] = [
 
 const PointsDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const { points, pointsHistory, awardPoints } = usePoints();
+  const { totalPoints, pointsHistory, awardPoints } = usePoints();
   const contentProgressData = mockContentProgress;
   const { content } = useLibraryContent();
 
   const completedItems = contentProgressData.filter(item => item.completed).length;
-  const totalPoints = pointsHistory.reduce((sum, entry) => sum + entry.points, 0);
   const pointsThisWeek = pointsHistory
     .filter(entry => {
       const entryDate = new Date(entry.timestamp);
@@ -100,7 +100,7 @@ const PointsDashboard = () => {
               <CardDescription>Available Points</CardDescription>
               <CardTitle className="flex items-center text-3xl">
                 <Trophy className="mr-2 h-5 w-5 text-yellow-500" />
-                {points}
+                {totalPoints}
               </CardTitle>
             </CardHeader>
             <CardContent>
