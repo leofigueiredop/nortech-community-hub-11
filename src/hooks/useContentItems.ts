@@ -9,6 +9,7 @@ export const useContentItems = () => {
   const [tagFilter, setTagFilter] = useState<string>('all');
   const [accessFilter, setAccessFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('newest');
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
 
   // Get all unique tags from content items
@@ -25,12 +26,29 @@ export const useContentItems = () => {
   const filteredContent = content.filter(item => {
     const matchesFormat = formatFilter === 'all' || item.format === formatFilter;
     const matchesTag = tagFilter === 'all' || item.tags.includes(tagFilter);
-    const matchesAccess = accessFilter === 'all' || item.accessLevel === accessFilter;
+    const matchesAccess = accessFilter === 'all' || 
+                          item.accessLevel === accessFilter ||
+                          (accessFilter === 'unlockable' && item.pointsEnabled);
     const matchesSearch = !searchQuery || 
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description.toLowerCase().includes(searchQuery.toLowerCase());
     
     return matchesFormat && matchesTag && matchesAccess && matchesSearch;
+  }).sort((a, b) => {
+    switch (sortBy) {
+      case 'newest':
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      case 'popular':
+        return b.views - a.views;
+      case 'recommended':
+        // This would typically use a more complex algorithm,
+        // but for now we'll just sort by a combination of views and recency
+        const aScore = a.views + (new Date(a.createdAt).getTime() / 1000000000);
+        const bScore = b.views + (new Date(b.createdAt).getTime() / 1000000000);
+        return bScore - aScore;
+      default:
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
   });
 
   // Get featured content
@@ -65,11 +83,13 @@ export const useContentItems = () => {
     tagFilter,
     accessFilter,
     searchQuery,
+    sortBy,
     selectedItem,
     setFormatFilter,
     setTagFilter,
     setAccessFilter,
     setSearchQuery,
+    setSortBy,
     setSelectedItem,
     addContent,
     updateContent,

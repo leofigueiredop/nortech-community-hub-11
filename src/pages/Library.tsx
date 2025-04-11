@@ -27,16 +27,18 @@ const Library: React.FC = () => {
     tagFilter,
     accessFilter,
     searchQuery,
+    sortBy,
     selectedItem,
     setFormatFilter,
     setTagFilter,
     setAccessFilter,
     setSearchQuery,
+    setSortBy,
     setSelectedItem
   } = useLibraryContent();
 
   const [visitedTags, setVisitedTags] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
 
   // Simulate user interests based on local storage or default to some tags
   useEffect(() => {
@@ -99,6 +101,9 @@ const Library: React.FC = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
+  // Create a ref for the scroll area to implement sticky header
+  const hasFilters = searchQuery !== '' || formatFilter !== 'all' || accessFilter !== 'all' || tagFilter !== 'all' || sortBy !== 'newest';
+
   return (
     <MainLayout title="Content Library">
       <div className="relative">
@@ -119,25 +124,25 @@ const Library: React.FC = () => {
         </div>
 
         {showFilters && (
-          <div className="sticky top-0 z-10 bg-background pb-2 border-b mb-4">
-            <ContentFilters
-              formatFilter={formatFilter}
-              tagFilter={tagFilter}
-              accessFilter={accessFilter}
-              searchQuery={searchQuery}
-              allFormats={allFormats}
-              allTags={allTags}
-              setFormatFilter={setFormatFilter}
-              setTagFilter={setTagFilter}
-              setAccessFilter={setAccessFilter}
-              setSearchQuery={setSearchQuery}
-            />
-          </div>
+          <ContentFilters
+            formatFilter={formatFilter}
+            tagFilter={tagFilter}
+            accessFilter={accessFilter}
+            searchQuery={searchQuery}
+            sortBy={sortBy}
+            allFormats={allFormats}
+            allTags={allTags}
+            setFormatFilter={setFormatFilter}
+            setTagFilter={setTagFilter}
+            setAccessFilter={setAccessFilter}
+            setSearchQuery={setSearchQuery}
+            setSortBy={setSortBy}
+          />
         )}
 
-        <ScrollArea className="h-[calc(100vh-10rem)]">
+        <ScrollArea className="h-[calc(100vh-12rem)]">
           {/* Hero Featured Content */}
-          {featuredContent.length > 0 && !searchQuery && tagFilter === 'all' && formatFilter === 'all' && (
+          {featuredContent.length > 0 && !hasFilters && (
             <FeaturedContentCarousel 
               items={featuredContent}
               onItemSelect={setSelectedItem}
@@ -145,7 +150,7 @@ const Library: React.FC = () => {
           )}
 
           {/* Content Sections */}
-          {!searchQuery && tagFilter === 'all' && formatFilter === 'all' && (
+          {!hasFilters && (
             <>
               <ContentSection 
                 title="Top 10 Trending" 
@@ -214,9 +219,9 @@ const Library: React.FC = () => {
           )}
 
           {/* Display filtered content when filters are applied */}
-          {(searchQuery || tagFilter !== 'all' || formatFilter !== 'all') && (
+          {hasFilters && (
             <ContentSection 
-              title="Search Results" 
+              title={`Search Results (${filteredContent.length})`}
               items={filteredContent} 
               onItemSelect={setSelectedItem}
               layout="grid"
