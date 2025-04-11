@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
@@ -6,24 +5,27 @@ import { useLibraryState } from '@/hooks/useLibraryState';
 import ContentViewer from '@/components/library/ContentViewer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Filter, X, Search } from 'lucide-react';
+import { Filter, X, Search, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { 
   Drawer,
   DrawerContent,
   DrawerTrigger
 } from '@/components/ui/drawer';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import LibraryContentRows from '@/components/library/LibraryContentRows';
 import LibraryFiltersSidebar from '@/components/library/LibraryFiltersSidebar';
 import FeaturedContentCarousel from '@/components/library/FeaturedContentCarousel';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
+import CreateContentModal from '@/components/library/CreateContentModal';
 
 const Library: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('all');
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCreateContentOpen, setIsCreateContentOpen] = useState(false);
   
   const {
     content,
@@ -49,14 +51,12 @@ const Library: React.FC = () => {
     addVisitedTag
   } = useLibraryState();
 
-  // Track when user selects a tag
   useEffect(() => {
     if (tagFilter !== 'all') {
       addVisitedTag(tagFilter);
     }
   }, [tagFilter, addVisitedTag]);
 
-  // Apply view filter
   useEffect(() => {
     if (activeView === 'all') {
       setAccessFilter('all');
@@ -69,7 +69,6 @@ const Library: React.FC = () => {
     }
   }, [activeView, setAccessFilter]);
 
-  // Apply search filter
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       setGlobalSearchQuery(searchQuery);
@@ -78,20 +77,17 @@ const Library: React.FC = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, setGlobalSearchQuery]);
 
-  // Check if search is active
   const isSearchActive = searchQuery.trim() !== '';
 
   return (
     <MainLayout title="Content Library">
       <div className="relative min-h-screen flex flex-col">
-        {/* Top Navigation Bar */}
         <div className="sticky top-0 z-30 w-full bg-background/95 backdrop-blur supports-backdrop-blur:bg-background/60 border-b">
           <div className="container flex h-14 max-w-screen-2xl items-center">
             <div className="mr-4 hidden md:flex">
               <h1 className="text-xl font-semibold">Content Library</h1>
             </div>
             
-            {/* Content Type Tabs */}
             <nav className="flex items-center space-x-2 lg:space-x-6 overflow-auto">
               <Button 
                 variant={activeView === 'all' ? "default" : "ghost"} 
@@ -126,10 +122,8 @@ const Library: React.FC = () => {
               </Button>
             </nav>
 
-            {/* Spacer */}
             <div className="flex-1"></div>
 
-            {/* Search */}
             <div className="relative w-full max-w-sm mr-2">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -151,7 +145,6 @@ const Library: React.FC = () => {
               )}
             </div>
 
-            {/* Filters Drawer */}
             <Drawer open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
               <DrawerTrigger asChild>
                 <Button 
@@ -192,10 +185,8 @@ const Library: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Content Area */}
         <ScrollArea className="flex-1">
           <div className="container py-6 max-w-screen-2xl space-y-8">
-            {/* Featured Content (only when not searching) */}
             {featuredContent.length > 0 && !isSearchActive && activeView === 'all' && (
               <FeaturedContentCarousel 
                 items={featuredContent}
@@ -203,7 +194,6 @@ const Library: React.FC = () => {
               />
             )}
 
-            {/* Display search results or content rows */}
             {isSearchActive ? (
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold">
@@ -246,11 +236,35 @@ const Library: React.FC = () => {
         </ScrollArea>
       </div>
 
-      {/* Content Viewer Dialog */}
       <ContentViewer 
         item={selectedItem} 
         onClose={() => setSelectedItem(null)} 
       />
+
+      <CreateContentModal 
+        isOpen={isCreateContentOpen} 
+        onClose={() => setIsCreateContentOpen(false)} 
+      />
+
+      <div className="fixed bottom-6 right-6 z-10">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                onClick={() => setIsCreateContentOpen(true)} 
+                size="lg" 
+                className="rounded-full w-14 h-14 shadow-lg"
+              >
+                <Plus className="h-6 w-6" />
+                <span className="sr-only">Create Content</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              <p>Create New Content</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
     </MainLayout>
   );
 };
