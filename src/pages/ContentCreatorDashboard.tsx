@@ -1,392 +1,335 @@
 
 import React, { useState } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
-import { ContentItem } from '@/types/library';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs';
-import { 
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { MoreVerticalIcon } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger,
   DropdownMenuItem,
-  DropdownMenuSeparator
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { toast } from 'sonner';
-import { 
-  Edit, 
-  Trash2, 
-  Copy, 
-  Eye, 
-  FileText, 
-  Film, 
-  Music, 
-  Link as LinkIcon, 
-  Brain, 
-  Plus, 
-  BarChart3,
-  Search, 
-  LayoutGrid, 
-  List,
-  Star 
-} from 'lucide-react';
+import { ContentItem } from '@/types/library';
+import { useToast } from '@/hooks/use-toast';
 import CreateContentModal from '@/components/library/CreateContentModal';
-import MoreVerticalIcon from '@/components/library/management/MoreVerticalIcon';
 
-const ContentCreatorDashboard: React.FC = () => {
-  const [isCreateContentOpen, setIsCreateContentOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedContentIds, setSelectedContentIds] = useState<string[]>([]);
-  
-  const {
-    content,
-    updateContent,
-    deleteContent,
-    addContent,
-  } = useLibraryContent();
-  
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+const ContentCreatorDashboard = () => {
+  const { content, updateContent, deleteContent } = useLibraryContent();
+  const [search, setSearch] = useState('');
+  const [formatFilter, setFormatFilter] = useState<string>('all');
+  const [editItem, setEditItem] = useState<ContentItem | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const { toast } = useToast();
+
+  // Filter content based on search and format
+  const filteredContent = content.filter((item) => {
+    const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase()) ||
+      item.description.toLowerCase().includes(search.toLowerCase());
+    const matchesFormat = formatFilter === 'all' || item.format === formatFilter;
+    return matchesSearch && matchesFormat;
+  });
+
+  const handleTopTenToggle = (item: ContentItem) => {
+    updateContent({
+      ...item,
+      isTopTen: !item.isTopTen,
+    });
+    
+    toast({
+      title: item.isTopTen ? "Removed from Top 10" : "Added to Top 10",
+      description: `"${item.title}" has been ${item.isTopTen ? "removed from" : "added to"} the Top 10 section.`
+    });
   };
-  
-  const filteredContent = content.filter(item => 
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
+
+  const handleFeaturedToggle = (item: ContentItem) => {
+    updateContent({
+      ...item,
+      featured: !item.featured,
+    });
+    
+    toast({
+      title: item.featured ? "Removed from Featured" : "Added to Featured",
+      description: `"${item.title}" has been ${item.featured ? "removed from" : "added to"} the Featured section.`
+    });
+  };
+
   const handleEdit = (item: ContentItem) => {
-    // In a real implementation, this would open an edit modal
-    toast.success('Edit functionality to be implemented');
+    setEditItem(item);
+    setIsCreateModalOpen(true);
   };
-  
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this content?')) {
-      deleteContent(id);
-      toast.success('Content deleted successfully');
-    }
-  };
-  
-  const handleDuplicate = (id: string) => {
-    const contentToDuplicate = content.find(item => item.id === id);
-    if (contentToDuplicate) {
-      const duplicatedContent = {
-        ...contentToDuplicate,
-        id: crypto.randomUUID(),
-        title: `${contentToDuplicate.title} (Copy)`,
-        featured: false,
-        views: 0,
-        createdAt: new Date().toISOString()
-      };
-      addContent(duplicatedContent);
-      toast.success('Content duplicated successfully');
-    }
-  };
-  
-  const toggleFeatured = (id: string, isFeatured: boolean) => {
-    const itemToUpdate = content.find(item => item.id === id);
-    if (itemToUpdate) {
-      updateContent({
-        ...itemToUpdate,
-        featured: !isFeatured
+
+  const handleDelete = (item: ContentItem) => {
+    if (window.confirm(`Are you sure you want to delete "${item.title}"?`)) {
+      deleteContent(item.id);
+      
+      toast({
+        title: "Content deleted",
+        description: `"${item.title}" has been removed from your library.`
       });
-      toast.success(`Content ${!isFeatured ? 'added to' : 'removed from'} featured section`);
     }
   };
-  
-  const toggleTopTen = (id: string, isTopTen: boolean) => {
-    const itemToUpdate = content.find(item => item.id === id);
-    if (itemToUpdate) {
-      updateContent({
-        ...itemToUpdate,
-        isTopTen: !isTopTen
-      });
-      toast.success(`Content ${!isTopTen ? 'added to' : 'removed from'} Top 10`);
-    }
+
+  const handleDuplicate = (item: ContentItem) => {
+    const duplicate = {
+      ...item,
+      id: `${item.id}-copy-${Date.now()}`,
+      title: `${item.title} (Copy)`,
+      views: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    // You'd typically call an API to create the duplicate
+    // For this mockup, we'll use the existing content management function
+    updateContent(duplicate);
+    
+    toast({
+      title: "Content duplicated",
+      description: `"${item.title}" has been duplicated.`
+    });
   };
-  
-  const getFormatIcon = (format: string) => {
-    switch (format) {
-      case 'video': return <Film size={16} className="mr-1" />;
-      case 'audio': return <Music size={16} className="mr-1" />;
-      case 'pdf': case 'text': return <FileText size={16} className="mr-1" />;
-      case 'url': case 'link': return <LinkIcon size={16} className="mr-1" />;
-      default: return <Brain size={16} className="mr-1" />;
-    }
-  };
-  
-  const getAccessLevelBadge = (accessLevel: string) => {
-    switch (accessLevel) {
-      case 'premium':
-        return <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">Premium</Badge>;
-      case 'free':
-        return <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Free</Badge>;
-      case 'unlockable':
-        return <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">Unlockable</Badge>;
-      default:
-        return <Badge variant="outline">Unknown</Badge>;
-    }
-  };
-  
+
   return (
-    <MainLayout title="Content Creator Dashboard">
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Content Creator Dashboard</h1>
-          <Button onClick={() => setIsCreateContentOpen(true)} className="gap-2">
-            <Plus size={16} />
-            <span>Create Content</span>
-          </Button>
-        </div>
-        
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search content..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="pl-8"
-            />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="icon"
-              onClick={() => setViewMode('list')}
-              className="h-9 w-9"
-            >
-              <List size={18} />
-            </Button>
-            <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
-              size="icon"
-              onClick={() => setViewMode('grid')}
-              className="h-9 w-9"
-            >
-              <LayoutGrid size={18} />
-            </Button>
-          </div>
-        </div>
-        
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList>
-            <TabsTrigger value="all">All Content ({content.length})</TabsTrigger>
-            <TabsTrigger value="featured">Featured ({content.filter(item => item.featured).length})</TabsTrigger>
-            <TabsTrigger value="top10">Top 10 ({content.filter(item => item.isTopTen).length})</TabsTrigger>
-            <TabsTrigger value="premium">Premium ({content.filter(item => item.accessLevel === 'premium').length})</TabsTrigger>
-            <TabsTrigger value="free">Free ({content.filter(item => item.accessLevel === 'free').length})</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="all" className="mt-4">
-            {viewMode === 'list' ? (
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[300px]">Content</TableHead>
-                      <TableHead>Format</TableHead>
-                      <TableHead>Access</TableHead>
-                      <TableHead className="text-center">Views</TableHead>
-                      <TableHead className="text-center">XP</TableHead>
-                      <TableHead className="text-center">Featured</TableHead>
-                      <TableHead className="text-center">Top 10</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredContent.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded overflow-hidden bg-gray-100 flex-shrink-0">
-                              {item.thumbnail ? (
-                                <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                                  <FileText size={20} className="text-gray-500" />
-                                </div>
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="font-medium truncate max-w-[200px]">{item.title}</div>
-                              <div className="text-xs text-muted-foreground truncate max-w-[200px]">{item.description}</div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            {getFormatIcon(item.format)}
-                            <span className="capitalize">{item.format}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{getAccessLevelBadge(item.accessLevel)}</TableCell>
-                        <TableCell className="text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <Eye size={14} />
-                            <span>{item.views}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center">{item.pointsValue || 0}</TableCell>
-                        <TableCell className="text-center">
-                          <Switch 
-                            checked={item.featured || false} 
-                            onCheckedChange={() => toggleFeatured(item.id, !!item.featured)}
-                          />
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Switch 
-                            checked={item.isTopTen || false} 
-                            onCheckedChange={() => toggleTopTen(item.id, !!item.isTopTen)}
-                          />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreVerticalIcon size={16} />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleEdit(item)}>
-                                <Edit size={14} className="mr-2" /> Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDuplicate(item.id)}>
-                                <Copy size={14} className="mr-2" /> Duplicate
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleDelete(item.id)} className="text-red-600">
-                                <Trash2 size={14} className="mr-2" /> Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-                {filteredContent.map((item) => (
-                  <div key={item.id} className="border rounded-lg overflow-hidden bg-white dark:bg-slate-800 shadow-sm">
-                    <div className="relative aspect-video bg-gray-100">
-                      {item.thumbnail ? (
-                        <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                          <FileText size={32} className="text-gray-500" />
-                        </div>
-                      )}
-                      <div className="absolute top-2 right-2 flex space-x-1">
-                        {item.featured && (
-                          <Badge variant="secondary" className="bg-amber-500">
-                            <Star size={10} className="mr-1" /> Featured
-                          </Badge>
-                        )}
-                        {item.isTopTen && (
-                          <Badge variant="secondary" className="bg-blue-500">
-                            Top 10
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    <div className="p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-sm font-medium truncate flex-1">{item.title}</div>
-                        {getAccessLevelBadge(item.accessLevel)}
-                      </div>
-                      <div className="text-xs text-muted-foreground line-clamp-2 mb-2">{item.description}</div>
-                      <div className="flex justify-between items-center text-xs text-muted-foreground">
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center">
-                            <Eye size={12} className="mr-1" />
-                            <span>{item.views}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <BarChart3 size={12} className="mr-1" />
-                            <span>{item.pointsValue || 0} XP</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleEdit(item)}>
-                            <Edit size={14} />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleDuplicate(item.id)}>
-                            <Copy size={14} />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500" onClick={() => handleDelete(item.id)}>
-                            <Trash2 size={14} />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="featured">
-            {/* Similar content to "all" tab but filtered for featured items */}
-            <p className="p-4 text-center text-muted-foreground">
-              {content.filter(item => item.featured).length === 0 
-                ? "No featured content yet. Use the toggles in the All Content tab to feature content."
-                : `Showing ${content.filter(item => item.featured).length} featured items.`}
-            </p>
-          </TabsContent>
-          
-          <TabsContent value="top10">
-            {/* Similar content to "all" tab but filtered for top 10 items */}
-            <p className="p-4 text-center text-muted-foreground">
-              {content.filter(item => item.isTopTen).length === 0 
-                ? "No Top 10 content yet. Use the toggles in the All Content tab to add content to Top 10."
-                : `Showing ${content.filter(item => item.isTopTen).length} Top 10 items.`}
-            </p>
-          </TabsContent>
-          
-          <TabsContent value="premium">
-            {/* Similar content to "all" tab but filtered for premium items */}
-            <p className="p-4 text-center text-muted-foreground">
-              {content.filter(item => item.accessLevel === 'premium').length === 0 
-                ? "No premium content yet."
-                : `Showing ${content.filter(item => item.accessLevel === 'premium').length} premium items.`}
-            </p>
-          </TabsContent>
-          
-          <TabsContent value="free">
-            {/* Similar content to "all" tab but filtered for free items */}
-            <p className="p-4 text-center text-muted-foreground">
-              {content.filter(item => item.accessLevel === 'free').length === 0 
-                ? "No free content yet."
-                : `Showing ${content.filter(item => item.accessLevel === 'free').length} free items.`}
-            </p>
-          </TabsContent>
-        </Tabs>
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Content Manager</h1>
+        <Button onClick={() => setIsCreateModalOpen(true)}>Add New Content</Button>
       </div>
       
-      <CreateContentModal 
-        isOpen={isCreateContentOpen} 
-        onClose={() => setIsCreateContentOpen(false)} 
-      />
-    </MainLayout>
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex-1">
+          <Input
+            placeholder="Search content..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full"
+          />
+        </div>
+        <div className="w-full md:w-56">
+          <Select value={formatFilter} onValueChange={setFormatFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by format" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Formats</SelectItem>
+              <SelectItem value="video">Video</SelectItem>
+              <SelectItem value="audio">Audio</SelectItem>
+              <SelectItem value="pdf">PDF</SelectItem>
+              <SelectItem value="text">Text</SelectItem>
+              <SelectItem value="url">URL</SelectItem>
+              <SelectItem value="image">Image</SelectItem>
+              <SelectItem value="course">Course</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      <Tabs defaultValue="list" className="w-full">
+        <TabsList>
+          <TabsTrigger value="list">List View</TabsTrigger>
+          <TabsTrigger value="grid">Grid View</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="list" className="bg-white rounded-md shadow">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Format</TableHead>
+                  <TableHead>Visibility</TableHead>
+                  <TableHead className="text-center">Views</TableHead>
+                  <TableHead className="text-center">Top 10</TableHead>
+                  <TableHead className="text-center">Featured</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredContent.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium max-w-xs truncate">{item.title}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">
+                        {item.format}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        className={
+                          item.accessLevel === 'free' 
+                            ? 'bg-green-100 text-green-800' 
+                            : item.accessLevel === 'premium' 
+                              ? 'bg-purple-100 text-purple-800' 
+                              : 'bg-amber-100 text-amber-800'
+                        }
+                      >
+                        {item.accessLevel}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">{item.views}</TableCell>
+                    <TableCell className="text-center">
+                      <Switch 
+                        checked={item.isTopTen || false} 
+                        onCheckedChange={() => handleTopTenToggle(item)} 
+                      />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Switch 
+                        checked={item.featured || false} 
+                        onCheckedChange={() => handleFeaturedToggle(item)} 
+                      />
+                    </TableCell>
+                    <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVerticalIcon />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEdit(item)}>
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDuplicate(item)}>
+                            Duplicate
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-red-600"
+                            onClick={() => handleDelete(item)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                
+                {filteredContent.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-6 text-gray-500">
+                      No content found. Try adjusting your search or filters.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="grid" className="bg-white rounded-md shadow p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredContent.map((item) => (
+              <div key={item.id} className="border rounded-lg overflow-hidden bg-white shadow-sm">
+                <div className="aspect-video bg-gray-100 relative">
+                  <img 
+                    src={item.thumbnailUrl || '/placeholder.svg'} 
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <Badge 
+                    className={`absolute top-2 right-2 
+                      ${item.accessLevel === 'free' 
+                        ? 'bg-green-100 text-green-800' 
+                        : item.accessLevel === 'premium' 
+                          ? 'bg-purple-100 text-purple-800' 
+                          : 'bg-amber-100 text-amber-800'
+                      }`
+                    }
+                  >
+                    {item.accessLevel}
+                  </Badge>
+                </div>
+                
+                <div className="p-4">
+                  <h3 className="font-medium truncate">{item.title}</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {item.views} views · {new Date(item.createdAt).toLocaleDateString()}
+                  </p>
+                  
+                  <div className="flex justify-between items-center mt-4">
+                    <div className="flex space-x-4">
+                      <div className="flex flex-col items-center">
+                        <span className="text-xs text-gray-500 mb-1">Top 10</span>
+                        <Switch 
+                          checked={item.isTopTen || false} 
+                          onCheckedChange={() => handleTopTenToggle(item)}
+                          size="sm"
+                        />
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="text-xs text-gray-500 mb-1">Featured</span>
+                        <Switch 
+                          checked={item.featured || false} 
+                          onCheckedChange={() => handleFeaturedToggle(item)}
+                          size="sm"
+                        />
+                      </div>
+                    </div>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreVerticalIcon />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEdit(item)}>
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDuplicate(item)}>
+                          Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          className="text-red-600"
+                          onClick={() => handleDelete(item)}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {filteredContent.length === 0 && (
+              <div className="col-span-full text-center py-10 text-gray-500">
+                No content found. Try adjusting your search or filters.
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+      
+      {isCreateModalOpen && (
+        <CreateContentModal 
+          isOpen={isCreateModalOpen} 
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            setEditItem(null);
+          }}
+        />
+      )}
+    </div>
   );
 };
 

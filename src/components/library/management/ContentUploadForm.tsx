@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
-import { ContentItem, ContentFormat, AccessLevel, ContentVisibility } from '@/types/library';
+import { ContentItem, ContentFormat } from '@/types/library';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { v4 as uuidv4 } from 'uuid';
 import ContentBasicInfo from './form/ContentBasicInfo';
@@ -70,9 +70,9 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
         title: editItem.title,
         description: editItem.description,
         format: editItem.format,
-        resourceUrl: editItem.resourceUrl,
+        resourceUrl: editItem.resourceUrl || '',
         tags: editItem.tags.join(', '),
-        accessLevel: editItem.accessLevel,
+        accessLevel: editItem.accessLevel === 'unlockable' ? 'premium' : editItem.accessLevel,
         visibility: editItem.visibility || 'public',
         categoryId: editItem.categoryId || '',
         pointsEnabled: editItem.pointsEnabled || false,
@@ -115,12 +115,12 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
       resourceUrl: values.resourceUrl || (file ? `mock-file-path/${file.name}` : ''),
       thumbnailUrl: previewImage || '/placeholder.svg',
       tags: selectedTags,
-      accessLevel: values.accessLevel as AccessLevel,
+      accessLevel: values.accessLevel,
       createdAt: editItem?.createdAt || now,
       updatedAt: now,
       views: editItem?.views || 0,
       categoryId: values.categoryId === 'none' ? undefined : values.categoryId,
-      visibility: values.visibility as ContentVisibility || 'public',
+      visibility: values.visibility || 'public',
       featured: editItem?.featured || false,
       pointsEnabled: values.pointsEnabled,
       pointsValue: values.pointsValue,
@@ -130,11 +130,11 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
     
     // Add optional fields based on format
     if (['video', 'audio'].includes(values.format)) {
-      newContent.duration = editItem?.duration || "00:00";
+      newContent.duration = editItem?.duration || 0;
     }
     
     if (['pdf', 'image'].includes(values.format)) {
-      newContent.fileSize = editItem?.fileSize || (file ? `${Math.round(file.size / 1024)} KB` : "0 KB");
+      newContent.fileSize = editItem?.fileSize || (file ? Math.round(file.size / 1024) : 0);
     }
     
     onSave(newContent);

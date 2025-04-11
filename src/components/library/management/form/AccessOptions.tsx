@@ -4,7 +4,6 @@ import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/for
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UseFormReturn } from 'react-hook-form';
-import { ContentVisibility } from '@/types/library';
 
 interface AccessOptionsProps {
   form: UseFormReturn<any>;
