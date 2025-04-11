@@ -50,7 +50,7 @@ const ContentDetails: React.FC<ContentDetailsProps> = ({ item }) => {
           </div>
         </div>
       );
-    } else {
+    } else if (item.author && typeof item.author === 'object') {
       return (
         <div className="flex items-center">
           <Avatar className="h-8 w-8 mr-2">
@@ -64,6 +64,7 @@ const ContentDetails: React.FC<ContentDetailsProps> = ({ item }) => {
         </div>
       );
     }
+    return null;
   };
 
   return (

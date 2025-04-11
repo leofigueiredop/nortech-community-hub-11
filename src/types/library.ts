@@ -13,7 +13,7 @@ export interface ContentItem {
   description: string;
   format: ContentFormat;
   thumbnail: string;
-  author: string; // Changed to only accept string for simplicity
+  author: string | Author; // Allow both string and Author object
   tags: string[];
   createdAt: string;
   updatedAt: string;
