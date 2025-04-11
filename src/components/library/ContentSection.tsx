@@ -18,6 +18,7 @@ interface ContentSectionProps {
   onItemSelect: (item: ContentItem) => void;
   viewAllUrl?: string;
   isTopTen?: boolean;
+  layout?: 'carousel' | 'grid'; // Added layout property
 }
 
 const ContentSection: React.FC<ContentSectionProps> = ({ 
@@ -25,12 +26,42 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   items, 
   onItemSelect,
   viewAllUrl,
-  isTopTen = false
+  isTopTen = false,
+  layout = 'carousel' // Default to carousel
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   if (items.length === 0) return null;
 
+  // If layout is grid, render a grid of cards
+  if (layout === 'grid') {
+    return (
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold">{title}</h2>
+          
+          {viewAllUrl && (
+            <Button variant="ghost" size="sm" className="flex items-center gap-1">
+              View All <ChevronRight size={16} />
+            </Button>
+          )}
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {items.map((item, index) => (
+            <EnhancedContentCard
+              key={item.id}
+              item={item}
+              onClick={() => onItemSelect(item)}
+              rankNumber={isTopTen && index < 10 ? index + 1 : undefined}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Default carousel layout
   return (
     <div 
       className="mb-8 relative group"

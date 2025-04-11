@@ -47,7 +47,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
       >
         {/* Rank number display for top 10 items */}
         {rankNumber !== undefined && (
-          <div className="absolute -left-4 -bottom-2 z-10 font-bold text-[90px] select-none" 
+          <div className="absolute -left-5 -top-1 z-10 font-bold text-[80px] select-none" 
             style={{
               color: 'transparent',
               WebkitTextStroke: '2px rgba(255,255,255,0.7)',

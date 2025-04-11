@@ -54,25 +54,7 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
 
   return (
     <div className="absolute inset-0 flex flex-col justify-between p-3 bg-gradient-to-t from-black/80 via-black/50 to-transparent">
-      <div className="flex justify-between items-start">
-        <Badge variant="outline" className="bg-black/40 text-white border-none shadow-md backdrop-blur-sm">
-          <ContentFormatIcon format={item.format} size={14} className="mr-1" />
-          {item.format.charAt(0).toUpperCase() + item.format.slice(1)}
-        </Badge>
-        
-        {item.isNew && (
-          <Badge className="bg-primary text-white border-none shadow-md">
-            New
-          </Badge>
-        )}
-        
-        {item.isExclusive && (
-          <Badge className="bg-amber-500 text-white border-none shadow-md">
-            Exclusive
-          </Badge>
-        )}
-      </div>
-      
+      {/* Content description and info shown on hover */}
       <div className="mt-auto">
         <motion.h3 
           className="text-sm font-semibold text-white mb-1 line-clamp-1"

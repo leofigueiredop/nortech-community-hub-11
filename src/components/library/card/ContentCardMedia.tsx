@@ -31,6 +31,22 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
         whileHover={{ scale: 1.05 }}
       />
       
+      {/* Content format badge - positioned at top left */}
+      <div className="absolute top-2 left-2 z-10">
+        <Badge variant="secondary" className="bg-black/60 text-white border-none font-medium px-2">
+          {item.format.charAt(0).toUpperCase() + item.format.slice(1)}
+        </Badge>
+      </div>
+      
+      {/* "New" badge - positioned at top right, only if item is new */}
+      {item.isNew && (
+        <div className="absolute top-2 right-2 z-10">
+          <Badge className="bg-purple-600 text-white border-none px-2 py-0.5">
+            New
+          </Badge>
+        </div>
+      )}
+      
       {/* Premium content overlay when not hovered */}
       {isPremium && !isHovered && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-black/60 to-black/20 transition-opacity duration-300">
@@ -82,21 +98,6 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
             <Play className="text-white ml-1" size={24} />
           </div>
         </motion.div>
-      )}
-      
-      {/* Premium badge for locked content (when not hovered) */}
-      {isPremium && !isHovered && (
-        <div className="absolute top-2 right-2">
-          <motion.div
-            initial={{ x: 10, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Badge variant="secondary" className="bg-gradient-to-r from-amber-400 to-amber-600 text-white shadow-md">
-              <Lock size={12} className="mr-1" /> Premium
-            </Badge>
-          </motion.div>
-        </div>
       )}
 
       {/* Free access badge if applicable */}
