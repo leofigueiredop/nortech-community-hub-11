@@ -69,7 +69,11 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
       if (progress && !progress.pointsAwarded) {
         awardPoints(item.id);
         if (item.pointsValue) {
-          addUserPoints(item.pointsValue);
+          addUserPoints({
+            type: 'content_completion',
+            description: `Completed "${item.title}"`,
+            points: item.pointsValue
+          });
         }
       }
     }

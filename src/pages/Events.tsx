@@ -22,7 +22,7 @@ export interface Event {
 const EVENT_TYPES = ['workshop', 'webinar', 'meetup', 'conference', 'hackathon'];
 
 const Events: React.FC = () => {
-  const { addPoints, awardBadge } = usePoints();
+  const { awardPoints, awardBadge } = usePoints();
   const { toast } = useToast();
   const [events, setEvents] = useState<Event[]>([]);
 

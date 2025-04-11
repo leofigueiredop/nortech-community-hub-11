@@ -30,7 +30,6 @@ export const POINTS_VALUES = {
 // Define the structure of the Points context
 export interface PointsContextType {
   totalPoints: number;
-  points: number;
   awardPoints: (pointsData: { type: string; description: string; points: number }) => void;
   addPoints: (pointsData: { type: string; description: string; points: number }) => void;
   deductPoints: (points: number, description?: string) => void;
@@ -115,7 +114,6 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   return (
     <PointsContext.Provider value={{
       totalPoints,
-      points: totalPoints, // For backward compatibility
       awardPoints,
       addPoints,
       deductPoints,

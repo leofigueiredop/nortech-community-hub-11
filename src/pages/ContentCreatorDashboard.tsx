@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
-import { ContentItem, ContentCategory } from '@/types/library';
+import { ContentItem, ContentCategory, ContentFormat, Author } from '@/types/library';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,7 +40,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { toast } from '@/components/ui/use-toast';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { ContentFormatIcon } from '@/components/library/management/utils/ContentFormatIcon';
 import {
@@ -180,7 +181,7 @@ const ContentCreatorDashboard: React.FC = () => {
   const handleContentSubmit = async (values: z.infer<typeof contentSchema>) => {
     try {
       if (selectedContent) {
-        const tags = typeof values.tags === 'string' ? values.tags.split(',') : values.tags || [];
+        const tags = typeof values.tags === 'string' ? values.tags.split(',').map(tag => tag.trim()) : values.tags || [];
         updateContent({ 
           ...selectedContent, 
           ...values,
@@ -192,7 +193,7 @@ const ContentCreatorDashboard: React.FC = () => {
           title: "Content updated successfully.",
         })
       } else {
-        const tags = typeof values.tags === 'string' ? values.tags.split(',') : [];
+        const tags = typeof values.tags === 'string' ? values.tags.split(',').map(tag => tag.trim()) : [];
         addContent({
           id: uuidv4(),
           createdAt: new Date().toISOString(),
