@@ -61,11 +61,13 @@ export const useLibraryContent = () => {
     tagFilter: contentHook.tagFilter,
     accessFilter: contentHook.accessFilter,
     searchQuery: contentHook.searchQuery,
+    sortBy: contentHook.sortBy, // Make sure this is exposed
     selectedItem: contentHook.selectedItem,
     setFormatFilter: contentHook.setFormatFilter,
     setTagFilter: contentHook.setTagFilter,
     setAccessFilter: contentHook.setAccessFilter,
     setSearchQuery: contentHook.setSearchQuery,
+    setSortBy: contentHook.setSortBy, // Make sure this is exposed
     setSelectedItem: contentHook.setSelectedItem,
     addContent,
     updateContent,
