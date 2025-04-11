@@ -2,12 +2,11 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, FolderPlus, List, Grid, BookOpen } from 'lucide-react';
+import { Plus, FolderPlus, List, Grid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ContentUploadForm from '@/components/library/management/ContentUploadForm';
 import ContentList from '@/components/library/management/ContentList';
 import CategoriesManagement from '@/components/library/management/CategoriesManagement';
-import CoursesManagement from '@/components/library/management/CoursesManagement';
 import { ContentItem } from '@/types/library';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { useToast } from '@/hooks/use-toast';
@@ -71,9 +70,6 @@ const ContentManagement: React.FC = () => {
               <TabsTrigger value="content" className="gap-2">
                 <List size={16} /> Content
               </TabsTrigger>
-              <TabsTrigger value="courses" className="gap-2">
-                <BookOpen size={16} /> Courses
-              </TabsTrigger>
               <TabsTrigger value="categories" className="gap-2">
                 <FolderPlus size={16} /> Categories
               </TabsTrigger>
@@ -99,10 +95,6 @@ const ContentManagement: React.FC = () => {
               onDelete={handleDeleteContent}
               categories={categories}
             />
-          </TabsContent>
-          
-          <TabsContent value="courses">
-            <CoursesManagement />
           </TabsContent>
           
           <TabsContent value="categories">

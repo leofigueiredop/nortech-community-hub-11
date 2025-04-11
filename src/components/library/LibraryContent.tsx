@@ -32,8 +32,6 @@ const LibraryContent: React.FC<LibraryContentProps> = ({
     .sort((a, b) => b.views - a.views)
     .slice(0, 10);
   
-  const courseContent = content.filter(item => item.format === 'course');
-  
   const pdfContent = content.filter(item => item.format === 'pdf' || item.format === 'text' || item.format === 'gdoc');
   
   const audioContent = content.filter(item => item.format === 'audio');
@@ -91,15 +89,6 @@ const LibraryContent: React.FC<LibraryContentProps> = ({
               items={recommendedContent} 
               onItemSelect={setSelectedItem}
               viewAllUrl="/library/recommended"
-            />
-          )}
-
-          {courseContent.length > 0 && (
-            <ContentSection 
-              title="Courses & Masterclasses" 
-              items={courseContent} 
-              onItemSelect={setSelectedItem}
-              viewAllUrl="/library/courses"
             />
           )}
 

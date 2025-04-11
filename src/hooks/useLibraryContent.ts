@@ -3,12 +3,10 @@ import { useCallback } from 'react';
 import { ContentItem } from '@/types/library';
 import { useContentItems } from './useContentItems';
 import { useCategories } from './useCategories';
-import { useCourses } from './useCourses';
 
 export const useLibraryContent = () => {
   const contentHook = useContentItems();
   const categoriesHook = useCategories();
-  const coursesHook = useCourses();
 
   // Enhanced functions to manage both content and categories together
   const addContent = useCallback((newContent: ContentItem) => {
@@ -78,11 +76,5 @@ export const useLibraryContent = () => {
     addCategory: categoriesHook.addCategory,
     updateCategory: categoriesHook.updateCategory,
     deleteCategory: categoriesHook.deleteCategory,
-    
-    // Courses state and methods
-    courses: coursesHook.courses,
-    addCourse: coursesHook.addCourse,
-    updateCourse: coursesHook.updateCourse,
-    deleteCourse: coursesHook.deleteCourse
   };
 };

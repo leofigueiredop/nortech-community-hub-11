@@ -34,9 +34,6 @@ import Leaderboard from "./pages/Leaderboard";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { PointsProvider } from "./context/PointsContext";
 import ContentManagement from "./pages/ContentManagement";
-import CourseCreate from "./pages/CourseCreate";
-import CourseEdit from "./pages/CourseEdit";
-import Courses from "./pages/Courses";
 import TagPage from "./pages/TagPage";
 import UserProfile from "./pages/UserProfile";
 import CreateEvent from "./pages/CreateEvent";
@@ -91,10 +88,6 @@ const App = () => (
               
               <Route path="/library" element={<Library />} />
               <Route path="/library/manage" element={<ContentManagement />} />
-              <Route path="/courses" element={<Courses />} />
-              <Route path="/courses/:courseId" element={<Courses />} />
-              <Route path="/courses/create" element={<CourseCreate />} />
-              <Route path="/courses/edit/:courseId" element={<CourseEdit />} />
               <Route path="/events" element={<Events />} />
               <Route path="/events/weekly" element={<EventsWeekly />} />
               <Route path="/events/calendar" element={<EventsCalendar />} />

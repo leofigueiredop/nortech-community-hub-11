@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Folder, Upload, FileVideo, File, FileAudio, BookOpen, Image, Tag } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { FileText, Folder, FileVideo, File, FileAudio, Image, Tag } from 'lucide-react';
 
 interface FormatTabsProps {
   activeTab: string;
@@ -35,9 +34,6 @@ const FormatTabs: React.FC<FormatTabsProps> = ({
           </TabsTrigger>
           <TabsTrigger value="audio" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
             <FileAudio size={16} /> Audio
-          </TabsTrigger>
-          <TabsTrigger value="course" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
-            <BookOpen size={16} /> Courses
           </TabsTrigger>
           <TabsTrigger value="image" className="gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
             <Image size={16} /> Images

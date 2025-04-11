@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { FileText, MessageSquare, Calendar, Terminal, Users, Trophy, Library, PlusCircle } from 'lucide-react';
+import { FileText, MessageSquare, Calendar, Users, Trophy, Library, PlusCircle } from 'lucide-react';
 import SidebarSection from './SidebarSection';
 import SidebarLink from './SidebarLink';
 import { 

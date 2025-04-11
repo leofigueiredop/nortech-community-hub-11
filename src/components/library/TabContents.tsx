@@ -24,7 +24,6 @@ interface TabContentsProps {
   videoContent: ContentItem[];
   documentContent: ContentItem[];
   audioContent: ContentItem[];
-  courseContent: ContentItem[];
   imageContent: ContentItem[];
   tagsWithCount: Array<{name: string, count: number}>;
   content: ContentItem[];
@@ -48,7 +47,6 @@ const TabContents: React.FC<TabContentsProps> = ({
   videoContent,
   documentContent,
   audioContent,
-  courseContent,
   imageContent,
   tagsWithCount,
   content,
@@ -93,13 +91,6 @@ const TabContents: React.FC<TabContentsProps> = ({
       <TabsContent value="audio">
         <ContentGrid 
           items={audioContent} 
-          onItemSelect={onItemSelect} 
-        />
-      </TabsContent>
-      
-      <TabsContent value="course">
-        <ContentGrid 
-          items={courseContent} 
           onItemSelect={onItemSelect} 
         />
       </TabsContent>
