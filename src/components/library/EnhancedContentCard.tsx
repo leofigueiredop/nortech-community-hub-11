@@ -9,7 +9,7 @@ import ContentCardInfo from './card/ContentCardInfo';
 interface EnhancedContentCardProps {
   item: ContentItem;
   onClick: () => void;
-  rankNumber?: number; // New prop for top 10 ranking
+  rankNumber?: number; // For top 10 ranking
 }
 
 const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ 

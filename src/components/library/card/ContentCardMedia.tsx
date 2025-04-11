@@ -78,7 +78,7 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
           className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
           whileHover={{ scale: 1.1 }}
         >
-          <div className="w-12 h-12 bg-nortech-purple rounded-full flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
             <Play className="text-white ml-1" size={24} />
           </div>
         </motion.div>

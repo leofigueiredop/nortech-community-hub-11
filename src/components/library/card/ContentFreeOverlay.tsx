@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { ContentItem } from '@/types/library';
-import { Button } from '@/components/ui/button';
-import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
-import { Play, FileText, Headphones, Eye, ExternalLink, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Play, FileText, Music, Download, ExternalLink, BookOpen } from 'lucide-react';
 import { ContentFormatIcon } from '../management/utils/ContentFormatIcon';
 
 interface ContentFreeOverlayProps {
@@ -12,89 +12,94 @@ interface ContentFreeOverlayProps {
 }
 
 const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
-  // Function to get appropriate button content based on format
-  const getActionButton = () => {
-    if (['video', 'youtube', 'vimeo'].includes(item.format)) {
-      return (
-        <Button className="bg-primary hover:bg-primary/90">
-          <Play className="mr-2 h-4 w-4" /> Watch Now
-        </Button>
-      );
-    } else if (item.format === 'audio') {
-      return (
-        <Button className="bg-primary hover:bg-primary/90">
-          <Headphones className="mr-2 h-4 w-4" /> Listen Now
-        </Button>
-      );
-    } else if (['pdf', 'text', 'gdoc'].includes(item.format)) {
-      return (
-        <Button className="bg-primary hover:bg-primary/90">
-          <Eye className="mr-2 h-4 w-4" /> Read Now
-        </Button>
-      );
-    } else {
-      return (
-        <Button className="bg-primary hover:bg-primary/90">
-          <ExternalLink className="mr-2 h-4 w-4" /> Access
-        </Button>
-      );
+  // Get the appropriate CTA based on content format
+  const getCTA = () => {
+    switch (item.format) {
+      case 'video':
+      case 'youtube':
+      case 'vimeo':
+        return (
+          <Button size="sm" className="bg-primary/90 hover:bg-primary text-white">
+            <Play size={16} className="mr-2" /> Watch Now
+          </Button>
+        );
+      case 'pdf':
+      case 'text':
+      case 'gdoc':
+        return (
+          <Button size="sm" className="bg-primary/90 hover:bg-primary text-white">
+            <FileText size={16} className="mr-2" /> Read Now
+          </Button>
+        );
+      case 'audio':
+        return (
+          <Button size="sm" className="bg-primary/90 hover:bg-primary text-white">
+            <Music size={16} className="mr-2" /> Listen Now
+          </Button>
+        );
+      case 'course':
+        return (
+          <Button size="sm" className="bg-primary/90 hover:bg-primary text-white">
+            <BookOpen size={16} className="mr-2" /> Start Course
+          </Button>
+        );
+      default:
+        return (
+          <Button size="sm" className="bg-primary/90 hover:bg-primary text-white">
+            <ExternalLink size={16} className="mr-2" /> View Now
+          </Button>
+        );
     }
   };
 
   return (
-    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent flex flex-col items-center justify-center p-4 text-white">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="w-full flex flex-col items-center space-y-3"
-      >
-        {/* Format icon */}
-        <div className="bg-black/30 p-2 rounded-full backdrop-blur-sm mb-2">
-          <ContentFormatIcon format={item.format} size={24} className="text-white" />
-        </div>
+    <div className="absolute inset-0 flex flex-col justify-between p-3 bg-gradient-to-t from-black/80 via-black/50 to-transparent">
+      <div className="flex justify-between items-start">
+        <Badge variant="outline" className="bg-black/40 text-white border-none shadow-md backdrop-blur-sm">
+          <ContentFormatIcon format={item.format} size={14} className="mr-1" />
+          {item.format.charAt(0).toUpperCase() + item.format.slice(1)}
+        </Badge>
         
-        {/* Short description (truncated) */}
-        <p className="text-sm text-center line-clamp-2 mb-2 max-w-xs">
-          {item.description}
-        </p>
+        {item.isNew && (
+          <Badge className="bg-primary text-white border-none shadow-md">
+            New
+          </Badge>
+        )}
         
-        {/* Action button based on content format */}
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        {item.isExclusive && (
+          <Badge className="bg-amber-500 text-white border-none shadow-md">
+            Exclusive
+          </Badge>
+        )}
+      </div>
+      
+      <div className="mt-auto">
+        <motion.h3 
+          className="text-sm font-semibold text-white mb-1 line-clamp-1"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.2 }}
         >
-          {getActionButton()}
-        </motion.div>
+          {item.title}
+        </motion.h3>
         
-        {/* Additional info */}
-        <div className="mt-2 flex items-center text-xs opacity-80">
-          <Eye size={12} className="mr-1" />
-          {item.views} views
-          <HoverCard>
-            <HoverCardTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full ml-2">
-                <Info size={12} />
-              </Button>
-            </HoverCardTrigger>
-            <HoverCardContent className="w-80 p-4">
-              <div className="flex justify-between space-x-4">
-                <div className="space-y-1">
-                  <h4 className="text-sm font-semibold">{item.title}</h4>
-                  <p className="text-xs">{item.description}</p>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {item.tags.map(tag => (
-                      <span key={tag} className="text-xs bg-muted px-1.5 py-0.5 rounded-sm">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
-        </div>
-      </motion.div>
+        <motion.p 
+          className="text-xs text-white/80 mb-3 line-clamp-2"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.2, delay: 0.1 }}
+        >
+          {item.description}
+        </motion.p>
+        
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.2, delay: 0.2 }}
+        >
+          {getCTA()}
+        </motion.div>
+      </div>
     </div>
   );
 };

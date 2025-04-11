@@ -1,101 +1,94 @@
 
 import React from 'react';
 import { ContentItem } from '@/types/library';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { formatDuration, getContentTypeName } from './contentViewerUtils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { X, Share2, Bookmark, Flag, LucideIcon, Lock } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ContentFormatIcon } from '../management/utils/ContentFormatIcon';
 
-export interface ContentHeaderProps {
+interface ContentHeaderProps {
   item: ContentItem;
-  onBack?: () => void;
+  onBack: () => void;
 }
 
 const ContentHeader: React.FC<ContentHeaderProps> = ({ item, onBack }) => {
-  // Format the creation date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  // Get author display
-  const getAuthorDisplay = () => {
+  // Function to render author
+  const renderAuthor = () => {
     if (typeof item.author === 'string') {
-      return item.author;
-    } else if (item.author && typeof item.author === 'object') {
-      return item.author.name;
+      return (
+        <div className="flex items-center">
+          <span className="text-sm text-muted-foreground">By:</span>
+          <span className="text-sm font-medium ml-1">{item.author}</span>
+        </div>
+      );
+    } else {
+      return (
+        <div className="flex items-center">
+          <span className="text-sm text-muted-foreground mr-1">By:</span>
+          <Avatar className="h-5 w-5 mr-1">
+            <AvatarImage src={item.author.avatar} alt={item.author.name} />
+            <AvatarFallback>{item.author.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <span className="text-sm font-medium">{item.author.name}</span>
+        </div>
+      );
     }
-    return 'Unknown Author';
-  };
-
-  // Get author avatar
-  const getAuthorAvatar = () => {
-    if (typeof item.author === 'object' && item.author && item.author.avatar) {
-      return item.author.avatar;
-    }
-    return null;
   };
 
   return (
-    <div className="mb-6">
-      {onBack && (
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="mb-2 p-0 h-8" 
-          onClick={onBack}
-        >
-          <ArrowLeft className="mr-1 h-4 w-4" />
-          <span>Back</span>
-        </Button>
-      )}
-      
-      <div className="flex items-center gap-2 mb-2">
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={getAuthorAvatar() || ''} alt={getAuthorDisplay()} />
-          <AvatarFallback>{getAuthorDisplay().charAt(0)}</AvatarFallback>
-        </Avatar>
-        <div>
-          <div className="text-sm font-medium">{getAuthorDisplay()}</div>
-          <div className="text-xs text-muted-foreground">
-            Published {formatDate(item.createdAt)}
+    <div className="flex flex-col mb-6">
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex-1">
+          <div className="flex items-center mb-2">
+            <Badge className="mr-2 capitalize bg-primary/90 text-primary-foreground">
+              <ContentFormatIcon format={item.format} size={14} className="mr-1 text-white" />
+              {item.format}
+            </Badge>
+            
+            {item.accessLevel === 'premium' && (
+              <Badge className="bg-amber-500 text-white">
+                <Lock size={12} className="mr-1" /> Premium
+              </Badge>
+            )}
+          </div>
+          
+          <h1 className="text-2xl font-bold mb-2">{item.title}</h1>
+          
+          <div className="flex flex-wrap items-center space-x-4">
+            {renderAuthor()}
+            
+            {item.categoryId && (
+              <div className="flex items-center">
+                <span className="text-sm text-muted-foreground">Category:</span>
+                <span className="text-sm font-medium ml-1">
+                  {item.categoryId}
+                </span>
+              </div>
+            )}
           </div>
         </div>
+        
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onBack}
+          className="ml-2"
+        >
+          <X size={18} />
+        </Button>
       </div>
       
-      <div className="flex flex-wrap gap-2 mt-3">
-        <Badge variant="outline" className="bg-primary/10">
-          {getContentTypeName(item.format)}
-        </Badge>
-        
-        {item.duration > 0 && (
-          <Badge variant="outline" className="bg-muted">
-            {formatDuration(item.duration)}
-          </Badge>
-        )}
-        
-        {item.accessLevel === 'premium' && (
-          <Badge className="bg-amber-500 text-white hover:bg-amber-600">
-            Premium
-          </Badge>
-        )}
-        
-        {item.pointsEnabled && (
-          <Badge className="bg-emerald-500 text-white hover:bg-emerald-600">
-            {item.pointsValue} Points
-          </Badge>
-        )}
-        
-        {item.tags && item.tags.slice(0, 2).map(tag => (
-          <Badge key={tag} variant="secondary">
-            {tag}
-          </Badge>
-        ))}
+      <div className="flex flex-wrap gap-2">
+        <Button variant="ghost" size="sm" className="gap-1">
+          <Share2 size={14} /> Share
+        </Button>
+        <Button variant="ghost" size="sm" className="gap-1">
+          <Bookmark size={14} /> Save
+        </Button>
+        <Button variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive">
+          <Flag size={14} /> Report
+        </Button>
       </div>
     </div>
   );

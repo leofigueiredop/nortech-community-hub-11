@@ -1,16 +1,21 @@
 
 import React, { useState } from 'react';
 import { ContentItem } from '@/types/library';
-import ContentRow from './ContentRow';
-import ContentGrid from './ContentGrid';
+import EnhancedContentCard from './EnhancedContentCard';
 import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { 
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
+} from '@/components/ui/carousel';
 
 interface ContentSectionProps {
   title: string;
   items: ContentItem[];
   onItemSelect: (item: ContentItem) => void;
-  layout?: 'row' | 'grid';
   viewAllUrl?: string;
   isTopTen?: boolean;
 }
@@ -19,21 +24,21 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   title, 
   items, 
   onItemSelect,
-  layout = 'row',
   viewAllUrl,
   isTopTen = false
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   if (items.length === 0) return null;
 
-  // For top ten, limit to 10 items and add rank numbers
-  const displayItems = isTopTen ? items.slice(0, 10) : items;
-
   return (
-    <div className="mb-8 relative group">
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-2xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
+    <div 
+      className="mb-8 relative group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold group-hover:text-primary transition-colors duration-300">
           {title}
         </h2>
         
@@ -44,29 +49,30 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         )}
       </div>
       
-      {layout === 'row' ? (
-        <ContentRow 
-          items={displayItems} 
-          onItemSelect={onItemSelect} 
-          isTopTen={isTopTen} 
-        />
-      ) : (
-        <ContentGrid 
-          items={expanded ? displayItems : displayItems.slice(0, 8)} 
-          onItemSelect={onItemSelect} 
-        />
-      )}
-      
-      {layout === 'grid' && displayItems.length > 8 && (
-        <div className="text-center mt-4">
-          <Button 
-            variant="outline" 
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? "Show Less" : "Show More"}
-          </Button>
+      <Carousel
+        opts={{
+          align: "start",
+          loop: items.length > 6,
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-2 md:-ml-4">
+          {items.map((item, index) => (
+            <CarouselItem key={item.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+              <EnhancedContentCard
+                item={item}
+                onClick={() => onItemSelect(item)}
+                rankNumber={isTopTen && index < 10 ? index + 1 : undefined}
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        
+        <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+          <CarouselPrevious className="left-1" />
+          <CarouselNext className="right-1" />
         </div>
-      )}
+      </Carousel>
     </div>
   );
 };

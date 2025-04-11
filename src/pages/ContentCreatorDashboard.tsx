@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -204,7 +203,7 @@ const ContentCreatorDashboard: React.FC = () => {
           pointsValue: 100,
           tags: tags,
           duration: values.duration || 0,
-          author: values.author || 'Nortech', 
+          author: typeof values.author === 'string' ? values.author : JSON.stringify(values.author),
           thumbnail: values.thumbnail || '/placeholder.svg',
           format: values.format as ContentFormat,
           accessLevel: values.accessLevel as 'free' | 'premium' | 'unlockable',

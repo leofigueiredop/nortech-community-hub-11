@@ -13,12 +13,12 @@ export interface ContentItem {
   description: string;
   format: ContentFormat;
   thumbnail: string;
-  author: Author | string; // Allow both Author object and string for flexibility
+  author: Author | string; // Can be either an Author object or just a string
   tags: string[];
   createdAt: string;
   updatedAt: string;
   views: number;
-  duration: number;
+  duration: number; // Duration in seconds
   accessLevel: 'free' | 'premium' | 'unlockable';
   featured: boolean;
   categoryId?: string;
@@ -33,6 +33,9 @@ export interface ContentItem {
   fileSize?: number; // Size of the content file
   allowComments?: boolean; // Whether comments are allowed
   freeAccessesLeft?: number; // Number of free accesses for premium content
+  isNew?: boolean; // Whether the content is new
+  isExclusive?: boolean; // Whether the content is exclusive
+  releaseDate?: string; // When the content was released
 }
 
 export interface ContentCategory {

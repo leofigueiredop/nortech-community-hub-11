@@ -1,3 +1,4 @@
+
 import { ContentItem, ContentCategory, ContentFormat } from '@/types/library';
 
 export const CATEGORIES: ContentCategory[] = [
@@ -49,7 +50,8 @@ export const CONTENT_ITEMS: ContentItem[] = [
     featured: true,
     categoryId: 'cat1',
     allowComments: true,
-    freeAccessesLeft: 0
+    freeAccessesLeft: 0,
+    isNew: true
   },
   {
     id: 'c2',
@@ -87,7 +89,8 @@ export const CONTENT_ITEMS: ContentItem[] = [
     duration: 1845, // Duration in seconds
     accessLevel: 'free',
     featured: true,
-    categoryId: 'cat2'
+    categoryId: 'cat2',
+    isExclusive: true
   },
   {
     id: 'c4',
@@ -155,7 +158,8 @@ export const CONTENT_ITEMS: ContentItem[] = [
     duration: 1560, // Duration in seconds
     accessLevel: 'premium',
     featured: true,
-    categoryId: 'cat2'
+    categoryId: 'cat2',
+    isNew: true
   },
   {
     id: 'c8',
@@ -193,7 +197,8 @@ export const CONTENT_ITEMS: ContentItem[] = [
     featured: true,
     categoryId: 'cat3',
     pointsEnabled: true,
-    pointsValue: 200
+    pointsValue: 200,
+    isExclusive: true
   },
   {
     id: 'c10',
@@ -209,6 +214,7 @@ export const CONTENT_ITEMS: ContentItem[] = [
     duration: 480, // Estimated reading time in seconds
     accessLevel: 'free',
     featured: false,
-    categoryId: 'cat1'
+    categoryId: 'cat1',
+    isNew: true
   }
 ];
