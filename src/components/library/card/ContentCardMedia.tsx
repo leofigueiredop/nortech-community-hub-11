@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { ContentItem } from '@/types/library';
 import { Play, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import PremiumContentOverlay from '../PremiumContentOverlay';
+import ContentFreeOverlay from './ContentFreeOverlay';
 
 interface ContentCardMediaProps {
   item: ContentItem;

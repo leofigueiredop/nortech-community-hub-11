@@ -4,6 +4,7 @@ import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/for
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UseFormReturn } from 'react-hook-form';
+import { ContentVisibility } from '@/types/library';
 
 interface AccessOptionsProps {
   form: UseFormReturn<any>;
@@ -50,8 +51,11 @@ const AccessOptions: React.FC<AccessOptionsProps> = ({ form }) => {
               </FormControl>
               <SelectContent>
                 <SelectItem value="public">Public</SelectItem>
+                <SelectItem value="premium">Premium Only</SelectItem>
+                <SelectItem value="points">Points Unlockable</SelectItem>
                 <SelectItem value="vip-only">VIP Members Only</SelectItem>
                 <SelectItem value="limited-time">Limited Time</SelectItem>
+                <SelectItem value="hidden">Hidden</SelectItem>
               </SelectContent>
             </Select>
             <FormControl />

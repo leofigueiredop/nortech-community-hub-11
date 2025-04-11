@@ -31,7 +31,7 @@ const formSchema = z.object({
   resourceUrl: z.string().optional(),
   tags: z.string().optional(),
   accessLevel: z.enum(["free", "premium"]),
-  visibility: z.enum(["public", "vip-only", "limited-time"]).optional(),
+  visibility: z.enum(["public", "premium", "points", "hidden", "vip-only", "limited-time"]).optional(),
   categoryId: z.string().optional(),
   pointsEnabled: z.boolean().default(false),
   pointsValue: z.number().default(POINTS_VALUES.content_completion),
