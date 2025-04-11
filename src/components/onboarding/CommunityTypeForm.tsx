@@ -72,8 +72,8 @@ const CommunityTypeForm: React.FC = () => {
     console.log('Form data:', data);
     // Store the community type selection in localStorage
     localStorage.setItem('communityType', data.communityType);
-    // Go to next step (community setup)
-    navigate('/onboarding/community');
+    // Go to templates selection
+    navigate('/onboarding/community-templates');
   };
 
   return (

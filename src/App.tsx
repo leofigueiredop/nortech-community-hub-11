@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,8 @@ import Community from "./pages/onboarding/Community";
 import Profile from "./pages/onboarding/Profile";
 import Features from "./pages/onboarding/Features";
 import Creator from "./pages/onboarding/Creator";
+import CommunityType from "./pages/onboarding/CommunityType";
+import CommunityTemplates from "./pages/onboarding/CommunityTemplates";
 import Dashboard from "./pages/Dashboard";
 import Feed from "./pages/Feed";
 import CreatePost from "./pages/CreatePost";
@@ -55,7 +58,6 @@ import Integration from "./pages/settings/Integration";
 import Migration from "./pages/settings/Migration";
 import Paywall from "./pages/settings/Paywall";
 import PointsConfiguration from "./pages/settings/PointsConfiguration";
-import CommunityType from "./pages/onboarding/CommunityType";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +73,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/onboarding/creator" element={<Creator />} />
               <Route path="/onboarding/community-type" element={<CommunityType />} />
+              <Route path="/onboarding/community-templates" element={<CommunityTemplates />} />
               <Route path="/onboarding/community" element={<Community />} />
               <Route path="/onboarding/profile" element={<Profile />} />
               <Route path="/onboarding/features" element={<Features />} />
