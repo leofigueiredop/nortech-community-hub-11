@@ -98,7 +98,7 @@ const FeaturedContentCarousel: React.FC<FeaturedContentCarouselProps> = ({
                     
                     {/* Tags */}
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {item.tags.slice(0, 3).map(tag => (
+                      {item.tags && item.tags.slice(0, 3).map(tag => (
                         <Badge key={tag} variant="secondary" className="bg-black/30 backdrop-blur-md">
                           {tag}
                         </Badge>

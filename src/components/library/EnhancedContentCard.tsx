@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import ContentCardMedia from './card/ContentCardMedia';
 import ContentCardInfo from './card/ContentCardInfo';
 import ContentFreeOverlay from './card/ContentFreeOverlay';
-import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
+import PremiumContentOverlay from './PremiumContentOverlay';
 
 interface EnhancedContentCardProps {
   item: ContentItem;
@@ -51,7 +51,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
           <div className="absolute -left-2 -top-2 z-10 font-bold text-6xl select-none" 
             style={{
               color: 'white',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+              textShadow: '2px 2px 4px rgba(0,0,0,0.7), 0 0 10px rgba(0,0,0,0.5)'
             }}>
             {rankNumber}
           </div>
@@ -70,7 +70,17 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
         
         {/* Overlay with description and actions (visible when hovered) */}
         {isHovered && (
-          <ContentFreeOverlay item={item} />
+          <>
+            {isPremium ? (
+              <PremiumContentOverlay 
+                pointsEnabled={item.pointsEnabled}
+                pointsValue={item.pointsValue} 
+                freeAccessLeft={item.freeAccessesLeft}
+              />
+            ) : (
+              <ContentFreeOverlay item={item} />
+            )}
+          </>
         )}
       </Card>
     </motion.div>

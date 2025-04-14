@@ -30,7 +30,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 10);
   
-  const mostPopular = [...viewFilteredContent]
+  const topTen = [...viewFilteredContent]
     .sort((a, b) => b.views - a.views)
     .slice(0, 10);
   
@@ -63,11 +63,6 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
   const premiumShowcase = activeView === 'all' || activeView === 'premium' 
     ? viewFilteredContent.filter(item => item.accessLevel === 'premium').slice(0, 10)
     : [];
-  
-  // Top trending
-  const topTrending = [...viewFilteredContent]
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 10);
 
   // Check if we have any content to display
   const hasContent = viewFilteredContent.length > 0;
@@ -75,7 +70,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
   // Check if sections have content to show
   const hasSections = 
     newReleases.length > 0 || 
-    mostPopular.length > 0 || 
+    topTen.length > 0 || 
     videoContent.length > 0 || 
     pdfContent.length > 0 || 
     audioContent.length > 0 || 
@@ -86,9 +81,9 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
   if (!hasContent) {
     return (
       <div className="text-center py-8 px-4">
-        <h2 className="text-2xl font-semibold mb-4">Nenhum conteúdo disponível</h2>
+        <h2 className="text-2xl font-semibold mb-4">No content available</h2>
         <p className="text-muted-foreground">
-          Não há conteúdo disponível para os filtros selecionados.
+          There is no content available for the selected filters.
         </p>
       </div>
     );
@@ -96,11 +91,11 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
 
   return (
     <div className="space-y-4 py-6">
-      {/* Top trending row (always first when in 'all' view) */}
-      {activeView === 'all' && topTrending.length > 0 && (
+      {/* Top 10 This Week */}
+      {topTen.length > 0 && (
         <ContentSection 
-          title="Em Alta" 
-          items={topTrending} 
+          title="Top 10 This Week" 
+          items={topTen} 
           onItemSelect={onItemSelect}
           isTopTen={true}
         />
@@ -109,7 +104,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {/* New releases */}
       {newReleases.length > 0 && (
         <ContentSection 
-          title="Lançamentos Recentes" 
+          title="New Releases" 
           items={newReleases} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/new"
@@ -119,7 +114,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {/* Recommended content (personalized, if any) */}
       {recommendedContent.length > 0 && (
         <ContentSection 
-          title="Recomendado Para Você" 
+          title="Recommended For You" 
           items={recommendedContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/recommended"
@@ -129,7 +124,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {/* Premium content showcase (only in all or premium views) */}
       {(activeView === 'all' || activeView === 'premium') && premiumShowcase.length > 0 && (
         <ContentSection 
-          title="Conteúdo Premium" 
+          title="Premium Content" 
           items={premiumShowcase} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/premium"
@@ -139,7 +134,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {/* Format-specific sections */}
       {videoContent.length > 0 && (
         <ContentSection 
-          title="Vídeos" 
+          title="Videos" 
           items={videoContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/videos"
@@ -148,7 +143,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       
       {courseContent.length > 0 && (
         <ContentSection 
-          title="Cursos" 
+          title="Courses" 
           items={courseContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/courses"
@@ -157,7 +152,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       
       {pdfContent.length > 0 && (
         <ContentSection 
-          title="Guias & Documentos PDF" 
+          title="PDF Guides" 
           items={pdfContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/documents"
@@ -166,27 +161,17 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       
       {audioContent.length > 0 && (
         <ContentSection 
-          title="Conteúdo em Áudio" 
+          title="Audio Lessons" 
           items={audioContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/audio"
         />
       )}
       
-      {/* Most popular (if not already showing trending) */}
-      {activeView !== 'all' && mostPopular.length > 0 && (
-        <ContentSection 
-          title="Mais Populares" 
-          items={mostPopular} 
-          onItemSelect={onItemSelect}
-          viewAllUrl="/library/popular"
-        />
-      )}
-      
       {!hasSections && (
         <div className="text-center py-8">
           <p className="text-muted-foreground">
-            Nenhum conteúdo corresponde às configurações de visualização atuais.
+            No content matches your current view settings.
           </p>
         </div>
       )}

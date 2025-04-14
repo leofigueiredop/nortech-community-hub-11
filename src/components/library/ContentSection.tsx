@@ -42,7 +42,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
           
           {viewAllUrl && (
             <Button variant="ghost" size="sm" className="flex items-center gap-1">
-              Ver Todos <ChevronRight size={16} />
+              View All <ChevronRight size={16} />
             </Button>
           )}
         </div>
@@ -65,18 +65,18 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   // Default carousel layout
   return (
     <div 
-      className="mb-12 px-1 py-2" 
+      className="mb-12 py-8" 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold group-hover:text-primary transition-colors duration-300">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
           {title}
         </h2>
         
         {viewAllUrl && (
           <Button variant="ghost" size="sm" className="flex items-center gap-1">
-            Ver Todos <ChevronRight size={16} />
+            View All <ChevronRight size={16} />
           </Button>
         )}
       </div>
@@ -103,8 +103,8 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         </CarouselContent>
         
         <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <CarouselPrevious className="h-8 w-8 -left-4" />
-          <CarouselNext className="h-8 w-8 -right-4" />
+          <CarouselPrevious className="h-8 w-8" />
+          <CarouselNext className="h-8 w-8" />
         </div>
       </Carousel>
     </div>

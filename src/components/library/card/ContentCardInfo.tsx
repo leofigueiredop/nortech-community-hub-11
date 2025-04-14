@@ -16,23 +16,35 @@ const ContentCardInfo: React.FC<ContentCardInfoProps> = ({ item }) => {
       
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs px-1.5 py-0 h-5">
-            {item.format}
-          </Badge>
-          
-          <span className="flex items-center">
-            <Eye size={12} className="mr-1" />
-            {item.views}
-          </span>
+          {item.views > 0 && (
+            <span className="flex items-center">
+              <Eye size={12} className="mr-1" />
+              {item.views}
+            </span>
+          )}
         </div>
         
-        {item.duration && (
+        {item.duration > 0 && (
           <span className="flex items-center">
             <Clock size={12} className="mr-1" />
             {formatDuration(item.duration)}
           </span>
         )}
       </div>
+      
+      {/* Tags - limited to 2 */}
+      {item.tags && item.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-1.5">
+          {item.tags.slice(0, 2).map(tag => (
+            <Badge key={tag} variant="secondary" className="text-xs px-1.5 py-0 h-5 opacity-70">
+              {tag}
+            </Badge>
+          ))}
+          {item.tags.length > 2 && (
+            <span className="text-xs text-muted-foreground">+{item.tags.length - 2}</span>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -49,6 +49,7 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
   return (
     <ScrollArea className="flex-1">
       <div className="container py-6 max-w-screen-2xl space-y-8">
+        {/* Hero Feature Carousel - only show on main view, not during search */}
         {featuredContent.length > 0 && !isSearchActive && activeView === 'all' && (
           <FeaturedContentCarousel 
             items={featuredContent}
@@ -56,6 +57,7 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
           />
         )}
 
+        {/* Search Results */}
         {isSearchActive ? (
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold">
@@ -85,6 +87,7 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
             )}
           </div>
         ) : (
+          /* Netflix-style content rows when not searching */
           <LibraryContentRows 
             content={content}
             activeView={activeView}

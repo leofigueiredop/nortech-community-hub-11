@@ -9,7 +9,7 @@ interface PremiumContentOverlayProps {
   pointsEnabled?: boolean;
   pointsValue?: number;
   freeAccessLeft?: number;
-  onSubscribe: () => void;
+  onSubscribe?: () => void;
   onUsePoints?: () => void;
 }
 
@@ -17,8 +17,8 @@ const PremiumContentOverlay: React.FC<PremiumContentOverlayProps> = ({
   pointsEnabled = false,
   pointsValue = 150,
   freeAccessLeft = 0,
-  onSubscribe,
-  onUsePoints,
+  onSubscribe = () => {},
+  onUsePoints = () => {},
 }) => {
   return (
     <motion.div 
@@ -48,8 +48,7 @@ const PremiumContentOverlay: React.FC<PremiumContentOverlayProps> = ({
         </motion.div>
         
         <h3 className="text-2xl font-bold mb-1">Premium Content</h3>
-        <p className="text-white/80 mb-2">Part of the VIP Mentorship Library</p>
-        <p className="text-white/70 text-sm mb-6">Subscribe to unlock this content and gain access to our entire premium library.</p>
+        <p className="text-white/80 mb-2">Subscribe to unlock this premium content</p>
         
         <div className="space-y-3 w-full">
           <motion.div

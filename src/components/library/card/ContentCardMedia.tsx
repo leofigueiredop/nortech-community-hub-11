@@ -1,10 +1,9 @@
 
 import React from 'react';
 import { ContentItem } from '@/types/library';
-import { Play, Lock } from 'lucide-react';
+import { Play, Lock, FileText, Music, BadgeCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
-import PremiumContentOverlay from '../PremiumContentOverlay';
 
 interface ContentCardMediaProps {
   item: ContentItem;
@@ -17,20 +16,49 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
   isHovered, 
   isPremium 
 }) => {
+  // Format-specific icons
+  const getFormatIcon = () => {
+    switch(item.format) {
+      case 'video':
+      case 'youtube':
+      case 'vimeo':
+        return <Play className="mr-1 h-3 w-3" />;
+      case 'pdf':
+      case 'text':
+      case 'gdoc':
+        return <FileText className="mr-1 h-3 w-3" />;
+      case 'audio':
+        return <Music className="mr-1 h-3 w-3" />;
+      default:
+        return null;
+    }
+  };
+
+  // Format label
+  const getFormatLabel = () => {
+    if (['video', 'youtube', 'vimeo'].includes(item.format)) return 'Video';
+    if (['pdf', 'text', 'gdoc'].includes(item.format)) return 'PDF';
+    if (item.format === 'audio') return 'Audio';
+    if (item.format === 'course') return 'Course';
+    return item.format.charAt(0).toUpperCase() + item.format.slice(1);
+  };
+  
   return (
-    <div className="relative aspect-video overflow-hidden rounded-t-lg">
+    <div className="relative aspect-video overflow-hidden rounded-lg">
+      {/* Thumbnail with blur effect for premium content */}
       <img 
         src={item.thumbnailUrl || item.thumbnail || '/placeholder.svg'} 
         alt={item.title}
         className={`w-full h-full object-cover transition-all duration-300 ${
-          isHovered ? 'scale-105 brightness-40' : isPremium ? 'brightness-75' : 'brightness-90'
+          isHovered ? 'scale-105 brightness-30' : isPremium && !isHovered ? 'brightness-50 blur-[1px]' : 'brightness-90'
         }`}
       />
       
       {/* Content format badge - positioned at top left */}
       <div className="absolute top-2 left-2 z-10">
-        <Badge variant="secondary" className="bg-black/70 text-white border-none font-medium">
-          {item.format.charAt(0).toUpperCase() + item.format.slice(1)}
+        <Badge variant="secondary" className="bg-black/70 text-white border-none font-medium flex items-center">
+          {getFormatIcon()}
+          {getFormatLabel()}
         </Badge>
       </div>
       
@@ -63,6 +91,24 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
               Premium
             </Badge>
           </motion.div>
+        </div>
+      )}
+      
+      {/* Free badge */}
+      {!isPremium && !isHovered && (
+        <div className="absolute bottom-2 left-2 z-10">
+          <Badge className="bg-green-600 text-white border-none flex items-center">
+            <BadgeCheck className="mr-1 h-3 w-3" /> Free
+          </Badge>
+        </div>
+      )}
+      
+      {/* Unlockable badge */}
+      {item.pointsEnabled && !isHovered && (
+        <div className="absolute bottom-2 right-2 z-10">
+          <Badge className="bg-blue-600 text-white border-none">
+            {item.pointsValue} Points
+          </Badge>
         </div>
       )}
       
