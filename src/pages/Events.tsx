@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -50,7 +49,7 @@ const Events = () => {
       });
       
       // Award points for registering to an event
-      awardPoints(10, `Registered for ${event.title}`);
+      awardPoints(10);
       
       // Add to notifications system
       addNotification({

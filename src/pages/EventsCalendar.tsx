@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { format, addMonths, subMonths } from 'date-fns';
@@ -46,7 +45,7 @@ const EventsCalendar = () => {
       });
       
       // Award points for registering to an event
-      awardPoints(10, `Registered for ${event.title}`);
+      awardPoints(10);
       
       // Add to notifications system
       addNotification({

@@ -9,6 +9,13 @@ import CSVUploader from './CSVUploader';
 import AttendanceList from './AttendanceList';
 import BadgeAssignment from './BadgeAssignment';
 
+interface Attendee {
+  email: string;
+  name: string;
+  present: boolean;
+  pointsAwarded: boolean;
+}
+
 interface EventAttendanceManagerProps {
   eventId: number;
   eventTitle: string;
@@ -20,11 +27,19 @@ const EventAttendanceManager: React.FC<EventAttendanceManagerProps> = ({
 }) => {
   const { toast } = useToast();
   const { awardPoints } = usePoints();
-  const [attendees, setAttendees] = useState<string[]>([]);
+  const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [isAwarding, setIsAwarding] = useState(false);
   
-  const handleCSVUpload = (data: string[]) => {
-    setAttendees(data);
+  const handleCSVUpload = (data: Array<{email: string; name: string}>) => {
+    // Convert the data to Attendee objects
+    const newAttendees: Attendee[] = data.map(item => ({
+      email: item.email,
+      name: item.name,
+      present: true,
+      pointsAwarded: false
+    }));
+    
+    setAttendees(newAttendees);
     toast({
       title: "Attendees Imported",
       description: `Successfully imported ${data.length} attendees`,
@@ -70,13 +85,14 @@ const EventAttendanceManager: React.FC<EventAttendanceManagerProps> = ({
         </TabsContent>
         
         <TabsContent value="import">
-          <CSVUploader onUpload={handleCSVUpload} />
+          <CSVUploader onUploadComplete={handleCSVUpload} />
         </TabsContent>
         
         <TabsContent value="badges">
           <BadgeAssignment 
             eventId={eventId} 
-            attendees={attendees} 
+            attendees={attendees}
+            eventTitle={eventTitle}
           />
         </TabsContent>
       </Tabs>
