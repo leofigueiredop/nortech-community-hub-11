@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ContentItem } from '@/types/library';
@@ -16,6 +15,7 @@ import {
   getCompletionCriteria 
 } from './viewer/contentViewerUtils';
 import { usePointsTracking } from '@/utils/pointsTracking';
+import { Progress } from '@/components/ui/progress';
 
 interface ContentViewerProps {
   item: ContentItem | null;
@@ -33,35 +33,28 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
 
   useEffect(() => {
     if (item) {
-      // Reset state when item changes
       setActiveTab('details');
       
-      // Check if user has free access to this content
       const hasFreeAccess = 
         item.accessLevel === 'free' || 
         (item.accessLevel === 'premium' && item.freeAccessesLeft && item.freeAccessesLeft > 0);
       
       setHasAccess(hasFreeAccess);
       
-      // Add to progress tracking if not already there
       addProgress(item.id);
       
-      // Check for format-specific badges
       checkForBadges(item);
     }
   }, [item, addProgress]);
 
-  // Check for format-specific badges
   const checkForBadges = (currentItem: ContentItem) => {
     const allProgress = getAllProgress();
     const badges: {name: string, description: string}[] = [];
     
-    // Format-specific badge checks
     if (currentItem.format === 'pdf') {
-      // Check if completed 3 PDFs
       const completedPDFs = allProgress.filter(p => 
         p.completed && 
-        p.contentId.includes('pdf') // This is simplified - you'd need proper content type tracking
+        p.contentId.includes('pdf')
       );
       
       if (completedPDFs.length >= 3) {
@@ -82,7 +75,6 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
       badges.push(badge);
     }
     
-    // If any item is 100% complete
     if (getProgress(currentItem.id)?.completed) {
       badges.push({
         name: "Completionist",
@@ -93,28 +85,22 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
     setEarnedBadges(badges);
   };
 
-  // Dialog open state
   const isOpen = !!item;
 
-  // Handle content view
   const handleContentView = () => {
     if (!item) return;
     
-    // Set view start time
     setViewStartTime(Date.now());
     
-    // Add initial progress if needed
     const progress = getProgress(item.id);
     if (!progress || progress.progress === 0) {
-      updateProgress(item.id, 10); // Start with 10% progress
+      updateProgress(item.id, 10);
     }
   };
 
-  // Handle content progress (called from content preview components)
   const handleProgress = (progressPercentage: number) => {
     if (!item) return;
     
-    // Apply format-specific completion thresholds
     let shouldComplete = false;
     if (item.format === 'pdf' && progressPercentage >= 90) shouldComplete = true;
     else if (item.format === 'audio' && progressPercentage >= 70) shouldComplete = true;
@@ -123,7 +109,6 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
     const finalProgress = shouldComplete ? 100 : progressPercentage;
     updateProgress(item.id, finalProgress);
     
-    // Award points if applicable and completed
     if (shouldComplete && item.pointsEnabled) {
       const progress = getProgress(item.id);
       if (progress && !progress.pointsAwarded) {
@@ -135,7 +120,6 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
             points: item.pointsValue
           });
           
-          // Track content completion for badges
           trackContentCompletion(item);
           checkForBadges(item);
         }
@@ -143,30 +127,24 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
     }
   };
 
-  // Calculate time spent viewing content
   const calculateTimeSpent = () => {
     if (!viewStartTime) return 0;
-    return Math.floor((Date.now() - viewStartTime) / 1000); // in seconds
+    return Math.floor((Date.now() - viewStartTime) / 1000);
   };
 
-  // Handle content access (e.g., unlocking premium content)
   const handleAccess = () => {
     setHasAccess(true);
   };
 
-  // Handle dialog close
   const handleClose = () => {
     if (!item) return;
     
-    // Save progress before closing
     const timeSpent = calculateTimeSpent();
-    if (timeSpent > 10) { // Only count if more than 10 seconds spent
+    if (timeSpent > 10) {
       const currentProgress = getProgress(item.id);
       if (currentProgress) {
-        // Increase progress based on time spent and format
         let progressIncrement = Math.floor(timeSpent / 10);
         
-        // Format-specific progress calculations
         if (item.format === 'video' && item.duration > 0) {
           progressIncrement = Math.floor((timeSpent / item.duration) * 100);
         } else if (item.format === 'audio' && item.duration > 0) {
@@ -179,14 +157,12 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
         );
         
         updateProgress(item.id, newProgress);
-        handleProgress(newProgress); // Check if we reached completion threshold
+        handleProgress(newProgress);
       }
     }
     
-    // Reset state
     setViewStartTime(null);
     
-    // Call parent close handler
     onClose();
   };
 
