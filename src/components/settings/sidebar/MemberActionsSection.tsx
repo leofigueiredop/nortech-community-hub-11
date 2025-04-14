@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, Mail, KeyRound } from 'lucide-react';
+import { FileText, Mail } from 'lucide-react';
 import SettingsMenuItem from '../SettingsMenuItem';
 
 interface MemberActionsSectionProps {
@@ -21,12 +21,6 @@ const MemberActionsSection: React.FC<MemberActionsSectionProps> = ({ activeSecti
         label="Digest" 
         to="/settings/digest" 
         active={activeSection === "digest"} 
-      />
-      <SettingsMenuItem 
-        icon={<KeyRound size={18} />} 
-        label="SSO" 
-        to="/settings/sso" 
-        active={activeSection === "sso"} 
       />
     </div>
   );

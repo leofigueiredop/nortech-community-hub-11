@@ -12,3 +12,8 @@ export { default as PointsConfiguration } from './PointsConfiguration';
 export { default as Migration } from './Migration';
 export { default as AIAgents } from './AIAgents';
 export { default as Notifications } from './Notifications';
+export { default as Plans } from './Plans';
+export { default as Paywall } from './Paywall';
+export { default as Subscriptions } from './Subscriptions';
+export { default as Legal } from './Legal';
+export { default as Digest } from './Digest';

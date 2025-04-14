@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Gauge, Settings, RefreshCw, Trophy } from 'lucide-react';
+import { Settings, Palette, RefreshCw, Trophy } from 'lucide-react';
 import SettingsMenuItem from '../SettingsMenuItem';
 
 interface TechnicalSectionProps {
@@ -17,7 +17,7 @@ const TechnicalSection: React.FC<TechnicalSectionProps> = ({ activeSection }) =>
         active={activeSection === "general"} 
       />
       <SettingsMenuItem 
-        icon={<Gauge size={18} />} 
+        icon={<Palette size={18} />} 
         label="Branding" 
         to="/settings/branding" 
         active={activeSection === "branding"} 
@@ -32,7 +32,7 @@ const TechnicalSection: React.FC<TechnicalSectionProps> = ({ activeSection }) =>
         icon={<Trophy size={18} />} 
         label="Points Configuration" 
         to="/settings/points-configuration" 
-        active={activeSection === "points"} 
+        active={activeSection === "points-configuration"} 
       />
     </div>
   );

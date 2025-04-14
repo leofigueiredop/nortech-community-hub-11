@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MessageSquare, FileText, Layout, Shield, Video, Workflow, Bot } from 'lucide-react';
+import { MessageSquare, FileText, Layout, Shield, Workflow, Bot } from 'lucide-react';
 import SettingsMenuItem from '../SettingsMenuItem';
 
 interface ContentManagementSectionProps {
@@ -33,12 +33,6 @@ const ContentManagementSection: React.FC<ContentManagementSectionProps> = ({ act
         label="Moderation" 
         to="/settings/moderation" 
         active={activeSection === "moderation"} 
-      />
-      <SettingsMenuItem 
-        icon={<Video size={18} />} 
-        label="Live" 
-        to="/settings/live" 
-        active={activeSection === "live"} 
       />
       <SettingsMenuItem 
         icon={<Workflow size={18} />} 

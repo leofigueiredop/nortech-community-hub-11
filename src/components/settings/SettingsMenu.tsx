@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
   Settings, Palette, Smartphone, ListChecks, Globe, Bot, 
-  MessageSquare, Share2, ArrowLeftRight, Bell, Trophy
+  MessageSquare, Share2, ArrowLeftRight, Bell, Trophy,
+  FileText, Mail, DollarSign, BarChart3, Shield, Layout,
+  Workflow
 } from 'lucide-react';
 
 const settingsGroups = [
@@ -25,10 +27,24 @@ const settingsGroups = [
     ]
   },
   {
-    title: 'AI & Integrations',
+    title: 'Content Management',
     items: [
+      { name: 'Marketing', icon: <MessageSquare className="mr-2 h-4 w-4" />, path: '/settings/marketing' },
+      { name: 'Posts', icon: <FileText className="mr-2 h-4 w-4" />, path: '/settings/posts' },
+      { name: 'Spaces', icon: <Layout className="mr-2 h-4 w-4" />, path: '/settings/spaces' },
+      { name: 'Moderation', icon: <Shield className="mr-2 h-4 w-4" />, path: '/settings/moderation' },
+      { name: 'Workflows', icon: <Workflow className="mr-2 h-4 w-4" />, path: '/settings/workflows' },
       { name: 'AI Agents', icon: <Bot className="mr-2 h-4 w-4" />, path: '/settings/ai-agents' },
-      { name: 'Integration', icon: <Share2 className="mr-2 h-4 w-4" />, path: '/settings/integration' },
+    ]
+  },
+  {
+    title: 'Monetization',
+    items: [
+      { name: 'Nortech Plans', icon: <DollarSign className="mr-2 h-4 w-4" />, path: '/settings/plans' },
+      { name: 'Member Subscriptions', icon: <DollarSign className="mr-2 h-4 w-4" />, path: '/settings/subscriptions' },
+      { name: 'Paywall Setup', icon: <DollarSign className="mr-2 h-4 w-4" />, path: '/settings/paywall' },
+      { name: 'Analytics', icon: <BarChart3 className="mr-2 h-4 w-4" />, path: '/settings/analytics' },
+      { name: 'Affiliates', icon: <Share2 className="mr-2 h-4 w-4" />, path: '/settings/affiliates' },
     ]
   },
   {
@@ -36,6 +52,13 @@ const settingsGroups = [
     items: [
       { name: 'Messaging', icon: <MessageSquare className="mr-2 h-4 w-4" />, path: '/settings/messaging' },
       { name: 'Notifications', icon: <Bell className="mr-2 h-4 w-4" />, path: '/settings/notifications' },
+    ]
+  },
+  {
+    title: 'Member Experience',
+    items: [
+      { name: 'Legal', icon: <FileText className="mr-2 h-4 w-4" />, path: '/settings/legal' },
+      { name: 'Digest', icon: <Mail className="mr-2 h-4 w-4" />, path: '/settings/digest' },
     ]
   },
   {

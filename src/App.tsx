@@ -37,6 +37,7 @@ import NotFound from '@/pages/NotFound';
 import { PointsProvider } from '@/context/PointsContext';
 import { NotificationsProvider } from '@/context/NotificationsContext';
 import * as Settings from '@/pages/settings';
+import LiveStreams from '@/pages/LiveStreams';
 
 function App() {
   return (
@@ -61,6 +62,7 @@ function App() {
             <Route path="/members" element={<Members />} />
             <Route path="/create-space" element={<CreateSpace />} />
             <Route path="/matchmaker" element={<Matchmaker />} />
+            <Route path="/live-streams" element={<LiveStreams />} />
             
             {/* Points related routes */}
             <Route path="/points" element={<PointsDashboard />} />
@@ -96,6 +98,11 @@ function App() {
             <Route path="/settings/migration" element={<Settings.Migration />} />
             <Route path="/settings/ai-agents" element={<Settings.AIAgents />} />
             <Route path="/settings/notifications" element={<Settings.Notifications />} />
+            <Route path="/settings/plans" element={<Settings.Plans />} />
+            <Route path="/settings/paywall" element={<Settings.Paywall />} />
+            <Route path="/settings/subscriptions" element={<Settings.Subscriptions />} />
+            <Route path="/settings/legal" element={<Settings.Legal />} />
+            <Route path="/settings/digest" element={<Settings.Digest />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
