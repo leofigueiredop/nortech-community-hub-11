@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { usePoints } from '@/context/PointsContext';
 import { useContentProgress } from '@/hooks/useContentProgress';
@@ -417,7 +418,7 @@ export const useDiscussions = () => {
   const acceptAnswer = useCallback((discussionId: string, replyId: string) => {
     setReplies(prev => ({
       ...prev,
-      [discussionId]: prev[discussionId].map(r => ({
+      [discussionId]: (prev[discussionId] || []).map(r => ({
         ...r,
         isAcceptedAnswer: r.id === replyId
       }))
