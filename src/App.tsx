@@ -8,9 +8,6 @@ import Events from '@/pages/Events';
 import EventsCalendar from '@/pages/EventsCalendar';
 import EventsWeekly from '@/pages/EventsWeekly';
 import CreateEvent from '@/pages/CreateEvent';
-import AITerminal from '@/pages/AITerminal';
-import PointsStore from '@/pages/PointsStore';
-import PointsDashboard from '@/pages/PointsDashboard';
 import Feed from '@/pages/Feed';
 import Discussions from '@/pages/Discussions';
 import DiscussionTopic from '@/pages/DiscussionTopic';
@@ -20,7 +17,8 @@ import TagPage from '@/pages/TagPage';
 import UserProfile from '@/pages/UserProfile';
 import Members from '@/pages/Members';
 import CreateSpace from '@/pages/CreateSpace';
-import LiveStreams from '@/pages/LiveStreams';
+import PointsStore from '@/pages/PointsStore';
+import PointsDashboard from '@/pages/PointsDashboard';
 import OnboardingLayout from '@/pages/OnboardingLayout';
 import CommunityType from '@/pages/onboarding/CommunityType';
 import Community from '@/pages/onboarding/Community';
@@ -30,7 +28,6 @@ import Migration from '@/pages/onboarding/Migration';
 import MembershipPlans from '@/pages/onboarding/MembershipPlans';
 import InviteMembers from '@/pages/onboarding/InviteMembers';
 import FinalStep from '@/pages/onboarding/FinalStep';
-import AIMatchmaker from '@/pages/AIMatchmaker';
 import Leaderboard from '@/pages/Leaderboard';
 import Analytics from '@/pages/Analytics';
 import ContentCreatorDashboard from '@/pages/ContentCreatorDashboard';
@@ -53,9 +50,6 @@ function App() {
             <Route path="/events/calendar" element={<EventsCalendar />} />
             <Route path="/events/weekly" element={<EventsWeekly />} />
             <Route path="/create-event" element={<CreateEvent />} />
-            <Route path="/ai-terminal" element={<AITerminal />} />
-            <Route path="/points-store" element={<PointsStore />} />
-            <Route path="/points-dashboard" element={<PointsDashboard />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/discussions" element={<Discussions />} />
             <Route path="/discussions/:topicId" element={<DiscussionTopic />} />
@@ -65,7 +59,14 @@ function App() {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/members" element={<Members />} />
             <Route path="/create-space" element={<CreateSpace />} />
-            <Route path="/live-streams" element={<LiveStreams />} />
+            
+            {/* Points related routes */}
+            <Route path="/points" element={<PointsDashboard />} />
+            <Route path="/points-dashboard" element={<PointsDashboard />} />
+            <Route path="/points/store" element={<PointsStore />} />
+            <Route path="/points-store" element={<PointsStore />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            
             <Route path="/onboarding" element={<OnboardingLayout />}>
               <Route path="community-type" element={<CommunityType />} />
               <Route path="community" element={<Community />} />
@@ -76,8 +77,6 @@ function App() {
               <Route path="invite-members" element={<InviteMembers />} />
               <Route path="final-step" element={<FinalStep />} />
             </Route>
-            <Route path="/ai-matchmaker" element={<AIMatchmaker />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/content-creator-dashboard" element={<ContentCreatorDashboard />} />
             <Route path="/content-management" element={<ContentManagement />} />

@@ -37,7 +37,7 @@ const TechnicalSection: React.FC<TechnicalSectionProps> = ({ activeSection }) =>
       <SettingsMenuItem 
         icon={<Trophy size={18} />} 
         label="Points Configuration" 
-        to="/settings/points" 
+        to="/settings/points-configuration" 
         active={activeSection === "points"} 
       />
     </div>
