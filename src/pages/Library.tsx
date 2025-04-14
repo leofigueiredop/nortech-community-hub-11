@@ -12,7 +12,7 @@ import CreateContentButton from '@/components/library/CreateContentButton';
 import ContentFilters from '@/components/library/ContentFilters';
 
 const Library: React.FC = () => {
-  const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('free'); // Default to 'free'
+  const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('all'); // Default to 'all' to show premium content
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateContentOpen, setIsCreateContentOpen] = useState(false);
   

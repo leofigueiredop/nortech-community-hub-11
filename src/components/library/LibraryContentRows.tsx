@@ -59,10 +59,8 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
     item.tags && Array.isArray(item.tags) && item.tags.some(tag => visitedTags.includes(tag))
   ).slice(0, 10);
 
-  // Premium showcase (only show in 'all' or 'premium' views)
-  const premiumShowcase = activeView === 'all' || activeView === 'premium' 
-    ? viewFilteredContent.filter(item => item.accessLevel === 'premium').slice(0, 10)
-    : [];
+  // Premium showcase (always show at least this section in 'all' view)
+  const premiumShowcase = content.filter(item => item.accessLevel === 'premium').slice(0, 10);
 
   // Check if we have any content to display
   const hasContent = viewFilteredContent.length > 0;
@@ -111,6 +109,16 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
         />
       )}
       
+      {/* Premium content showcase - always show in 'all' view */}
+      {activeView === 'all' && premiumShowcase.length > 0 && (
+        <ContentSection 
+          title="Premium Content" 
+          items={premiumShowcase} 
+          onItemSelect={onItemSelect}
+          viewAllUrl="/library/premium"
+        />
+      )}
+      
       {/* Recommended content (personalized, if any) */}
       {recommendedContent.length > 0 && (
         <ContentSection 
@@ -118,16 +126,6 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
           items={recommendedContent} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/recommended"
-        />
-      )}
-      
-      {/* Premium content showcase (only in all or premium views) */}
-      {(activeView === 'all' || activeView === 'premium') && premiumShowcase.length > 0 && (
-        <ContentSection 
-          title="Premium Content" 
-          items={premiumShowcase} 
-          onItemSelect={onItemSelect}
-          viewAllUrl="/library/premium"
         />
       )}
       

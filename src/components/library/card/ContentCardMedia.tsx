@@ -44,7 +44,7 @@ const ContentCardMedia: React.FC<ContentCardMediaProps> = ({
   };
   
   return (
-    <div className="relative aspect-video overflow-hidden rounded-lg">
+    <div className="relative aspect-video overflow-hidden">
       {/* Thumbnail with blur effect for premium content */}
       <img 
         src={item.thumbnailUrl || item.thumbnail || '/placeholder.svg'} 

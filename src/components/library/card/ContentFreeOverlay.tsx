@@ -106,7 +106,7 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
         >
           <span className="flex items-center">
             <Eye size={12} className="mr-1" />
-            {item.views} views
+            {item.views.toLocaleString()} views
           </span>
           
           {item.tags && item.tags.length > 0 && (
