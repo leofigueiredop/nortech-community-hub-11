@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Clock, Users, Link as LinkIcon, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Link as LinkIcon, ExternalLink, Crown } from 'lucide-react';
 import { Event, EVENT_TYPES } from './types/EventTypes';
 import { format } from 'date-fns';
 import EventCardActions from './card/EventCardActions';
@@ -46,12 +46,24 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
     }
   };
 
+  const handlePremiumTicket = () => {
+    window.open('https://example.com/buy-ticket', '_blank');
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <div className="flex justify-between items-start">
-            <DialogTitle className="text-2xl">{event.title}</DialogTitle>
+            <DialogTitle className="text-2xl">
+              {event.title}
+              {event.isPremium && (
+                <Badge className="ml-2 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                  <Crown size={12} className="mr-1" />
+                  Premium
+                </Badge>
+              )}
+            </DialogTitle>
             <Badge className={`${eventType.color}`}>
               {eventType.icon}
               {eventType.label}
@@ -141,20 +153,43 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                   </div>
                 </div>
               )}
+              
+              {event.isPremium && (
+                <div className="flex items-start">
+                  <Crown className="h-5 w-5 mr-2 text-amber-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Premium Event</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      This is a premium event that requires ticket purchase
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-0">
           <div className="w-full space-y-2">
-            <EventCardActions 
-              status={event.status}
-              isRegistered={event.isRegistered}
-              attendees={event.attendees}
-              capacity={event.capacity}
-              onRSVP={() => handleRSVP()}
-              onOpenAttendanceModal={() => {}}
-            />
+            {event.isPremium ? (
+              <Button 
+                className="w-full bg-amber-500 hover:bg-amber-600"
+                onClick={handlePremiumTicket}
+              >
+                <Crown size={16} className="mr-2" />
+                Buy Premium Ticket
+              </Button>
+            ) : (
+              <EventCardActions 
+                status={event.status}
+                isRegistered={event.isRegistered}
+                attendees={event.attendees}
+                capacity={event.capacity}
+                onRSVP={() => handleRSVP()}
+                onOpenAttendanceModal={() => {}}
+                isPremium={event.isPremium}
+              />
+            )}
             
             {(event.isRegistered || !event.status || event.status !== 'ended') && (
               <EventCalendarButtons 

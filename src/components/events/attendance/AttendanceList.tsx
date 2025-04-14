@@ -1,9 +1,9 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Clock, Search, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/hooks/use-toast';
 
 interface Attendee {
   email: string;
@@ -14,80 +14,77 @@ interface Attendee {
 
 interface AttendanceListProps {
   attendees: Attendee[];
+  onUpdateAttendees: React.Dispatch<React.SetStateAction<Attendee[]>>;
 }
 
-const AttendanceList: React.FC<AttendanceListProps> = ({ attendees }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+const AttendanceList: React.FC<AttendanceListProps> = ({ 
+  attendees, 
+  onUpdateAttendees 
+}) => {
+  const { toast } = useToast();
   
-  const filteredAttendees = attendees.filter(
-    attendee => 
-      attendee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      attendee.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleTogglePresence = (index: number) => {
+    onUpdateAttendees(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], present: !updated[index].present };
+      return updated;
+    });
+  };
   
+  const markAllPresent = () => {
+    onUpdateAttendees(prev => prev.map(attendee => ({ ...attendee, present: true })));
+    toast({
+      title: "Attendance updated",
+      description: "All attendees have been marked as present",
+    });
+  };
+  
+  if (attendees.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <p>No attendees have been added yet. Import a CSV to get started.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input 
-          placeholder="Search attendees..." 
-          className="pl-8" 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+    <div>
+      <div className="flex justify-end mb-4">
+        <Button size="sm" variant="outline" onClick={markAllPresent}>
+          Mark All Present
+        </Button>
       </div>
       
-      <div className="border rounded-md">
+      <div className="border rounded-md overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-12">Present</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Points</TableHead>
+              <TableHead className="w-24">Points</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAttendees.length > 0 ? (
-              filteredAttendees.map((attendee, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">{attendee.name}</TableCell>
-                  <TableCell>{attendee.email}</TableCell>
-                  <TableCell>
-                    {attendee.present ? (
-                      <Badge className="bg-green-100 text-green-800 flex w-fit items-center gap-1">
-                        <CheckCircle size={12} />
-                        Present
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="flex w-fit items-center gap-1">
-                        <X size={12} />
-                        Absent
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {attendee.pointsAwarded ? (
-                      <Badge className="bg-blue-100 text-blue-800 flex w-fit items-center gap-1">
-                        <CheckCircle size={12} />
-                        Awarded
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="flex w-fit items-center gap-1">
-                        <Clock size={12} />
-                        Pending
-                      </Badge>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
-                  No attendees found
+            {attendees.map((attendee, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <Checkbox 
+                    checked={attendee.present} 
+                    onCheckedChange={() => handleTogglePresence(index)}
+                  />
+                </TableCell>
+                <TableCell>{attendee.name}</TableCell>
+                <TableCell>{attendee.email}</TableCell>
+                <TableCell>
+                  {attendee.pointsAwarded ? (
+                    <span className="text-green-600">✓ Awarded</span>
+                  ) : (
+                    <span className="text-gray-400">Pending</span>
+                  )}
                 </TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </div>

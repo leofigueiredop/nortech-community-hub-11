@@ -1,91 +1,73 @@
 
 import React from 'react';
-import { 
-  Users, Coffee, Presentation, VideoIcon, 
-  Briefcase, GraduationCap, HeartHandshake, Trophy, 
-  Calendar, Laptop, Headphones, Star
-} from 'lucide-react';
+import { Video, Coffee, GraduationCap, Mic, Users, Music, BookOpen, Heart, Medal } from 'lucide-react';
 
-export type EventType = 'workshop' | 'meetup' | 'conference' | 'webinar' | 'career_fair' | 'course' | 'volunteer' | 'competition' | 'live' | 'mentoria';
+export type EventType = 'webinar' | 'meetup' | 'conference' | 'workshop' | 'course' | 'hackathon' | 'talk' | 'party' | 'competition';
 
 export interface Event {
   id: number;
   title: string;
   description: string;
-  type: EventType;
   date: Date;
   time: string;
-  location: string;
+  type: EventType;
   speaker: string;
-  image: string | null;
-  status?: 'upcoming' | 'happening_soon' | 'in_progress' | 'ended';
-  isRegistered: boolean;
+  location: string;
   attendees: number;
   capacity: number;
+  image?: string;
   url?: string;
-  platform?: 'zoom' | 'teams' | 'meet' | 'other';
-  pointsValue?: number; // Points earned for attending
-  badgeName?: string; // Badge earned for attending
-  registeredUsers?: string[]; // Array of registered user IDs
+  isRegistered?: boolean;
+  status?: 'upcoming' | 'live' | 'ended';
+  registeredUsers?: string[];
+  pointsValue?: number;
+  isPremium?: boolean;
 }
 
 export const EVENT_TYPES = {
-  workshop: {
-    label: 'Workshop',
-    icon: <Briefcase size={14} className="mr-1" />,
-    color: 'bg-amber-100 text-amber-800 border-amber-200',
+  webinar: {
+    label: 'Webinar',
+    icon: <Video className="h-3 w-3 mr-1" />,
+    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
   },
   meetup: {
     label: 'Meetup',
-    icon: <Coffee size={14} className="mr-1" />,
-    color: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+    icon: <Coffee className="h-3 w-3 mr-1" />,
+    color: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300'
   },
   conference: {
     label: 'Conference',
-    icon: <Presentation size={14} className="mr-1" />,
-    color: 'bg-purple-100 text-purple-800 border-purple-200',
+    icon: <Users className="h-3 w-3 mr-1" />,
+    color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
   },
-  webinar: {
-    label: 'Webinar',
-    icon: <VideoIcon size={14} className="mr-1" />,
-    color: 'bg-blue-100 text-blue-800 border-blue-200',
-  },
-  career_fair: {
-    label: 'Career Fair',
-    icon: <Briefcase size={14} className="mr-1" />,
-    color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  workshop: {
+    label: 'Workshop',
+    icon: <GraduationCap className="h-3 w-3 mr-1" />,
+    color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
   },
   course: {
     label: 'Course',
-    icon: <GraduationCap size={14} className="mr-1" />,
-    color: 'bg-pink-100 text-pink-800 border-pink-200',
+    icon: <BookOpen className="h-3 w-3 mr-1" />,
+    color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
   },
-  volunteer: {
-    label: 'Volunteer',
-    icon: <HeartHandshake size={14} className="mr-1" />,
-    color: 'bg-orange-100 text-orange-800 border-orange-200',
+  hackathon: {
+    label: 'Hackathon',
+    icon: <GraduationCap className="h-3 w-3 mr-1" />,
+    color: 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300'
+  },
+  talk: {
+    label: 'Talk',
+    icon: <Mic className="h-3 w-3 mr-1" />,
+    color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300'
+  },
+  party: {
+    label: 'Party',
+    icon: <Music className="h-3 w-3 mr-1" />,
+    color: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300'
   },
   competition: {
     label: 'Competition',
-    icon: <Trophy size={14} className="mr-1" />,
-    color: 'bg-green-100 text-green-800 border-green-200',
-  },
-  live: {
-    label: 'Live',
-    color: 'bg-red-100 text-red-800 border-red-200',
-    icon: <Laptop size={14} className="mr-1" />
-  },
-  mentoria: {
-    label: 'Mentoria',
-    color: 'bg-amber-100 text-amber-800 border-amber-200',
-    icon: <Headphones size={14} className="mr-1" />
+    icon: <Medal className="h-3 w-3 mr-1" />,
+    color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
   }
-};
-
-// Helper function for getting type filters
-export const getTypeFilters = () => {
-  return Object.entries(EVENT_TYPES).map(([type, details]) => ({
-    type,
-    details
-  }));
 };

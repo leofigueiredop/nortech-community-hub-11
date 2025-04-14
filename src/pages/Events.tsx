@@ -1,45 +1,55 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Calendar, List } from 'lucide-react';
+import { Plus, Calendar, List, Grid } from 'lucide-react';
 import { usePoints } from '@/context/PointsContext';
 import { useNotifications } from '@/context/NotificationsContext';
 import EventsList from '@/components/events/EventsList';
 import EventGrid from '@/components/events/EventGrid';
-import EventsHeader from '@/components/events/EventsHeader';
-import EventTypeFilter from '@/components/events/EventTypeFilter';
 import { mockEvents } from '@/components/events/data/EventsMockData';
 import { EventType } from '@/components/events/types/EventTypes';
+import EventConfirmDialog from '@/components/events/EventConfirmDialog';
 
 const Events = () => {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
-  const [filterType, setFilterType] = useState<EventType | 'all'>('all');
   const [allEvents, setAllEvents] = useState(mockEvents);
   const [filteredEvents, setFilteredEvents] = useState(mockEvents);
-  const [selectedTypes, setSelectedTypes] = useState<EventType[]>(
-    Object.keys(mockEvents.reduce((types, event) => ({ ...types, [event.type]: true }), {})) as EventType[]
-  );
+  const [confirmEvent, setConfirmEvent] = useState<number | null>(null);
+  const [selectedPremiumFilter, setSelectedPremiumFilter] = useState<'all' | 'premium' | 'free'>('all');
   
   const { toast } = useToast();
   const { awardPoints } = usePoints();
   const { addNotification } = useNotifications();
 
-  // Filter events when selectedTypes changes
+  // Filter events based on premium status
   useEffect(() => {
-    if (selectedTypes.length === 0) {
-      setFilteredEvents([]);
-    } else {
-      setFilteredEvents(allEvents.filter(event => selectedTypes.includes(event.type)));
+    let events = [...allEvents];
+    
+    if (selectedPremiumFilter === 'premium') {
+      events = events.filter(event => event.isPremium);
+    } else if (selectedPremiumFilter === 'free') {
+      events = events.filter(event => !event.isPremium);
     }
-  }, [selectedTypes, allEvents]);
+    
+    setFilteredEvents(events);
+  }, [selectedPremiumFilter, allEvents]);
 
   // RSVP handler
   const handleRSVP = (eventId: number) => {
+    // Show confirmation dialog first
+    setConfirmEvent(eventId);
+  };
+  
+  // Confirm RSVP after dialog
+  const confirmRSVP = () => {
+    if (!confirmEvent) return;
+    
     // Get the event that is being registered for
-    const event = allEvents.find(e => e.id === eventId);
+    const event = allEvents.find(e => e.id === confirmEvent);
     
     if (event) {
       // Show toast notification
@@ -49,7 +59,11 @@ const Events = () => {
       });
       
       // Award points for registering to an event
-      awardPoints(10);
+      awardPoints({
+        type: "event_registration",
+        description: `Registered for ${event.title}`,
+        points: 10
+      });
       
       // Add to notifications system
       addNotification({
@@ -63,7 +77,7 @@ const Events = () => {
     // Update the event's attendees count and registered users
     setAllEvents(prevEvents => 
       prevEvents.map(event => 
-        event.id === eventId 
+        event.id === confirmEvent 
           ? { 
               ...event, 
               attendees: event.attendees + 1,
@@ -73,6 +87,9 @@ const Events = () => {
           : event
       )
     );
+    
+    // Clear the confirmEvent state
+    setConfirmEvent(null);
   };
 
   const handleAttendanceModal = (eventId: number) => {
@@ -83,20 +100,6 @@ const Events = () => {
   return (
     <MainLayout title="Events">
       <div className="container py-6">
-        <EventsHeader 
-          viewType={viewType} 
-          setViewType={setViewType}
-          filterType={filterType}
-          setFilterType={setFilterType}
-        />
-
-        <div className="mb-6">
-          <EventTypeFilter 
-            selectedTypes={selectedTypes}
-            onChange={setSelectedTypes}
-          />
-        </div>
-
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Community Events</h1>
@@ -105,51 +108,78 @@ const Events = () => {
             </p>
           </div>
           
-          <Link to="/create-event">
-            <Button className="bg-nortech-purple hover:bg-nortech-purple/90">
-              <Plus size={16} className="mr-2" />
-              Create Event
-            </Button>
-          </Link>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-md p-1">
+              <Button
+                variant={selectedPremiumFilter === 'all' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setSelectedPremiumFilter('all')}
+                className="rounded-sm text-xs"
+              >
+                All
+              </Button>
+              <Button
+                variant={selectedPremiumFilter === 'premium' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setSelectedPremiumFilter('premium')}
+                className="rounded-sm text-xs"
+              >
+                Premium
+              </Button>
+              <Button
+                variant={selectedPremiumFilter === 'free' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setSelectedPremiumFilter('free')}
+                className="rounded-sm text-xs"
+              >
+                Free
+              </Button>
+            </div>
+            
+            <div className="hidden md:flex border rounded-lg overflow-hidden">
+              <Button 
+                variant={viewType === 'list' ? 'default' : 'outline'} 
+                size="sm" 
+                onClick={() => setViewType('list')}
+                className="rounded-none flex items-center gap-2"
+              >
+                <List size={16} />
+                <span className="hidden sm:inline">List</span>
+              </Button>
+              <Button 
+                variant={viewType === 'grid' ? 'default' : 'outline'} 
+                size="sm"
+                onClick={() => setViewType('grid')}
+                className="rounded-none flex items-center gap-2"
+              >
+                <Grid size={16} />
+                <span className="hidden sm:inline">Grid</span>
+              </Button>
+            </div>
+            
+            <Link to="/create-event">
+              <Button className="bg-nortech-purple hover:bg-nortech-purple/90">
+                <Plus size={16} className="mr-2" />
+                Create Event
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <Tabs defaultValue="grid" className="mb-6">
-          <TabsList className="mb-6">
-            <TabsTrigger 
-              value="grid" 
-              onClick={() => setViewType('grid')}
-              className="flex items-center gap-2"
-            >
-              <Calendar size={16} />
-              Grid View
-            </TabsTrigger>
-            <TabsTrigger 
-              value="list" 
-              onClick={() => setViewType('list')}
-              className="flex items-center gap-2"
-            >
-              <List size={16} />
-              List View
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="grid">
-            <EventGrid 
-              events={filteredEvents} 
-              viewType={viewType} 
-              onRSVP={handleRSVP} 
-              onOpenAttendanceModal={handleAttendanceModal}
-            />
-          </TabsContent>
-          
-          <TabsContent value="list">
-            <EventsList 
-              events={filteredEvents} 
-              onRSVP={handleRSVP} 
-              onOpenAttendanceModal={handleAttendanceModal}
-            />
-          </TabsContent>
-        </Tabs>
+        {viewType === 'grid' ? (
+          <EventGrid 
+            events={filteredEvents} 
+            viewType={viewType} 
+            onRSVP={handleRSVP} 
+            onOpenAttendanceModal={handleAttendanceModal}
+          />
+        ) : (
+          <EventsList 
+            events={filteredEvents} 
+            onRSVP={handleRSVP} 
+            onOpenAttendanceModal={handleAttendanceModal}
+          />
+        )}
         
         <div className="mt-8 text-center">
           <div className="text-sm text-muted-foreground mb-3">
@@ -170,6 +200,14 @@ const Events = () => {
             </Link>
           </div>
         </div>
+        
+        {/* Event confirmation dialog */}
+        <EventConfirmDialog
+          isOpen={confirmEvent !== null}
+          onClose={() => setConfirmEvent(null)}
+          onConfirm={confirmRSVP}
+          event={allEvents.find(e => e.id === confirmEvent) || null}
+        />
       </div>
     </MainLayout>
   );

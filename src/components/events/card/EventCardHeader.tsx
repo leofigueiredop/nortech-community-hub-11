@@ -1,18 +1,19 @@
 
 import React from 'react';
 import { format } from 'date-fns';
+import { CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, Check } from 'lucide-react';
-import { EVENT_TYPES } from '../types/EventTypes';
+import { EVENT_TYPES, EventType } from '../types/EventTypes';
+import { Crown } from 'lucide-react';
 
 interface EventCardHeaderProps {
   title: string;
   date: Date;
   time: string;
-  type: keyof typeof EVENT_TYPES;
-  status?: 'upcoming' | 'happening_soon' | 'in_progress' | 'ended';
-  isRegistered: boolean;
+  type: EventType;
+  status?: 'upcoming' | 'live' | 'ended';
+  isRegistered?: boolean;
+  isPremium?: boolean;
 }
 
 const EventCardHeader: React.FC<EventCardHeaderProps> = ({
@@ -20,42 +21,55 @@ const EventCardHeader: React.FC<EventCardHeaderProps> = ({
   date,
   time,
   type,
-  status,
-  isRegistered
+  status = 'upcoming',
+  isRegistered = false,
+  isPremium = false
 }) => {
   const eventType = EVENT_TYPES[type];
   
+  // Get status badge color
+  const getStatusBadge = () => {
+    switch(status) {
+      case 'live': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'ended': return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+      default: return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+    }
+  };
+
   return (
     <CardHeader className="pb-2">
       <div className="flex justify-between items-start">
         <div>
-          <CardTitle className="text-lg">{title}</CardTitle>
-          <CardDescription className="text-sm">
+          <CardTitle className="text-lg group-hover:text-nortech-purple transition-colors">
+            {title}
+            {isPremium && (
+              <Badge className="ml-2 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                <Crown size={12} className="mr-1" />
+                Premium
+              </Badge>
+            )}
+          </CardTitle>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {format(date, 'MMMM d, yyyy')} • {time}
-          </CardDescription>
+          </p>
         </div>
-        <div className="flex flex-col gap-1 items-end">
+        
+        <div className="flex flex-col items-end gap-1">
           <Badge className={`flex items-center ${eventType.color}`}>
             {eventType.icon}
             {eventType.label}
           </Badge>
           
-          {/* Status badges */}
-          {status === 'happening_soon' && (
-            <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">
-              <Clock size={12} className="mr-1" />
-              Happening soon
-            </Badge>
-          )}
-          {status === 'ended' && (
-            <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">
-              Ended
-            </Badge>
-          )}
           {isRegistered && (
-            <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
-              <Check size={12} className="mr-1" />
+            <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-400">
               Registered
+            </Badge>
+          )}
+          
+          {!isRegistered && (
+            <Badge variant="outline" className={getStatusBadge()}>
+              {status === 'live' ? 'Live now' : 
+               status === 'ended' ? 'Ended' : 'Upcoming'}
             </Badge>
           )}
         </div>

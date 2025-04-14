@@ -35,29 +35,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
   const handleRSVP = () => {
     // RSVP for the event
     onRSVP(event.id);
-    
-    // Show toast notification
-    toast({
-      title: "RSVP Confirmed",
-      description: `You've successfully registered for "${event.title}"`,
-    });
-    
-    // Add to notifications
-    addNotification({
-      type: 'event',
-      title: 'Event Registration Confirmed',
-      message: `You're registered for "${event.title}" on ${new Date(event.date).toLocaleDateString()}`,
-      link: '/events',
-    });
-    
-    // In a real app, we would also send an email confirmation here
-    console.log(`Email confirmation would be sent for event: ${event.title}`);
   };
 
   return (
     <>
       <Card 
-        className="mb-4 cursor-pointer hover:shadow-md transition-shadow"
+        className="mb-4 cursor-pointer hover:shadow-md transition-shadow group"
         onClick={() => setShowDetailModal(true)}
       >
         <EventCardHeader 
@@ -67,6 +50,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
           type={event.type}
           status={status}
           isRegistered={isRegistered}
+          isPremium={event.isPremium}
         />
         
         <CardContent>
@@ -87,6 +71,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
               capacity={event.capacity}
               onRSVP={handleRSVP}
               onOpenAttendanceModal={() => setShowAttendanceModal(true)}
+              isPremium={event.isPremium}
             />
             
             <EventCalendarButtons 

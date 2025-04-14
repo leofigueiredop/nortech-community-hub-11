@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { format, addMonths, subMonths } from 'date-fns';
@@ -11,6 +12,7 @@ import EventTypeFilter from '@/components/events/EventTypeFilter';
 import { useNotifications } from '@/context/NotificationsContext';
 import { EventType } from '@/components/events/types/EventTypes';
 import { usePoints } from '@/context/PointsContext';
+import EventConfirmDialog from '@/components/events/EventConfirmDialog';
 
 const EventsCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -19,23 +21,46 @@ const EventsCalendar = () => {
   const [selectedTypes, setSelectedTypes] = useState<EventType[]>(
     Object.keys(mockEvents.reduce((types, event) => ({ ...types, [event.type]: true }), {})) as EventType[]
   );
+  const [confirmEvent, setConfirmEvent] = useState<number | null>(null);
+  const [selectedPremiumFilter, setSelectedPremiumFilter] = useState<'all' | 'premium' | 'free'>('all');
+  
   const { toast } = useToast();
   const { addNotification } = useNotifications();
   const { awardPoints } = usePoints();
 
-  // Filter events when selectedTypes changes
+  // Filter events when selectedTypes or premium filter changes
   useEffect(() => {
-    if (selectedTypes.length === 0) {
-      setFilteredEvents([]);
+    let filtered = allEvents;
+    
+    // Filter by type
+    if (selectedTypes.length > 0) {
+      filtered = filtered.filter(event => selectedTypes.includes(event.type));
     } else {
-      setFilteredEvents(allEvents.filter(event => selectedTypes.includes(event.type)));
+      filtered = [];
     }
-  }, [selectedTypes, allEvents]);
+    
+    // Filter by premium status
+    if (selectedPremiumFilter === 'premium') {
+      filtered = filtered.filter(event => event.isPremium);
+    } else if (selectedPremiumFilter === 'free') {
+      filtered = filtered.filter(event => !event.isPremium);
+    }
+    
+    setFilteredEvents(filtered);
+  }, [selectedTypes, allEvents, selectedPremiumFilter]);
 
   // RSVP handler
   const handleRSVP = (eventId: number) => {
+    // Show confirmation dialog first
+    setConfirmEvent(eventId);
+  };
+  
+  // Confirm RSVP after dialog
+  const confirmRSVP = () => {
+    if (!confirmEvent) return;
+    
     // Get the event that is being registered for
-    const event = allEvents.find(e => e.id === eventId);
+    const event = allEvents.find(e => e.id === confirmEvent);
     
     if (event) {
       // Show toast notification
@@ -45,7 +70,11 @@ const EventsCalendar = () => {
       });
       
       // Award points for registering to an event
-      awardPoints(10);
+      awardPoints({
+        type: "event_registration",
+        description: `Registered for ${event.title}`,
+        points: 10
+      });
       
       // Add to notifications system
       addNotification({
@@ -59,7 +88,7 @@ const EventsCalendar = () => {
     // Update the event's attendees count and registered users
     setAllEvents(prevEvents => 
       prevEvents.map(event => 
-        event.id === eventId 
+        event.id === confirmEvent 
           ? { 
               ...event, 
               attendees: event.attendees + 1,
@@ -69,6 +98,9 @@ const EventsCalendar = () => {
           : event
       )
     );
+    
+    // Clear the confirmEvent state
+    setConfirmEvent(null);
   };
 
   const handlePreviousMonth = () => {
@@ -84,14 +116,48 @@ const EventsCalendar = () => {
       <div className="container py-6">
         <div className="mb-6">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Calendar View</h1>
+            <div>
+              <h1 className="text-2xl font-bold">Calendar View</h1>
+              <p className="text-muted-foreground">
+                Browse events in a calendar format
+              </p>
+            </div>
             
             <div className="flex items-center gap-3">
-              <div className="border rounded-lg flex overflow-hidden">
-                <Button variant="ghost" size="sm" className="rounded-none bg-muted">
-                  <Calendar size={16} className="mr-2" />
-                  <span>Calendar</span>
+              <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-md p-1 mr-2">
+                <Button
+                  variant={selectedPremiumFilter === 'all' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setSelectedPremiumFilter('all')}
+                  className="rounded-sm text-xs"
+                >
+                  All
                 </Button>
+                <Button
+                  variant={selectedPremiumFilter === 'premium' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setSelectedPremiumFilter('premium')}
+                  className="rounded-sm text-xs"
+                >
+                  Premium
+                </Button>
+                <Button
+                  variant={selectedPremiumFilter === 'free' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setSelectedPremiumFilter('free')}
+                  className="rounded-sm text-xs"
+                >
+                  Free
+                </Button>
+              </div>
+              
+              <div className="border rounded-lg flex overflow-hidden">
+                <Link to="/events/calendar">
+                  <Button variant="ghost" size="sm" className="rounded-none bg-muted">
+                    <Calendar size={16} className="mr-2" />
+                    <span>Calendar</span>
+                  </Button>
+                </Link>
                 <Link to="/events">
                   <Button variant="ghost" size="sm" className="rounded-none">
                     <List size={16} className="mr-2" />
@@ -144,6 +210,14 @@ const EventsCalendar = () => {
             onRSVP={handleRSVP}
           />
         </div>
+        
+        {/* Event confirmation dialog */}
+        <EventConfirmDialog
+          isOpen={confirmEvent !== null}
+          onClose={() => setConfirmEvent(null)}
+          onConfirm={confirmRSVP}
+          event={allEvents.find(e => e.id === confirmEvent) || null}
+        />
       </div>
     </MainLayout>
   );
