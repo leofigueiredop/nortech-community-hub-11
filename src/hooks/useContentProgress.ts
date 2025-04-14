@@ -95,6 +95,30 @@ export const useContentProgress = () => {
   const getAllProgress = useCallback(() => {
     return progress;
   }, [progress]);
+  
+  // Get progress for all items with a specific format
+  const getFormatProgress = useCallback((format: string, contentList: any[]) => {
+    const formatItems = contentList.filter(item => item.format === format);
+    const formatItemIds = formatItems.map(item => item.id);
+    
+    return progress.filter(p => formatItemIds.includes(p.contentId));
+  }, [progress]);
+  
+  // Get stats about content consumption
+  const getContentStats = useCallback(() => {
+    const total = progress.length;
+    const completed = progress.filter(p => p.completed).length;
+    const inProgress = progress.filter(p => p.progress > 0 && !p.completed).length;
+    const notStarted = progress.filter(p => p.progress === 0).length;
+    
+    return {
+      total,
+      completed,
+      inProgress,
+      notStarted,
+      completionRate: total > 0 ? (completed / total) * 100 : 0
+    };
+  }, [progress]);
 
   // This hook now matches the expectations of components that use it
   return {
@@ -103,6 +127,8 @@ export const useContentProgress = () => {
     updateProgress,
     getProgress,
     awardPoints,
-    getAllProgress
+    getAllProgress,
+    getFormatProgress,
+    getContentStats
   };
 };

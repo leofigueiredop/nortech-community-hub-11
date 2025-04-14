@@ -1,3 +1,4 @@
+
 import { usePoints, POINTS_VALUES } from '@/context/PointsContext';
 import { ContentItem } from '@/types/library';
 
@@ -97,7 +98,7 @@ export const usePointsTracking = () => {
     addPoints({
       type: 'content_view',
       description: `Viewed "${content.title}"`,
-      points: content.pointsValue || POINTS_VALUES.content_view
+      points: content.pointsValue ? Math.floor(content.pointsValue * 0.1) : POINTS_VALUES.content_view
     });
   };
   
@@ -109,6 +110,43 @@ export const usePointsTracking = () => {
       description: `Completed "${content.title}"`,
       points: content.pointsValue || POINTS_VALUES.content_completion
     });
+    
+    // Award format-specific badges
+    if (content.format === 'pdf') {
+      checkPDFMilestones();
+    } else if (content.format === 'video') {
+      checkVideoMilestones();
+    } else if (content.format === 'course') {
+      awardBadge({
+        name: `${content.title} Graduate`,
+        description: `Completed the ${content.title} course`,
+        category: 'achievement'
+      });
+    }
+  };
+  
+  // Check PDF milestones for badges
+  const checkPDFMilestones = () => {
+    // In a real app, this would query completed PDF content count
+    setTimeout(() => {
+      awardBadge({
+        name: 'PDF Explorer',
+        description: 'Read 3 PDF documents',
+        category: 'achievement'
+      });
+    }, 500);
+  };
+  
+  // Check video milestones for badges
+  const checkVideoMilestones = () => {
+    // In a real app, this would query completed video content count
+    setTimeout(() => {
+      awardBadge({
+        name: 'Video Enthusiast',
+        description: 'Watched 5 videos',
+        category: 'achievement'
+      });
+    }, 500);
   };
   
   // New function to award custom badge
@@ -130,6 +168,8 @@ export const usePointsTracking = () => {
     trackContentView,
     trackContentCompletion,
     awardCustomBadge,
-    checkEventAttendanceMilestones
+    checkEventAttendanceMilestones,
+    checkPDFMilestones,
+    checkVideoMilestones
   };
 };

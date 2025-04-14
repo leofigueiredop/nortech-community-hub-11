@@ -9,7 +9,13 @@ import ContentHeader from '@/components/library/viewer/ContentHeader';
 import ContentPreview from '@/components/library/viewer/ContentPreview';
 import ContentDetails from '@/components/library/viewer/ContentDetails';
 import ContentComments from '@/components/library/viewer/ContentComments';
+import ContentProgress from '@/components/library/viewer/ContentProgress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  getContentDuration, 
+  getCompletionCriteria 
+} from './viewer/contentViewerUtils';
+import { usePointsTracking } from '@/utils/pointsTracking';
 
 interface ContentViewerProps {
   item: ContentItem | null;
@@ -19,8 +25,10 @@ interface ContentViewerProps {
 const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
   const [activeTab, setActiveTab] = useState('details');
   const [hasAccess, setHasAccess] = useState(false);
-  const { addProgress, updateProgress, getProgress, awardPoints } = useContentProgress();
+  const [earnedBadges, setEarnedBadges] = useState<{name: string, description: string}[]>([]);
+  const { addProgress, updateProgress, getProgress, awardPoints, getAllProgress } = useContentProgress();
   const { awardPoints: addUserPoints } = usePoints();
+  const { trackContentCompletion, awardCustomBadge } = usePointsTracking();
   const [viewStartTime, setViewStartTime] = useState<number | null>(null);
 
   useEffect(() => {
@@ -37,8 +45,53 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
       
       // Add to progress tracking if not already there
       addProgress(item.id);
+      
+      // Check for format-specific badges
+      checkForBadges(item);
     }
   }, [item, addProgress]);
+
+  // Check for format-specific badges
+  const checkForBadges = (currentItem: ContentItem) => {
+    const allProgress = getAllProgress();
+    const badges: {name: string, description: string}[] = [];
+    
+    // Format-specific badge checks
+    if (currentItem.format === 'pdf') {
+      // Check if completed 3 PDFs
+      const completedPDFs = allProgress.filter(p => 
+        p.completed && 
+        p.contentId.includes('pdf') // This is simplified - you'd need proper content type tracking
+      );
+      
+      if (completedPDFs.length >= 3) {
+        const badge = {
+          name: "PDF Master",
+          description: "Completed 3 PDF documents"
+        };
+        badges.push(badge);
+        awardCustomBadge(badge.name, badge.description, 'achievement');
+      }
+    }
+    
+    if (currentItem.format === 'course' && getProgress(currentItem.id)?.completed) {
+      const badge = {
+        name: `${currentItem.title} Graduate`,
+        description: `Completed the ${currentItem.title} course`
+      };
+      badges.push(badge);
+    }
+    
+    // If any item is 100% complete
+    if (getProgress(currentItem.id)?.completed) {
+      badges.push({
+        name: "Completionist",
+        description: "Finished a piece of content"
+      });
+    }
+    
+    setEarnedBadges(badges);
+  };
 
   // Dialog open state
   const isOpen = !!item;
@@ -61,10 +114,17 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
   const handleProgress = (progressPercentage: number) => {
     if (!item) return;
     
-    updateProgress(item.id, progressPercentage);
+    // Apply format-specific completion thresholds
+    let shouldComplete = false;
+    if (item.format === 'pdf' && progressPercentage >= 90) shouldComplete = true;
+    else if (item.format === 'audio' && progressPercentage >= 70) shouldComplete = true;
+    else if (progressPercentage >= 100) shouldComplete = true;
+    
+    const finalProgress = shouldComplete ? 100 : progressPercentage;
+    updateProgress(item.id, finalProgress);
     
     // Award points if applicable and completed
-    if (progressPercentage >= 100 && item.pointsEnabled) {
+    if (shouldComplete && item.pointsEnabled) {
       const progress = getProgress(item.id);
       if (progress && !progress.pointsAwarded) {
         awardPoints(item.id);
@@ -74,6 +134,10 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
             description: `Completed "${item.title}"`,
             points: item.pointsValue
           });
+          
+          // Track content completion for badges
+          trackContentCompletion(item);
+          checkForBadges(item);
         }
       }
     }
@@ -99,12 +163,23 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
     if (timeSpent > 10) { // Only count if more than 10 seconds spent
       const currentProgress = getProgress(item.id);
       if (currentProgress) {
-        // Increase progress based on time spent (simplified logic)
+        // Increase progress based on time spent and format
+        let progressIncrement = Math.floor(timeSpent / 10);
+        
+        // Format-specific progress calculations
+        if (item.format === 'video' && item.duration > 0) {
+          progressIncrement = Math.floor((timeSpent / item.duration) * 100);
+        } else if (item.format === 'audio' && item.duration > 0) {
+          progressIncrement = Math.floor((timeSpent / item.duration) * 100);
+        }
+        
         const newProgress = Math.min(
           100, 
-          currentProgress.progress + Math.floor(timeSpent / (item.duration / 100))
+          currentProgress.progress + progressIncrement
         );
+        
         updateProgress(item.id, newProgress);
+        handleProgress(newProgress); // Check if we reached completion threshold
       }
     }
     
@@ -116,6 +191,9 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
   };
 
   if (!item) return null;
+
+  const progress = getProgress(item.id)?.progress || 0;
+  const isCompleted = progress >= 100;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -130,6 +208,16 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
               onContentView={handleContentView}
               onProgress={handleProgress}
               handleAccess={handleAccess}
+            />
+            
+            <ContentProgress 
+              progress={progress}
+              showProgress={true}
+              pointsValue={item.pointsValue || 0}
+              pointsEnabled={!!item.pointsEnabled}
+              isCompleted={isCompleted}
+              format={item.format}
+              badges={earnedBadges}
             />
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
@@ -147,7 +235,11 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
               </TabsList>
               
               <TabsContent value="details">
-                <ContentDetails item={item} />
+                <ContentDetails 
+                  item={item} 
+                  duration={getContentDuration(item.duration || 0)} 
+                  completionCriteria={getCompletionCriteria(item)} 
+                />
               </TabsContent>
               
               {item.format === 'video' && (
@@ -166,8 +258,24 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
               
               {item.format === 'course' && (
                 <TabsContent value="modules">
-                  <div className="text-sm text-muted-foreground">
-                    <p className="mb-4">This course has no modules yet.</p>
+                  <div className="py-4 space-y-4">
+                    <h3 className="text-lg font-medium">Course Modules</h3>
+                    <div className="space-y-2">
+                      {[1, 2, 3].map((module) => (
+                        <div key={module} className="border rounded-md p-3">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-medium">Module {module}: Introduction</h4>
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                              {module === 1 ? 'Completed' : module === 2 ? 'In Progress' : 'Locked'}
+                            </span>
+                          </div>
+                          <Progress value={module === 1 ? 100 : module === 2 ? 40 : 0} className="h-1.5 mb-2" />
+                          <div className="text-xs text-muted-foreground">
+                            {module === 1 ? 'Completed on Apr 10, 2023' : module === 2 ? '40% complete' : 'Unlock by completing previous modules'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </TabsContent>
               )}

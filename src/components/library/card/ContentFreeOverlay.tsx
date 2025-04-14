@@ -4,14 +4,19 @@ import { ContentItem } from '@/types/library';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, FileText, Music, Download, ExternalLink, BookOpen, Clock, Eye, ArrowRight } from 'lucide-react';
+import { Play, FileText, Music, Download, ExternalLink, BookOpen, Clock, Eye, ArrowRight, Star } from 'lucide-react';
 import { formatDuration } from '../viewer/contentViewerUtils';
+import { useContentProgress } from '@/hooks/useContentProgress';
 
 interface ContentFreeOverlayProps {
   item: ContentItem;
 }
 
 const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
+  const { getProgress } = useContentProgress();
+  const progress = getProgress(item.id);
+  const progressPercentage = progress?.progress || 0;
+  
   // Get the appropriate CTA based on content format
   const getCTA = () => {
     switch (item.format) {
@@ -20,7 +25,12 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
       case 'vimeo':
         return (
           <Button size="sm" className="bg-primary hover:bg-primary/90 text-white w-full">
-            <Play size={16} className="mr-2" /> Watch Now
+            <Play size={16} className="mr-2" /> 
+            {progressPercentage > 0 && progressPercentage < 100 
+              ? `Continue (${progressPercentage}%)` 
+              : progressPercentage >= 100 
+                ? "Watch Again" 
+                : "Watch Now"}
           </Button>
         );
       case 'pdf':
@@ -28,19 +38,34 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
       case 'gdoc':
         return (
           <Button size="sm" className="bg-primary hover:bg-primary/90 text-white w-full">
-            <FileText size={16} className="mr-2" /> Read Now
+            <FileText size={16} className="mr-2" />
+            {progressPercentage > 0 && progressPercentage < 100 
+              ? `Continue (${progressPercentage}%)` 
+              : progressPercentage >= 100 
+                ? "Read Again" 
+                : "Read Now"}
           </Button>
         );
       case 'audio':
         return (
           <Button size="sm" className="bg-primary hover:bg-primary/90 text-white w-full">
-            <Music size={16} className="mr-2" /> Listen Now
+            <Music size={16} className="mr-2" />
+            {progressPercentage > 0 && progressPercentage < 100 
+              ? `Continue (${progressPercentage}%)` 
+              : progressPercentage >= 100 
+                ? "Listen Again" 
+                : "Listen Now"}
           </Button>
         );
       case 'course':
         return (
           <Button size="sm" className="bg-primary hover:bg-primary/90 text-white w-full">
-            <BookOpen size={16} className="mr-2" /> Start Course
+            <BookOpen size={16} className="mr-2" />
+            {progressPercentage > 0 && progressPercentage < 100 
+              ? `Continue Course` 
+              : progressPercentage >= 100 
+                ? "Review Course" 
+                : "Start Course"}
           </Button>
         );
       default:
@@ -67,13 +92,25 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
       <div className="flex justify-between items-start">
         <Badge className="bg-primary/90">{item.format.charAt(0).toUpperCase() + item.format.slice(1)}</Badge>
         
-        {item.duration && (
+        {item.duration > 0 && (
           <Badge variant="outline" className="border-white/30 text-white/90">
             <Clock size={12} className="mr-1" />
             {formatDuration(item.duration)}
           </Badge>
         )}
       </div>
+      
+      {/* Progress indicator for items with progress */}
+      {progressPercentage > 0 && (
+        <div className="absolute top-12 left-0 right-0 px-4">
+          <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary" 
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+          </div>
+        </div>
+      )}
       
       {/* Middle section with title and description */}
       <div className="space-y-2 mt-auto mb-3">
@@ -109,14 +146,11 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
             {item.views.toLocaleString()} views
           </span>
           
-          {item.tags && item.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {item.tags.slice(0, 1).map(tag => (
-                <Badge key={tag} variant="outline" className="text-xs border-white/20 text-white/80">
-                  #{tag}
-                </Badge>
-              ))}
-            </div>
+          {item.pointsEnabled && item.pointsValue && (
+            <span className="flex items-center">
+              <Star size={12} className="mr-1 text-amber-400" />
+              Earn {item.pointsValue} XP
+            </span>
           )}
         </motion.div>
         
