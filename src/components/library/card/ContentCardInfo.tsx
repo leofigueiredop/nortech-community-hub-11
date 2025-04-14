@@ -11,23 +11,23 @@ interface ContentCardInfoProps {
 
 const ContentCardInfo: React.FC<ContentCardInfoProps> = ({ item }) => {
   return (
-    <div className="p-3 bg-card">
-      <h3 className="font-medium text-sm line-clamp-1 mb-1">{item.title}</h3>
+    <div className="p-3 bg-card space-y-1.5">
+      <h3 className="font-medium text-sm line-clamp-2 min-h-[2.5rem]">{item.title}</h3>
       
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
           {item.views > 0 && (
             <span className="flex items-center">
-              <Eye size={12} className="mr-1" />
-              {item.views}
+              <Eye size={12} className="mr-1 flex-shrink-0" />
+              <span className="truncate max-w-[60px]">{item.views.toLocaleString()}</span>
             </span>
           )}
         </div>
         
         {item.duration > 0 && (
           <span className="flex items-center">
-            <Clock size={12} className="mr-1" />
-            {formatDuration(item.duration)}
+            <Clock size={12} className="mr-1 flex-shrink-0" />
+            <span className="truncate max-w-[60px]">{formatDuration(item.duration)}</span>
           </span>
         )}
       </div>
@@ -36,7 +36,11 @@ const ContentCardInfo: React.FC<ContentCardInfoProps> = ({ item }) => {
       {item.tags && item.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-1.5">
           {item.tags.slice(0, 2).map(tag => (
-            <Badge key={tag} variant="secondary" className="text-xs px-1.5 py-0 h-5 opacity-70">
+            <Badge 
+              key={tag} 
+              variant="secondary" 
+              className="text-xs px-1.5 py-0 h-5 opacity-70 truncate max-w-[100px]"
+            >
               {tag}
             </Badge>
           ))}

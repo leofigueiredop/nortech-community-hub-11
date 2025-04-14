@@ -11,7 +11,7 @@ import PremiumContentOverlay from './PremiumContentOverlay';
 interface EnhancedContentCardProps {
   item: ContentItem;
   onClick: () => void;
-  rankNumber?: number; // For top 10 ranking
+  rankNumber?: number;
 }
 
 const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ 
@@ -21,7 +21,6 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   
-  // Enhanced card variants for more elegant hover animation
   const cardVariants = {
     initial: { scale: 1, zIndex: 1 },
     hover: { 
@@ -38,17 +37,18 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
       initial="initial"
       animate={isHovered ? "hover" : "initial"}
       variants={cardVariants}
-      className="h-full cursor-pointer w-full relative"
+      className="h-full cursor-pointer w-full relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <Card 
-        className="overflow-hidden border-0 h-full shadow-md rounded-xl transition-all duration-200"
+        className="overflow-hidden border-0 h-full shadow-md rounded-xl transition-all duration-200 flex flex-col"
         onClick={onClick}
       >
         {/* Rank number display for top 10 items */}
         {rankNumber !== undefined && (
-          <div className="absolute -left-2 -top-2 z-10 font-bold text-6xl select-none" 
+          <div 
+            className="absolute -left-2 -top-2 z-10 font-bold text-4xl select-none pointer-events-none" 
             style={{
               color: 'white',
               textShadow: '2px 2px 4px rgba(0,0,0,0.7), 0 0 10px rgba(0,0,0,0.5)'
