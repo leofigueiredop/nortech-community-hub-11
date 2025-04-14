@@ -33,10 +33,10 @@ import Analytics from '@/pages/Analytics';
 import ContentCreatorDashboard from '@/pages/ContentCreatorDashboard';
 import ContentManagement from '@/pages/ContentManagement';
 import Matchmaker from '@/pages/Matchmaker';
-import * as Settings from '@/pages/settings';
 import NotFound from '@/pages/NotFound';
 import { PointsProvider } from '@/context/PointsContext';
 import { NotificationsProvider } from '@/context/NotificationsContext';
+import * as Settings from '@/pages/settings';
 
 function App() {
   return (
@@ -82,19 +82,21 @@ function App() {
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/content-creator-dashboard" element={<ContentCreatorDashboard />} />
             <Route path="/content-management" element={<ContentManagement />} />
-            <Route path="/settings" element={<Settings.Index />}>
-              <Route path="general" element={<Settings.General />} />
-              <Route path="branding" element={<Settings.Branding />} />
-              <Route path="defaults" element={<Settings.Defaults />} />
-              <Route path="integration" element={<Settings.Integration />} />
-              <Route path="messaging" element={<Settings.Messaging />} />
-              <Route path="mobile" element={<Settings.Mobile />} />
-              <Route path="domain" element={<Settings.Domain />} />
-              <Route path="points-configuration" element={<Settings.PointsConfiguration />} />
-              <Route path="migration" element={<Settings.Migration />} />
-              <Route path="ai-agents" element={<Settings.AIAgents />} />
-              <Route path="notifications" element={<Settings.Notifications />} />
-            </Route>
+            
+            {/* Settings routes */}
+            <Route path="/settings" element={<Settings.Index />} />
+            <Route path="/settings/general" element={<Settings.General />} />
+            <Route path="/settings/branding" element={<Settings.Branding />} />
+            <Route path="/settings/defaults" element={<Settings.Defaults />} />
+            <Route path="/settings/integration" element={<Settings.Integration />} />
+            <Route path="/settings/messaging" element={<Settings.Messaging />} />
+            <Route path="/settings/mobile" element={<Settings.Mobile />} />
+            <Route path="/settings/domain" element={<Settings.Domain />} />
+            <Route path="/settings/points-configuration" element={<Settings.PointsConfiguration />} />
+            <Route path="/settings/migration" element={<Settings.Migration />} />
+            <Route path="/settings/ai-agents" element={<Settings.AIAgents />} />
+            <Route path="/settings/notifications" element={<Settings.Notifications />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
