@@ -32,7 +32,9 @@ const CreateEvent = () => {
     badgeName: '',
     image: null as File | null,
     ticketUrl: '',
-    isPaid: false
+    isPaid: false,
+    isPremium: false,
+    premiumDescription: ''
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -113,13 +115,45 @@ const CreateEvent = () => {
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
+                      id="isPremium"
+                      checked={eventData.isPremium}
+                      onChange={(e) => handleInputChange('isPremium', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <label htmlFor="isPremium" className="text-sm font-medium">
+                      This is a premium event
+                    </label>
+                  </div>
+                  
+                  {eventData.isPremium && (
+                    <div className="grid grid-cols-1 gap-2">
+                      <label htmlFor="premiumDescription" className="text-sm font-medium">
+                        Premium Description
+                      </label>
+                      <textarea
+                        id="premiumDescription"
+                        value={eventData.premiumDescription}
+                        onChange={(e) => handleInputChange('premiumDescription', e.target.value)}
+                        placeholder="Describe what makes this a premium event (e.g., 'Live class with exclusive content')"
+                        className="px-3 py-2 border border-gray-300 rounded-md"
+                        rows={3}
+                      />
+                      <p className="text-xs text-gray-500">
+                        This description will be displayed to users considering purchasing premium access
+                      </p>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
                       id="isPaid"
                       checked={eventData.isPaid}
                       onChange={(e) => handleInputChange('isPaid', e.target.checked)}
                       className="h-4 w-4 rounded border-gray-300"
                     />
                     <label htmlFor="isPaid" className="text-sm font-medium">
-                      This is a paid event
+                      This event requires payment
                     </label>
                   </div>
                   
