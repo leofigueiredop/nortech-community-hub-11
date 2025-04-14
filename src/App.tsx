@@ -1,137 +1,105 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Index from '@/pages/Index';
+import Dashboard from '@/pages/Dashboard';
+import Library from '@/pages/Library';
+import Events from '@/pages/Events';
+import EventsCalendar from '@/pages/EventsCalendar';
+import EventsWeekly from '@/pages/EventsWeekly';
+import CreateEvent from '@/pages/CreateEvent';
+import AITerminal from '@/pages/AITerminal';
+import PointsStore from '@/pages/PointsStore';
+import PointsDashboard from '@/pages/PointsDashboard';
+import Feed from '@/pages/Feed';
+import Discussions from '@/pages/Discussions';
+import DiscussionTopic from '@/pages/DiscussionTopic';
+import DiscussionDetail from '@/pages/DiscussionDetail';
+import CreatePost from '@/pages/CreatePost';
+import TagPage from '@/pages/TagPage';
+import UserProfile from '@/pages/UserProfile';
+import Members from '@/pages/Members';
+import CreateSpace from '@/pages/CreateSpace';
+import LiveStreams from '@/pages/LiveStreams';
+import OnboardingLayout from '@/components/layout/OnboardingLayout';
+import CommunityType from '@/components/onboarding/CommunityType';
+import Community from '@/components/onboarding/Community';
+import CommunityTemplates from '@/components/onboarding/CommunityTemplates';
+import Creator from '@/components/onboarding/Creator';
+import Migration from '@/components/onboarding/Migration';
+import MembershipPlans from '@/components/onboarding/MembershipPlans';
+import InviteMembers from '@/components/onboarding/InviteMembers';
+import FinalStep from '@/components/onboarding/FinalStep';
+import AIMatchmaker from '@/pages/AIMatchmaker';
+import Leaderboard from '@/pages/Leaderboard';
+import Analytics from '@/pages/Analytics';
+import ContentCreatorDashboard from '@/pages/ContentCreatorDashboard';
+import ContentManagement from '@/pages/ContentManagement';
+import * as Settings from '@/pages/settings';
+import NotFound from '@/pages/NotFound';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import Community from "./pages/onboarding/Community";
-import Creator from "./pages/onboarding/Creator";
-import Migration from "./pages/onboarding/Migration";
-import CommunityType from "./pages/onboarding/CommunityType";
-import CommunityTemplates from "./pages/onboarding/CommunityTemplates";
-import InviteMembers from "./pages/onboarding/InviteMembers";
-import MembershipPlans from "./pages/onboarding/MembershipPlans";
-import FinalStep from "./pages/onboarding/FinalStep";
-import Dashboard from "./pages/Dashboard";
-import Feed from "./pages/Feed";
-import CreatePost from "./pages/CreatePost";
-import Discussions from "./pages/Discussions";
-import DiscussionTopic from "./pages/DiscussionTopic";
-import Library from "./pages/Library";
-import Events from "./pages/Events";
-import EventsWeekly from "./pages/EventsWeekly";
-import EventsCalendar from "./pages/EventsCalendar";
-import Members from "./pages/Members";
-import Analytics from "./pages/Analytics";
-import CreateSpace from "./pages/CreateSpace";
-import AITerminal from "./pages/AITerminal";
-import AIMatchmaker from "./pages/AIMatchmaker";
-import PointsDashboard from "./pages/PointsDashboard";
-import PointsStore from "./pages/PointsStore";
-import Leaderboard from "./pages/Leaderboard";
-import { NotificationsProvider } from "./context/NotificationsContext";
-import { PointsProvider } from "./context/PointsContext";
-import ContentManagement from "./pages/ContentManagement";
-import ContentCreatorDashboard from "./pages/ContentCreatorDashboard";
-import TagPage from "./pages/TagPage";
-import UserProfile from "./pages/UserProfile";
-import CreateEvent from "./pages/CreateEvent";
-
-// Import settings pages
-import SettingsIndex from "./pages/settings/Index";
-import General from "./pages/settings/General";
-import Branding from "./pages/settings/Branding";
-import Mobile from "./pages/settings/Mobile";
-import Defaults from "./pages/settings/Defaults";
-import Plans from "./pages/settings/Plans";
-import Subscriptions from "./pages/settings/Subscriptions";
-import Domain from "./pages/settings/Domain";
-import AIAgents from "./pages/settings/AIAgents";
-import Messaging from "./pages/settings/Messaging";
-import Notifications from "./pages/settings/Notifications";
-import Legal from "./pages/settings/Legal";
-import Digest from "./pages/settings/Digest";
-import SSO from "./pages/settings/SSO";
-import Integration from "./pages/settings/Integration";
-import MigrationSettings from "./pages/settings/Migration";
-import Paywall from "./pages/settings/Paywall";
-import PointsConfiguration from "./pages/settings/PointsConfiguration";
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <NotificationsProvider>
-      <PointsProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/onboarding/creator" element={<Creator />} />
-              <Route path="/onboarding/migration" element={<Migration />} />
-              <Route path="/onboarding/community-type" element={<CommunityType />} />
-              <Route path="/onboarding/community-templates" element={<CommunityTemplates />} />
-              <Route path="/onboarding/invite-members" element={<InviteMembers />} />
-              <Route path="/onboarding/membership-plans" element={<MembershipPlans />} />
-              <Route path="/onboarding/final-step" element={<FinalStep />} />
-              <Route path="/onboarding/community" element={<Community />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/feed" element={<Feed />} />
-              <Route path="/create-post" element={<CreatePost />} />
-              <Route path="/create-space" element={<CreateSpace />} />
-              
-              <Route path="/discussions" element={<Discussions />} />
-              <Route path="/discussions/:topicId" element={<DiscussionTopic />} />
-              
-              <Route path="/library" element={<Library />} />
-              <Route path="/library/manage" element={<ContentManagement />} />
-              <Route path="/content-creator-dashboard" element={<ContentCreatorDashboard />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/events/weekly" element={<EventsWeekly />} />
-              <Route path="/events/calendar" element={<EventsCalendar />} />
-              <Route path="/events/create" element={<CreateEvent />} />
-              <Route path="/members" element={<Members />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/points" element={<PointsDashboard />} />
-              <Route path="/points/store" element={<PointsStore />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="/ai-terminal" element={<AITerminal />} />
-              <Route path="/ai-matchmaker" element={<AIMatchmaker />} />
-              <Route path="/profile" element={<UserProfile />} />
-              <Route path="/profile/:userId" element={<UserProfile />} />
-              
-              <Route path="/tags/:tagName" element={<TagPage />} />
-              
-              <Route path="/settings" element={<SettingsIndex />} />
-              <Route path="/settings/general" element={<General />} />
-              <Route path="/settings/branding" element={<Branding />} />
-              <Route path="/settings/mobile" element={<Mobile />} />
-              <Route path="/settings/defaults" element={<Defaults />} />
-              <Route path="/settings/plans" element={<Plans />} />
-              <Route path="/settings/subscriptions" element={<Subscriptions />} />
-              <Route path="/settings/domain" element={<Domain />} />
-              <Route path="/settings/ai-agents" element={<AIAgents />} />
-              <Route path="/settings/messaging" element={<Messaging />} />
-              <Route path="/settings/notifications" element={<Notifications />} />
-              <Route path="/settings/legal" element={<Legal />} />
-              <Route path="/settings/digest" element={<Digest />} />
-              <Route path="/settings/sso" element={<SSO />} />
-              <Route path="/settings/integration" element={<Integration />} />
-              <Route path="/settings/migration" element={<MigrationSettings />} />
-              <Route path="/settings/paywall" element={<Paywall />} />
-              <Route path="/settings/points" element={<PointsConfiguration />} />
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </PointsProvider>
-    </NotificationsProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/library" element={<Library />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/events/calendar" element={<EventsCalendar />} />
+        <Route path="/events/weekly" element={<EventsWeekly />} />
+        <Route path="/create-event" element={<CreateEvent />} />
+        <Route path="/ai-terminal" element={<AITerminal />} />
+        <Route path="/points-store" element={<PointsStore />} />
+        <Route path="/points-dashboard" element={<PointsDashboard />} />
+        <Route path="/feed" element={<Feed />} />
+        <Route path="/discussions" element={<Discussions />} />
+        <Route path="/discussions/:topicId" element={<DiscussionTopic />} />
+        <Route path="/discussions/:topicId/:discussionId" element={<DiscussionDetail />} />
+        <Route path="/create-post" element={<CreatePost />} />
+        <Route path="/tag/:tagName" element={<TagPage />} />
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/members" element={<Members />} />
+        <Route path="/create-space" element={<CreateSpace />} />
+        <Route path="/live-streams" element={<LiveStreams />} />
+        <Route path="/onboarding" element={<OnboardingLayout />}>
+          <Route path="community-type" element={<CommunityType />} />
+          <Route path="community" element={<Community />} />
+          <Route path="community-templates" element={<CommunityTemplates />} />
+          <Route path="creator" element={<Creator />} />
+          <Route path="migration" element={<Migration />} />
+          <Route path="membership-plans" element={<MembershipPlans />} />
+          <Route path="invite-members" element={<InviteMembers />} />
+          <Route path="final-step" element={<FinalStep />} />
+        </Route>
+        <Route path="/ai-matchmaker" element={<AIMatchmaker />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/content-creator-dashboard" element={<ContentCreatorDashboard />} />
+        <Route path="/content-management" element={<ContentManagement />} />
+        <Route path="/settings" element={<Settings.Index />}>
+          <Route path="general" element={<Settings.General />} />
+          <Route path="branding" element={<Settings.Branding />} />
+          <Route path="defaults" element={<Settings.Defaults />} />
+          <Route path="integration" element={<Settings.Integration />} />
+          <Route path="messaging" element={<Settings.Messaging />} />
+          <Route path="mobile" element={<Settings.Mobile />} />
+          <Route path="domain" element={<Settings.Domain />} />
+          <Route path="digest" element={<Settings.Digest />} />
+          <Route path="legal" element={<Settings.Legal />} />
+          <Route path="paywall" element={<Settings.Paywall />} />
+          <Route path="paywall-settings" element={<Settings.PaywallSettings />} />
+          <Route path="points-configuration" element={<Settings.PointsConfiguration />} />
+          <Route path="subscriptions" element={<Settings.Subscriptions />} />
+          <Route path="sso" element={<Settings.SSO />} />
+          <Route path="migration" element={<Settings.Migration />} />
+          <Route path="ai-agents" element={<Settings.AIAgents />} />
+          <Route path="plans" element={<Settings.Plans />} />
+          <Route path="notifications" element={<Settings.Notifications />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
 export default App;
