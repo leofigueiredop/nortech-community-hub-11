@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { usePoints } from '@/context/PointsContext';
 import { useContentProgress } from '@/hooks/useContentProgress';
@@ -7,7 +6,8 @@ import {
   DiscussionTopic, 
   DiscussionReply, 
   DiscussionFilter,
-  DiscussionBadge 
+  DiscussionBadge,
+  DiscussionUser
 } from '@/types/discussion';
 
 // Mock data for discussion topics
@@ -301,10 +301,13 @@ export const useDiscussions = () => {
         ...prev,
         [topicId]: prev[topicId].map(d => {
           if (d.id === discussionId) {
+            const currentParticipants = prev[topicId].find(disc => disc.id === discussionId)?.participants || 0;
+            const newParticipantsCount = currentParticipants + 1;
+            
             return {
               ...d,
               replies: d.replies + 1,
-              participants: new Set([...prev[topicId].find(disc => disc.id === discussionId)?.participants || [], reply.author.id]).size,
+              participants: newParticipantsCount,
               lastActivity: 'agora mesmo'
             };
           }
@@ -373,7 +376,6 @@ export const useDiscussions = () => {
     if (isUpvote) {
       const discussion = getDiscussion(discussionId);
       if (discussion) {
-        // In a real app, you'd award points to the author, not the current user
         awardPoints({
           type: 'received_upvote',
           description: `Recebeu um upvote na discussão: ${discussion.title}`,
@@ -402,7 +404,6 @@ export const useDiscussions = () => {
     if (isUpvote) {
       const reply = replies[discussionId]?.find(r => r.id === replyId);
       if (reply) {
-        // In a real app, you'd award points to the author, not the current user
         awardPoints({
           type: 'received_reply_upvote',
           description: 'Recebeu um upvote em uma resposta',
@@ -441,7 +442,6 @@ export const useDiscussions = () => {
     // Award points for having answer accepted
     const reply = replies[discussionId]?.find(r => r.id === replyId);
     if (reply) {
-      // In a real app, you'd award points to the author, not the current user
       awardPoints({
         type: 'answer_accepted',
         description: 'Sua resposta foi marcada como solução',
@@ -468,7 +468,6 @@ export const useDiscussions = () => {
             if (filter.value === 'unanswered') return !discussion.isAnswered;
             return true;
           case 'time':
-            // Simple implementation - in a real app you'd use proper date comparison
             if (filter.value === 'today') return discussion.lastActivity.includes('hora') || discussion.lastActivity.includes('minuto');
             if (filter.value === 'week') return !discussion.lastActivity.includes('mês');
             return true;
