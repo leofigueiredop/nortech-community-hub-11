@@ -1,23 +1,16 @@
 
 import React from 'react';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DatePicker } from '@/components/ui/date-picker';
-import { TimePicker } from '@/components/ui/time-picker';
-import { Globe, Link, MapPin } from 'lucide-react';
 
 interface DateLocationSectionProps {
   eventData: {
     date: Date;
     startTime: string;
     endTime: string;
+    location: string;
     isOnline: boolean;
     platform: string;
     meetingLink: string;
-    location: string;
   };
   handleInputChange: (name: string, value: any) => void;
 }
@@ -27,99 +20,118 @@ const DateLocationSection: React.FC<DateLocationSectionProps> = ({
   handleInputChange 
 }) => {
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">Date & Location</h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="grid gap-2">
-          <Label>Date</Label>
-          <DatePicker
-            date={eventData.date}
-            setDate={(date) => handleInputChange('date', date)}
-          />
-        </div>
-        
-        <div className="grid gap-2">
-          <Label>Time</Label>
-          <div className="flex gap-2 items-center">
-            <div className="flex-1">
-              <TimePicker
-                value={eventData.startTime}
-                onChange={(value) => handleInputChange('startTime', value)}
-              />
-            </div>
-            <span className="opacity-50">to</span>
-            <div className="flex-1">
-              <TimePicker
-                value={eventData.endTime}
-                onChange={(value) => handleInputChange('endTime', value)}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex items-center space-x-2 my-4">
-        <Switch
-          id="isOnline"
-          checked={eventData.isOnline}
-          onCheckedChange={(checked) => handleInputChange('isOnline', checked)}
-        />
-        <Label htmlFor="isOnline">This is an online event</Label>
-      </div>
-      
-      {eventData.isOnline ? (
-        <div className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="platform">Online Platform</Label>
-            <Select 
-              value={eventData.platform}
-              onValueChange={(value) => handleInputChange('platform', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select platform" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="zoom">Zoom</SelectItem>
-                <SelectItem value="teams">Microsoft Teams</SelectItem>
-                <SelectItem value="meet">Google Meet</SelectItem>
-                <SelectItem value="webex">Cisco Webex</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
+    <div>
+      <h3 className="text-lg font-medium mb-4">Date & Location</h3>
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Date <span className="text-red-500">*</span>
+            </label>
+            <DatePicker 
+              date={eventData.date} 
+              setDate={(date) => handleInputChange('date', date || new Date())} 
+            />
           </div>
           
-          <div className="grid gap-2">
-            <Label htmlFor="meetingLink">Meeting Link</Label>
-            <div className="flex items-center border rounded-md pl-2">
-              <Link className="h-4 w-4 opacity-50" />
-              <Input 
-                id="meetingLink" 
-                value={eventData.meetingLink}
-                onChange={(e) => handleInputChange('meetingLink', e.target.value)}
-                placeholder="Enter meeting URL"
-                className="border-0"
-              />
-            </div>
+          <div>
+            <label htmlFor="startTime" className="block text-sm font-medium mb-1">
+              Start Time <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="time"
+              id="startTime"
+              value={eventData.startTime}
+              onChange={(e) => handleInputChange('startTime', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
+            />
           </div>
-        </div>
-      ) : (
-        <div className="grid gap-2">
-          <Label htmlFor="location">Location</Label>
-          <div className="flex items-center border rounded-md pl-2">
-            <MapPin className="h-4 w-4 opacity-50" />
-            <Input 
-              id="location" 
-              value={eventData.location}
-              onChange={(e) => handleInputChange('location', e.target.value)}
-              placeholder="Enter physical location"
-              className="border-0"
+          
+          <div>
+            <label htmlFor="endTime" className="block text-sm font-medium mb-1">
+              End Time <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="time"
+              id="endTime"
+              value={eventData.endTime}
+              onChange={(e) => handleInputChange('endTime', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
             />
           </div>
         </div>
-      )}
-      
-      <Separator />
+        
+        <div className="grid grid-cols-1 gap-4">
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="isOnline"
+              checked={eventData.isOnline}
+              onChange={(e) => handleInputChange('isOnline', e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300"
+            />
+            <label htmlFor="isOnline" className="text-sm font-medium">
+              This is an online event
+            </label>
+          </div>
+          
+          {eventData.isOnline ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="platform" className="block text-sm font-medium mb-1">
+                    Platform <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="platform"
+                    value={eventData.platform}
+                    onChange={(e) => handleInputChange('platform', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    required
+                  >
+                    <option value="zoom">Zoom</option>
+                    <option value="meet">Google Meet</option>
+                    <option value="teams">Microsoft Teams</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label htmlFor="meetingLink" className="block text-sm font-medium mb-1">
+                    Meeting Link <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="meetingLink"
+                    value={eventData.meetingLink}
+                    onChange={(e) => handleInputChange('meetingLink', e.target.value)}
+                    placeholder="https://zoom.us/j/123456789"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <label htmlFor="location" className="block text-sm font-medium mb-1">
+                Physical Location <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="location"
+                value={eventData.location}
+                onChange={(e) => handleInputChange('location', e.target.value)}
+                placeholder="Enter the venue address"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

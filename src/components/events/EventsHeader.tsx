@@ -4,6 +4,13 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Grid, List, Plus } from 'lucide-react';
 import { EventType } from './types/EventTypes';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface EventsHeaderProps {
   viewType: 'grid' | 'list';
@@ -32,7 +39,7 @@ const EventsHeader: React.FC<EventsHeaderProps> = ({
           <Button
             variant={viewType === 'list' ? 'default' : 'outline'}
             size="sm"
-            className="rounded-l-md rounded-r-none"
+            className="rounded-l-md rounded-r-none px-3"
             onClick={() => setViewType('list')}
           >
             <List className="h-4 w-4 mr-2" />
@@ -41,7 +48,7 @@ const EventsHeader: React.FC<EventsHeaderProps> = ({
           <Button
             variant={viewType === 'grid' ? 'default' : 'outline'}
             size="sm"
-            className="rounded-r-md rounded-l-none"
+            className="rounded-r-md rounded-l-none px-3"
             onClick={() => setViewType('grid')}
           >
             <Grid className="h-4 w-4 mr-2" />
@@ -49,7 +56,7 @@ const EventsHeader: React.FC<EventsHeaderProps> = ({
           </Button>
         </div>
         
-        <Link to="/events/create">
+        <Link to="/create-event">
           <Button className="w-full sm:w-auto bg-nortech-purple hover:bg-nortech-purple/90">
             <Plus className="h-4 w-4 mr-2" />
             Create Event

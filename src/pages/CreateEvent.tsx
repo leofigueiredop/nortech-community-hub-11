@@ -30,7 +30,9 @@ const CreateEvent = () => {
     points: 20,
     badgeEnabled: true,
     badgeName: '',
-    image: null as File | null
+    image: null as File | null,
+    ticketUrl: '',
+    isPaid: false
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -102,6 +104,46 @@ const CreateEvent = () => {
               eventData={eventData} 
               handleFileChange={handleFileChange} 
             />
+
+            {/* Ticket Information Section */}
+            <div>
+              <h3 className="text-lg font-medium mb-4">Ticket Information</h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="isPaid"
+                      checked={eventData.isPaid}
+                      onChange={(e) => handleInputChange('isPaid', e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <label htmlFor="isPaid" className="text-sm font-medium">
+                      This is a paid event
+                    </label>
+                  </div>
+                  
+                  {eventData.isPaid && (
+                    <div className="grid grid-cols-1 gap-2">
+                      <label htmlFor="ticketUrl" className="text-sm font-medium">
+                        External Ticket URL
+                      </label>
+                      <input
+                        type="text"
+                        id="ticketUrl"
+                        value={eventData.ticketUrl}
+                        onChange={(e) => handleInputChange('ticketUrl', e.target.value)}
+                        placeholder="https://ticketing-site.com/your-event"
+                        className="px-3 py-2 border border-gray-300 rounded-md"
+                      />
+                      <p className="text-xs text-gray-500">
+                        Provide a link where attendees can purchase tickets for this event
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </CardContent>
           
           <CardFooter className="flex justify-between border-t px-6 py-4">

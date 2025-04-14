@@ -7,6 +7,7 @@ import { getEventStatus, isUserRegistered } from './utils/EventUtils';
 import { useNotifications } from '@/context/NotificationsContext';
 import EventAttendanceManager from './attendance/EventAttendanceManager';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import EventDetailModal from './EventDetailModal';
 
 // Import the new smaller components
 import EventCardHeader from './card/EventCardHeader';
@@ -23,6 +24,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
   const { toast } = useToast();
   const { addNotification } = useNotifications();
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   
   // Get the event status
   const status = event.status || getEventStatus(event);
@@ -53,45 +55,52 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
   };
 
   return (
-    <Card className="mb-4">
-      <EventCardHeader 
-        title={event.title}
-        date={event.date}
-        time={event.time}
-        type={event.type}
-        status={status}
-        isRegistered={isRegistered}
-      />
-      
-      <CardContent>
-        <EventCardDetails 
-          description={event.description}
-          image={event.image}
-          speaker={event.speaker}
-          location={event.location}
-          attendees={event.attendees}
-          capacity={event.capacity}
-        />
-        
-        <EventCardActions 
-          status={status}
-          isRegistered={isRegistered}
-          attendees={event.attendees}
-          capacity={event.capacity}
-          onRSVP={handleRSVP}
-          onOpenAttendanceModal={() => setShowAttendanceModal(true)}
-        />
-        
-        <EventCalendarButtons 
+    <>
+      <Card 
+        className="mb-4 cursor-pointer hover:shadow-md transition-shadow"
+        onClick={() => setShowDetailModal(true)}
+      >
+        <EventCardHeader 
           title={event.title}
           date={event.date}
           time={event.time}
-          description={event.description}
-          location={event.location}
-          isRegistered={isRegistered}
+          type={event.type}
           status={status}
+          isRegistered={isRegistered}
         />
-      </CardContent>
+        
+        <CardContent>
+          <EventCardDetails 
+            description={event.description}
+            image={event.image}
+            speaker={event.speaker}
+            location={event.location}
+            attendees={event.attendees}
+            capacity={event.capacity}
+          />
+          
+          <div onClick={(e) => e.stopPropagation()}>
+            <EventCardActions 
+              status={status}
+              isRegistered={isRegistered}
+              attendees={event.attendees}
+              capacity={event.capacity}
+              onRSVP={handleRSVP}
+              onOpenAttendanceModal={() => setShowAttendanceModal(true)}
+            />
+            
+            <EventCalendarButtons 
+              title={event.title}
+              date={event.date}
+              time={event.time}
+              description={event.description}
+              location={event.location}
+              isRegistered={isRegistered}
+              status={status}
+            />
+          </div>
+        </CardContent>
+      </Card>
       
       {/* Attendance management dialog */}
       <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
@@ -102,7 +111,15 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
           <EventAttendanceManager eventId={event.id} eventTitle={event.title} />
         </DialogContent>
       </Dialog>
-    </Card>
+
+      {/* Event detail modal */}
+      <EventDetailModal 
+        event={event}
+        isOpen={showDetailModal}
+        onClose={() => setShowDetailModal(false)}
+        onRSVP={onRSVP}
+      />
+    </>
   );
 };
 

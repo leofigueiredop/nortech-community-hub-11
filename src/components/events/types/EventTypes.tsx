@@ -72,12 +72,12 @@ export const EVENT_TYPES = {
   },
   live: {
     label: 'Live',
-    color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+    color: 'bg-red-100 text-red-800 border-red-200',
     icon: <Laptop size={14} className="mr-1" />
   },
   mentoria: {
     label: 'Mentoria',
-    color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+    color: 'bg-amber-100 text-amber-800 border-amber-200',
     icon: <Headphones size={14} className="mr-1" />
   }
 };
