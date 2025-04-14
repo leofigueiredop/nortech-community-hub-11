@@ -61,7 +61,6 @@ function App() {
             <Route path="/members" element={<Members />} />
             <Route path="/create-space" element={<CreateSpace />} />
             <Route path="/matchmaker" element={<Matchmaker />} />
-            <Route path="/ai-matchmaker" element={<Matchmaker />} />
             
             {/* Points related routes */}
             <Route path="/points" element={<PointsDashboard />} />
@@ -91,16 +90,9 @@ function App() {
               <Route path="messaging" element={<Settings.Messaging />} />
               <Route path="mobile" element={<Settings.Mobile />} />
               <Route path="domain" element={<Settings.Domain />} />
-              <Route path="digest" element={<Settings.Digest />} />
-              <Route path="legal" element={<Settings.Legal />} />
-              <Route path="paywall" element={<Settings.Paywall />} />
-              <Route path="paywall-settings" element={<Settings.PaywallSettings />} />
               <Route path="points-configuration" element={<Settings.PointsConfiguration />} />
-              <Route path="subscriptions" element={<Settings.Subscriptions />} />
-              <Route path="sso" element={<Settings.SSO />} />
               <Route path="migration" element={<Settings.Migration />} />
               <Route path="ai-agents" element={<Settings.AIAgents />} />
-              <Route path="plans" element={<Settings.Plans />} />
               <Route path="notifications" element={<Settings.Notifications />} />
             </Route>
             <Route path="*" element={<NotFound />} />

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Gauge, Settings, Shield, RefreshCw, Trophy } from 'lucide-react';
+import { Gauge, Settings, RefreshCw, Trophy } from 'lucide-react';
 import SettingsMenuItem from '../SettingsMenuItem';
 
 interface TechnicalSectionProps {
@@ -21,12 +21,6 @@ const TechnicalSection: React.FC<TechnicalSectionProps> = ({ activeSection }) =>
         label="Branding" 
         to="/settings/branding" 
         active={activeSection === "branding"} 
-      />
-      <SettingsMenuItem 
-        icon={<Shield size={18} />} 
-        label="SSO" 
-        to="/settings/sso" 
-        active={activeSection === "sso"} 
       />
       <SettingsMenuItem 
         icon={<RefreshCw size={18} />} 

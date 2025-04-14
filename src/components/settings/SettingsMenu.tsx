@@ -3,8 +3,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
-  Settings, Palette, Smartphone, ListChecks, CreditCard, Globe, Bot, 
-  MessageSquare, Scale, Mail, KeyRound, Share2, ArrowLeftRight, LockIcon, Bell
+  Settings, Palette, Smartphone, ListChecks, Globe, Bot, 
+  MessageSquare, Share2, ArrowLeftRight, Bell, Trophy
 } from 'lucide-react';
 
 const settingsGroups = [
@@ -18,18 +18,17 @@ const settingsGroups = [
     ]
   },
   {
-    title: 'Monetization',
+    title: 'Content & Engagement',
     items: [
-      { name: 'Plans & Pricing', icon: <CreditCard className="mr-2 h-4 w-4" />, path: '/settings/plans' },
-      { name: 'Subscriptions', icon: <CreditCard className="mr-2 h-4 w-4" />, path: '/settings/subscriptions' },
+      { name: 'Points Configuration', icon: <Trophy className="mr-2 h-4 w-4" />, path: '/settings/points-configuration' },
       { name: 'Domain', icon: <Globe className="mr-2 h-4 w-4" />, path: '/settings/domain' },
-      { name: 'Paywall', icon: <LockIcon className="mr-2 h-4 w-4" />, path: '/settings/paywall' },
     ]
   },
   {
     title: 'AI & Integrations',
     items: [
       { name: 'AI Agents', icon: <Bot className="mr-2 h-4 w-4" />, path: '/settings/ai-agents' },
+      { name: 'Integration', icon: <Share2 className="mr-2 h-4 w-4" />, path: '/settings/integration' },
     ]
   },
   {
@@ -37,15 +36,11 @@ const settingsGroups = [
     items: [
       { name: 'Messaging', icon: <MessageSquare className="mr-2 h-4 w-4" />, path: '/settings/messaging' },
       { name: 'Notifications', icon: <Bell className="mr-2 h-4 w-4" />, path: '/settings/notifications' },
-      { name: 'Digest Emails', icon: <Mail className="mr-2 h-4 w-4" />, path: '/settings/digest' },
     ]
   },
   {
     title: 'Technical',
     items: [
-      { name: 'Legal', icon: <Scale className="mr-2 h-4 w-4" />, path: '/settings/legal' },
-      { name: 'SSO', icon: <KeyRound className="mr-2 h-4 w-4" />, path: '/settings/sso' },
-      { name: 'Integration', icon: <Share2 className="mr-2 h-4 w-4" />, path: '/settings/integration' },
       { name: 'Migration', icon: <ArrowLeftRight className="mr-2 h-4 w-4" />, path: '/settings/migration' },
     ]
   }
