@@ -2,7 +2,7 @@
 import { Event } from '../types/EventTypes';
 
 // Helper functions for event status
-export const getEventStatus = (event: Event): 'upcoming' | 'happening_soon' | 'in_progress' | 'ended' => {
+export const getEventStatus = (event: Event): 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress' => {
   const now = new Date();
   const eventDate = new Date(event.date);
   const eventTime = event.time.split(' - ')[0]; // Get start time

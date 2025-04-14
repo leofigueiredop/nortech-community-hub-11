@@ -64,9 +64,9 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                 </Badge>
               )}
             </DialogTitle>
-            <Badge className={`${eventType.color}`}>
-              {eventType.icon}
-              {eventType.label}
+            <Badge className={`${eventType?.color || 'bg-gray-100 text-gray-800'}`}>
+              {eventType?.icon}
+              {eventType?.label || event.type}
             </Badge>
           </div>
           <DialogDescription>

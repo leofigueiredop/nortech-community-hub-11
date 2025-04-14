@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Video, Coffee, GraduationCap, Mic, Users, Music, BookOpen, Heart, Medal } from 'lucide-react';
+import { Video, Coffee, GraduationCap, Mic, Users, Music, BookOpen, Heart, Medal, Briefcase, HandHelping, Laptop, Headphones } from 'lucide-react';
 
-export type EventType = 'webinar' | 'meetup' | 'conference' | 'workshop' | 'course' | 'hackathon' | 'talk' | 'party' | 'competition';
+export type EventType = 'webinar' | 'meetup' | 'conference' | 'workshop' | 'course' | 'hackathon' | 'talk' | 'party' | 'competition' | 'career_fair' | 'volunteer' | 'live' | 'mentoria';
 
 export interface Event {
   id: number;
@@ -17,8 +17,9 @@ export interface Event {
   capacity: number;
   image?: string;
   url?: string;
+  platform?: 'zoom' | 'meet' | 'teams' | string;
   isRegistered?: boolean;
-  status?: 'upcoming' | 'live' | 'ended';
+  status?: 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress';
   registeredUsers?: string[];
   pointsValue?: number;
   isPremium?: boolean;
@@ -69,5 +70,25 @@ export const EVENT_TYPES = {
     label: 'Competition',
     icon: <Medal className="h-3 w-3 mr-1" />,
     color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+  },
+  career_fair: {
+    label: 'Career Fair',
+    icon: <Briefcase className="h-3 w-3 mr-1" />,
+    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+  },
+  volunteer: {
+    label: 'Volunteer',
+    icon: <HandHelping className="h-3 w-3 mr-1" />,
+    color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300'
+  },
+  live: {
+    label: 'Live',
+    icon: <Laptop className="h-3 w-3 mr-1" />,
+    color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+  },
+  mentoria: {
+    label: 'Mentoria',
+    icon: <Headphones className="h-3 w-3 mr-1" />,
+    color: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300'
   }
 };

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Check, Users, ExternalLink, Crown } from 'lucide-react';
 
 interface EventCardActionsProps {
-  status?: 'upcoming' | 'live' | 'ended';
+  status?: 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress';
   isRegistered?: boolean;
   attendees: number;
   capacity: number;

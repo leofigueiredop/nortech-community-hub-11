@@ -11,7 +11,7 @@ interface EventCardHeaderProps {
   date: Date;
   time: string;
   type: EventType;
-  status?: 'upcoming' | 'live' | 'ended';
+  status?: 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress';
   isRegistered?: boolean;
   isPremium?: boolean;
 }
@@ -30,9 +30,30 @@ const EventCardHeader: React.FC<EventCardHeaderProps> = ({
   // Get status badge color
   const getStatusBadge = () => {
     switch(status) {
-      case 'live': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'ended': return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
-      default: return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case 'live':
+      case 'in_progress': 
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'ended': 
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+      case 'happening_soon':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
+      default: 
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+    }
+  };
+
+  // Get status display text
+  const getStatusText = () => {
+    switch(status) {
+      case 'live':
+      case 'in_progress': 
+        return 'Live now';
+      case 'ended': 
+        return 'Ended';
+      case 'happening_soon':
+        return 'Starting soon';
+      default: 
+        return 'Upcoming';
     }
   };
 
@@ -55,9 +76,9 @@ const EventCardHeader: React.FC<EventCardHeaderProps> = ({
         </div>
         
         <div className="flex flex-col items-end gap-1">
-          <Badge className={`flex items-center ${eventType.color}`}>
-            {eventType.icon}
-            {eventType.label}
+          <Badge className={`flex items-center ${eventType?.color || 'bg-gray-100 text-gray-800'}`}>
+            {eventType?.icon}
+            {eventType?.label || type}
           </Badge>
           
           {isRegistered && (
@@ -68,8 +89,7 @@ const EventCardHeader: React.FC<EventCardHeaderProps> = ({
           
           {!isRegistered && (
             <Badge variant="outline" className={getStatusBadge()}>
-              {status === 'live' ? 'Live now' : 
-               status === 'ended' ? 'Ended' : 'Upcoming'}
+              {getStatusText()}
             </Badge>
           )}
         </div>

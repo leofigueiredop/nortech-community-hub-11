@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Calendar } from 'lucide-react';
+import { Calendar, MoreHorizontal } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface EventCalendarButtonsProps {
   title: string;
@@ -9,8 +10,8 @@ interface EventCalendarButtonsProps {
   time: string;
   description: string;
   location: string;
-  isRegistered: boolean;
-  status?: 'upcoming' | 'happening_soon' | 'in_progress' | 'ended';
+  isRegistered?: boolean;
+  status?: 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress';
 }
 
 const EventCalendarButtons: React.FC<EventCalendarButtonsProps> = ({
@@ -22,57 +23,102 @@ const EventCalendarButtons: React.FC<EventCalendarButtonsProps> = ({
   isRegistered,
   status
 }) => {
-  // Generate Google Calendar link
-  const generateGoogleCalLink = () => {
-    const startDateTime = new Date(date);
-    const [startHour, startMinute] = time.split(' - ')[0].split(':');
-    startDateTime.setHours(parseInt(startHour), parseInt(startMinute));
+  // Format the date and time for calendar integration
+  const formatGoogleCalendarDate = (date: Date, timeStr: string) => {
+    const [startTime] = timeStr.split(' - ');
+    const [hours, minutes] = startTime.split(':');
     
-    const endDateTime = new Date(startDateTime);
-    endDateTime.setHours(endDateTime.getHours() + 2); // Assuming 2 hour events
+    const eventDate = new Date(date);
+    eventDate.setHours(parseInt(hours));
+    eventDate.setMinutes(parseInt(minutes));
     
-    const startStr = startDateTime.toISOString().replace(/-|:|\.\d\d\d/g, '');
-    const endStr = endDateTime.toISOString().replace(/-|:|\.\d\d\d/g, '');
+    // Add 1 hour as default duration
+    const endDate = new Date(eventDate);
+    endDate.setHours(endDate.getHours() + 1);
     
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}`;
+    const formatDateForGoogle = (date: Date) => {
+      return date.toISOString().replace(/-|:|\.\d+/g, '');
+    };
+    
+    return {
+      start: formatDateForGoogle(eventDate),
+      end: formatDateForGoogle(endDate)
+    };
   };
   
-  // Generate Outlook Calendar link
-  const generateOutlookCalLink = () => {
-    const startDateTime = new Date(date);
-    const [startHour, startMinute] = time.split(' - ')[0].split(':');
-    startDateTime.setHours(parseInt(startHour), parseInt(startMinute));
-    
-    const endDateTime = new Date(startDateTime);
-    endDateTime.setHours(endDateTime.getHours() + 2); // Assuming 2 hour events
-    
-    return `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(title)}&startdt=${startDateTime.toISOString()}&enddt=${endDateTime.toISOString()}&body=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}`;
-  };
-
-  if (!(isRegistered || status !== 'ended')) {
+  // Only show calendar buttons for upcoming events or for registered users
+  if (status === 'ended' && !isRegistered) {
     return null;
   }
   
+  const { start, end } = formatGoogleCalendarDate(date, time);
+  
+  const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}&sf=true&output=xml`;
+  
+  // Function to generate iCal file
+  const generateICalFile = () => {
+    const formatICalDate = (date: Date) => {
+      return date.toISOString().replace(/-|:|\.\d+/g, '').slice(0, -1);
+    };
+    
+    const [startTime] = time.split(' - ');
+    const [hours, minutes] = startTime.split(':');
+    
+    const eventDate = new Date(date);
+    eventDate.setHours(parseInt(hours));
+    eventDate.setMinutes(parseInt(minutes));
+    
+    // Add 1 hour as default duration
+    const endDate = new Date(eventDate);
+    endDate.setHours(endDate.getHours() + 1);
+    
+    const icalStart = formatICalDate(eventDate);
+    const icalEnd = formatICalDate(endDate);
+    
+    const icalContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//hacksw/handcal//NONSGML v1.0//EN',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      `DTSTART:${icalStart}`,
+      `DTEND:${icalEnd}`,
+      `SUMMARY:${title}`,
+      `DESCRIPTION:${description}`,
+      `LOCATION:${location}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+    
+    const blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8' });
+    const href = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = href;
+    link.setAttribute('download', `${title.replace(/\s+/g, '-')}.ics`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   return (
-    <div className="flex space-x-2 mt-2">
-      <Button 
-        variant="outline" 
-        size="sm" 
-        className="flex-1"
-        onClick={() => window.open(generateGoogleCalLink(), '_blank')}
-      >
-        <Calendar size={16} className="mr-2" />
-        Add to Google Calendar
-      </Button>
-      <Button 
-        variant="outline" 
-        size="sm" 
-        className="flex-1"
-        onClick={() => window.open(generateOutlookCalLink(), '_blank')}
-      >
-        <Calendar size={16} className="mr-2" />
-        Add to Outlook
-      </Button>
+    <div className="flex justify-end mt-2" onClick={(e) => e.stopPropagation()}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="text-xs">
+            <Calendar className="h-3.5 w-3.5 mr-1" />
+            Add to Calendar
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => window.open(googleCalendarUrl, '_blank')}>
+            Google Calendar
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={generateICalFile}>
+            Apple / Outlook Calendar
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
