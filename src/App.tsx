@@ -32,6 +32,7 @@ import Leaderboard from '@/pages/Leaderboard';
 import Analytics from '@/pages/Analytics';
 import ContentCreatorDashboard from '@/pages/ContentCreatorDashboard';
 import ContentManagement from '@/pages/ContentManagement';
+import Matchmaker from '@/pages/Matchmaker';
 import * as Settings from '@/pages/settings';
 import NotFound from '@/pages/NotFound';
 import { PointsProvider } from '@/context/PointsContext';
@@ -59,6 +60,8 @@ function App() {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/members" element={<Members />} />
             <Route path="/create-space" element={<CreateSpace />} />
+            <Route path="/matchmaker" element={<Matchmaker />} />
+            <Route path="/ai-matchmaker" element={<Matchmaker />} />
             
             {/* Points related routes */}
             <Route path="/points" element={<PointsDashboard />} />

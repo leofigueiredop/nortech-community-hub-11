@@ -19,7 +19,7 @@ const ContentSection: React.FC = () => {
     { id: '2', to: '/discussions', icon: <MessageSquare size={18} />, label: 'Discussions' },
     { id: '3', to: '/library', icon: <Library size={18} />, label: 'Content Library' },
     { id: '4', to: '/events', icon: <Calendar size={18} />, label: 'Events', additionalPaths: ['/events/weekly', '/events/calendar'] },
-    { id: '5', to: '/ai-matchmaker', icon: <Users size={18} />, label: 'AI Matchmaker' },
+    { id: '5', to: '/matchmaker', icon: <Users size={18} />, label: 'Matchmaker' },
     { id: '6', to: '/points', icon: <Trophy size={18} />, label: 'Points', additionalPaths: ['/leaderboard', '/points/store'] },
   ]);
 
