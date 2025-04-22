@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -55,7 +54,7 @@ const Step2Authentication: React.FC = () => {
       name: '',
       email: '',
       password: '',
-      termsAccepted: false
+      termsAccepted: false // This is okay as default, validation happens on submit
     }
   });
 

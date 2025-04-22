@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Star, Award, ArrowRight, Download, BookOpen } from 'lucide-react';
+import { Star, Award, ArrowRight, Download, BookOpen, User, Calendar } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const Step7Completion: React.FC = () => {
@@ -121,7 +121,7 @@ const Step7Completion: React.FC = () => {
               <span>Explore content</span>
             </div>
             <div className="flex flex-col items-center">
-              <Users className="h-5 w-5 mb-1" />
+              <User className="h-5 w-5 mb-1" />
               <span>Join discussions</span>
             </div>
             <div className="flex flex-col items-center">
