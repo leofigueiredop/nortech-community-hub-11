@@ -54,8 +54,8 @@ const Step2Authentication: React.FC = () => {
       name: '',
       email: '',
       password: '',
-      termsAccepted: false // This is okay as default, validation happens on submit
-    }
+      termsAccepted: undefined
+    } as Partial<RegisterFormValues>
   });
 
   const onLoginSubmit = async (data: LoginFormValues) => {
