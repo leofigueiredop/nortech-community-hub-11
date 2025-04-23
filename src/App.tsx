@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
@@ -96,6 +95,7 @@ function App() {
               </Route>
               
               <Route path="/onboarding" element={<OnboardingLayout />}>
+                <Route path="" element={<Welcome />} />
                 <Route path="community-type" element={<CommunityType />} />
                 <Route path="community" element={<Community />} />
                 <Route path="community-templates" element={<CommunityTemplates />} />
