@@ -27,6 +27,7 @@ import Migration from '@/pages/onboarding/Migration';
 import MembershipPlans from '@/pages/onboarding/MembershipPlans';
 import InviteMembers from '@/pages/onboarding/InviteMembers';
 import FinalStep from '@/pages/onboarding/FinalStep';
+import Welcome from '@/pages/onboarding/Welcome';
 import Leaderboard from '@/pages/Leaderboard';
 import Analytics from '@/pages/Analytics';
 import ContentCreatorDashboard from '@/pages/ContentCreatorDashboard';
@@ -75,14 +76,12 @@ function App() {
               <Route path="/matchmaker" element={<Matchmaker />} />
               <Route path="/live-streams" element={<LiveStreams />} />
               
-              {/* Points related routes */}
               <Route path="/points" element={<PointsDashboard />} />
               <Route path="/points-dashboard" element={<PointsDashboard />} />
               <Route path="/points/store" element={<PointsStore />} />
               <Route path="/points-store" element={<PointsStore />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               
-              {/* New authentication routes */}
               <Route path="/auth" element={<AuthOnboardingLayout />}>
                 <Route path="" element={<Step1CommunityContext />} />
                 <Route path=":communityId" element={<Step1CommunityContext />} />
@@ -109,7 +108,6 @@ function App() {
               <Route path="/content-creator-dashboard" element={<ContentCreatorDashboard />} />
               <Route path="/content-management" element={<ContentManagement />} />
               
-              {/* Settings routes */}
               <Route path="/settings" element={<Settings.Index />} />
               <Route path="/settings/general" element={<Settings.General />} />
               <Route path="/settings/branding" element={<Settings.Branding />} />

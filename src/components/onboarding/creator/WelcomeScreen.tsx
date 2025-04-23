@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Building2 } from 'lucide-react';
+import { ArrowRight, Building2, ArrowUpRight } from 'lucide-react';
 import CreatorOnboardingLayout from './CreatorOnboardingLayout';
 
 const WelcomeScreen: React.FC = () => {
