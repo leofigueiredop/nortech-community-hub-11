@@ -40,7 +40,6 @@ import { AuthProvider } from '@/context/AuthContext';
 import * as Settings from '@/pages/settings';
 import LiveStreams from '@/pages/LiveStreams';
 
-// Import new auth pages
 import AuthOnboardingLayout from '@/pages/auth/OnboardingLayout';
 import Step1CommunityContext from '@/pages/auth/Step1CommunityContext';
 import Step2Authentication from '@/pages/auth/Step2Authentication';

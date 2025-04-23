@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ArrowUpRight } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 
 interface CreatorOnboardingLayoutProps {
   children: React.ReactNode;
@@ -10,19 +9,18 @@ interface CreatorOnboardingLayoutProps {
 
 const CreatorOnboardingLayout: React.FC<CreatorOnboardingLayoutProps> = ({ children }) => {
   const handleTalkToSales = () => {
-    // Here you would integrate with your CRM or open Calendly
     window.open('https://calendly.com/your-sales-team', '_blank');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 dark:from-gray-950 dark:to-purple-950 relative">
       <Button
         variant="outline"
-        className="fixed top-4 right-4 hover:bg-white/90"
         onClick={handleTalkToSales}
+        className="fixed top-4 right-4 z-50 bg-white dark:bg-gray-800 shadow-lg border-purple-200 hover:border-purple-300 hover:bg-purple-50"
       >
-        💼 Scale faster? Talk to Sales
-        <ArrowUpRight className="ml-2 h-4 w-4" />
+        <MessageSquare className="w-4 h-4 mr-2 text-purple-600" />
+        Talk to Sales Team
       </Button>
       
       {children}
