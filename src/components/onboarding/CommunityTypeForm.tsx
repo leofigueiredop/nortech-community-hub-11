@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -88,8 +89,8 @@ const CommunityTypeForm: React.FC = () => {
     });
     
     setTimeout(() => {
-      // Go to templates selection
-      navigate('/onboarding/community-templates');
+      // Corrigido: direcionar para a página de comunidade ao invés de templates
+      navigate('/onboarding/community');
     }, 1500);
   };
 

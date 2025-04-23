@@ -10,7 +10,7 @@ const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
 
   const handleStartSetup = () => {
-    navigate('/onboarding/community-type');
+    navigate('/onboarding/creator');
   };
 
   return (

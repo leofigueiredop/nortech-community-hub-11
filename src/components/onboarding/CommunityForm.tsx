@@ -5,6 +5,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
+import { Progress } from '@/components/ui/progress';
+import { toast } from '@/components/ui/use-toast';
+import { ArrowRight } from 'lucide-react';
 
 interface FormData {
   communityName: string;
@@ -25,15 +28,33 @@ const CommunityForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/onboarding/profile');
+    
+    // Salvar dados da comunidade
+    localStorage.setItem('communityData', JSON.stringify(formData));
+    localStorage.setItem('onboardingStep', '4');
+    
+    // Mostrar feedback
+    toast({
+      title: "🎖️ Achievement Unlocked!",
+      description: "Community details saved (+15 XP)",
+      duration: 3000,
+    });
+    
+    // Navegar para próxima etapa
+    navigate('/onboarding/creator');
   };
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardContent className="pt-6">
-        <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 bg-nortech-purple rounded-lg flex items-center justify-center">
-            <span className="text-white text-4xl font-bold">C</span>
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-20 h-20 bg-nortech-purple rounded-lg flex items-center justify-center mb-4">
+            <span className="text-white text-4xl font-bold">N</span>
+          </div>
+          
+          <div className="w-full mb-6">
+            <Progress value={66.6} className="h-2 w-full" />
+            <p className="text-xs text-center text-muted-foreground mt-1">Step 4 of 6</p>
           </div>
         </div>
         
@@ -73,9 +94,12 @@ const CommunityForm: React.FC = () => {
             </div>
           </div>
           
-          <div className="pt-4 flex justify-end">
-            <Button type="submit" className="bg-nortech-purple hover:bg-nortech-purple/90">
-              Next
+          <div className="pt-4">
+            <Button 
+              type="submit" 
+              className="w-full bg-nortech-purple hover:bg-nortech-purple/90"
+            >
+              Continue <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </form>

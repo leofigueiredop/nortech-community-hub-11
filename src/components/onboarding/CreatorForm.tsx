@@ -45,8 +45,8 @@ const CreatorForm: React.FC = () => {
     setShowBadge(true);
     
     setTimeout(() => {
-      // Navigate to migration question
-      navigate('/onboarding/migration');
+      // Corrigido: direcionar para a página de tipo de comunidade
+      navigate('/onboarding/community-type');
     }, 1500);
     
     // Show achievement toast
@@ -68,7 +68,8 @@ const CreatorForm: React.FC = () => {
     setShowBadge(true);
     
     setTimeout(() => {
-      navigate('/onboarding/migration');
+      // Corrigido: direcionar para a página de tipo de comunidade
+      navigate('/onboarding/community-type');
     }, 1500);
     
     // Show achievement toast
