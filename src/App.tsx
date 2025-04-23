@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
@@ -21,9 +22,7 @@ import PointsDashboard from '@/pages/PointsDashboard';
 import OnboardingLayout from '@/pages/OnboardingLayout';
 import CommunityType from '@/pages/onboarding/CommunityType';
 import Community from '@/pages/onboarding/Community';
-import CommunityTemplates from '@/pages/onboarding/CommunityTemplates';
 import Creator from '@/pages/onboarding/Creator';
-import Migration from '@/pages/onboarding/Migration';
 import MembershipPlans from '@/pages/onboarding/MembershipPlans';
 import InviteMembers from '@/pages/onboarding/InviteMembers';
 import FinalStep from '@/pages/onboarding/FinalStep';
@@ -96,9 +95,7 @@ function App() {
                 <Route path="" element={<Welcome />} />
                 <Route path="community-type" element={<CommunityType />} />
                 <Route path="community" element={<Community />} />
-                <Route path="community-templates" element={<CommunityTemplates />} />
                 <Route path="creator" element={<Creator />} />
-                <Route path="migration" element={<Migration />} />
                 <Route path="membership-plans" element={<MembershipPlans />} />
                 <Route path="invite-members" element={<InviteMembers />} />
                 <Route path="final-step" element={<FinalStep />} />
