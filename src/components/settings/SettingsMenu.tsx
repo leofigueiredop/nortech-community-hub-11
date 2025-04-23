@@ -1,92 +1,165 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { 
-  Settings, Palette, Smartphone, ListChecks, Globe, Bot, 
-  MessageSquare, Share2, ArrowLeftRight, Bell, Trophy,
-  FileText, Mail, DollarSign, BarChart3, Shield, Layout,
-  Workflow
+  Settings, Palette, Globe, RefreshCw, 
+  MessageSquare, FileText, Layout, Shield, Workflow, Bot, Trophy,
+  CreditCard, DollarSign, BarChart3, Share2, Bell, Mail
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search, Star } from 'lucide-react';
 
 const settingsGroups = [
   {
-    title: 'General',
+    title: '🛠 Community Setup',
+    description: 'Configure the foundational setup of your community',
     items: [
-      { name: 'General Settings', icon: <Settings className="mr-2 h-4 w-4" />, path: '/settings/general' },
-      { name: 'Branding', icon: <Palette className="mr-2 h-4 w-4" />, path: '/settings/branding' },
-      { name: 'Mobile App', icon: <Smartphone className="mr-2 h-4 w-4" />, path: '/settings/mobile' },
-      { name: 'Defaults', icon: <ListChecks className="mr-2 h-4 w-4" />, path: '/settings/defaults' },
+      { name: 'General Settings', icon: <Settings className="mr-2 h-5 w-5" />, path: '/settings/general', description: 'Basic community configuration and options' },
+      { name: 'Branding', icon: <Palette className="mr-2 h-5 w-5" />, path: '/settings/branding', description: 'Customize the look and feel of your community' },
+      { name: 'Domain', icon: <Globe className="mr-2 h-5 w-5" />, path: '/settings/domain', description: 'Connect and manage custom domains' },
+      { name: 'Migration', icon: <RefreshCw className="mr-2 h-5 w-5" />, path: '/settings/migration', description: 'Import or export community data' },
     ]
   },
   {
-    title: 'Content & Engagement',
+    title: '🧩 Content & Engagement',
+    description: 'Manage how content is created, automated, moderated and gamified',
     items: [
-      { name: 'Points Configuration', icon: <Trophy className="mr-2 h-4 w-4" />, path: '/settings/points-configuration' },
-      { name: 'Domain', icon: <Globe className="mr-2 h-4 w-4" />, path: '/settings/domain' },
+      { name: 'Marketing', icon: <MessageSquare className="mr-2 h-5 w-5" />, path: '/settings/marketing', description: 'Tools to grow and promote your community' },
+      { name: 'Posts', icon: <FileText className="mr-2 h-5 w-5" />, path: '/settings/posts', description: 'Configure post types and settings' },
+      { name: 'Spaces', icon: <Layout className="mr-2 h-5 w-5" />, path: '/settings/spaces', description: 'Organize community content into spaces' },
+      { name: 'Moderation', icon: <Shield className="mr-2 h-5 w-5" />, path: '/settings/moderation', description: 'Tools to maintain community standards' },
+      { name: 'Workflows', icon: <Workflow className="mr-2 h-5 w-5" />, path: '/settings/workflows', description: 'Automate community processes and actions' },
+      { name: 'AI Agents', icon: <Bot className="mr-2 h-5 w-5" />, path: '/settings/ai-agents', description: 'Configure AI assistants for your community' },
+      { name: 'Points Configuration', icon: <Trophy className="mr-2 h-5 w-5" />, path: '/settings/points-configuration', description: 'Set up gamification and rewards' },
     ]
   },
   {
-    title: 'Content Management',
+    title: '💸 Monetization',
+    description: 'Manage pricing, track revenue and activate growth tools',
     items: [
-      { name: 'Marketing', icon: <MessageSquare className="mr-2 h-4 w-4" />, path: '/settings/marketing' },
-      { name: 'Posts', icon: <FileText className="mr-2 h-4 w-4" />, path: '/settings/posts' },
-      { name: 'Spaces', icon: <Layout className="mr-2 h-4 w-4" />, path: '/settings/spaces' },
-      { name: 'Moderation', icon: <Shield className="mr-2 h-4 w-4" />, path: '/settings/moderation' },
-      { name: 'Workflows', icon: <Workflow className="mr-2 h-4 w-4" />, path: '/settings/workflows' },
-      { name: 'AI Agents', icon: <Bot className="mr-2 h-4 w-4" />, path: '/settings/ai-agents' },
+      { name: 'Nortech Plans', icon: <CreditCard className="mr-2 h-5 w-5" />, path: '/settings/plans', description: 'Configure subscription plans and pricing' },
+      { name: 'Member Subscriptions', icon: <DollarSign className="mr-2 h-5 w-5" />, path: '/settings/subscriptions', description: 'Manage member subscription settings' },
+      { name: 'Paywall Setup', icon: <DollarSign className="mr-2 h-5 w-5" />, path: '/settings/paywall', description: 'Configure content access rules' },
+      { name: 'Analytics', icon: <BarChart3 className="mr-2 h-5 w-5" />, path: '/settings/analytics', description: 'Community growth and engagement metrics' },
+      { name: 'Affiliates', icon: <Share2 className="mr-2 h-5 w-5" />, path: '/settings/affiliates', description: 'Manage affiliate programs and tracking' },
     ]
   },
   {
-    title: 'Monetization',
+    title: '🧑‍🤝‍🧑 Member Experience',
+    description: 'Configure how members interact, receive messages and see legal terms',
     items: [
-      { name: 'Nortech Plans', icon: <DollarSign className="mr-2 h-4 w-4" />, path: '/settings/plans' },
-      { name: 'Member Subscriptions', icon: <DollarSign className="mr-2 h-4 w-4" />, path: '/settings/subscriptions' },
-      { name: 'Paywall Setup', icon: <DollarSign className="mr-2 h-4 w-4" />, path: '/settings/paywall' },
-      { name: 'Analytics', icon: <BarChart3 className="mr-2 h-4 w-4" />, path: '/settings/analytics' },
-      { name: 'Affiliates', icon: <Share2 className="mr-2 h-4 w-4" />, path: '/settings/affiliates' },
-    ]
-  },
-  {
-    title: 'Communication',
-    items: [
-      { name: 'Messaging', icon: <MessageSquare className="mr-2 h-4 w-4" />, path: '/settings/messaging' },
-      { name: 'Notifications', icon: <Bell className="mr-2 h-4 w-4" />, path: '/settings/notifications' },
-    ]
-  },
-  {
-    title: 'Member Experience',
-    items: [
-      { name: 'Legal', icon: <FileText className="mr-2 h-4 w-4" />, path: '/settings/legal' },
-      { name: 'Digest', icon: <Mail className="mr-2 h-4 w-4" />, path: '/settings/digest' },
-    ]
-  },
-  {
-    title: 'Technical',
-    items: [
-      { name: 'Migration', icon: <ArrowLeftRight className="mr-2 h-4 w-4" />, path: '/settings/migration' },
+      { name: 'Legal', icon: <FileText className="mr-2 h-5 w-5" />, path: '/settings/legal', description: 'Manage terms of service and privacy policies' },
+      { name: 'Digest', icon: <Mail className="mr-2 h-5 w-5" />, path: '/settings/digest', description: 'Configure email digests and newsletters' },
+      { name: 'Notifications', icon: <Bell className="mr-2 h-5 w-5" />, path: '/settings/notifications', description: 'Manage notification preferences' },
     ]
   }
 ];
 
 const SettingsMenu: React.FC = () => {
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [pinnedItems, setPinnedItems] = React.useState(["analytics", "branding"]);
+  
+  const togglePin = (itemName: string) => {
+    setPinnedItems(prev => 
+      prev.includes(itemName) 
+        ? prev.filter(item => item !== itemName)
+        : [...prev, itemName]
+    );
+  };
+  
+  // Filter settings based on search query
+  const filteredGroups = searchQuery.trim() === "" 
+    ? settingsGroups 
+    : settingsGroups.map(group => ({
+        ...group,
+        items: group.items.filter(item => 
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      })).filter(group => group.items.length > 0);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {settingsGroups.map((group, index) => (
-        <div key={index} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="font-medium text-gray-900 dark:text-white">{group.title}</h3>
+    <div className="space-y-8">
+      <div className="relative max-w-md mx-auto md:mx-0">
+        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+        <Input
+          placeholder="Search settings..."
+          className="pl-9 bg-white dark:bg-gray-800"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+      
+      {pinnedItems.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Star className="h-4 w-4 text-amber-400" />
+            <h2 className="font-semibold text-lg">Pinned Settings</h2>
           </div>
-          <div className="p-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {settingsGroups.flatMap(group => 
+              group.items.filter(item => 
+                pinnedItems.includes(item.name.toLowerCase())
+              ).map((item, itemIndex) => (
+                <Link key={`pinned-${itemIndex}`} to={item.path}>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow flex items-center gap-3 h-full">
+                    <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full p-2">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900 dark:text-gray-100">{item.name}</h3>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="ml-auto" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        togglePin(item.name.toLowerCase());
+                      }}
+                    >
+                      <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    </Button>
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {filteredGroups.map((group, index) => (
+        <div key={index}>
+          <div className="border-b border-gray-200 dark:border-gray-700 mb-6 pb-2">
+            <h2 className="text-xl font-bold">{group.title}</h2>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">{group.description}</p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {group.items.map((item, itemIndex) => (
               <Link key={itemIndex} to={item.path}>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start mb-1 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                >
-                  {item.icon}
-                  {item.name}
-                </Button>
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow h-full">
+                  <div className="flex items-start">
+                    <div className="bg-gray-100 dark:bg-gray-700 rounded-full p-2 mr-3">
+                      {item.icon}
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="font-medium text-gray-900 dark:text-gray-100">{item.name}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{item.description}</p>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        togglePin(item.name.toLowerCase());
+                      }}
+                    >
+                      <Star className={`h-4 w-4 ${pinnedItems.includes(item.name.toLowerCase()) ? 'fill-amber-400 text-amber-400' : 'text-gray-400'}`} />
+                    </Button>
+                  </div>
+                </div>
               </Link>
             ))}
           </div>

@@ -1,14 +1,15 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Star } from 'lucide-react';
 
-export interface SettingsMenuItemProps {
+interface SettingsMenuItemProps {
   icon: React.ReactNode;
   label: string;
   to: string;
   active?: boolean;
-  badge?: string;
-  className?: string;
+  isPinned?: boolean;
+  onPin?: () => void;
 }
 
 const SettingsMenuItem: React.FC<SettingsMenuItemProps> = ({ 
@@ -16,33 +17,33 @@ const SettingsMenuItem: React.FC<SettingsMenuItemProps> = ({
   label, 
   to, 
   active = false,
-  badge,
-  className
+  isPinned = false,
+  onPin
 }) => {
   return (
-    <Link 
-      to={to} 
-      className={`
-        flex items-center justify-between px-3 py-1.5 my-0.5 text-sm rounded-md
-        ${active 
-          ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 font-medium' 
-          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700/50'}
-        ${className || ''}
-      `}
-    >
-      <div className="flex items-center gap-2">
-        <span className={`${active ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400'}`}>
-          {icon}
-        </span>
-        <span>{label}</span>
-      </div>
+    <div className="flex items-center group">
+      <Link
+        to={to}
+        className={`flex items-center gap-3 px-3 py-2 rounded-md flex-grow ${
+          active 
+            ? "bg-purple-100 text-purple-900 dark:bg-purple-900/50 dark:text-purple-100" 
+            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+        }`}
+      >
+        <div className="text-gray-500 dark:text-gray-400">{icon}</div>
+        <span className="text-sm font-medium">{label}</span>
+      </Link>
       
-      {badge && (
-        <span className="text-xs bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 px-1.5 py-0.5 rounded-full">
-          {badge}
-        </span>
+      {onPin && (
+        <button 
+          onClick={onPin} 
+          className="p-1 opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+          title={isPinned ? "Unpin" : "Pin to favorites"}
+        >
+          <Star className={`h-4 w-4 ${isPinned ? "fill-amber-400 text-amber-400" : "text-gray-400"}`} />
+        </button>
       )}
-    </Link>
+    </div>
   );
 };
 
