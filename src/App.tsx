@@ -107,10 +107,7 @@ function App() {
               <Route path="/settings" element={<Settings.Index />} />
               <Route path="/settings/general" element={<Settings.General />} />
               <Route path="/settings/branding" element={<Settings.Branding />} />
-              <Route path="/settings/defaults" element={<Settings.Defaults />} />
               <Route path="/settings/integration" element={<Settings.Integration />} />
-              <Route path="/settings/messaging" element={<Settings.Messaging />} />
-              <Route path="/settings/mobile" element={<Settings.Mobile />} />
               <Route path="/settings/domain" element={<Settings.Domain />} />
               <Route path="/settings/points-configuration" element={<Settings.PointsConfiguration />} />
               <Route path="/settings/migration" element={<Settings.Migration />} />

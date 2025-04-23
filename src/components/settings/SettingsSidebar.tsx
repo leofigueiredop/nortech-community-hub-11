@@ -7,7 +7,7 @@ import {
   Globe, Search, Star
 } from 'lucide-react';
 import SectionDivider from './SectionDivider';
-import SettingsMenuItem from '../SettingsMenuItem';
+import SettingsMenuItem from './SettingsMenuItem';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
