@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { 
   Settings, Palette, RefreshCw, Trophy, 
   MessageSquare, FileText, Layout, Shield, Workflow, Bot,
-  DollarSign, BarChart3, Share2, CreditCard, Bell, Mail,
+  DollarSign, BarChart3, Share2, CreditCard, Bell,
   Globe, Search, Star
 } from 'lucide-react';
 import SectionDivider from './SectionDivider';
@@ -246,14 +245,6 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection = "gene
             active={activeSection === "legal"} 
             onPin={() => togglePin("legal")}
             isPinned={pinnedItems.includes("legal")}
-          />
-          <SettingsMenuItem 
-            icon={<Mail size={18} />} 
-            label="Digest" 
-            to="/settings/digest" 
-            active={activeSection === "digest"} 
-            onPin={() => togglePin("digest")}
-            isPinned={pinnedItems.includes("digest")}
           />
           <SettingsMenuItem 
             icon={<Bell size={18} />} 

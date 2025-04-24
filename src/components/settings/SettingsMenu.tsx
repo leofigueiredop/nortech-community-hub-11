@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Settings, Palette, Globe, RefreshCw, 
   MessageSquare, FileText, Layout, Shield, Workflow, Bot, Trophy,
-  CreditCard, DollarSign, BarChart3, Share2, Bell, Mail
+  CreditCard, DollarSign, BarChart3, Share2, Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,7 +49,6 @@ const settingsGroups = [
     description: 'Configure how members interact, receive messages and see legal terms',
     items: [
       { name: 'Legal', icon: <FileText className="mr-2 h-5 w-5" />, path: '/settings/legal', description: 'Manage terms of service and privacy policies' },
-      { name: 'Digest', icon: <Mail className="mr-2 h-5 w-5" />, path: '/settings/digest', description: 'Configure email digests and newsletters' },
       { name: 'Notifications', icon: <Bell className="mr-2 h-5 w-5" />, path: '/settings/notifications', description: 'Manage notification preferences' },
     ]
   }
@@ -68,7 +66,6 @@ const SettingsMenu: React.FC = () => {
     );
   };
   
-  // Filter settings based on search query
   const filteredGroups = searchQuery.trim() === "" 
     ? settingsGroups 
     : settingsGroups.map(group => ({

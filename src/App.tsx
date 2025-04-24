@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
@@ -124,7 +123,7 @@ function App() {
               <Route path="/settings/workflows" element={<Settings.Workflows />} />
               <Route path="/settings/analytics" element={<Settings.Analytics />} />
               <Route path="/settings/affiliates" element={<Settings.Affiliates />} />
-
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
