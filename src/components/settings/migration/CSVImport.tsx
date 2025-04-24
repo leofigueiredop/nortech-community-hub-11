@@ -105,7 +105,7 @@ const CSVImport: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {['Name', 'Email', 'Role', 'Join Date', 'Tags'].map((field) => (
+                  {['Name', 'Email', 'Role'].map((field) => (
                     <TableRow key={field}>
                       <TableCell className="font-medium">{field}</TableCell>
                       <TableCell>
@@ -118,9 +118,7 @@ const CSVImport: React.FC = () => {
                       <TableCell className="text-sm text-muted-foreground">
                         {field === 'Name' ? 'John Doe' : 
                           field === 'Email' ? 'john@example.com' : 
-                          field === 'Role' ? 'Member' :
-                          field === 'Join Date' ? '2023-01-15' : 
-                          'beginner,javascript'}
+                          field === 'Role' ? 'Member' : ''}
                       </TableCell>
                     </TableRow>
                   ))}

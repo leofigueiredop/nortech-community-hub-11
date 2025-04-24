@@ -11,33 +11,25 @@ const historyItems = [
     id: 1, 
     date: '2023-06-15', 
     type: 'Import', 
-    platform: 'Discord', 
+    source: 'CSV Upload', 
     status: 'completed',
-    items: '156 members, 2,450 messages'
+    items: '156 members'
   },
   { 
     id: 2, 
     date: '2023-06-10', 
     type: 'Export', 
-    platform: 'All Data', 
+    source: 'Members', 
     status: 'completed',
-    items: 'Full backup'
+    items: 'All members'
   },
   { 
     id: 3, 
     date: '2023-05-28', 
     type: 'Import', 
-    platform: 'CSV', 
+    source: 'CSV', 
     status: 'failed',
     items: 'Format error at row 23'
-  },
-  { 
-    id: 4, 
-    date: '2023-05-15', 
-    type: 'Export', 
-    platform: 'Members Only', 
-    status: 'processing',
-    items: 'Generating...'
   }
 ];
 
@@ -70,7 +62,7 @@ const MigrationHistory: React.FC = () => {
             <TableRow key={item.id}>
               <TableCell>{item.date}</TableCell>
               <TableCell>{item.type}</TableCell>
-              <TableCell>{item.platform}</TableCell>
+              <TableCell>{item.source}</TableCell>
               <TableCell>
                 <Badge 
                   variant="outline" 
