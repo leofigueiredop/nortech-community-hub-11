@@ -1,10 +1,14 @@
 
 import { useState } from 'react';
 import { ContentItem } from '@/types/library';
-import { mockLibraryData } from '@/data/mockLibraryData';
+import { CONTENT_ITEMS } from '@/data/mockLibraryData';
 import { sampleCourse } from '@/data/mockCourseData';
+import { useContentItems } from '@/hooks/useContentItems';
 
 export const useLibraryContent = () => {
+  // We'll extend the base useContentItems hook to get all filtering functionality
+  const contentItemsHook = useContentItems();
+  
   const [content] = useState<ContentItem[]>([
     {
       id: sampleCourse.id,
@@ -28,10 +32,12 @@ export const useLibraryContent = () => {
       pointsValue: 500,
       ...sampleCourse
     },
-    ...mockLibraryData
+    ...CONTENT_ITEMS
   ]);
 
+  // Return both the local content state and all the filtering functionality from useContentItems
   return {
+    ...contentItemsHook,
     content,
     loading: false,
     error: null

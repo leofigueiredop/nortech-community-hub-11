@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ContentItem, CourseModule, CourseModuleItem } from '@/types/library';
 import { Button } from '@/components/ui/button';
@@ -85,6 +86,7 @@ const CourseMaterialsTab: React.FC<CourseMaterialsTabProps> = ({
   
   const allMaterials = [...courseMaterials, ...lessonMaterials];
   
+  // Define the getIconForType function
   const getIconForType = (type: string) => {
     switch (type) {
       case 'pdf':
