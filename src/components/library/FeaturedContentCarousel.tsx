@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ContentItem } from '@/types/library';
 import { 
@@ -26,18 +27,20 @@ const FeaturedContentCarousel: React.FC<FeaturedContentCarouselProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   
+  // Create an autoplay plugin reference
   const autoplayPlugin = React.useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true })
   );
 
+  // Use effect to handle current index changes for dot indicators
   useEffect(() => {
-    if (!isHovered && autoplayPlugin.current) {
+    if (!isHovered) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % items.length);
       }, 5000);
       return () => clearInterval(interval);
     }
-  }, [isHovered, autoplayPlugin.current, items.length]);
+  }, [isHovered, items.length]);
   
   if (!items.length) return null;
   

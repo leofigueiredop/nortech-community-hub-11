@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -70,6 +71,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
     });
   };
 
+  // Special handler for Course format
   if (item.format === 'course') {
     return (
       <Dialog open={!!item} onOpenChange={onClose}>
@@ -82,6 +84,12 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6">
+              <div className="mb-2 flex items-center">
+                <span className="bg-primary text-white text-xs px-2 py-1 rounded-md">Course</span>
+                {item.accessLevel === 'premium' && (
+                  <span className="bg-amber-500 text-white text-xs px-2 py-1 rounded-md ml-2">Premium</span>
+                )}
+              </div>
               <h2 className="text-2xl font-bold text-white mb-2">{item.title}</h2>
               <p className="text-slate-200 text-sm line-clamp-2 mb-4">{item.description}</p>
               
@@ -91,7 +99,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
                   size="lg"
                   className="bg-primary text-white hover:bg-primary/90"
                 >
-                  Start Course
+                  Start Course <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
 
                 <div className="flex gap-2 ml-auto">
