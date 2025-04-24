@@ -26,7 +26,7 @@ export const useLibraryContent = () => {
       updatedAt: '2024-04-23T10:00:00Z',
       views: 1250,
       duration: 21600, // 6 hours in seconds
-      accessLevel: 'premium',
+      accessLevel: 'free', // Changed from premium to free
       featured: true,
       pointsEnabled: true,
       pointsValue: 500,

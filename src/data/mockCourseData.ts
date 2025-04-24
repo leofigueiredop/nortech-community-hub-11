@@ -6,7 +6,7 @@ export const sampleCourse: Course = {
   title: "React Mastery 2024",
   description: "Master modern React development with hands-on projects and advanced concepts. Learn hooks, state management, and best practices.",
   thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
-  accessLevel: "premium",
+  accessLevel: "free", // Changed from premium to free
   modules: [
     {
       id: "m1",

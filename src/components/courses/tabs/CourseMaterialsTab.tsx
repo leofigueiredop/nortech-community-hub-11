@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ContentItem, CourseModule, CourseModuleItem } from '@/types/library';
 import { Button } from '@/components/ui/button';
@@ -23,13 +22,27 @@ interface CourseMaterialsTabProps {
   isDarkMode: boolean;
 }
 
+const getIconForType = (type: string) => {
+  switch (type) {
+    case 'pdf':
+    case 'doc':
+      return <FileText className="h-5 w-5" />;
+    case 'link':
+      return <ExternalLink className="h-5 w-5" />;
+    case 'code':
+      return <FileText className="h-5 w-5" />;
+    case 'resource':
+    default:
+      return <FileBox className="h-5 w-5" />;
+  }
+};
+
 const CourseMaterialsTab: React.FC<CourseMaterialsTabProps> = ({
   course,
   currentLesson,
   currentModule,
   isDarkMode
 }) => {
-  // Mock materials data
   const courseMaterials: Material[] = [
     {
       id: '1',
@@ -86,33 +99,14 @@ const CourseMaterialsTab: React.FC<CourseMaterialsTabProps> = ({
   
   const allMaterials = [...courseMaterials, ...lessonMaterials];
   
-  // Define the getIconForType function
-  const getIconForType = (type: string) => {
-    switch (type) {
-      case 'pdf':
-      case 'doc':
-        return <FileText className="h-5 w-5" />;
-      case 'link':
-        return <ExternalLink className="h-5 w-5" />;
-      case 'code':
-        return <FileText className="h-5 w-5" />;
-      case 'resource':
-      default:
-        return <FileBox className="h-5 w-5" />;
-    }
-  };
-  
   const handleDownload = (material: Material) => {
     if (material.isPremium) {
-      // Handle premium content access
       console.log('Access premium content:', material);
       return;
     }
     
-    // In a real app, this would download or open the material
     console.log('Download material:', material);
     
-    // If it's a link, open in a new tab
     if (material.type === 'link') {
       window.open(material.url, '_blank');
     }
@@ -128,7 +122,6 @@ const CourseMaterialsTab: React.FC<CourseMaterialsTabProps> = ({
         </div>
       ) : (
         <div className="space-y-5">
-          {/* Course Materials Section */}
           <div>
             <h3 className="text-lg font-medium mb-3">Course Materials</h3>
             <div className="space-y-3">
@@ -143,7 +136,6 @@ const CourseMaterialsTab: React.FC<CourseMaterialsTabProps> = ({
             </div>
           </div>
           
-          {/* Lesson Materials Section (if any) */}
           {lessonMaterials.length > 0 && (
             <div>
               <h3 className="text-lg font-medium mb-3">
