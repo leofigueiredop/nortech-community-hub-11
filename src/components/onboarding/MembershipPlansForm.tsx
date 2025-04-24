@@ -1,307 +1,194 @@
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Check, Info } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
-import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowRight, Sparkles, Plus, DollarSign, CheckCircle2, X, Trash2 } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
-
-const formSchema = z.object({
-  planType: z.enum(['free', 'paid']),
-  planName: z.string().min(2, 'Plan name is required').optional(),
-  planPrice: z.number().min(0, 'Price must be at least 0').optional(),
-  planDescription: z.string().optional(),
-  features: z.array(z.string()).optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-interface PlanFeature {
-  id: string;
-  name: string;
-}
+import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { cn } from '@/lib/utils';
 
 const MembershipPlansForm: React.FC = () => {
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annually'>('annually');
   const navigate = useNavigate();
-  const [showBadge, setShowBadge] = useState(false);
-  const [isPaid, setIsPaid] = useState(false);
-  const [planFeatures, setPlanFeatures] = useState<string[]>([]);
-  const [newFeature, setNewFeature] = useState('');
   
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      planType: 'free',
-      features: [],
-    },
-  });
-  
-  const handlePlanTypeChange = (value: 'free' | 'paid') => {
-    setIsPaid(value === 'paid');
-  };
-  
-  const handleAddFeature = () => {
-    if (newFeature.trim() !== '' && !planFeatures.includes(newFeature.trim())) {
-      setPlanFeatures([...planFeatures, newFeature.trim()]);
-      setNewFeature('');
-    }
-  };
-  
-  const handleRemoveFeature = (featureToRemove: string) => {
-    setPlanFeatures(planFeatures.filter((feature) => feature !== featureToRemove));
-  };
-  
-  const onSubmit = (data: FormData) => {
-    form.setValue('features', planFeatures);
-    data.features = planFeatures;
-    
-    console.log('Membership plans data:', data);
-    
-    localStorage.setItem('membershipPlansData', JSON.stringify(data));
-    localStorage.setItem('onboardingStep', '6');
-    
-    setShowBadge(true);
-    
-    toast({
-      title: "🎖️ Achievement Unlocked!",
-      description: "Membership plans configured (+15 XP) - 100% completed!",
-      duration: 3000,
-    });
-    
-    setTimeout(() => {
-      navigate('/onboarding/final-step');
-    }, 1500);
-  };
-  
-  const handleSkip = () => {
-    localStorage.setItem('onboardingStep', '6');
-    
-    toast({
-      title: "Step skipped",
-      description: "You can configure membership plans later from the dashboard.",
-      duration: 3000,
-    });
-    
+  const handleNext = () => {
+    if (!selectedPlan) return;
+    // Here you would typically save the selected plan to your state/context
+    console.log(`Selected plan: ${selectedPlan}, billing: ${billingPeriod}`);
     navigate('/onboarding/final-step');
   };
+  
+  const plans = [
+    {
+      id: 'starter',
+      name: 'Starter',
+      price: 'Free',
+      description: 'Perfect for small communities just getting started',
+      features: [
+        'Up to 100 members',
+        'Basic discussion forums',
+        'Simple events calendar',
+        'Community announcements'
+      ]
+    },
+    {
+      id: 'growth',
+      name: 'Growth',
+      price: 49,
+      yearlyPrice: 470,
+      description: 'For growing communities with more engagement needs',
+      features: [
+        'Up to 1,000 members',
+        'Advanced discussion features',
+        'Content library & courses',
+        'Custom branding',
+        'Analytics dashboard'
+      ],
+      recommended: true
+    },
+    {
+      id: 'enterprise',
+      name: 'Enterprise',
+      price: 199,
+      yearlyPrice: 1990,
+      description: 'For large communities with advanced requirements',
+      features: [
+        'Unlimited members',
+        'White-label solution',
+        'SSO integration',
+        'API access',
+        'Dedicated support',
+        'Custom feature development'
+      ]
+    }
+  ];
 
   return (
-    <Card className="w-full max-w-3xl mx-auto relative">
-      {showBadge && (
-        <div className="absolute -top-5 -right-5 bg-nortech-purple text-white p-2 rounded-full animate-bounce shadow-lg">
-          <Sparkles className="h-6 w-6" />
-        </div>
-      )}
-      
-      <CardContent className="pt-6">
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-20 h-20 bg-nortech-purple rounded-lg flex items-center justify-center mb-4">
-            <span className="text-white text-4xl font-bold">N</span>
-          </div>
+    <div className="container mx-auto">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">Choose your Membership Plan</h1>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
+            Select the plan that best fits your community needs. You can always upgrade later.
+          </p>
           
-          <div className="w-full mb-6">
-            <Progress value={100} className="h-2 w-full" />
-            <p className="text-xs text-center text-muted-foreground mt-1">Step 6 of 6</p>
+          <div className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-800 p-1">
+            <Button
+              size="sm"
+              variant={billingPeriod === 'monthly' ? 'default' : 'ghost'}
+              className={cn(
+                "rounded-full",
+                billingPeriod === 'monthly' ? "bg-white dark:bg-gray-700" : ""
+              )}
+              onClick={() => setBillingPeriod('monthly')}
+            >
+              Monthly
+            </Button>
+            <Button
+              size="sm"
+              variant={billingPeriod === 'annually' ? 'default' : 'ghost'}
+              className={cn(
+                "rounded-full gap-2",
+                billingPeriod === 'annually' ? "bg-white dark:bg-gray-700" : ""
+              )}
+              onClick={() => setBillingPeriod('annually')}
+            >
+              Annually
+              <Badge variant="default" className="bg-green-600 text-white">Save 20%</Badge>
+            </Button>
           </div>
         </div>
         
-        <h2 className="text-2xl font-bold text-center mb-2">Configure Membership Plans</h2>
-        <p className="text-center text-muted-foreground mb-8">
-          Offer premium content and features with paid membership plans
-        </p>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="planType"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Plan Type</FormLabel>
-                  <FormControl>
-                    <Tabs defaultValue={field.value} className="w-full">
-                      <TabsList>
-                        <TabsTrigger 
-                          value="free"
-                          onClick={() => {
-                            field.onChange('free');
-                            handlePlanTypeChange('free');
-                          }}
-                        >
-                          Free
-                        </TabsTrigger>
-                        <TabsTrigger 
-                          value="paid"
-                          onClick={() => {
-                            field.onChange('paid');
-                            handlePlanTypeChange('paid');
-                          }}
-                        >
-                          Paid
-                        </TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            
-            {isPaid && (
-              <>
-                <Separator className="my-4" />
-                
-                <FormField
-                  control={form.control}
-                  name="planName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Plan Name</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Premium Membership" 
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Give your plan a clear and concise name.
-                      </FormDescription>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="planPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Plan Price</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input 
-                            type="number"
-                            placeholder="9.99" 
-                            className="pl-8"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormDescription>
-                        Set the monthly price for your premium plan.
-                      </FormDescription>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="planDescription"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Plan Description</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Access to exclusive content and community features" 
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Describe the benefits of your premium plan.
-                      </FormDescription>
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="space-y-2">
-                  <Label htmlFor="feature">Plan Features</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="feature"
-                      type="text"
-                      placeholder="Enter plan feature"
-                      value={newFeature}
-                      onChange={(e) => setNewFeature(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddFeature();
-                        }
-                      }}
-                    />
-                    <Button 
-                      type="button" 
-                      onClick={handleAddFeature}
-                      className="bg-nortech-purple hover:bg-nortech-purple/90"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                
-                {planFeatures.length > 0 && (
-                  <div className="bg-gray-50 p-4 rounded-md">
-                    <div className="flex items-center justify-between mb-2">
-                      <Label className="font-medium">Features included</Label>
-                      <span className="text-xs text-muted-foreground">{planFeatures.length} feature(s)</span>
-                    </div>
-                    <div className="space-y-2">
-                      {planFeatures.map((feature) => (
-                        <div key={feature} className="flex justify-between items-center bg-white p-2 rounded border">
-                          <span className="text-sm">{feature}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveFeature(feature)}
-                            className="h-6 w-6 p-0"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {plans.map((plan) => {
+            const isSelected = selectedPlan === plan.id;
+            const price = typeof plan.price === 'number' && billingPeriod === 'annually' && plan.yearlyPrice 
+              ? Math.round(plan.yearlyPrice / 12) 
+              : plan.price;
+              
+            return (
+              <Card 
+                key={plan.id} 
+                className={cn(
+                  "cursor-pointer transition-all hover:shadow-md border-2",
+                  isSelected ? "border-purple-600 dark:border-purple-400" : "border-transparent",
+                  plan.recommended ? "bg-gradient-to-b from-purple-50 to-white dark:from-purple-950 dark:to-gray-900" : ""
+                )}
+                onClick={() => setSelectedPlan(plan.id)}
+              >
+                {plan.recommended && (
+                  <div className="bg-purple-600 text-white text-xs font-medium py-1 text-center">
+                    Recommended
                   </div>
                 )}
-              </>
-            )}
-            
-            <div className="pt-4 flex justify-between">
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={handleSkip}
-              >
-                Skip for now
-              </Button>
-              
-              <Button 
-                type="submit" 
-                className="bg-nortech-purple hover:bg-nortech-purple/90"
-              >
-                Continue <ArrowRight className="ml-2 h-4 w-4" />
+                
+                <CardContent className="pt-6">
+                  <div className="mb-4">
+                    <h3 className="text-xl font-bold">{plan.name}</h3>
+                    <div className="flex items-baseline mt-1">
+                      <span className="text-3xl font-extrabold">
+                        {typeof price === 'number' ? `$${price}` : price}
+                      </span>
+                      {typeof price === 'number' && (
+                        <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">/mo</span>
+                      )}
+                    </div>
+                    {billingPeriod === 'annually' && plan.yearlyPrice && (
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        ${plan.yearlyPrice} billed annually
+                      </div>
+                    )}
+                  </div>
+                  
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    {plan.description}
+                  </p>
+                  
+                  <ul className="space-y-2 mb-4">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start">
+                        <Check size={16} className="text-green-500 mt-1 mr-2 shrink-0" />
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+        
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={() => navigate('/onboarding/invite')}>
+            Back
+          </Button>
+          <Button 
+            onClick={handleNext}
+            disabled={!selectedPlan}
+          >
+            Continue
+          </Button>
+        </div>
+        
+        <div className="mt-8 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 text-sm">
+          <div className="flex items-start gap-2">
+            <Info size={20} className="text-blue-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium mb-1">Need help choosing?</p>
+              <p className="text-gray-600 dark:text-gray-300">
+                Talk to our team for personalized recommendations or custom solutions for your specific community needs.
+              </p>
+              <Button variant="link" className="p-0 h-auto text-purple-600 dark:text-purple-400">
+                Contact Sales
               </Button>
             </div>
-          </form>
-        </Form>
-        
-        <Separator className="my-8" />
-        
-        <div className="text-center">
-          <p className="text-muted-foreground text-sm mb-4">
-            Not ready to set up membership plans yet? No problem! You can always configure them later from your dashboard.
-          </p>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

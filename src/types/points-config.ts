@@ -41,6 +41,23 @@ export interface RewardCategory {
 export type RewardVisibility = 'public' | 'vip' | 'limited';
 export type RewardType = 'digital' | 'nft' | 'badge' | 'access' | 'physical';
 
+export interface Reward {
+  id: string;
+  name: string;
+  description: string;
+  pointsCost: number;
+  type: RewardType;
+  visibility: RewardVisibility;
+  stock?: number;
+  imageUrl?: string;
+  actionUrl?: string;
+  expiresAt?: Date;
+  createdAt: Date;
+  redeemCount: number;
+  isActive: boolean;
+  categoryId?: string;
+}
+
 export interface RewardForm extends Omit<Reward, 'id' | 'createdAt' | 'redeemCount'> {
   id?: string;
 }

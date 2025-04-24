@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DollarSign, BarChart3, Share, CreditCard } from 'lucide-react';
+import { DollarSign, BarChart3, Share, CreditCard, Star } from 'lucide-react';
 import SettingsMenuItem from '../SettingsMenuItem';
 
 interface MonetizationSectionProps {
@@ -12,9 +12,15 @@ const MonetizationSection: React.FC<MonetizationSectionProps> = ({ activeSection
     <div className="space-y-1 px-2">
       <SettingsMenuItem 
         icon={<CreditCard size={18} />} 
-        label="Nortech Plans" 
+        label="Platform Plans" 
         to="/settings/plans" 
         active={activeSection === "plans"} 
+      />
+      <SettingsMenuItem 
+        icon={<Star size={18} />} 
+        label="Points Configuration" 
+        to="/settings/points-configuration" 
+        active={activeSection === "points-configuration"} 
       />
       <SettingsMenuItem 
         icon={<DollarSign size={18} />} 
