@@ -117,7 +117,6 @@ function App() {
               <Route path="/settings/paywall" element={<Settings.Paywall />} />
               <Route path="/settings/subscriptions" element={<Settings.Subscriptions />} />
               <Route path="/settings/legal" element={<Settings.Legal />} />
-              <Route path="/settings/digest" element={<Settings.Digest />} />
               <Route path="/settings/marketing" element={<Settings.Marketing />} />
               <Route path="/settings/posts" element={<Settings.Posts />} />
               <Route path="/settings/spaces" element={<Settings.Spaces />} />
