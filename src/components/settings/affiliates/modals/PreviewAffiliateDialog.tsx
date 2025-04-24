@@ -3,7 +3,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { copy } from 'lucide-react';
+import { Copy } from 'lucide-react';
 
 interface PreviewAffiliateDialogProps {
   open: boolean;
@@ -44,7 +44,7 @@ const PreviewAffiliateDialog: React.FC<PreviewAffiliateDialogProps> = ({
                   onClick={handleCopyLink}
                   className="shrink-0"
                 >
-                  <copy className="h-4 w-4" />
+                  <Copy className="h-4 w-4" />
                 </Button>
               </div>
             </div>

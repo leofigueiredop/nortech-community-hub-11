@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { calendar, eye, calendar_days } from 'lucide-react';
+import { Calendar, Eye, CalendarDays } from 'lucide-react';
 
 const PayoutHistorySection: React.FC = () => {
   const [selectedDateRange, setSelectedDateRange] = useState('last30');
@@ -31,7 +31,7 @@ const PayoutHistorySection: React.FC = () => {
             <CardDescription>View and export your past payouts</CardDescription>
           </div>
           <Button onClick={handleExport} variant="outline" className="flex items-center gap-2">
-            <calendar className="h-4 w-4" />
+            <Calendar className="h-4 w-4" />
             Export History
           </Button>
         </div>
@@ -60,7 +60,7 @@ const PayoutHistorySection: React.FC = () => {
                 </TableCell>
                 <TableCell className="text-right">
                   <Button variant="ghost" size="sm">
-                    <eye className="h-4 w-4" />
+                    <Eye className="h-4 w-4" />
                     <span className="sr-only">View details</span>
                   </Button>
                 </TableCell>
@@ -76,7 +76,7 @@ const PayoutHistorySection: React.FC = () => {
                 </TableCell>
                 <TableCell className="text-right">
                   <Button variant="ghost" size="sm">
-                    <eye className="h-4 w-4" />
+                    <Eye className="h-4 w-4" />
                     <span className="sr-only">View details</span>
                   </Button>
                 </TableCell>
