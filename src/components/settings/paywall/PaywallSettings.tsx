@@ -1,20 +1,17 @@
-
 import React, { useState } from 'react';
 import { PaywallTemplateType } from './PaywallTemplateGrid';
 import PaywallTemplateGrid from './PaywallTemplateGrid';
 import PaywallSettingsForm from './PaywallSettingsForm';
 import PaywallPreviewDialog from './PaywallPreviewDialog';
-import PaymentOptionsSection from './PaymentOptionsSection';
 import PaywallAISection from './PaywallAISection';
 import PaywallFAQSection from './PaywallFAQSection';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, Eye, Check } from 'lucide-react';
+import { Lock, Check } from 'lucide-react';
 
 const PaywallSettings: React.FC = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<PaywallTemplateType>('simple');
   
-  // Template preview definitions
   const templatePreviews = {
     simple: (
       <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-800">
@@ -106,7 +103,8 @@ const PaywallSettings: React.FC = () => {
       <div className="text-center max-w-3xl mx-auto space-y-4 mb-6 md:mb-10">
         <h1 className="text-2xl md:text-3xl font-bold">Paywall Setup</h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Configure how your members see premium content in your community. Personalize, connect payment methods, and optimize the experience.
+          Configure how your members see premium content in your community. 
+          Personalize and optimize the paywall experience.
         </p>
       </div>
 
@@ -129,8 +127,6 @@ const PaywallSettings: React.FC = () => {
         
         <PaywallSettingsForm />
       </div>
-
-      <PaymentOptionsSection />
       
       <PaywallAISection />
       
