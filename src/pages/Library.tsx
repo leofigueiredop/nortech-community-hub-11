@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
@@ -7,7 +6,6 @@ import ContentViewer from '@/components/library/ContentViewer';
 import CreateContentModal from '@/components/library/CreateContentModal';
 import LibraryTopBar from '@/components/library/LibraryTopBar';
 import LibraryContentArea from '@/components/library/LibraryContentArea';
-// Remove CreateContentButton import
 import ContentFilters from '@/components/library/ContentFilters';
 import { Button } from '@/components/ui/button';
 import { Trophy, Star, Award } from 'lucide-react';
@@ -155,21 +153,6 @@ const Library: React.FC = () => {
           setSortBy={setSortBy}
         />
 
-        <ContentFilters 
-          formatFilter={formatFilter}
-          tagFilter={tagFilter}
-          accessFilter={accessFilter}
-          searchQuery={searchQuery}
-          sortBy={sortBy}
-          allFormats={allFormats}
-          allTags={allTags}
-          setFormatFilter={setFormatFilter}
-          setTagFilter={setTagFilter}
-          setAccessFilter={setAccessFilter}
-          setSearchQuery={setSearchQuery}
-          setSortBy={setSortBy}
-        />
-
         <LibraryContentArea
           isSearchActive={isSearchActive}
           filteredContent={filteredContent}
@@ -191,8 +174,6 @@ const Library: React.FC = () => {
         isOpen={isCreateContentOpen} 
         onClose={() => setIsCreateContentOpen(false)} 
       />
-
-      {/* Removed CreateContentButton */}
     </MainLayout>
   );
 };

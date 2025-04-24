@@ -1,11 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { 
-  Filter, 
-  Settings, 
-  Search
-} from 'lucide-react';
+import { Filter, Settings } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { 
   Drawer,
@@ -36,9 +32,7 @@ const LibraryTopBar: React.FC<LibraryTopBarProps> = ({
   formatFilter,
   tagFilter,
   sortBy,
-  activeView,
   searchQuery,
-  setActiveView,
   setSearchQuery,
   setGlobalSearchQuery,
   allTags,
@@ -49,7 +43,7 @@ const LibraryTopBar: React.FC<LibraryTopBarProps> = ({
 }) => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   
-  const isSearchActive = searchQuery.trim() !== '';
+  const hasActiveFilters = formatFilter !== 'all' || tagFilter !== 'all' || sortBy !== 'newest';
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -59,14 +53,19 @@ const LibraryTopBar: React.FC<LibraryTopBarProps> = ({
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, setGlobalSearchQuery]);
 
-  const hasActiveFilters = formatFilter !== 'all' || tagFilter !== 'all' || sortBy !== 'newest';
-  const activeFiltersCount = (formatFilter !== 'all' ? 1 : 0) + (tagFilter !== 'all' ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0);
-
   return (
     <div className="sticky top-0 z-30 w-full bg-background/95 backdrop-blur supports-backdrop-blur:bg-background/60 border-b">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4">
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
           <h1 className="text-xl font-semibold">Content Library</h1>
+          <div className="relative max-w-md">
+            <Input
+              placeholder="Search content..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-[300px]"
+            />
+          </div>
         </div>
         
         <div className="flex items-center gap-2">
@@ -81,17 +80,16 @@ const LibraryTopBar: React.FC<LibraryTopBarProps> = ({
                 )}
               >
                 <Filter size={16} />
-                <span>Advanced Filters</span>
+                <span>Filters</span>
                 {hasActiveFilters && (
                   <span className="ml-1 rounded-full bg-primary w-5 h-5 flex items-center justify-center text-[10px] text-primary-foreground">
-                    {activeFiltersCount}
+                    {(formatFilter !== 'all' ? 1 : 0) + (tagFilter !== 'all' ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0)}
                   </span>
                 )}
               </Button>
             </DrawerTrigger>
             <DrawerContent className="max-h-[85vh]">
               <div className="px-4 py-6 max-w-md mx-auto">
-                <h3 className="text-lg font-semibold mb-4">Advanced Filters</h3>
                 <LibraryFiltersSidebar
                   formatFilter={formatFilter}
                   tagFilter={tagFilter}
@@ -108,7 +106,7 @@ const LibraryTopBar: React.FC<LibraryTopBarProps> = ({
           </Drawer>
 
           <Link to="/content-creator-dashboard">
-            <Button variant="outline" size="sm" className="gap-2 ml-2">
+            <Button className="gap-2 ml-2">
               <Settings size={16} />
               <span className="hidden sm:inline">Creator Dashboard</span>
             </Button>
