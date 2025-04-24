@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import SettingsLayout from '@/components/settings/SettingsLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,8 +27,7 @@ import {
   User,
   Clock,
   Zap,
-  Ban,
-  SpamIcon
+  Ban
 } from 'lucide-react';
 
 const Moderation: React.FC = () => {
@@ -382,7 +382,7 @@ const Moderation: React.FC = () => {
                         </div>
                         <div className="flex items-center justify-between p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/30 rounded-lg">
                           <div className="flex items-center gap-2">
-                            <SpamIcon className="h-4 w-4 text-orange-500" />
+                            <Ban className="h-4 w-4 text-orange-500" />
                             <span>Spam</span>
                           </div>
                           <button className="text-red-500 text-sm">Remove</button>
@@ -638,4 +638,195 @@ const Moderation: React.FC = () => {
                       
                       <div className="p-2 text-sm border-l-2 border-red-500 bg-red-50 dark:bg-red-900/20 rounded-sm">
                         <span className="font-medium">Sarah Johnson</span> banned SpamBot22 for 7 days
-                        <p className="text-xs text-gray-500 mt-1">Apr 21, 20
+                        <p className="text-xs text-gray-500 mt-1">Apr 21, 2025</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Automated Actions Tab */}
+          <TabsContent value="actions" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Automated Actions</CardTitle>
+                <CardDescription>Configure automated responses to rule violations</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Set up automatic actions that will be taken when users violate community rules. These actions can be triggered by report thresholds or by automatic content detection.
+                  </p>
+                  
+                  {/* First Violation */}
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="bg-yellow-100 dark:bg-yellow-900/50 p-1.5 rounded-md">
+                            <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                          </div>
+                          <CardTitle className="text-base">First Violation</CardTitle>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label>Action</Label>
+                            <select className="w-full mt-1 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1.5 bg-white dark:bg-gray-800">
+                              <option>Send Warning Message</option>
+                              <option>Remove Content</option>
+                              <option>Restrict Posting (1 hour)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <Label>Notify</Label>
+                            <select className="w-full mt-1 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1.5 bg-white dark:bg-gray-800">
+                              <option>User Only</option>
+                              <option>User & Moderators</option>
+                              <option>No Notifications</option>
+                            </select>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label>Warning Message</Label>
+                          <textarea 
+                            className="w-full mt-1 h-24 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 bg-white dark:bg-gray-800 text-sm"
+                            defaultValue="Your recent post violates our community guidelines. Please review our rules to avoid further actions on your account."
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Second Violation */}
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="bg-orange-100 dark:bg-orange-900/50 p-1.5 rounded-md">
+                            <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                          </div>
+                          <CardTitle className="text-base">Second Violation</CardTitle>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label>Action</Label>
+                            <select className="w-full mt-1 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1.5 bg-white dark:bg-gray-800">
+                              <option>Timeout (12 hours)</option>
+                              <option>Remove Content</option>
+                              <option>Restrict Posting (24 hours)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <Label>Notify</Label>
+                            <select className="w-full mt-1 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1.5 bg-white dark:bg-gray-800">
+                              <option>User & Moderators</option>
+                              <option>User Only</option>
+                              <option>No Notifications</option>
+                            </select>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label>Warning Message</Label>
+                          <textarea 
+                            className="w-full mt-1 h-24 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 bg-white dark:bg-gray-800 text-sm"
+                            defaultValue="This is your second violation of our community guidelines. Your account has been restricted temporarily. Further violations may result in permanent action."
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Third Violation */}
+                  <Card className="border border-gray-200 dark:border-gray-700">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="bg-red-100 dark:bg-red-900/50 p-1.5 rounded-md">
+                            <Ban className="h-5 w-5 text-red-600 dark:text-red-400" />
+                          </div>
+                          <CardTitle className="text-base">Third Violation</CardTitle>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label>Action</Label>
+                            <select className="w-full mt-1 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1.5 bg-white dark:bg-gray-800">
+                              <option>Ban (7 days)</option>
+                              <option>Ban (30 days)</option>
+                              <option>Permanent Ban</option>
+                            </select>
+                          </div>
+                          <div>
+                            <Label>Review</Label>
+                            <select className="w-full mt-1 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1.5 bg-white dark:bg-gray-800">
+                              <option>Require Admin Review</option>
+                              <option>Automatic</option>
+                            </select>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label>Message</Label>
+                          <textarea 
+                            className="w-full mt-1 h-24 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 bg-white dark:bg-gray-800 text-sm"
+                            defaultValue="Due to repeated violations of our community guidelines, your account has been banned. You may appeal this decision by contacting our support team."
+                          />
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <input type="checkbox" id="allow-appeal" className="rounded" defaultChecked />
+                          <label htmlFor="allow-appeal" className="text-sm">Allow user to appeal this action</label>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Reset Violations */}
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                    <div className="flex items-center gap-2">
+                      <Label>Reset violations after</Label>
+                      <select className="border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1.5 bg-white dark:bg-gray-800">
+                        <option>30 days</option>
+                        <option>60 days</option>
+                        <option>90 days</option>
+                        <option>Never</option>
+                      </select>
+                      <span className="text-sm text-gray-500">of good behavior</span>
+                    </div>
+                  </div>
+                  
+                  {/* Save Button */}
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button>Save Changes</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+        
+        <SupportCTA />
+      </div>
+    </SettingsLayout>
+  );
+};
+
+export default Moderation;
