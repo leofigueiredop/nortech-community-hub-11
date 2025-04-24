@@ -1,85 +1,158 @@
 
-import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { ContentItem } from '@/types/library';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import ContentCardMedia from './card/ContentCardMedia';
-import ContentCardInfo from './card/ContentCardInfo';
-import ContentFreeOverlay from './card/ContentFreeOverlay';
-import PremiumContentOverlay from './PremiumContentOverlay';
+import { ContentItem } from '@/types/library';
+import { useContentProgress } from '@/hooks/useContentProgress';
+import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Star, Clock, Eye } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface EnhancedContentCardProps {
   item: ContentItem;
-  onClick: () => void;
-  isNew?: boolean;
+  onSelect?: (item: ContentItem) => void;
+  rank?: number;
+  showBadge?: boolean;
+  showAuthor?: boolean;
+  className?: string;
 }
 
 const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ 
   item, 
-  onClick, 
-  isNew = false
+  onSelect,
+  rank,
+  showBadge = true,
+  showAuthor = true,
+  className
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const { getProgress } = useContentProgress();
+  const progress = getProgress(item.id)?.progress || 0;
   
-  const cardVariants = {
-    initial: { scale: 1, zIndex: 1 },
-    hover: { 
-      scale: 1.05, 
-      zIndex: 10,
-      transition: { duration: 0.2 }
+  const handleClick = (e: React.MouseEvent) => {
+    // If it's a course, let the Link handle navigation
+    if (item.format === 'course') {
+      return;
+    }
+    
+    // For other content types, open modal
+    if (onSelect) {
+      e.preventDefault();
+      onSelect(item);
     }
   };
   
-  const isPremium = item.accessLevel === 'premium';
-  
-  return (
-    <motion.div
-      initial="initial"
-      animate={isHovered ? "hover" : "initial"}
-      variants={cardVariants}
-      className="h-full cursor-pointer w-full relative group"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onTouchStart={() => setIsHovered(true)}
-      onTouchEnd={() => setTimeout(() => setIsHovered(false), 500)}
-    >
-      <Card 
-        className="overflow-hidden border border-border/40 h-full shadow-sm hover:shadow-md rounded-lg transition-all duration-200 flex flex-col"
-        onClick={onClick}
-      >
-        {isNew && (
+  const cardContent = (
+    <>
+      <div className="relative aspect-video w-full overflow-hidden rounded-t-md">
+        <img 
+          src={item.thumbnail} 
+          alt={item.title} 
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+        
+        {/* Progress bar */}
+        {progress > 0 && (
+          <div className="absolute bottom-0 left-0 right-0">
+            <Progress value={progress} className="h-1 rounded-none" />
+          </div>
+        )}
+        
+        {/* Rank badge */}
+        {rank !== undefined && (
+          <div className="absolute top-2 left-2 bg-primary text-primary-foreground w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">
+            {rank}
+          </div>
+        )}
+        
+        {/* Format badge */}
+        {showBadge && (
           <Badge 
-            className="absolute top-2 right-2 bg-green-500 text-white z-20 shadow-md border-none"
+            variant="outline" 
+            className="absolute top-2 right-2 bg-black/50 text-white border-none text-xs px-2"
           >
-            NEW
+            {item.format}
           </Badge>
         )}
         
-        <ContentCardMedia 
-          item={item} 
-          isHovered={isHovered} 
-          isPremium={isPremium} 
-        />
-        
-        <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
-          <ContentCardInfo item={item} />
-        </div>
-        
-        {isHovered && (
-          <>
-            {isPremium ? (
-              <PremiumContentOverlay 
-                pointsEnabled={item.pointsEnabled}
-                pointsValue={item.pointsValue} 
-                freeAccessLeft={item.freeAccessesLeft}
-              />
-            ) : (
-              <ContentFreeOverlay item={item} />
+        {/* Title */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h3 className="font-bold text-white text-lg line-clamp-2">
+            {item.title}
+          </h3>
+          
+          {/* Stats row */}
+          <div className="flex items-center gap-3 mt-2">
+            {item.pointsEnabled && item.pointsValue && (
+              <div className="flex items-center text-xs text-amber-300">
+                <Star className="h-3 w-3 mr-1" />
+                <span>{item.pointsValue} XP</span>
+              </div>
             )}
-          </>
+            
+            {item.duration > 0 && (
+              <div className="flex items-center text-xs text-slate-300">
+                <Clock className="h-3 w-3 mr-1" />
+                <span>{Math.round(item.duration / 60)} min</span>
+              </div>
+            )}
+            
+            <div className="flex items-center text-xs text-slate-300">
+              <Eye className="h-3 w-3 mr-1" />
+              <span>{item.views}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="p-4">
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+          {item.description}
+        </p>
+        
+        {showAuthor && typeof item.author === 'object' && (
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-full overflow-hidden bg-muted">
+              {item.author.avatar && (
+                <img 
+                  src={item.author.avatar} 
+                  alt={item.author.name}
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {item.author.name} • {formatDistanceToNow(new Date(item.updatedAt), { addSuffix: true })}
+            </span>
+          </div>
         )}
-      </Card>
+      </div>
+    </>
+  );
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={cn(
+        "group bg-card border rounded-md overflow-hidden shadow-sm hover:shadow-md transition-all",
+        className
+      )}
+    >
+      {item.format === 'course' ? (
+        <Link to={`/course/${item.id}`} className="block">
+          {cardContent}
+        </Link>
+      ) : (
+        <div onClick={handleClick} className="cursor-pointer">
+          {cardContent}
+        </div>
+      )}
     </motion.div>
   );
 };
