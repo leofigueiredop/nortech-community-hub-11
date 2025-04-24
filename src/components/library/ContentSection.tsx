@@ -1,14 +1,15 @@
 
 import React from 'react';
 import { ContentItem } from '@/types/library';
-import EnhancedContentCard from './EnhancedContentCard';
 import { 
-  Carousel,
-  CarouselContent,
+  Carousel, 
+  CarouselContent, 
   CarouselItem,
   CarouselNext,
-  CarouselPrevious
+  CarouselPrevious 
 } from '@/components/ui/carousel';
+import EnhancedContentCard from './EnhancedContentCard';
+import Autoplay from 'embla-carousel-autoplay';
 
 interface ContentSectionProps {
   title: string;
@@ -25,27 +26,27 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   isTopTen = false,
   layout = 'grid'
 }) => {
+  const autoplayPlugin = React.useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: true })
+  );
+
   if (layout === 'carousel') {
     return (
-      <div className="relative py-4">
-        {title && (
-          <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-        )}
-        
-        <Carousel
+      <div className="relative space-y-4">
+        <Carousel 
           opts={{
-            align: "start",
-            loop: items.length > 4,
+            align: 'start',
+            loop: true
           }}
+          plugins={isTopTen ? [autoplayPlugin.current] : []}
           className="w-full"
         >
           <CarouselContent className="-ml-4">
-            {items.map((item, index) => (
-              <CarouselItem key={item.id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+            {items.map((item) => (
+              <CarouselItem key={item.id} className="pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
                 <EnhancedContentCard
                   item={item}
                   onClick={() => onItemSelect(item)}
-                  rankNumber={isTopTen ? index + 1 : undefined}
                 />
               </CarouselItem>
             ))}
@@ -57,15 +58,13 @@ const ContentSection: React.FC<ContentSectionProps> = ({
     );
   }
 
-  // Grid layout
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {items.map((item, index) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {items.map((item) => (
         <EnhancedContentCard
           key={item.id}
           item={item}
           onClick={() => onItemSelect(item)}
-          rankNumber={isTopTen ? index + 1 : undefined}
         />
       ))}
     </div>

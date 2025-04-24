@@ -26,7 +26,6 @@ const PremiumContentOverlay: React.FC<PremiumContentOverlayProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      whileHover={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
     >
       <motion.div
         className="flex flex-col items-center gap-4 max-w-md text-center"
@@ -39,10 +38,7 @@ const PremiumContentOverlay: React.FC<PremiumContentOverlayProps> = ({
           animate={{ 
             boxShadow: ["0px 0px 0px rgba(251, 191, 36, 0)", "0px 0px 20px rgba(251, 191, 36, 0.5)", "0px 0px 0px rgba(251, 191, 36, 0)"],
           }}
-          transition={{
-            repeat: Infinity,
-            duration: 2,
-          }}
+          transition={{ repeat: Infinity, duration: 2 }}
         >
           <Lock className="h-8 w-8 text-white" />
         </motion.div>
@@ -51,19 +47,14 @@ const PremiumContentOverlay: React.FC<PremiumContentOverlayProps> = ({
         <p className="text-white/80 mb-2">Subscribe to unlock this premium content</p>
         
         <div className="space-y-3 w-full">
-          <motion.div
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
+          <Button 
+            onClick={onSubscribe}
+            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white flex items-center justify-center gap-2 shadow-lg"
+            size="lg"
           >
-            <Button 
-              onClick={onSubscribe}
-              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white flex items-center justify-center gap-2 shadow-lg"
-              size="lg"
-            >
-              <Crown className="h-5 w-5" />
-              Subscribe to Unlock
-            </Button>
-          </motion.div>
+            <Crown className="h-5 w-5" />
+            Subscribe to Unlock
+          </Button>
           
           {pointsEnabled && (
             <motion.div
@@ -72,11 +63,12 @@ const PremiumContentOverlay: React.FC<PremiumContentOverlayProps> = ({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
+              className="bg-white/10 rounded-lg p-1"
             >
               <Button 
                 onClick={onUsePoints}
                 variant="outline" 
-                className="w-full border-white/30 text-white hover:bg-white/10 flex items-center justify-center gap-2"
+                className="w-full border-white/30 bg-white/5 text-white hover:bg-white/20 flex items-center justify-center gap-2 backdrop-blur-sm"
                 size="lg"
               >
                 <Sparkles className="h-5 w-5" />
