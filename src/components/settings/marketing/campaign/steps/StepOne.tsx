@@ -5,13 +5,15 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
 
+interface StepOneData {
+  name: string;
+  audience: string;
+  tag: string;
+}
+
 interface StepOneProps {
-  data: {
-    name: string;
-    audience: string;
-    tag: string;
-  };
-  updateData: (data: Partial<typeof data>) => void;
+  data: StepOneData;
+  updateData: (data: Partial<StepOneData>) => void;
   onNext: () => void;
 }
 

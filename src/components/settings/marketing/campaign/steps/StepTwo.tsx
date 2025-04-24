@@ -7,13 +7,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Lightbulb, Wand2 } from 'lucide-react';
 
+interface StepTwoData {
+  subject: string;
+  previewText: string;
+  content: string;
+}
+
 interface StepTwoProps {
-  data: {
-    subject: string;
-    previewText: string;
-    content: string;
-  };
-  updateData: (data: Partial<typeof data>) => void;
+  data: StepTwoData;
+  updateData: (data: Partial<StepTwoData>) => void;
   onNext: () => void;
   onBack: () => void;
 }

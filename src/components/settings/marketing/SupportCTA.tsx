@@ -6,7 +6,7 @@ import { Headset, MessageSquare } from 'lucide-react';
 const SupportCTA: React.FC = () => {
   return (
     <div className="bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-4 flex flex-col md:flex-row items-center justify-between">
-      <div className="mb-4 md:mb-0">
+      <div className="mb-4 md:mb-0 text-center md:text-left">
         <h3 className="font-semibold text-indigo-700 dark:text-indigo-300">Need help with your campaign strategy?</h3>
         <p className="text-indigo-600/80 dark:text-indigo-400 text-sm">
           Book a session with our Marketing Team or get live assistance

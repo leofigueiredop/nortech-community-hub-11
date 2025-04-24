@@ -17,13 +17,15 @@ import {
 } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
+interface StepFourData {
+  name: string;
+  scheduledDate: Date | null;
+  timeZone: string;
+}
+
 interface StepFourProps {
-  data: {
-    name: string;
-    scheduledDate: Date | null;
-    timeZone: string;
-  };
-  updateData: (data: Partial<typeof data>) => void;
+  data: StepFourData;
+  updateData: (data: Partial<StepFourData>) => void;
   onComplete: () => void;
   onBack: () => void;
 }

@@ -8,13 +8,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Send, AlertTriangle, Check } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
+interface StepThreeData {
+  subject: string;
+  previewText: string;
+  content: string;
+}
+
 interface StepThreeProps {
-  data: {
-    subject: string;
-    previewText: string;
-    content: string;
-  };
-  updateData: (data: Partial<typeof data>) => void;
+  data: StepThreeData;
+  updateData: (data: Partial<StepThreeData>) => void;
   onNext: () => void;
   onBack: () => void;
 }

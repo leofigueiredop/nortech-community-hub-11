@@ -79,12 +79,12 @@ const MarketingAnalytics: React.FC = () => {
       </div>
       
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex-1">
+        <div className="flex-1 relative">
           <Input
             placeholder="Search campaigns..."
             className="w-full"
-            icon={<Search className="h-4 w-4" />}
           />
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
         </div>
         <div className="flex flex-row gap-3">
           <Select>
