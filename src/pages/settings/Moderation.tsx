@@ -28,7 +28,7 @@ import {
   Clock,
   Zap,
   Ban,
-  Spam as SpamIcon
+  SpamIcon
 } from 'lucide-react';
 
 const Moderation: React.FC = () => {
