@@ -7,7 +7,7 @@ import ContentViewer from '@/components/library/ContentViewer';
 import CreateContentModal from '@/components/library/CreateContentModal';
 import LibraryTopBar from '@/components/library/LibraryTopBar';
 import LibraryContentArea from '@/components/library/LibraryContentArea';
-import CreateContentButton from '@/components/library/CreateContentButton';
+// Remove CreateContentButton import
 import ContentFilters from '@/components/library/ContentFilters';
 import { Button } from '@/components/ui/button';
 import { Trophy, Star, Award } from 'lucide-react';
@@ -192,7 +192,7 @@ const Library: React.FC = () => {
         onClose={() => setIsCreateContentOpen(false)} 
       />
 
-      <CreateContentButton onClick={() => setIsCreateContentOpen(true)} />
+      {/* Removed CreateContentButton */}
     </MainLayout>
   );
 };
