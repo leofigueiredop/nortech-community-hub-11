@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, Mail } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import SettingsMenuItem from '../SettingsMenuItem';
 
 interface MemberActionsSectionProps {
@@ -15,12 +15,6 @@ const MemberActionsSection: React.FC<MemberActionsSectionProps> = ({ activeSecti
         label="Legal" 
         to="/settings/legal" 
         active={activeSection === "legal"} 
-      />
-      <SettingsMenuItem 
-        icon={<Mail size={18} />} 
-        label="Digest" 
-        to="/settings/digest" 
-        active={activeSection === "digest"} 
       />
     </div>
   );

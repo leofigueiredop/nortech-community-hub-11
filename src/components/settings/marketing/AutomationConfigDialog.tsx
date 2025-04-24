@@ -18,6 +18,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Mail, Clock, ArrowRight } from "lucide-react";
@@ -57,6 +58,14 @@ const AutomationConfigDialog: React.FC<AutomationConfigDialogProps> = ({
     },
   });
 
+  const templateVariables = [
+    { code: "{{FIRST_NAME}}", description: "Member's first name" },
+    { code: "{{LAST_NAME}}", description: "Member's last name" },
+    { code: "{{COMMUNITY_NAME}}", description: "Your community name" },
+    { code: "{{EMAIL}}", description: "Member's email" },
+    { code: "{{UNSUBSCRIBE_LINK}}", description: "Unsubscribe link" },
+  ];
+
   const onSubmit = (data: AutomationFormData) => {
     console.log("Automation configuration:", data);
     onClose();
@@ -71,6 +80,19 @@ const AutomationConfigDialog: React.FC<AutomationConfigDialogProps> = ({
             Customize the email sequence for {automation.description.toLowerCase()}
           </DialogDescription>
         </DialogHeader>
+
+        {/* Template Variables Guide */}
+        <div className="bg-muted p-4 rounded-lg mb-6">
+          <h4 className="text-sm font-medium mb-2">Available Template Variables:</h4>
+          <div className="grid grid-cols-2 gap-2">
+            {templateVariables.map((variable) => (
+              <div key={variable.code} className="text-sm">
+                <code className="bg-background px-1 py-0.5 rounded">{variable.code}</code>
+                <span className="text-muted-foreground ml-2">{variable.description}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -100,6 +122,9 @@ const AutomationConfigDialog: React.FC<AutomationConfigDialogProps> = ({
                           <FormControl>
                             <Input placeholder="Enter email subject" {...field} />
                           </FormControl>
+                          <FormDescription>
+                            Example: Welcome to {{COMMUNITY_NAME}}, {{FIRST_NAME}}!
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -114,10 +139,13 @@ const AutomationConfigDialog: React.FC<AutomationConfigDialogProps> = ({
                           <FormControl>
                             <Textarea
                               placeholder="Write your email content..."
-                              className="min-h-[100px]"
+                              className="min-h-[200px]"
                               {...field}
                             />
                           </FormControl>
+                          <FormDescription>
+                            Use HTML and template variables to personalize your email
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
