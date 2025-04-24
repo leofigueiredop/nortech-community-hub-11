@@ -2,10 +2,7 @@
 import React from 'react';
 import { ContentItem } from '@/types/library';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import LibraryContentRows from '@/components/library/LibraryContentRows';
-import FeaturedContentCarousel from '@/components/library/FeaturedContentCarousel';
-import { motion } from 'framer-motion';
-import EnhancedContentCard from './EnhancedContentCard';
+import LibraryContent from './LibraryContent';
 
 interface LibraryContentAreaProps {
   isSearchActive: boolean;
@@ -22,84 +19,32 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
   isSearchActive,
   filteredContent,
   searchQuery,
-  activeView,
-  featuredContent,
   content,
-  visitedTags,
   onItemSelect
 }) => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1
-    }
-  };
-
   return (
     <ScrollArea className="flex-1">
-      <div className="container py-6 max-w-screen-2xl space-y-6">
-        {/* Hero Feature Carousel - only show on main view, not during search */}
-        {featuredContent.length > 0 && !isSearchActive && activeView === 'all' && (
-          <FeaturedContentCarousel 
-            items={featuredContent}
-            onItemSelect={onItemSelect}
-          />
-        )}
-
-        {/* Search Results */}
-        {isSearchActive ? (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold flex items-center gap-2">
-              <span>Search Results</span>
-              <span className="px-2 py-0.5 bg-muted rounded-full text-sm font-normal">
-                {filteredContent.length} items
-              </span>
-            </h2>
-            <motion.div 
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {filteredContent.map(item => (
-                <motion.div key={item.id} variants={itemVariants}>
-                  <EnhancedContentCard item={item} onClick={() => onItemSelect(item)} />
-                </motion.div>
-              ))}
-            </motion.div>
-            {filteredContent.length === 0 && (
-              <motion.div 
-                className="text-center py-16 bg-muted/30 rounded-lg border border-dashed"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <h3 className="text-xl font-medium mb-2">No results found</h3>
-                <p className="text-muted-foreground">Try adjusting your search for "{searchQuery}"</p>
-              </motion.div>
-            )}
-          </div>
-        ) : (
-          /* Netflix-style content rows when not searching */
-          <LibraryContentRows 
-            content={content}
-            activeView={activeView}
-            visitedTags={visitedTags}
-            onItemSelect={onItemSelect}
-          />
-        )}
-      </div>
+      {isSearchActive ? (
+        <div className="container py-6 max-w-screen-2xl space-y-6">
+          <h2 className="text-2xl font-semibold flex items-center gap-2">
+            <span>Search Results</span>
+            <span className="px-2 py-0.5 bg-muted rounded-full text-sm font-normal">
+              {filteredContent.length} items
+            </span>
+          </h2>
+          {filteredContent.length === 0 && (
+            <div className="text-center py-16 bg-muted/30 rounded-lg border border-dashed">
+              <h3 className="text-xl font-medium mb-2">No results found</h3>
+              <p className="text-muted-foreground">Try adjusting your search for "{searchQuery}"</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <LibraryContent 
+          content={content}
+          onItemSelect={onItemSelect}
+        />
+      )}
     </ScrollArea>
   );
 };
