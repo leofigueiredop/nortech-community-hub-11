@@ -25,11 +25,11 @@ const DigestSettings: React.FC = () => {
   };
 
   return (
-    <Card className="bg-gray-900 rounded-2xl text-white shadow-lg overflow-hidden">
+    <Card className="bg-white rounded-2xl shadow-lg overflow-hidden">
       <CardContent className="p-8">
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Configurações do digest por email</h2>
-          <p className="text-gray-400">
+          <h2 className="text-xl font-semibold mb-4 text-nortech-dark-blue">Configurações do digest por email</h2>
+          <p className="text-nortech-text-muted">
             Os emails de digest semanal incluem um resumo personalizado dos posts populares, comentários e mais. 
             Cada membro receberá um digest contendo apenas conteúdo dos espaços que participa.
           </p>
@@ -38,10 +38,10 @@ const DigestSettings: React.FC = () => {
         <div className="space-y-8">
           <div className="flex items-center justify-between">
             <div>
-              <Label className="text-base font-semibold text-white block">
+              <Label className="text-base font-semibold text-nortech-dark-blue block">
                 Ativar digest semanal
               </Label>
-              <p className="text-gray-400 mt-1">
+              <p className="text-nortech-text-muted mt-1">
                 Se ativado, um digest personalizado será enviado para seus membros às quintas-feiras, começando às 9h. 
                 Os emails podem levar de 4 a 5 horas para serem enviados e os membros têm a opção de cancelar a inscrição.
               </p>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,17 +34,17 @@ const LegalSettings: React.FC = () => {
   };
 
   return (
-    <Card className="bg-gray-900 rounded-2xl text-white shadow-lg overflow-hidden">
+    <Card className="bg-white rounded-2xl shadow-lg overflow-hidden">
       <CardContent className="p-8">
-        <h2 className="text-xl font-semibold mb-8">Gerencie os avisos legais da sua comunidade</h2>
+        <h2 className="text-xl font-semibold mb-8 text-nortech-dark-blue">Gerencie os avisos legais da sua comunidade</h2>
         
         <div className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <Label htmlFor="legal-email" className="text-base font-semibold text-white block mb-2">
+              <Label htmlFor="legal-email" className="text-base font-semibold text-nortech-dark-blue block mb-2">
                 Email jurídico
               </Label>
-              <p className="text-gray-400 mb-2">
+              <p className="text-nortech-text-muted mb-2">
                 Este email será exibido nos termos de uso e política de privacidade da sua comunidade.
               </p>
             </div>
@@ -53,17 +52,17 @@ const LegalSettings: React.FC = () => {
               <Input 
                 id="legal-email" 
                 placeholder="legal@suacomunidade.com" 
-                className="bg-gray-800 border-gray-700 text-white" 
+                className="border-nortech-gray-light text-nortech-text-dark" 
               />
             </div>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <Label htmlFor="legal-address" className="text-base font-semibold text-white block mb-2">
+              <Label htmlFor="legal-address" className="text-base font-semibold text-nortech-dark-blue block mb-2">
                 Endereço jurídico
               </Label>
-              <p className="text-gray-400 mb-2">
+              <p className="text-nortech-text-muted mb-2">
                 Este endereço será exibido nos termos de uso e política de privacidade da sua comunidade.
               </p>
             </div>
@@ -71,29 +70,29 @@ const LegalSettings: React.FC = () => {
               <Input 
                 id="legal-address" 
                 placeholder="Rua Exemplo, 123 - Cidade, Estado, CEP" 
-                className="bg-gray-800 border-gray-700 text-white" 
+                className="border-nortech-gray-light text-nortech-text-dark" 
               />
             </div>
           </div>
           
-          <div className="h-px bg-gray-800 my-8"></div>
+          <div className="h-px bg-nortech-gray-light my-8"></div>
           
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold">Termos de serviço</h3>
-              <p className="text-gray-400 mt-1">
+              <p className="text-nortech-text-muted mt-1">
                 Novos membros precisarão concordar com estes termos para poder se cadastrar na sua comunidade.
               </p>
             </div>
             <div className="flex gap-2">
               <Button 
                 variant="outline" 
-                className="text-white border-gray-700 flex items-center gap-2"
+                className="text-nortech-text-dark border-nortech-gray-light flex items-center gap-2"
                 onClick={() => copyUrl('terms')}
               >
                 <Copy size={16} /> Copiar URL
               </Button>
-              <Button variant="outline" className="text-white border-gray-700 flex items-center gap-2">
+              <Button variant="outline" className="text-nortech-text-dark border-nortech-gray-light flex items-center gap-2">
                 <ExternalLink size={16} /> Visualizar
               </Button>
             </div>
@@ -106,16 +105,16 @@ const LegalSettings: React.FC = () => {
               onCheckedChange={setCustomTerms}
             />
             <div>
-              <Label htmlFor="custom-terms" className="text-base font-semibold text-white block">
+              <Label htmlFor="custom-terms" className="text-base font-semibold text-nortech-dark-blue block">
                 Adicionar termos personalizados ao contrato de serviço
               </Label>
-              <p className="text-gray-400 mt-1">
+              <p className="text-nortech-text-muted mt-1">
                 Seus termos personalizados serão exibidos no final como Anexo A.
               </p>
               {customTerms && (
                 <Button 
                   variant="outline" 
-                  className="mt-3 text-white border-gray-700"
+                  className="mt-3 text-nortech-text-dark border-nortech-gray-light"
                   onClick={() => setTermsEditorOpen(true)}
                 >
                   Editar termos personalizados
@@ -124,24 +123,24 @@ const LegalSettings: React.FC = () => {
             </div>
           </div>
           
-          <div className="h-px bg-gray-800 my-8"></div>
+          <div className="h-px bg-nortech-gray-light my-8"></div>
           
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold">Política de privacidade</h3>
-              <p className="text-gray-400 mt-1">
+              <p className="text-nortech-text-muted mt-1">
                 Novos membros precisarão concordar com esta política para poder se cadastrar na sua comunidade.
               </p>
             </div>
             <div className="flex gap-2">
               <Button 
                 variant="outline" 
-                className="text-white border-gray-700 flex items-center gap-2"
+                className="text-nortech-text-dark border-nortech-gray-light flex items-center gap-2"
                 onClick={() => copyUrl('privacy')}
               >
                 <Copy size={16} /> Copiar URL
               </Button>
-              <Button variant="outline" className="text-white border-gray-700 flex items-center gap-2">
+              <Button variant="outline" className="text-nortech-text-dark border-nortech-gray-light flex items-center gap-2">
                 <ExternalLink size={16} /> Visualizar
               </Button>
             </div>
@@ -151,10 +150,10 @@ const LegalSettings: React.FC = () => {
             <div className="flex items-start gap-3 mb-4">
               <RadioGroupItem value="template" id="template" className="mt-1" />
               <div>
-                <Label htmlFor="template" className="text-base font-semibold text-white block">
+                <Label htmlFor="template" className="text-base font-semibold text-nortech-dark-blue block">
                   Usar modelo de política de privacidade da Nortech
                 </Label>
-                <p className="text-gray-400 mt-1">
+                <p className="text-nortech-text-muted mt-1">
                   Nossa política padrão abrange os requisitos legais mais comuns.
                 </p>
               </div>
@@ -163,16 +162,16 @@ const LegalSettings: React.FC = () => {
             <div className="flex items-start gap-3 mb-4">
               <RadioGroupItem value="custom" id="custom" className="mt-1" />
               <div>
-                <Label htmlFor="custom" className="text-base font-semibold text-white block">
+                <Label htmlFor="custom" className="text-base font-semibold text-nortech-dark-blue block">
                   Criar sua própria política de privacidade (Recomendado)
                 </Label>
-                <p className="text-gray-400 mt-1">
+                <p className="text-nortech-text-muted mt-1">
                   Personalize completamente sua política de privacidade.
                 </p>
                 {privacyOption === 'custom' && (
                   <Button 
                     variant="outline" 
-                    className="mt-3 text-white border-gray-700"
+                    className="mt-3 text-nortech-text-dark border-nortech-gray-light"
                     onClick={() => setPrivacyEditorOpen(true)}
                   >
                     Editar política de privacidade
@@ -184,7 +183,7 @@ const LegalSettings: React.FC = () => {
             <div className="flex items-start gap-3">
               <RadioGroupItem value="link" id="link" className="mt-1" />
               <div>
-                <Label htmlFor="link" className="text-base font-semibold text-white block">
+                <Label htmlFor="link" className="text-base font-semibold text-nortech-dark-blue block">
                   Fornecer um link para sua própria página de política de privacidade
                 </Label>
                 {privacyOption === 'link' && (
@@ -204,7 +203,6 @@ const LegalSettings: React.FC = () => {
           </div>
         </div>
         
-        {/* Editor Modal for Terms of Service */}
         <Dialog open={termsEditorOpen} onOpenChange={setTermsEditorOpen}>
           <DialogContent className="bg-gray-900 text-white max-w-4xl">
             <DialogHeader>
@@ -236,7 +234,6 @@ const LegalSettings: React.FC = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Editor Modal for Privacy Policy */}
         <Dialog open={privacyEditorOpen} onOpenChange={setPrivacyEditorOpen}>
           <DialogContent className="bg-gray-900 text-white max-w-4xl">
             <DialogHeader>

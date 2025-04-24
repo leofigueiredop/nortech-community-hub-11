@@ -54,18 +54,18 @@ const NotificationSettings: React.FC = () => {
   };
 
   return (
-    <Card className="bg-gray-900 rounded-2xl text-white shadow-lg overflow-hidden">
+    <Card className="bg-white rounded-2xl shadow-lg overflow-hidden">
       <CardContent className="p-8">
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Configurações de notificações</h2>
-          <p className="text-gray-400">
+          <h2 className="text-xl font-semibold mb-4 text-nortech-dark-blue">Configurações de notificações</h2>
+          <p className="text-nortech-text-muted">
             Personalize como e quando você recebe notificações da Nortech Communities.
             Essas configurações se aplicam a todos os espaços dos quais você é membro.
           </p>
         </div>
 
         <Tabs defaultValue="types" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-800">
+          <TabsList className="grid w-full grid-cols-3 bg-nortech-gray-light">
             <TabsTrigger value="types">Tipos de notificações</TabsTrigger>
             <TabsTrigger value="channels">Canais de entrega</TabsTrigger>
             <TabsTrigger value="frequency">Frequência</TabsTrigger>
@@ -290,7 +290,10 @@ const NotificationSettings: React.FC = () => {
         </Tabs>
 
         <div className="flex justify-end mt-8">
-          <Button className="bg-nortech-purple hover:bg-nortech-purple/90" onClick={handleSave}>
+          <Button 
+            className="bg-nortech-purple hover:bg-nortech-purple/90" 
+            onClick={handleSave}
+          >
             Salvar preferências
           </Button>
         </div>
