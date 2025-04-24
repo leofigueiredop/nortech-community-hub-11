@@ -13,7 +13,6 @@ export { default as Plans } from './Plans';
 export { default as Paywall } from './Paywall';
 export { default as Subscriptions } from './Subscriptions';
 export { default as Legal } from './Legal';
-export { default as Digest } from './Digest';
 export { default as Marketing } from './Marketing';
 export { default as Posts } from './Posts';
 export { default as Spaces } from './Spaces';

@@ -123,7 +123,7 @@ const AutomationConfigDialog: React.FC<AutomationConfigDialogProps> = ({
                             <Input placeholder="Enter email subject" {...field} />
                           </FormControl>
                           <FormDescription>
-                            Example: Welcome to {{COMMUNITY_NAME}}, {{FIRST_NAME}}!
+                            Example: Welcome to {"{{COMMUNITY_NAME}}"}, {"{{FIRST_NAME}}"}!
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
