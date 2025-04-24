@@ -18,10 +18,10 @@ const FeaturedContent: React.FC<FeaturedContentProps> = ({ items, onItemSelect }
   const featured = items[0];
 
   return (
-    <div className="mb-10">
+    <div className="mb-6"> {/* Reduced margin-bottom */}
       <Card className="bg-gradient-to-br from-slate-900 to-indigo-900 text-white overflow-hidden border-none">
         <div className="flex flex-col md:flex-row">
-          <div className="md:w-3/5 relative">
+          <div className="md:w-2/5 relative">
             <div className="aspect-video md:aspect-auto md:h-full relative overflow-hidden">
               <img 
                 src={featured.thumbnailUrl || '/placeholder.svg'} 
@@ -39,8 +39,8 @@ const FeaturedContent: React.FC<FeaturedContentProps> = ({ items, onItemSelect }
             </Button>
           </div>
           
-          <CardContent className="p-6 md:w-2/5 flex flex-col justify-center">
-            <div className="flex items-center mb-3">
+          <CardContent className="p-4 md:w-3/5 flex flex-col justify-center space-y-3"> {/* Reduced padding and added space-y-3 */}
+            <div className="flex items-center">
               <Badge className="bg-nortech-purple/80 hover:bg-nortech-purple">
                 <FileVideo size={14} className="mr-1" /> Featured
               </Badge>
@@ -51,19 +51,19 @@ const FeaturedContent: React.FC<FeaturedContentProps> = ({ items, onItemSelect }
               )}
             </div>
             
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3">{featured.title}</h2>
-            <p className="text-gray-300 mb-6">{featured.description}</p>
+            <h2 className="text-xl sm:text-2xl font-bold">{featured.title}</h2>
+            <p className="text-gray-300 text-sm line-clamp-2">{featured.description}</p>
             
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2 mb-2">
               {featured.tags.map(tag => (
-                <Badge key={tag} variant="secondary" className="bg-white/10 hover:bg-white/20 text-white">
+                <Badge key={tag} variant="secondary" className="bg-white/10 hover:bg-white/20 text-white text-xs">
                   {tag}
                 </Badge>
               ))}
             </div>
             
             <Button 
-              className="bg-nortech-purple hover:bg-nortech-purple/90 w-full sm:w-auto"
+              className="bg-nortech-purple hover:bg-nortech-purple/90 w-full sm:w-auto text-sm"
               onClick={() => onItemSelect(featured)}
             >
               Watch Now
