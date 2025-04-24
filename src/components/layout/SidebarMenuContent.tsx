@@ -1,51 +1,122 @@
-
 import React from 'react';
-import { 
-  SidebarHeader, 
-  SidebarSeparator,
-  SidebarGroup,
-} from '@/components/ui/sidebar';
-import { Link } from 'react-router-dom';
-import HomeSection from './sidebar/HomeSection';
-import GetStartedSection from './sidebar/GetStartedSection';
-import ContentSection from './sidebar/ContentSection';
-import CommunitySection from './sidebar/CommunitySection';
-import LinksSection from './sidebar/LinksSection';
+import { CommunitySwitcher } from '@/components/community/CommunitySwitcher';
+import { Home, Book, Users, Settings, Plus, GraduationCap, Calendar, MessageSquare } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useViewContext } from './MainLayout';
 
-const SidebarMenuContent: React.FC = () => {
+const SidebarMenuContent = () => {
+  const { viewAs } = useViewContext();
+
   return (
-    <>
-      <SidebarHeader className="border-b border-nortech-gray-light dark:border-gray-800 px-3 py-4">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center rounded-lg font-bold transform transition-all duration-200 group-hover:scale-110 shadow-md">
-            N
-          </div>
-          <span className="font-semibold text-xl bg-gradient-to-r from-purple-700 to-indigo-700 bg-clip-text text-transparent">Nortech</span>
-        </Link>
-      </SidebarHeader>
-      
-      <div className="p-3 mt-2">
-        <SidebarGroup>
-          <HomeSection />
-        </SidebarGroup>
-        
-        <SidebarSeparator className="my-3 bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-900 to-transparent h-px" />
-        
-        <GetStartedSection />
-        
-        <SidebarSeparator className="my-3 bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-900 to-transparent h-px" />
-        
-        <ContentSection />
-        
-        <SidebarSeparator className="my-3 bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-900 to-transparent h-px" />
-        
-        <CommunitySection />
-
-        <SidebarSeparator className="my-3 bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-900 to-transparent h-px" />
-        
-        <LinksSection />
+    <div className="flex flex-col h-full">
+      <div className="p-4">
+        <CommunitySwitcher />
       </div>
-    </>
+      <nav className="flex-1 px-2 py-4">
+        <ul>
+          <li>
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `flex items-center px-2 py-2 rounded-md hover:bg-secondary hover:text-secondary-foreground ${
+                  isActive ? 'bg-secondary text-secondary-foreground font-medium' : 'text-muted-foreground'
+                }`
+              }
+            >
+              <Home className="w-4 h-4 mr-2" />
+              <span>Home</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/library"
+              className={({ isActive }) =>
+                `flex items-center px-2 py-2 rounded-md hover:bg-secondary hover:text-secondary-foreground ${
+                  isActive ? 'bg-secondary text-secondary-foreground font-medium' : 'text-muted-foreground'
+                }`
+              }
+            >
+              <Book className="w-4 h-4 mr-2" />
+              <span>Library</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/members"
+              className={({ isActive }) =>
+                `flex items-center px-2 py-2 rounded-md hover:bg-secondary hover:text-secondary-foreground ${
+                  isActive ? 'bg-secondary text-secondary-foreground font-medium' : 'text-muted-foreground'
+                }`
+              }
+            >
+              <Users className="w-4 h-4 mr-2" />
+              <span>Members</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/courses"
+              className={({ isActive }) =>
+                `flex items-center px-2 py-2 rounded-md hover:bg-secondary hover:text-secondary-foreground ${
+                  isActive ? 'bg-secondary text-secondary-foreground font-medium' : 'text-muted-foreground'
+                }`
+              }
+            >
+              <GraduationCap className="w-4 h-4 mr-2" />
+              <span>Courses</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/events"
+              className={({ isActive }) =>
+                `flex items-center px-2 py-2 rounded-md hover:bg-secondary hover:text-secondary-foreground ${
+                  isActive ? 'bg-secondary text-secondary-foreground font-medium' : 'text-muted-foreground'
+                }`
+              }
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              <span>Events</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/chat"
+              className={({ isActive }) =>
+                `flex items-center px-2 py-2 rounded-md hover:bg-secondary hover:text-secondary-foreground ${
+                  isActive ? 'bg-secondary text-secondary-foreground font-medium' : 'text-muted-foreground'
+                }`
+              }
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              <span>Chat</span>
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
+      {viewAs === 'admin' && (
+        <div className="border-t border-border p-3">
+          <Button variant="secondary" size="sm" className="w-full">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Section
+          </Button>
+        </div>
+      )}
+      <div className="border-t border-border p-3">
+        <NavLink
+          to="/settings/general"
+          className={({ isActive }) =>
+            `flex items-center px-2 py-2 rounded-md hover:bg-secondary hover:text-secondary-foreground ${
+              isActive ? 'bg-secondary text-secondary-foreground font-medium' : 'text-muted-foreground'
+            }`
+          }
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          <span>Settings</span>
+        </NavLink>
+      </div>
+    </div>
   );
 };
 

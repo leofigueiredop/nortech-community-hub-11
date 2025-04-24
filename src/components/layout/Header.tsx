@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CommunitySwitcher } from '@/components/community/CommunitySwitcher';
 import PointsBadge from '@/components/points/PointsBadge';
 import { Trophy, Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -37,11 +36,8 @@ const Header: React.FC<{
   return (
     <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          {children}
-          <CommunitySwitcher />
-          {title && <h1 className="font-medium">{title}</h1>}
-        </div>
+        {children}
+        {title && <h1 className="font-medium">{title}</h1>}
 
         <div className="hidden md:flex items-center gap-4 flex-1 max-w-md mx-6">
           <Button 
