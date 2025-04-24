@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Dashboard from '@/pages/Dashboard';
 import Library from '@/pages/Library';
+import CourseViewer from '@/pages/CourseViewer';
 import Events from '@/pages/Events';
 import EventsCalendar from '@/pages/EventsCalendar';
 import EventsWeekly from '@/pages/EventsWeekly';
@@ -57,6 +58,8 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/library" element={<Library />} />
+              <Route path="/course/:courseId" element={<CourseViewer />} />
+              <Route path="/course/:courseId/:lessonId" element={<CourseViewer />} />
               <Route path="/events" element={<Events />} />
               <Route path="/events/calendar" element={<EventsCalendar />} />
               <Route path="/events/weekly" element={<EventsWeekly />} />
