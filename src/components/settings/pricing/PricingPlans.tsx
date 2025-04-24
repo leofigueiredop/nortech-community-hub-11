@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -145,7 +144,57 @@ const PricingPlans = () => {
         </Button>
       </div>
       
-      <ComparisonDialog open={comparisonOpen} setOpen={setComparisonOpen} plans={plans} />
+      <ComparisonDialog 
+        open={comparisonOpen} 
+        onOpenChange={setComparisonOpen} 
+        features={[
+          {
+            name: 'Membros máximos',
+            tooltip: 'Número máximo de membros permitidos',
+            starter: '100',
+            professional: '1.000',
+            business: '10.000',
+            enterprise: 'Ilimitado',
+            whiteLabel: 'Ilimitado'
+          },
+          {
+            name: 'Administradores',
+            tooltip: 'Número de administradores permitidos',
+            starter: '1',
+            professional: '3',
+            business: '10',
+            enterprise: 'Ilimitado',
+            whiteLabel: 'Ilimitado'
+          },
+          {
+            name: 'Moderadores',
+            tooltip: 'Número de moderadores permitidos',
+            starter: '1',
+            professional: '10',
+            business: '100',
+            enterprise: 'Ilimitado',
+            whiteLabel: 'Ilimitado'
+          },
+          {
+            name: 'Grupos de discussão',
+            tooltip: 'Quantidade de grupos permitidos',
+            starter: false,
+            professional: true,
+            business: true,
+            enterprise: true,
+            whiteLabel: true
+          },
+          {
+            name: 'Branding personalizado',
+            tooltip: 'Customize com suas cores e logo',
+            starter: false,
+            professional: true,
+            business: true,
+            enterprise: true,
+            whiteLabel: true
+          }
+        ]}
+      />
       
       <PricingFAQ />
     </div>

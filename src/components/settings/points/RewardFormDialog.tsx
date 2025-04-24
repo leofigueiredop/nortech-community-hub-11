@@ -27,14 +27,15 @@ const RewardFormDialog: React.FC<RewardFormDialogProps> = ({
   onSubmit 
 }) => {
   const [formData, setFormData] = useState<RewardForm>({
-    title: '',
+    name: '',
     description: '',
     imageUrl: '',
     pointsCost: 100,
     type: 'digital',
     visibility: 'public',
     stock: null,
-    expiresAt: null
+    expiresAt: null,
+    isActive: true
   });
 
   const [enableStock, setEnableStock] = useState(false);
@@ -44,20 +45,29 @@ const RewardFormDialog: React.FC<RewardFormDialogProps> = ({
   // Reset form when dialog opens/closes or reward changes
   useEffect(() => {
     if (open && reward) {
-      setFormData(reward);
-      setEnableStock(reward.stock !== null);
-      setEnableExpiration(reward.expiresAt !== null);
-      setDate(reward.expiresAt ? new Date(reward.expiresAt) : undefined);
+      setFormData({
+        ...reward,
+        // Make sure expiresAt is a Date object if it exists
+        expiresAt: reward.expiresAt ? 
+          (typeof reward.expiresAt === 'string' ? new Date(reward.expiresAt) : reward.expiresAt) 
+          : null
+      });
+      setEnableStock(reward.stock !== null && reward.stock !== undefined);
+      setEnableExpiration(!!reward.expiresAt);
+      setDate(reward.expiresAt ? 
+        (typeof reward.expiresAt === 'string' ? new Date(reward.expiresAt) : reward.expiresAt) 
+        : undefined);
     } else if (open) {
       setFormData({
-        title: '',
+        name: '',
         description: '',
         imageUrl: '',
         pointsCost: 100,
         type: 'digital',
         visibility: 'public',
         stock: null,
-        expiresAt: null
+        expiresAt: null,
+        isActive: true
       });
       setEnableStock(false);
       setEnableExpiration(false);
@@ -88,7 +98,7 @@ const RewardFormDialog: React.FC<RewardFormDialogProps> = ({
     if (!enableExpiration) {
       setFormData(prev => ({ ...prev, expiresAt: null }));
     } else if (enableExpiration && date) {
-      setFormData(prev => ({ ...prev, expiresAt: date.toISOString() }));
+      setFormData(prev => ({ ...prev, expiresAt: date }));
     }
   }, [enableExpiration, date]);
 
@@ -113,11 +123,11 @@ const RewardFormDialog: React.FC<RewardFormDialogProps> = ({
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2 col-span-2">
-                <Label htmlFor="title">Reward Title</Label>
+                <Label htmlFor="name">Reward Title</Label>
                 <Input
-                  id="title"
-                  name="title"
-                  value={formData.title}
+                  id="name"
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
                   placeholder="e.g. Premium Course Access"
                   required

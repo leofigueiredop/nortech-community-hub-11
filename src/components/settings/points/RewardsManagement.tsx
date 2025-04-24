@@ -18,12 +18,14 @@ import { Reward } from '@/types/rewards';
 import { toast } from 'sonner';
 
 // Reward type icons and colors
-const rewardTypeInfo: Record<RewardType, { color: string, label: string }> = {
+const rewardTypeInfo: Record<string, { color: string, label: string }> = {
   digital: { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300', label: 'Digital' },
   nft: { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300', label: 'NFT' },
   badge: { color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300', label: 'Badge' },
   access: { color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300', label: 'Access' },
-  physical: { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300', label: 'Physical' }
+  physical: { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300', label: 'Physical' },
+  free: { color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300', label: 'Free' },
+  downloadable: { color: 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300', label: 'Download' }
 };
 
 const visibilityInfo: Record<RewardVisibility, { color: string, label: string }> = {
@@ -40,7 +42,8 @@ const RewardsManagement: React.FC = () => {
 
   const handleEditReward = (reward: Reward) => {
     setEditingReward({
-      title: reward.title,
+      id: reward.id,
+      name: reward.title,
       description: reward.description,
       imageUrl: reward.imageUrl,
       pointsCost: reward.pointsCost,
@@ -48,14 +51,15 @@ const RewardsManagement: React.FC = () => {
       visibility: reward.visibility as RewardVisibility,
       stock: reward.stock,
       expiresAt: reward.expiresAt,
-      actionUrl: reward.actionUrl
+      actionUrl: reward.actionUrl,
+      isActive: true
     });
     setIsFormOpen(true);
   };
 
   const handleDuplicateReward = (reward: Reward) => {
     setEditingReward({
-      title: `${reward.title} (Copy)`,
+      name: `${reward.title} (Copy)`,
       description: reward.description,
       imageUrl: reward.imageUrl,
       pointsCost: reward.pointsCost,
@@ -63,17 +67,40 @@ const RewardsManagement: React.FC = () => {
       visibility: reward.visibility as RewardVisibility,
       stock: reward.stock,
       expiresAt: reward.expiresAt,
-      actionUrl: reward.actionUrl
+      actionUrl: reward.actionUrl,
+      isActive: true
     });
     setIsFormOpen(true);
   };
 
   const handleFormSubmit = (formData: RewardForm) => {
     if (formData.id) {
-      updateReward(formData.id, formData);
+      updateReward(formData.id, {
+        title: formData.name,
+        description: formData.description,
+        imageUrl: formData.imageUrl,
+        pointsCost: formData.pointsCost,
+        type: formData.type as any,
+        visibility: formData.visibility as any,
+        stock: formData.stock || null,
+        expiresAt: formData.expiresAt ? 
+          (formData.expiresAt instanceof Date ? formData.expiresAt.toISOString() : formData.expiresAt) : null,
+        actionUrl: formData.actionUrl
+      });
       toast.success('Reward updated successfully');
     } else {
-      addReward(formData);
+      addReward({
+        title: formData.name,
+        description: formData.description,
+        imageUrl: formData.imageUrl,
+        pointsCost: formData.pointsCost,
+        type: formData.type as any,
+        visibility: formData.visibility as any,
+        stock: formData.stock || null,
+        expiresAt: formData.expiresAt ? 
+          (formData.expiresAt instanceof Date ? formData.expiresAt.toISOString() : formData.expiresAt) : null,
+        actionUrl: formData.actionUrl
+      });
       toast.success('New reward created successfully');
     }
     setIsFormOpen(false);
@@ -184,8 +211,8 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward, onEdit, onDuplicate }) 
         </div>
         
         <div className="flex items-center gap-2 mb-3">
-          <Badge variant="outline" className={rewardTypeInfo[reward.type as RewardType]?.color}>
-            {rewardTypeInfo[reward.type as RewardType]?.label}
+          <Badge variant="outline" className={rewardTypeInfo[reward.type]?.color || ''}>
+            {rewardTypeInfo[reward.type]?.label || reward.type}
           </Badge>
           {reward.stock !== null && (
             <span className="text-xs text-muted-foreground">

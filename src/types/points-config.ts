@@ -58,6 +58,16 @@ export interface Reward {
   categoryId?: string;
 }
 
-export interface RewardForm extends Omit<Reward, 'id' | 'createdAt' | 'redeemCount'> {
+export interface RewardForm {
   id?: string;
+  name: string;
+  description: string;
+  pointsCost: number;
+  type: RewardType;
+  visibility: RewardVisibility;
+  stock?: number | null;
+  imageUrl?: string;
+  actionUrl?: string;
+  expiresAt?: Date | string | null;
+  isActive?: boolean;
 }
