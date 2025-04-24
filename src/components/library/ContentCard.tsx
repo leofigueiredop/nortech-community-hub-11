@@ -16,7 +16,7 @@ interface ContentCardProps {
   isTopPick?: boolean;
   rank?: number;
   showProgress?: boolean;
-  onClick?: () => void; // Added onClick prop
+  onClick?: () => void; // Added onClick prop for compatibility
 }
 
 const ContentCard: React.FC<ContentCardProps> = ({
@@ -41,7 +41,7 @@ const ContentCard: React.FC<ContentCardProps> = ({
     
     // If it's a course, navigate to course page instead of opening modal
     if (item.format === 'course') {
-      // Don't call onSelect for courses
+      // Don't call onSelect for courses, they will navigate via Link
       return;
     }
     
