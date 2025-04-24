@@ -26,45 +26,56 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 10);
   
-  // Content by format
-  const videoContent = content.filter(item => item.format === 'video' || item.format === 'youtube' || item.format === 'vimeo');
-  const pdfContent = content.filter(item => item.format === 'pdf' || item.format === 'text' || item.format === 'gdoc');
-  const audioContent = content.filter(item => item.format === 'audio');
-  const courseContent = content.filter(item => item.format === 'course');
-  const linkContent = content.filter(item => item.format === 'link');
+  // Content by format - refined grouping with clear labels
+  const videoContent = content.filter(item => 
+    item.format === 'video' || item.format === 'youtube' || item.format === 'vimeo');
   
-  // For users with premium view
-  const isPremiumView = activeView === 'premium' || activeView === 'premiumPlus';
+  const pdfContent = content.filter(item => 
+    item.format === 'pdf' || item.format === 'text' || item.format === 'gdoc');
   
-  // Personalized recommendations (based on visited tags)
-  const recommendedContent = content.filter(item => 
-    item.tags.some(tag => visitedTags.includes(tag))
-  ).slice(0, 10);
+  const audioContent = content.filter(item => 
+    item.format === 'audio');
+  
+  const courseContent = content.filter(item => 
+    item.format === 'course');
+  
+  const linkContent = content.filter(item => 
+    item.format === 'link');
+  
+  // For personalized recommendations based on visited tags
+  const recommendedContent = content
+    .filter(item => item.tags.some(tag => visitedTags.includes(tag)))
+    .slice(0, 10);
 
   return (
-    <div className="space-y-4">
-      {/* Top 10 section */}
-      <ContentSection 
-        title="Top 10 This Week" 
-        items={topTenContent} 
-        onItemSelect={onItemSelect}
-        isTopTen={true}
-        viewAllUrl="/library/top"
-      />
+    <div className="space-y-8 pb-12">
+      {/* Top 10 section with clean numbering */}
+      {topTenContent.length > 0 && (
+        <ContentSection 
+          title="Top 10 This Week" 
+          items={topTenContent} 
+          onItemSelect={onItemSelect}
+          isTopTen={true}
+          viewAllUrl="/library/top"
+        />
+      )}
 
-      {/* Recent additions */}
-      <ContentSection 
-        title="New Releases" 
-        items={newReleases} 
-        onItemSelect={onItemSelect}
-        viewAllUrl="/library/new"
-      />
+      {/* Recent additions - everyone wants to see what's new */}
+      {newReleases.length > 0 && (
+        <ContentSection 
+          title="New Releases" 
+          items={newReleases} 
+          onItemSelect={onItemSelect}
+          viewAllUrl="/library/new"
+          showNewBadge={true}
+        />
+      )}
 
-      {/* Content by format */}
+      {/* Content by format - most engaging first */}
       {courseContent.length > 0 && (
         <ContentSection 
           title="Courses 🔥" 
-          items={courseContent} 
+          items={courseContent.slice(0, 20)} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/courses"
         />
@@ -73,7 +84,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {videoContent.length > 0 && (
         <ContentSection 
           title="Videos 🎥" 
-          items={videoContent} 
+          items={videoContent.slice(0, 20)} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/videos"
         />
@@ -81,8 +92,8 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       
       {pdfContent.length > 0 && (
         <ContentSection 
-          title="PDFs 📘" 
-          items={pdfContent} 
+          title="Documents & PDFs 📘" 
+          items={pdfContent.slice(0, 20)} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/pdfs"
         />
@@ -90,8 +101,8 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       
       {audioContent.length > 0 && (
         <ContentSection 
-          title="Audio Series 🎧" 
-          items={audioContent} 
+          title="Audio Content 🎧" 
+          items={audioContent.slice(0, 20)} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/audio"
         />
@@ -100,14 +111,14 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {linkContent.length > 0 && (
         <ContentSection 
           title="Links & Resources 🔗" 
-          items={linkContent} 
+          items={linkContent.slice(0, 20)} 
           onItemSelect={onItemSelect}
           viewAllUrl="/library/links"
         />
       )}
       
-      {/* Personalized recommendations */}
-      {recommendedContent.length > 0 && (
+      {/* Personalized recommendations - always a winner */}
+      {recommendedContent.length > 3 && (
         <ContentSection 
           title="Recommended For You" 
           items={recommendedContent} 

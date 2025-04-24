@@ -7,17 +7,20 @@ import ContentCardMedia from './card/ContentCardMedia';
 import ContentCardInfo from './card/ContentCardInfo';
 import ContentFreeOverlay from './card/ContentFreeOverlay';
 import PremiumContentOverlay from './PremiumContentOverlay';
+import { Badge } from '@/components/ui/badge';
 
 interface EnhancedContentCardProps {
   item: ContentItem;
   onClick: () => void;
   rankNumber?: number;
+  isNew?: boolean;
 }
 
 const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ 
   item, 
   onClick, 
-  rankNumber 
+  rankNumber,
+  isNew = false
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   
@@ -40,19 +43,27 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
       className="h-full cursor-pointer w-full relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={() => setIsHovered(true)}
+      onTouchEnd={() => setTimeout(() => setIsHovered(false), 500)}
     >
       <Card 
-        className="overflow-hidden border-0 h-full shadow-md rounded-xl transition-all duration-200 flex flex-col"
+        className="overflow-hidden border border-border/40 h-full shadow-sm hover:shadow-md rounded-lg transition-all duration-200 flex flex-col"
         onClick={onClick}
       >
+        {/* New badge */}
+        {isNew && (
+          <Badge 
+            className="absolute top-2 right-2 bg-green-500 text-white z-20 shadow-md border-none"
+          >
+            NEW
+          </Badge>
+        )}
+        
         {/* Rank number display for top 10 items */}
         {rankNumber !== undefined && (
           <div 
-            className="absolute -left-2 -top-2 z-10 font-bold text-4xl select-none pointer-events-none" 
-            style={{
-              color: 'white',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.7), 0 0 10px rgba(0,0,0,0.5)'
-            }}>
+            className="absolute -left-1 -top-1 z-30 w-8 h-8 flex items-center justify-center bg-primary rounded-full text-white font-bold text-lg select-none pointer-events-none shadow-lg" 
+          >
             {rankNumber}
           </div>
         )}

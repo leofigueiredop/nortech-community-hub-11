@@ -48,7 +48,7 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
 
   return (
     <ScrollArea className="flex-1">
-      <div className="container py-6 max-w-screen-2xl space-y-8">
+      <div className="container py-6 max-w-screen-2xl space-y-6">
         {/* Hero Feature Carousel - only show on main view, not during search */}
         {featuredContent.length > 0 && !isSearchActive && activeView === 'all' && (
           <FeaturedContentCarousel 
@@ -60,11 +60,14 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
         {/* Search Results */}
         {isSearchActive ? (
           <div className="space-y-6">
-            <h2 className="text-2xl font-semibold">
-              Search Results: {filteredContent.length} items
+            <h2 className="text-2xl font-semibold flex items-center gap-2">
+              <span>Search Results</span>
+              <span className="px-2 py-0.5 bg-muted rounded-full text-sm font-normal">
+                {filteredContent.length} items
+              </span>
             </h2>
             <motion.div 
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -77,12 +80,13 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
             </motion.div>
             {filteredContent.length === 0 && (
               <motion.div 
-                className="text-center py-12"
+                className="text-center py-16 bg-muted/30 rounded-lg border border-dashed"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <p className="text-muted-foreground">No results found for "{searchQuery}"</p>
+                <h3 className="text-xl font-medium mb-2">No results found</h3>
+                <p className="text-muted-foreground">Try adjusting your search for "{searchQuery}"</p>
               </motion.div>
             )}
           </div>

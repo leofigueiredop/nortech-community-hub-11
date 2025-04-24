@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ContentItem } from '@/types/library';
 import { formatDuration } from '../viewer/contentViewerUtils';
-import { Play, FileText, Book, Play as PlayIcon, Bookmark, CheckCircle } from 'lucide-react';
+import { Play, FileText, Book, Play as PlayIcon, Bookmark, CheckCircle, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useContentProgress } from '@/hooks/useContentProgress';
 
@@ -22,7 +22,7 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
       case 'video':
       case 'youtube':
       case 'vimeo':
-        return <Play className="h-4 w-4" />;
+        return <Play className="h-4 w-4" fill="currentColor" />;
       case 'pdf':
       case 'text':
         return <FileText className="h-4 w-4" />;
@@ -55,17 +55,26 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
 
   return (
     <div className="absolute inset-0 bg-card/95 flex flex-col p-4 z-10 animate-fade-in overflow-y-auto">
-      <div className="flex-1 flex flex-col space-y-3">
-        {/* Title & Description */}
-        <h3 className="text-sm font-medium line-clamp-1">{item.title}</h3>
+      <div className="flex-1 flex flex-col space-y-2">
+        {/* Title */}
+        <h3 className="text-sm font-semibold line-clamp-1">{item.title}</h3>
         
+        {/* Description */}
         <p className="text-xs text-muted-foreground line-clamp-3">{item.description}</p>
+        
+        {/* Duration info if available */}
+        {item.duration > 0 && (
+          <div className="flex items-center text-xs text-muted-foreground">
+            <Clock className="h-3 w-3 mr-1" />
+            <span>{formatDuration(item.duration)}</span>
+          </div>
+        )}
         
         {/* Tags */}
         {item.tags && item.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-auto">
             {item.tags.slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="outline" className="text-xs">
+              <Badge key={tag} variant="outline" className="text-xs text-foreground/70">
                 {tag}
               </Badge>
             ))}
@@ -99,12 +108,12 @@ const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
       
       {/* Actions */}
       <div className="flex gap-2 mt-4">
-        <Button size="sm" className="w-full flex items-center gap-2">
+        <Button size="sm" className="w-full flex items-center gap-2 bg-primary hover:bg-primary/90">
           {getActionIcon()}
           <span>{getActionText()}</span>
         </Button>
         
-        <Button size="sm" variant="outline">
+        <Button size="icon" variant="outline">
           <Bookmark className="h-4 w-4" />
           <span className="sr-only">Save</span>
         </Button>
