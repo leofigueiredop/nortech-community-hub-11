@@ -40,7 +40,7 @@ const samplePosts: Record<string, SocialPost[]> = {
     {
       id: '2',
       platform: 'instagram',
-      content: '🔥 Transform your skills with @yourcommunity courses! I've been a member for [TIME_PERIOD] and learned so much. Click my affiliate link in bio to join! #YourCommunity #Learning #Growth',
+      content: "🔥 Transform your skills with @yourcommunity courses! I've been a member for [TIME_PERIOD] and learned so much. Click my affiliate link in bio to join! #YourCommunity #Learning #Growth",
       hasImage: true,
       imageUrl: 'https://via.placeholder.com/1080x1080/6E59A5/FFFFFF?text=Join+Today',
     }
@@ -49,7 +49,7 @@ const samplePosts: Record<string, SocialPost[]> = {
     {
       id: '3',
       platform: 'twitter',
-      content: 'I've been using @yourcommunity for [TIME_PERIOD] and it's completely changed how I approach [TOPIC]. Join through my link to get started: [AFFILIATE_LINK] #YourCommunity',
+      content: "I've been using @yourcommunity for [TIME_PERIOD] and it's completely changed how I approach [TOPIC]. Join through my link to get started: [AFFILIATE_LINK] #YourCommunity",
       hasImage: false,
     }
   ],
@@ -57,7 +57,7 @@ const samplePosts: Record<string, SocialPost[]> = {
     {
       id: '4',
       platform: 'facebook',
-      content: 'Looking to level up your [SKILL]? I've been a member of Your Community for [TIME_PERIOD] and it's been incredible for my growth. Join through my affiliate link to get started on your journey: [AFFILIATE_LINK]',
+      content: "Looking to level up your [SKILL]? I've been a member of Your Community for [TIME_PERIOD] and it's been incredible for my growth. Join through my affiliate link to get started on your journey: [AFFILIATE_LINK]",
       hasImage: true,
       imageUrl: 'https://via.placeholder.com/1200x630/9b87f5/FFFFFF?text=Your+Community',
     }
@@ -66,7 +66,7 @@ const samplePosts: Record<string, SocialPost[]> = {
     {
       id: '5',
       platform: 'linkedin',
-      content: 'I'm excited to share a valuable resource that's helped me advance my professional skills in [INDUSTRY/FIELD]. Your Community offers comprehensive resources for [TARGET_AUDIENCE]. Through my affiliate link, you can join this thriving community: [AFFILIATE_LINK] #ProfessionalDevelopment #YourCommunity',
+      content: "I'm excited to share a valuable resource that's helped me advance my professional skills in [INDUSTRY/FIELD]. Your Community offers comprehensive resources for [TARGET_AUDIENCE]. Through my affiliate link, you can join this thriving community: [AFFILIATE_LINK] #ProfessionalDevelopment #YourCommunity",
       hasImage: false,
     }
   ]
