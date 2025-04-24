@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Check, X, HelpCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { type Plan } from './PricingPlans';
 
 interface Feature {
   name: string;
@@ -22,7 +23,7 @@ interface Feature {
   whiteLabel?: string | boolean;
 }
 
-interface ComparisonDialogProps {
+export interface ComparisonDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   features: Feature[];
