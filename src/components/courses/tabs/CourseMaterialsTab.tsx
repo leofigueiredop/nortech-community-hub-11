@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ContentItem, CourseModule, CourseModuleItem } from '@/types/library';
 import { Button } from '@/components/ui/button';
@@ -172,7 +171,11 @@ interface MaterialItemProps {
   isDarkMode: boolean;
 }
 
-const MaterialItem: React.FC<MaterialItemProps> = ({ material, onDownload, isDarkMode }) => {
+const MaterialItem: React.FC<MaterialItemProps> = ({
+  material,
+  onDownload,
+  isDarkMode
+}) => {
   return (
     <div 
       className={`p-4 rounded-md border flex items-center justify-between ${
