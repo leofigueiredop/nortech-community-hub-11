@@ -1,0 +1,89 @@
+
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "back": "Back",
+    "next": "Next",
+    "loading": "Loading...",
+    "search": "Search",
+    "viewAll": "View All",
+    "subscribeNow": "Subscribe Now",
+    "settings": "Settings",
+    "language": "Language",
+    "english": "English",
+    "portuguese": "Portuguese",
+    "languageSaved": "Language saved"
+  },
+  "header": {
+    "searchEverything": "Search everything...",
+    "ranking": "Community Ranking",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "sidebar": {
+    "home": "Home",
+    "community": "Community",
+    "content": "Content",
+    "getStarted": "Get Started",
+    "forums": "Forums",
+    "events": "Events",
+    "library": "Library",
+    "members": "Members",
+    "leaderboard": "Leaderboard"
+  },
+  "settings": {
+    "general": {
+      "title": "General Settings",
+      "communitySettings": "Community Settings",
+      "generalDescription": "Configure basic information about your community",
+      "manageSettings": "Manage General Settings",
+      "communityName": "Community Name",
+      "communityNameDescription": "Your brand name shown to members",
+      "language": "Language",
+      "languageDescription": "Default for new members",
+      "communityId": "Community ID",
+      "communityIdDescription": "For support identification",
+      "visibilityAccess": "Visibility & Access",
+      "visibilityAccessDescription": "Control how users can access your community",
+      "communityUrl": "Community URL",
+      "communityUrlDescription": "Your community's web address",
+      "setupCustomDomain": "Set up custom domain",
+      "privateCommunity": "Private Community",
+      "privateCommunityDescription": "Only invited users can join",
+      "invitationLink": "Invitation Link",
+      "invitationLinkDescription": "Share this to onboard users",
+      "saveChanges": "Save Changes",
+      "saving": "Saving...",
+      "settingsSaved": "Settings saved"
+    },
+    "branding": {
+      "title": "Branding Settings",
+      "brandColors": "Brand Colors",
+      "lightMode": "Light Mode",
+      "darkMode": "Dark Mode",
+      "logoSettings": "Logo Settings",
+      "uploadLogo": "Upload Logo",
+      "notificationSettings": "Notification Settings",
+      "replyEmail": "Reply Email",
+      "whiteLabelApp": "White Label App",
+      "upgradeForWhiteLabel": "Upgrade to remove Lovable branding"
+    },
+    "contentEngagement": {
+      "title": "Content & Engagement",
+      "description": "Manage how content is created, automated, moderated and gamified"
+    },
+    "monetization": {
+      "title": "Monetization",
+      "description": "Manage pricing, track revenue and activate growth tools"
+    },
+    "memberExperience": {
+      "title": "Member Experience",
+      "description": "Configure how members interact, receive messages and see legal terms"
+    }
+  }
+}

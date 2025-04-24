@@ -11,8 +11,11 @@ import GetStartedSection from './sidebar/GetStartedSection';
 import ContentSection from './sidebar/ContentSection';
 import CommunitySection from './sidebar/CommunitySection';
 import LinksSection from './sidebar/LinksSection';
+import { useTranslation } from 'react-i18next';
 
 const SidebarMenuContent: React.FC = () => {
+  const { t } = useTranslation();
+  
   return (
     <>
       <SidebarHeader className="border-b border-nortech-gray-light dark:border-gray-800 px-3 py-4 flex items-center justify-between">
