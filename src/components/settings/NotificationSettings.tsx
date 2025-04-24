@@ -73,217 +73,164 @@ const NotificationSettings: React.FC = () => {
 
           <TabsContent value="types" className="space-y-6">
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-blue-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Novas postagens</Label>
-                    <p className="text-gray-400 text-sm">Quando alguém publica em um espaço que você segue</p>
+              {[
+                { 
+                  icon: FileText, 
+                  iconColor: 'text-blue-400', 
+                  label: 'Novas postagens', 
+                  description: 'Quando alguém publica em um espaço que você segue',
+                  key: 'posts'
+                },
+                { 
+                  icon: MessageSquare, 
+                  iconColor: 'text-purple-400', 
+                  label: 'Respostas às suas postagens', 
+                  description: 'Quando alguém responde à sua postagem ou comentário',
+                  key: 'replies'
+                },
+                { 
+                  icon: Calendar, 
+                  iconColor: 'text-green-400', 
+                  label: 'Eventos e sessões ao vivo', 
+                  description: 'Próximos eventos para os quais você se registrou',
+                  key: 'events'
+                },
+                { 
+                  icon: FileText, 
+                  iconColor: 'text-teal-400', 
+                  label: 'Novo conteúdo', 
+                  description: 'Quando novo conteúdo é adicionado a cursos em que você está inscrito',
+                  key: 'content'
+                },
+                { 
+                  icon: UserPlus, 
+                  iconColor: 'text-pink-400', 
+                  label: 'Convites', 
+                  description: 'Convites para espaços e aprovações de membros',
+                  key: 'invitations'
+                },
+                { 
+                  icon: Award, 
+                  iconColor: 'text-amber-400', 
+                  label: 'Conquistas e emblemas', 
+                  description: 'Quando você completa cursos ou ganha novos emblemas',
+                  key: 'milestones'
+                },
+                { 
+                  icon: Megaphone, 
+                  iconColor: 'text-red-400', 
+                  label: 'Anúncios', 
+                  description: 'Anúncios importantes da comunidade feitos por administradores',
+                  key: 'announcements'
+                }
+              ].map((item, index) => (
+                <React.Fragment key={item.key}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <item.icon className={`h-5 w-5 ${item.iconColor}`} />
+                      <div>
+                        <Label className="text-base font-semibold text-nortech-dark-blue block">{item.label}</Label>
+                        <p className="text-nortech-text-muted text-sm">{item.description}</p>
+                      </div>
+                    </div>
+                    <Switch 
+                      checked={preferences[item.key as keyof typeof preferences]} 
+                      onCheckedChange={() => handleTogglePreference(item.key as keyof typeof preferences)}
+                    />
                   </div>
-                </div>
-                <Switch 
-                  checked={preferences.posts} 
-                  onCheckedChange={() => handleTogglePreference('posts')}
-                />
-              </div>
-
-              <Separator className="bg-gray-800" />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <MessageSquare className="h-5 w-5 text-purple-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Respostas às suas postagens</Label>
-                    <p className="text-gray-400 text-sm">Quando alguém responde à sua postagem ou comentário</p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={preferences.replies} 
-                  onCheckedChange={() => handleTogglePreference('replies')}
-                />
-              </div>
-
-              <Separator className="bg-gray-800" />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-green-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Eventos e sessões ao vivo</Label>
-                    <p className="text-gray-400 text-sm">Próximos eventos para os quais você se registrou</p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={preferences.events} 
-                  onCheckedChange={() => handleTogglePreference('events')}
-                />
-              </div>
-
-              <Separator className="bg-gray-800" />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-teal-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Novo conteúdo</Label>
-                    <p className="text-gray-400 text-sm">Quando novo conteúdo é adicionado a cursos em que você está inscrito</p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={preferences.content} 
-                  onCheckedChange={() => handleTogglePreference('content')}
-                />
-              </div>
-
-              <Separator className="bg-gray-800" />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <UserPlus className="h-5 w-5 text-pink-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Convites</Label>
-                    <p className="text-gray-400 text-sm">Convites para espaços e aprovações de membros</p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={preferences.invitations} 
-                  onCheckedChange={() => handleTogglePreference('invitations')}
-                />
-              </div>
-
-              <Separator className="bg-gray-800" />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Award className="h-5 w-5 text-amber-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Conquistas e emblemas</Label>
-                    <p className="text-gray-400 text-sm">Quando você completa cursos ou ganha novos emblemas</p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={preferences.milestones} 
-                  onCheckedChange={() => handleTogglePreference('milestones')}
-                />
-              </div>
-
-              <Separator className="bg-gray-800" />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Megaphone className="h-5 w-5 text-red-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Anúncios</Label>
-                    <p className="text-gray-400 text-sm">Anúncios importantes da comunidade feitos por administradores</p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={preferences.announcements} 
-                  onCheckedChange={() => handleTogglePreference('announcements')}
-                />
-              </div>
+                  {index < 6 && <Separator className="bg-nortech-gray-light" />}
+                </React.Fragment>
+              ))}
             </div>
           </TabsContent>
 
           <TabsContent value="channels" className="space-y-6">
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Bell className="h-5 w-5 text-indigo-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Notificações no aplicativo</Label>
-                    <p className="text-gray-400 text-sm">Notificações no centro de notificações</p>
+              {[
+                { 
+                  icon: Bell, 
+                  iconColor: 'text-indigo-400', 
+                  label: 'Notificações no aplicativo', 
+                  description: 'Notificações no centro de notificações',
+                  key: 'inApp'
+                },
+                { 
+                  icon: Mail, 
+                  iconColor: 'text-cyan-400', 
+                  label: 'Notificações por email', 
+                  description: 'Enviar notificações para seu email',
+                  key: 'email'
+                },
+                { 
+                  icon: Bell, 
+                  iconColor: 'text-orange-400', 
+                  label: 'Notificações push', 
+                  description: 'Notificações no seu dispositivo móvel',
+                  key: 'push'
+                },
+                { 
+                  icon: Clock, 
+                  iconColor: 'text-rose-400', 
+                  label: 'Emails de resumo', 
+                  description: 'Receber um resumo das atividades',
+                  key: 'digest'
+                }
+              ].map((item, index) => (
+                <React.Fragment key={item.key}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <item.icon className={`h-5 w-5 ${item.iconColor}`} />
+                      <div>
+                        <Label className="text-base font-semibold text-nortech-dark-blue block">{item.label}</Label>
+                        <p className="text-nortech-text-muted text-sm">{item.description}</p>
+                      </div>
+                    </div>
+                    <Switch 
+                      checked={channels[item.key as keyof typeof channels]} 
+                      onCheckedChange={() => handleToggleChannel(item.key as keyof typeof channels)}
+                    />
                   </div>
-                </div>
-                <Switch 
-                  checked={channels.inApp} 
-                  onCheckedChange={() => handleToggleChannel('inApp')}
-                />
-              </div>
-
-              <Separator className="bg-gray-800" />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-cyan-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Notificações por email</Label>
-                    <p className="text-gray-400 text-sm">Enviar notificações para seu email</p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={channels.email} 
-                  onCheckedChange={() => handleToggleChannel('email')}
-                />
-              </div>
-
-              <Separator className="bg-gray-800" />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Bell className="h-5 w-5 text-orange-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Notificações push</Label>
-                    <p className="text-gray-400 text-sm">Notificações no seu dispositivo móvel</p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={channels.push} 
-                  onCheckedChange={() => handleToggleChannel('push')}
-                />
-              </div>
-
-              <Separator className="bg-gray-800" />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-rose-400" />
-                  <div>
-                    <Label className="text-base font-semibold text-white">Emails de resumo</Label>
-                    <p className="text-gray-400 text-sm">Receber um resumo das atividades</p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={channels.digest} 
-                  onCheckedChange={() => handleToggleChannel('digest')}
-                />
-              </div>
+                  {index < 3 && <Separator className="bg-nortech-gray-light" />}
+                </React.Fragment>
+              ))}
             </div>
           </TabsContent>
 
           <TabsContent value="frequency" className="space-y-6">
             <div className="space-y-6">
-              <Label className="text-base font-semibold text-white">Frequência de notificações</Label>
-              <p className="text-gray-400 text-sm mb-4">Escolha com que frequência você recebe notificações</p>
+              <Label className="text-base font-semibold text-nortech-dark-blue">Frequência de notificações</Label>
+              <p className="text-nortech-text-muted text-sm mb-4">Escolha com que frequência você recebe notificações</p>
 
               <RadioGroup 
                 value={frequency} 
                 onValueChange={setFrequency} 
                 className="space-y-4"
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="realtime" id="realtime" />
-                  <Label htmlFor="realtime" className="text-white">
-                    <span className="font-semibold">Tempo real</span>
-                    <p className="text-gray-400 text-sm">Receba notificações assim que acontecerem</p>
-                  </Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="daily" id="daily" />
-                  <Label htmlFor="daily" className="text-white">
-                    <span className="font-semibold">Resumo diário</span>
-                    <p className="text-gray-400 text-sm">Receba um resumo uma vez por dia</p>
-                  </Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="weekly" id="weekly" />
-                  <Label htmlFor="weekly" className="text-white">
-                    <span className="font-semibold">Resumo semanal</span>
-                    <p className="text-gray-400 text-sm">Receba um resumo uma vez por semana</p>
-                  </Label>
-                </div>
+                {[
+                  { 
+                    value: 'realtime', 
+                    label: 'Tempo real', 
+                    description: 'Receba notificações assim que acontecerem'
+                  },
+                  { 
+                    value: 'daily', 
+                    label: 'Resumo diário', 
+                    description: 'Receba um resumo uma vez por dia'
+                  },
+                  { 
+                    value: 'weekly', 
+                    label: 'Resumo semanal', 
+                    description: 'Receba um resumo uma vez por semana'
+                  }
+                ].map((item) => (
+                  <div key={item.value} className="flex items-center space-x-2">
+                    <RadioGroupItem value={item.value} id={item.value} />
+                    <Label htmlFor={item.value} className="text-nortech-dark-blue">
+                      <span className="font-semibold">{item.label}</span>
+                      <p className="text-nortech-text-muted text-sm">{item.description}</p>
+                    </Label>
+                  </div>
+                ))}
               </RadioGroup>
             </div>
           </TabsContent>
