@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
@@ -21,6 +20,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import { Mail, Clock, ArrowRight } from "lucide-react";
+
+interface EmailConfig {
+  subject: string;
+  content: string;
+  delayHours?: number;
+}
+
+interface AutomationFormData {
+  emails: EmailConfig[];
+}
 
 interface AutomationConfigDialogProps {
   isOpen: boolean;
@@ -37,15 +47,17 @@ const AutomationConfigDialog: React.FC<AutomationConfigDialogProps> = ({
   onClose,
   automation
 }) => {
-  const form = useForm({
+  const form = useForm<AutomationFormData>({
     defaultValues: {
-      emailSubject: "",
-      emailContent: "",
-      delay: "24",
+      emails: Array(automation.steps).fill({
+        subject: "",
+        content: "",
+        delayHours: 24,
+      }),
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: AutomationFormData) => {
     console.log("Automation configuration:", data);
     onClose();
   };
@@ -61,58 +73,82 @@ const AutomationConfigDialog: React.FC<AutomationConfigDialogProps> = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-6">
               {Array.from({ length: automation.steps }).map((_, index) => (
-                <div key={index} className="space-y-4 p-4 border rounded-lg">
-                  <h3 className="font-medium">Email {index + 1}</h3>
-                  
-                  <FormField
-                    control={form.control}
-                    name={`emailSubject_${index}`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Subject</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter email subject" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name={`emailContent_${index}`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Content</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Write your email content..."
-                            className="min-h-[100px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
+                <div key={index} className="relative">
+                  {/* Journey Timeline */}
                   {index > 0 && (
+                    <div className="absolute -top-6 left-8 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <Clock className="h-4 w-4 mr-1" />
+                      <span>+{form.getValues().emails[index]?.delayHours || 24}h after Email {index}</span>
+                    </div>
+                  )}
+                  
+                  <div className="p-4 border rounded-lg space-y-4 bg-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Mail className="h-5 w-5 text-primary" />
+                      <h3 className="font-medium">Email {index + 1}</h3>
+                    </div>
+
                     <FormField
                       control={form.control}
-                      name={`delay_${index}`}
+                      name={`emails.${index}.subject`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Delay after previous email (hours)</FormLabel>
+                          <FormLabel>Subject</FormLabel>
                           <FormControl>
-                            <Input type="number" min="1" {...field} />
+                            <Input placeholder="Enter email subject" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={form.control}
+                      name={`emails.${index}.content`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Content</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Write your email content..."
+                              className="min-h-[100px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {index > 0 && (
+                      <FormField
+                        control={form.control}
+                        name={`emails.${index}.delayHours`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Delay after previous email (hours)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="1"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {/* Journey Arrow */}
+                  {index < automation.steps - 1 && (
+                    <div className="flex justify-center my-2">
+                      <ArrowRight className="h-5 w-5 text-gray-400" />
+                    </div>
                   )}
                 </div>
               ))}
