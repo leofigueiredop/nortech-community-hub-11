@@ -5,9 +5,9 @@ import ContentSection from './ContentSection';
 
 interface LibraryContentRowsProps {
   content: ContentItem[];
-  activeView: 'all' | 'free' | 'premium' | 'unlockable';
+  activeView: string;
   visitedTags: string[];
-  onItemSelect: (item: ContentItem | null) => void;
+  onItemSelect: (item: ContentItem) => void;
 }
 
 const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
@@ -16,110 +16,97 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
   visitedTags,
   onItemSelect
 }) => {
-  // Apply main filter based on active view
-  const viewFilteredContent = content.filter(item => {
-    if (activeView === 'all') return true;
-    if (activeView === 'free') return item.accessLevel === 'free';
-    if (activeView === 'premium') return item.accessLevel === 'premium';
-    if (activeView === 'unlockable') return !!item.pointsEnabled;
-    return true;
-  });
-
-  // Organize content into sections
-  const newReleases = [...viewFilteredContent]
+  // Top 10 content
+  const topTenContent = [...content]
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 10);
+    
+  // New releases
+  const newReleases = [...content]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 10);
   
-  const topTen = [...viewFilteredContent]
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 10);
+  // Content by format
+  const videoContent = content.filter(item => item.format === 'video' || item.format === 'youtube' || item.format === 'vimeo');
+  const pdfContent = content.filter(item => item.format === 'pdf' || item.format === 'text' || item.format === 'gdoc');
+  const audioContent = content.filter(item => item.format === 'audio');
+  const courseContent = content.filter(item => item.format === 'course');
+  const linkContent = content.filter(item => item.format === 'link');
   
-  // Videos
-  const videoContent = viewFilteredContent.filter(
-    item => item.format === 'video' || item.format === 'youtube' || item.format === 'vimeo'
-  ).slice(0, 10);
-  
-  // PDFs
-  const pdfContent = viewFilteredContent.filter(
-    item => item.format === 'pdf' || item.format === 'text' || item.format === 'gdoc'
-  ).slice(0, 10);
-  
-  // Audio
-  const audioContent = viewFilteredContent.filter(
-    item => item.format === 'audio'
-  ).slice(0, 10);
-  
-  // Courses
-  const courseContent = viewFilteredContent.filter(
-    item => item.format === 'course'
-  ).slice(0, 10);
+  // For users with premium view
+  const isPremiumView = activeView === 'premium' || activeView === 'premiumPlus';
   
   // Personalized recommendations (based on visited tags)
-  const recommendedContent = viewFilteredContent.filter(item => 
-    item.tags && Array.isArray(item.tags) && item.tags.some(tag => visitedTags.includes(tag))
+  const recommendedContent = content.filter(item => 
+    item.tags.some(tag => visitedTags.includes(tag))
   ).slice(0, 10);
 
-  // Premium showcase (always show at least this section in 'all' view)
-  const premiumShowcase = content.filter(item => item.accessLevel === 'premium').slice(0, 10);
-
-  // Check if we have any content to display
-  const hasContent = viewFilteredContent.length > 0;
-
-  // Check if sections have content to show
-  const hasSections = 
-    newReleases.length > 0 || 
-    topTen.length > 0 || 
-    videoContent.length > 0 || 
-    pdfContent.length > 0 || 
-    audioContent.length > 0 || 
-    courseContent.length > 0 || 
-    recommendedContent.length > 0 || 
-    premiumShowcase.length > 0;
-
-  if (!hasContent) {
-    return (
-      <div className="text-center py-8 px-4">
-        <h2 className="text-2xl font-semibold mb-4">No content available</h2>
-        <p className="text-muted-foreground">
-          There is no content available for the selected filters.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-4 py-6">
-      {/* Top 10 This Week */}
-      {topTen.length > 0 && (
+    <div className="space-y-4">
+      {/* Top 10 section */}
+      <ContentSection 
+        title="Top 10 This Week" 
+        items={topTenContent} 
+        onItemSelect={onItemSelect}
+        isTopTen={true}
+        viewAllUrl="/library/top"
+      />
+
+      {/* Recent additions */}
+      <ContentSection 
+        title="New Releases" 
+        items={newReleases} 
+        onItemSelect={onItemSelect}
+        viewAllUrl="/library/new"
+      />
+
+      {/* Content by format */}
+      {courseContent.length > 0 && (
         <ContentSection 
-          title="Top 10 This Week" 
-          items={topTen} 
+          title="Courses 🔥" 
+          items={courseContent} 
           onItemSelect={onItemSelect}
-          isTopTen={true}
+          viewAllUrl="/library/courses"
         />
       )}
       
-      {/* New releases */}
-      {newReleases.length > 0 && (
+      {videoContent.length > 0 && (
         <ContentSection 
-          title="New Releases" 
-          items={newReleases} 
+          title="Videos 🎥" 
+          items={videoContent} 
           onItemSelect={onItemSelect}
-          viewAllUrl="/library/new"
+          viewAllUrl="/library/videos"
         />
       )}
       
-      {/* Premium content showcase - always show in 'all' view */}
-      {activeView === 'all' && premiumShowcase.length > 0 && (
+      {pdfContent.length > 0 && (
         <ContentSection 
-          title="Premium Content" 
-          items={premiumShowcase} 
+          title="PDFs 📘" 
+          items={pdfContent} 
           onItemSelect={onItemSelect}
-          viewAllUrl="/library/premium"
+          viewAllUrl="/library/pdfs"
         />
       )}
       
-      {/* Recommended content (personalized, if any) */}
+      {audioContent.length > 0 && (
+        <ContentSection 
+          title="Audio Series 🎧" 
+          items={audioContent} 
+          onItemSelect={onItemSelect}
+          viewAllUrl="/library/audio"
+        />
+      )}
+      
+      {linkContent.length > 0 && (
+        <ContentSection 
+          title="Links & Resources 🔗" 
+          items={linkContent} 
+          onItemSelect={onItemSelect}
+          viewAllUrl="/library/links"
+        />
+      )}
+      
+      {/* Personalized recommendations */}
       {recommendedContent.length > 0 && (
         <ContentSection 
           title="Recommended For You" 
@@ -127,51 +114,6 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
           onItemSelect={onItemSelect}
           viewAllUrl="/library/recommended"
         />
-      )}
-      
-      {/* Format-specific sections */}
-      {videoContent.length > 0 && (
-        <ContentSection 
-          title="Videos" 
-          items={videoContent} 
-          onItemSelect={onItemSelect}
-          viewAllUrl="/library/videos"
-        />
-      )}
-      
-      {courseContent.length > 0 && (
-        <ContentSection 
-          title="Courses" 
-          items={courseContent} 
-          onItemSelect={onItemSelect}
-          viewAllUrl="/library/courses"
-        />
-      )}
-      
-      {pdfContent.length > 0 && (
-        <ContentSection 
-          title="PDF Guides" 
-          items={pdfContent} 
-          onItemSelect={onItemSelect}
-          viewAllUrl="/library/documents"
-        />
-      )}
-      
-      {audioContent.length > 0 && (
-        <ContentSection 
-          title="Audio Lessons" 
-          items={audioContent} 
-          onItemSelect={onItemSelect}
-          viewAllUrl="/library/audio"
-        />
-      )}
-      
-      {!hasSections && (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">
-            No content matches your current view settings.
-          </p>
-        </div>
       )}
     </div>
   );
