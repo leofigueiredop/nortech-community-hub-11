@@ -1,190 +1,233 @@
 
 import React, { useState } from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PlusCircle, Edit, Trash2, Gift, Tag, Calendar } from 'lucide-react';
+import { Plus, Edit, Copy, Eye, Archive } from 'lucide-react';
 import { useRewardsAdmin } from '@/hooks/useRewardsAdmin';
+import { RewardType, RewardVisibility, RewardForm } from '@/types/points-config';
 import RewardFormDialog from './RewardFormDialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Reward } from '@/types/rewards';
-import DeleteConfirmDialog from './DeleteConfirmDialog';
+import { toast } from 'sonner';
+
+// Reward type icons and colors
+const rewardTypeInfo: Record<RewardType, { color: string, label: string }> = {
+  digital: { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300', label: 'Digital' },
+  nft: { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300', label: 'NFT' },
+  badge: { color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300', label: 'Badge' },
+  access: { color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300', label: 'Access' },
+  physical: { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300', label: 'Physical' }
+};
+
+const visibilityInfo: Record<RewardVisibility, { color: string, label: string }> = {
+  public: { color: 'bg-green-100 text-green-800', label: 'Public' },
+  vip: { color: 'bg-purple-100 text-purple-800', label: 'VIP Only' },
+  limited: { color: 'bg-amber-100 text-amber-800', label: 'Limited Time' }
+};
 
 const RewardsManagement: React.FC = () => {
-  const { rewards, deleteReward } = useRewardsAdmin();
+  const { rewards, addReward, updateReward, deleteReward } = useRewardsAdmin();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [currentReward, setCurrentReward] = useState<Reward | null>(null);
+  const [editingReward, setEditingReward] = useState<RewardForm | null>(null);
+  const [selectedType, setSelectedType] = useState<RewardType | 'all'>('all');
 
   const handleEditReward = (reward: Reward) => {
-    setCurrentReward(reward);
+    setEditingReward({
+      title: reward.title,
+      description: reward.description,
+      imageUrl: reward.imageUrl,
+      pointsCost: reward.pointsCost,
+      type: reward.type as RewardType,
+      visibility: reward.visibility as RewardVisibility,
+      stock: reward.stock,
+      expiresAt: reward.expiresAt,
+      actionUrl: reward.actionUrl
+    });
     setIsFormOpen(true);
   };
 
-  const handleDeleteReward = (reward: Reward) => {
-    setCurrentReward(reward);
-    setIsDeleteConfirmOpen(true);
+  const handleDuplicateReward = (reward: Reward) => {
+    setEditingReward({
+      title: `${reward.title} (Copy)`,
+      description: reward.description,
+      imageUrl: reward.imageUrl,
+      pointsCost: reward.pointsCost,
+      type: reward.type as RewardType,
+      visibility: reward.visibility as RewardVisibility,
+      stock: reward.stock,
+      expiresAt: reward.expiresAt,
+      actionUrl: reward.actionUrl
+    });
+    setIsFormOpen(true);
   };
 
-  const confirmDelete = () => {
-    if (currentReward) {
-      deleteReward(currentReward.id);
-      setIsDeleteConfirmOpen(false);
+  const handleFormSubmit = (formData: RewardForm) => {
+    if (formData.id) {
+      updateReward(formData.id, formData);
+      toast.success('Reward updated successfully');
+    } else {
+      addReward(formData);
+      toast.success('New reward created successfully');
     }
+    setIsFormOpen(false);
+    setEditingReward(null);
   };
 
-  const getVisibilityBadge = (visibility: string) => {
-    switch (visibility) {
-      case 'public':
-        return <Badge variant="secondary">Public</Badge>;
-      case 'vip':
-        return <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300">VIP Only</Badge>;
-      case 'limited':
-        return <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">Limited Time</Badge>;
-      default:
-        return <Badge variant="secondary">Public</Badge>;
-    }
+  const handleCreateNewReward = () => {
+    setEditingReward(null);
+    setIsFormOpen(true);
   };
 
-  const getTypeBadge = (type: string) => {
-    switch (type) {
-      case 'free':
-        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Free</Badge>;
-      case 'downloadable':
-        return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">Downloadable</Badge>;
-      case 'access':
-        return <Badge variant="outline" className="bg-indigo-100 text-indigo-800 border-indigo-300">Access</Badge>;
-      case 'nft':
-        return <Badge variant="outline" className="bg-pink-100 text-pink-800 border-pink-300">NFT</Badge>;
-      default:
-        return <Badge variant="outline">Other</Badge>;
-    }
-  };
+  const filteredRewards = selectedType === 'all' 
+    ? rewards 
+    : rewards.filter(reward => reward.type === selectedType);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Rewards Management</CardTitle>
-          <CardDescription>
-            Manage the rewards that users can redeem with their points
-          </CardDescription>
-        </div>
-        <Button onClick={() => { setCurrentReward(null); setIsFormOpen(true); }}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add Reward
-        </Button>
-      </CardHeader>
-      <CardContent>
-        {rewards.length === 0 ? (
-          <div className="text-center py-8 space-y-3">
-            <Gift className="h-12 w-12 mx-auto text-muted-foreground" />
-            <h3 className="text-lg font-medium">No rewards yet</h3>
-            <p className="text-muted-foreground mb-4">Create your first reward to start engaging your community</p>
-            <Button 
-              variant="outline" 
-              onClick={() => { setCurrentReward(null); setIsFormOpen(true); }}
-            >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add Your First Reward
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+            <div>
+              <CardTitle>Rewards Store</CardTitle>
+              <CardDescription>
+                Configure rewards that members can redeem with their points
+              </CardDescription>
+            </div>
+            <Button onClick={handleCreateNewReward} className="gap-2 sm:self-end">
+              <Plus className="h-4 w-4" />
+              Create Reward
             </Button>
           </div>
-        ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Reward</TableHead>
-                  <TableHead>Points</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Visibility</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rewards.map((reward) => (
-                  <TableRow key={reward.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center space-x-2">
-                        <div 
-                          className="w-8 h-8 rounded bg-cover bg-center"
-                          style={{ backgroundImage: `url(${reward.imageUrl || '/placeholder.svg'})` }}
-                        />
-                        <span>{reward.title}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{reward.pointsCost}</TableCell>
-                    <TableCell>{getTypeBadge(reward.type)}</TableCell>
-                    <TableCell>{getVisibilityBadge(reward.visibility)}</TableCell>
-                    <TableCell>
-                      {reward.stock === null ? (
-                        <span className="text-muted-foreground">Unlimited</span>
-                      ) : (
-                        <span>{reward.stock}</span>
-                      )}
-                      {reward.expiresAt && (
-                        <div className="flex items-center text-xs text-muted-foreground mt-1">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          Expires: {new Date(reward.expiresAt).toLocaleDateString()}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleEditReward(reward)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleDeleteReward(reward)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            <Tabs defaultValue="all" onValueChange={(value) => setSelectedType(value as RewardType | 'all')}>
+              <TabsList className="mb-4">
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="digital">Digital</TabsTrigger>
+                <TabsTrigger value="nft">NFT</TabsTrigger>
+                <TabsTrigger value="badge">Badge</TabsTrigger>
+                <TabsTrigger value="access">Access</TabsTrigger>
+                <TabsTrigger value="physical">Physical</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="all" className="mt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredRewards.map((reward) => (
+                    <RewardCard 
+                      key={reward.id}
+                      reward={reward}
+                      onEdit={() => handleEditReward(reward)}
+                      onDuplicate={() => handleDuplicateReward(reward)}
+                    />
+                  ))}
+                </div>
+              </TabsContent>
+
+              {Object.keys(rewardTypeInfo).map((type) => (
+                <TabsContent key={type} value={type} className="mt-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredRewards.map((reward) => (
+                      <RewardCard 
+                        key={reward.id}
+                        reward={reward}
+                        onEdit={() => handleEditReward(reward)}
+                        onDuplicate={() => handleDuplicateReward(reward)}
+                      />
+                    ))}
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
           </div>
-        )}
+        </CardContent>
+      </Card>
 
-        {isFormOpen && (
-          <RewardFormDialog 
-            isOpen={isFormOpen}
-            onClose={() => setIsFormOpen(false)}
-            reward={currentReward}
-          />
-        )}
+      <RewardFormDialog 
+        open={isFormOpen} 
+        onOpenChange={setIsFormOpen}
+        reward={editingReward}
+        onSubmit={handleFormSubmit}
+      />
+    </>
+  );
+};
 
-        {isDeleteConfirmOpen && (
-          <DeleteConfirmDialog
-            isOpen={isDeleteConfirmOpen}
-            onClose={() => setIsDeleteConfirmOpen(false)}
-            onConfirm={confirmDelete}
-            title="Delete Reward"
-            description={`Are you sure you want to delete "${currentReward?.title}"? This action cannot be undone.`}
-          />
-        )}
+interface RewardCardProps {
+  reward: Reward;
+  onEdit: () => void;
+  onDuplicate: () => void;
+}
+
+const RewardCard: React.FC<RewardCardProps> = ({ reward, onEdit, onDuplicate }) => {
+  return (
+    <Card className="overflow-hidden">
+      <div 
+        className="h-40 bg-center bg-cover"
+        style={{ 
+          backgroundImage: reward.imageUrl ? `url(${reward.imageUrl})` : 'url("/placeholder.svg")' 
+        }}
+      />
+      <CardContent className="pt-4">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="font-medium text-lg">{reward.title}</h3>
+          <Badge variant="secondary" className={visibilityInfo[reward.visibility as RewardVisibility]?.color}>
+            {visibilityInfo[reward.visibility as RewardVisibility]?.label}
+          </Badge>
+        </div>
+        
+        <div className="flex items-center gap-2 mb-3">
+          <Badge variant="outline" className={rewardTypeInfo[reward.type as RewardType]?.color}>
+            {rewardTypeInfo[reward.type as RewardType]?.label}
+          </Badge>
+          {reward.stock !== null && (
+            <span className="text-xs text-muted-foreground">
+              {reward.stock} left
+            </span>
+          )}
+        </div>
+        
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+          {reward.description}
+        </p>
+        
+        <div className="flex justify-between items-center">
+          <div>
+            <span className="font-bold">{reward.pointsCost}</span>
+            <span className="text-muted-foreground"> points</span>
+          </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">Actions</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onEdit}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onDuplicate}>
+                <Copy className="h-4 w-4 mr-2" />
+                Duplicate
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Eye className="h-4 w-4 mr-2" />
+                Preview
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </CardContent>
     </Card>
   );

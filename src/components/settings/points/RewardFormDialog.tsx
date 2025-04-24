@@ -1,320 +1,279 @@
 
-import React from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import React, { useEffect, useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Reward } from '@/types/rewards';
-import { useRewardsAdmin } from '@/hooks/useRewardsAdmin';
-
-const rewardSchema = z.object({
-  title: z.string().min(3, { message: "Title must be at least 3 characters" }),
-  description: z.string().min(10, { message: "Description must be at least 10 characters" }),
-  imageUrl: z.string().url({ message: "Must be a valid URL" }).optional().or(z.literal("")),
-  pointsCost: z.coerce.number().min(1, { message: "Points must be at least 1" }),
-  type: z.enum(["free", "downloadable", "access", "nft"]),
-  visibility: z.enum(["public", "vip", "limited"]),
-  stock: z.coerce.number().optional().nullable(),
-  hasExpiration: z.boolean().default(false),
-  expiresAt: z.string().optional(),
-  actionUrl: z.string().url({ message: "Must be a valid URL" }).optional().or(z.literal("")),
-});
-
-type RewardFormValues = z.infer<typeof rewardSchema>;
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { RewardForm, RewardType, RewardVisibility } from '@/types/points-config';
 
 interface RewardFormDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  reward: Reward | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  reward: RewardForm | null;
+  onSubmit: (data: RewardForm) => void;
 }
 
-const RewardFormDialog: React.FC<RewardFormDialogProps> = ({ isOpen, onClose, reward }) => {
-  const { addReward, updateReward } = useRewardsAdmin();
-
-  const form = useForm<RewardFormValues>({
-    resolver: zodResolver(rewardSchema),
-    defaultValues: reward ? {
-      ...reward,
-      hasExpiration: !!reward.expiresAt,
-      expiresAt: reward.expiresAt ? new Date(reward.expiresAt).toISOString().slice(0, 10) : undefined,
-    } : {
-      title: "",
-      description: "",
-      imageUrl: "",
-      pointsCost: 100,
-      type: "free",
-      visibility: "public",
-      stock: null,
-      hasExpiration: false,
-      expiresAt: undefined,
-      actionUrl: "",
-    },
+const RewardFormDialog: React.FC<RewardFormDialogProps> = ({ 
+  open, 
+  onOpenChange, 
+  reward,
+  onSubmit 
+}) => {
+  const [formData, setFormData] = useState<RewardForm>({
+    title: '',
+    description: '',
+    imageUrl: '',
+    pointsCost: 100,
+    type: 'digital',
+    visibility: 'public',
+    stock: null,
+    expiresAt: null
   });
 
-  const onSubmit = (values: RewardFormValues) => {
-    const rewardData = {
-      ...values,
-      expiresAt: values.hasExpiration ? values.expiresAt : null,
-      stock: values.stock === undefined ? null : values.stock,
-    };
-    
-    if (reward) {
-      updateReward(reward.id, rewardData);
-    } else {
-      addReward(rewardData);
+  const [enableStock, setEnableStock] = useState(false);
+  const [enableExpiration, setEnableExpiration] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(undefined);
+
+  // Reset form when dialog opens/closes or reward changes
+  useEffect(() => {
+    if (open && reward) {
+      setFormData(reward);
+      setEnableStock(reward.stock !== null);
+      setEnableExpiration(reward.expiresAt !== null);
+      setDate(reward.expiresAt ? new Date(reward.expiresAt) : undefined);
+    } else if (open) {
+      setFormData({
+        title: '',
+        description: '',
+        imageUrl: '',
+        pointsCost: 100,
+        type: 'digital',
+        visibility: 'public',
+        stock: null,
+        expiresAt: null
+      });
+      setEnableStock(false);
+      setEnableExpiration(false);
+      setDate(undefined);
     }
-    
-    onClose();
+  }, [open, reward]);
+
+  // Update form data when user changes inputs
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'pointsCost' || name === 'stock' ? parseInt(value) : value
+    }));
+  };
+
+  // Update stock based on toggle
+  useEffect(() => {
+    if (!enableStock) {
+      setFormData(prev => ({ ...prev, stock: null }));
+    } else if (enableStock && formData.stock === null) {
+      setFormData(prev => ({ ...prev, stock: 10 }));
+    }
+  }, [enableStock]);
+
+  // Update expiration date based on toggle and date picker
+  useEffect(() => {
+    if (!enableExpiration) {
+      setFormData(prev => ({ ...prev, expiresAt: null }));
+    } else if (enableExpiration && date) {
+      setFormData(prev => ({ ...prev, expiresAt: date.toISOString() }));
+    }
+  }, [enableExpiration, date]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>{reward ? "Edit Reward" : "Add New Reward"}</DialogTitle>
-          <DialogDescription>
-            {reward 
-              ? "Update the details of this reward" 
-              : "Create a new reward for users to redeem with their points"}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="E.g., Premium E-Book" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Describe what this reward provides..." 
-                      {...field} 
-                      rows={3}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="pointsCost"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Points Cost</FormLabel>
-                    <FormControl>
-                      <Input type="number" min={1} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{reward ? 'Edit Reward' : 'Create New Reward'}</DialogTitle>
+            <DialogDescription>
+              {reward 
+                ? 'Update the details for this reward.' 
+                : 'Fill in the details below to create a new reward.'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2 col-span-2">
+                <Label htmlFor="title">Reward Title</Label>
+                <Input
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="e.g. Premium Course Access"
+                  required
+                />
+              </div>
               
-              <FormField
-                control={form.control}
-                name="stock"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Stock (leave blank for unlimited)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        min={0} 
-                        placeholder="Unlimited"
-                        value={field.value === null ? "" : field.value}
-                        onChange={(e) => {
-                          const value = e.target.value === "" ? null : parseInt(e.target.value);
-                          field.onChange(value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reward Type</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="free">Free</SelectItem>
-                        <SelectItem value="downloadable">Downloadable</SelectItem>
-                        <SelectItem value="access">Access-based</SelectItem>
-                        <SelectItem value="nft">NFT-mintable</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      How will users receive this reward?
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid gap-2 col-span-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Describe what this reward includes"
+                  rows={3}
+                  required
+                />
+              </div>
               
-              <FormField
-                control={form.control}
-                name="visibility"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Visibility</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select visibility" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="public">Public</SelectItem>
-                        <SelectItem value="vip">VIP Only</SelectItem>
-                        <SelectItem value="limited">Limited Time</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Who can see and redeem this reward?
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <FormField
-              control={form.control}
-              name="imageUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Image URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://..." {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    URL to an image representing this reward
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="actionUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Action URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://..." {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    URL users will be directed to after redeeming (if applicable)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="hasExpiration"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                  <div className="space-y-0.5">
-                    <FormLabel>Set Expiration Date</FormLabel>
-                    <FormDescription>
-                      Reward will only be available until the specified date
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
+              <div className="grid gap-2">
+                <Label htmlFor="imageUrl">Image URL</Label>
+                <Input
+                  id="imageUrl"
+                  name="imageUrl"
+                  value={formData.imageUrl || ''}
+                  onChange={handleChange}
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="pointsCost">Cost in Points</Label>
+                <Input
+                  id="pointsCost"
+                  name="pointsCost"
+                  type="number"
+                  min={1}
+                  value={formData.pointsCost}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="type">Reward Type</Label>
+                <select
+                  id="type"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="digital">Digital</option>
+                  <option value="nft">NFT</option>
+                  <option value="badge">Badge</option>
+                  <option value="access">Access</option>
+                  <option value="physical">Physical</option>
+                </select>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="visibility">Visibility</Label>
+                <select
+                  id="visibility"
+                  name="visibility"
+                  value={formData.visibility}
+                  onChange={handleChange}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="public">Public</option>
+                  <option value="vip">VIP Only</option>
+                  <option value="limited">Limited Time</option>
+                </select>
+              </div>
+              
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="stock">Limited Stock</Label>
+                  <Switch
+                    id="enable-stock"
+                    checked={enableStock}
+                    onCheckedChange={setEnableStock}
+                  />
+                </div>
+                <Input
+                  id="stock"
+                  name="stock"
+                  type="number"
+                  min={1}
+                  value={formData.stock || ''}
+                  onChange={handleChange}
+                  disabled={!enableStock}
+                  placeholder="e.g. 10"
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="expiresAt">Expiration Date</Label>
+                  <Switch
+                    id="enable-expiration"
+                    checked={enableExpiration}
+                    onCheckedChange={setEnableExpiration}
+                  />
+                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                      disabled={!enableExpiration}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      initialFocus
+                      disabled={(date) => date < new Date()}
                     />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            
-            {form.watch("hasExpiration") && (
-              <FormField
-                control={form.control}
-                name="expiresAt"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Expiration Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="submit">
-                {reward ? "Update Reward" : "Create Reward"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              <div className="grid gap-2 col-span-2">
+                <Label htmlFor="actionUrl">Action URL (Optional)</Label>
+                <Input
+                  id="actionUrl"
+                  name="actionUrl"
+                  value={formData.actionUrl || ''}
+                  onChange={handleChange}
+                  placeholder="e.g. https://example.com/premium"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Users will be directed to this URL after redeeming the reward
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              {reward ? 'Update Reward' : 'Create Reward'}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
