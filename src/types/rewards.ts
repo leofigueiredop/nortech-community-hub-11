@@ -5,7 +5,7 @@ export interface Reward {
   description: string;
   imageUrl?: string;
   pointsCost: number;
-  type: 'digital' | 'nft' | 'badge' | 'access' | 'physical';
+  type: 'digital' | 'nft' | 'badge' | 'access' | 'physical' | 'free' | 'downloadable';
   visibility: 'public' | 'vip' | 'limited';
   stock: number | null;
   expiresAt: string | null;

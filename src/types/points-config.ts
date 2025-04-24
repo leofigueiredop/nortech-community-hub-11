@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 export type PointTemplateType = 'educational' | 'social' | 'gaming';
 
 export interface PointTemplate {
@@ -39,7 +41,7 @@ export interface RewardCategory {
 }
 
 export type RewardVisibility = 'public' | 'vip' | 'limited';
-export type RewardType = 'digital' | 'nft' | 'badge' | 'access' | 'physical';
+export type RewardType = 'digital' | 'nft' | 'badge' | 'access' | 'physical' | 'free' | 'downloadable';
 
 export interface Reward {
   id: string;
@@ -51,7 +53,7 @@ export interface Reward {
   stock?: number;
   imageUrl?: string;
   actionUrl?: string;
-  expiresAt?: Date;
+  expiresAt?: Date | string | null;
   createdAt: Date;
   redeemCount: number;
   isActive: boolean;
@@ -70,4 +72,5 @@ export interface RewardForm {
   actionUrl?: string;
   expiresAt?: Date | string | null;
   isActive?: boolean;
+  categoryId?: string;
 }

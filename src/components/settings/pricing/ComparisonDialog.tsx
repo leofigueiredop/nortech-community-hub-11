@@ -6,153 +6,104 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogClose
+  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Check, X, HelpCircle } from 'lucide-react';
+import { Check, X, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { type Plan } from './PricingPlans';
+import { Plan } from './PricingPlans';
 
-interface Feature {
+type Feature = {
   name: string;
   tooltip?: string;
   starter: string | boolean;
   professional: string | boolean;
   business: string | boolean;
   enterprise: string | boolean;
-  whiteLabel?: string | boolean;
-}
+  whiteLabel: string | boolean;
+};
 
 export interface ComparisonDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   features: Feature[];
-  isMobile?: boolean;
 }
 
 export const ComparisonDialog: React.FC<ComparisonDialogProps> = ({ 
-  features, 
   open, 
   onOpenChange,
-  isMobile = false
+  features 
 }) => {
-  // Plan names for column headers
-  const planNames = ['Starter', 'Professional', 'Business', 'Enterprise', 'White Label'];
+  if (!features || features.length === 0) {
+    return null;
+  }
+
+  const renderValue = (value: string | boolean) => {
+    if (typeof value === 'boolean') {
+      return value ? (
+        <Check className="h-5 w-5 text-green-500 mx-auto" />
+      ) : (
+        <X className="h-5 w-5 text-gray-300 mx-auto" />
+      );
+    }
+    return <span className="text-center block">{value}</span>;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl w-[90vw] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Comparação de Planos</DialogTitle>
+          <DialogTitle className="text-xl font-bold">Plan Comparison</DialogTitle>
           <DialogDescription>
-            Compare recursos e escolha o plano ideal para a sua comunidade
+            Compare all available plans to find the right fit for your community
           </DialogDescription>
         </DialogHeader>
-        
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+
+        <div className="mt-6 overflow-x-auto">
+          <table className="w-full min-w-[600px] border-collapse">
             <thead>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Recurso
-                </th>
-                {planNames.map((planName, index) => (
-                  <th 
-                    key={index}
-                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider 
-                      ${index === 1 ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}
-                  >
-                    {planName}
-                  </th>
-                ))}
+                <th className="text-left p-3 bg-gray-50 dark:bg-gray-800 rounded-tl-lg">Features</th>
+                <th className="p-3 bg-gray-50 dark:bg-gray-800 text-center">Starter</th>
+                <th className="p-3 bg-gray-50 dark:bg-gray-800 text-center">Professional</th>
+                <th className="p-3 bg-gray-50 dark:bg-gray-800 text-center">Business</th>
+                <th className="p-3 bg-gray-50 dark:bg-gray-800 text-center">Enterprise</th>
+                <th className="p-3 bg-gray-50 dark:bg-gray-800 text-center rounded-tr-lg">White Label</th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {features.map((feature, idx) => (
-                <tr key={idx} className={idx % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800/50' : ''}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center gap-1">
-                    {feature.name}
-                    {feature.tooltip && (
+            <tbody>
+              {features.map((feature, index) => (
+                <tr key={index} className="border-b border-gray-100 dark:border-gray-700">
+                  <td className="py-3 px-4 font-medium">
+                    {feature.tooltip ? (
                       <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span>
-                              <HelpCircle className="h-4 w-4 text-gray-400" />
-                            </span>
+                          <TooltipTrigger className="flex items-center gap-1">
+                            {feature.name} <Info className="h-3 w-3 text-gray-400" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>{feature.tooltip}</p>
+                            <p className="text-xs max-w-xs">{feature.tooltip}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                    )}
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${planNames[0] === 'Professional' ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}>
-                    {typeof feature.starter === 'boolean' ? (
-                      feature.starter ? (
-                        <Check className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <X className="h-5 w-5 text-gray-400" />
-                      )
                     ) : (
-                      <span>{feature.starter}</span>
+                      feature.name
                     )}
                   </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${planNames[1] === 'Professional' ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}>
-                    {typeof feature.professional === 'boolean' ? (
-                      feature.professional ? (
-                        <Check className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <X className="h-5 w-5 text-gray-400" />
-                      )
-                    ) : (
-                      <span>{feature.professional}</span>
-                    )}
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${planNames[2] === 'Professional' ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}>
-                    {typeof feature.business === 'boolean' ? (
-                      feature.business ? (
-                        <Check className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <X className="h-5 w-5 text-gray-400" />
-                      )
-                    ) : (
-                      <span>{feature.business}</span>
-                    )}
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${planNames[3] === 'Professional' ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}>
-                    {typeof feature.enterprise === 'boolean' ? (
-                      feature.enterprise ? (
-                        <Check className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <X className="h-5 w-5 text-gray-400" />
-                      )
-                    ) : (
-                      <span>{feature.enterprise}</span>
-                    )}
-                  </td>
-                  {feature.whiteLabel !== undefined && (
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${planNames[4] === 'Professional' ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}>
-                      {typeof feature.whiteLabel === 'boolean' ? (
-                        feature.whiteLabel ? (
-                          <Check className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <X className="h-5 w-5 text-gray-400" />
-                        )
-                      ) : (
-                        <span>{feature.whiteLabel}</span>
-                      )}
-                    </td>
-                  )}
+                  <td className="py-3 px-4 text-center">{renderValue(feature.starter)}</td>
+                  <td className="py-3 px-4 text-center">{renderValue(feature.professional)}</td>
+                  <td className="py-3 px-4 text-center">{renderValue(feature.business)}</td>
+                  <td className="py-3 px-4 text-center">{renderValue(feature.enterprise)}</td>
+                  <td className="py-3 px-4 text-center">{renderValue(feature.whiteLabel)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        
-        <div className="flex justify-end mt-4">
+
+        <div className="mt-6 flex justify-end">
           <DialogClose asChild>
-            <Button variant="outline">Fechar</Button>
+            <Button variant="outline">Close Comparison</Button>
           </DialogClose>
         </div>
       </DialogContent>
