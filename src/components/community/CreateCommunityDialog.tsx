@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const categories = [
   { value: 'education', label: 'Educacional' },
@@ -40,6 +40,7 @@ export default function CreateCommunityDialog({
   const [name, setName] = React.useState('');
   const [category, setCategory] = React.useState('');
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleCreate = () => {
     if (!name || !category) {
@@ -51,14 +52,16 @@ export default function CreateCommunityDialog({
       return;
     }
 
-    // Here you would typically create the community
+    localStorage.setItem('newCommunityName', name);
+    localStorage.setItem('newCommunityCategory', category);
+    
     toast({
-      title: "Comunidade criada!",
-      description: "Redirecionando para as configurações...",
+      title: "Ótimo!",
+      description: "Vamos configurar sua nova comunidade.",
     });
     
     onOpenChange(false);
-    // Redirect to settings would happen here
+    navigate('/onboarding/membership-plans');
   };
 
   return (

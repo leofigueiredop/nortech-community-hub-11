@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import CreateCommunityDialog from './CreateCommunityDialog';
+import { cn } from '@/lib/utils';
 
 interface Community {
   id: string;
@@ -30,18 +31,33 @@ const mockCommunities: Community[] = [
 export function CommunitySwitcher() {
   const [showCreateDialog, setShowCreateDialog] = React.useState(false);
   const { user } = useAuth();
-  const currentCommunity = mockCommunities[0]; // In a real app, this would come from context/state
+  const currentCommunity = mockCommunities[0];
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="gap-2 h-10 w-full lg:w-60 justify-start">
+          <Button 
+            variant="ghost" 
+            className={cn(
+              "gap-2 h-10 w-full lg:w-60 justify-start",
+              currentCommunity.name === "Nortech" ? "bg-purple-100 dark:bg-purple-900/20" : ""
+            )}
+          >
             <Avatar className="h-6 w-6">
               <AvatarImage src={currentCommunity.logo} alt={currentCommunity.name} />
-              <AvatarFallback>{currentCommunity.name[0]}</AvatarFallback>
+              <AvatarFallback className={cn(
+                currentCommunity.name === "Nortech" ? "bg-nortech-purple text-white" : ""
+              )}>
+                {currentCommunity.name[0]}
+              </AvatarFallback>
             </Avatar>
-            <span className="truncate">{currentCommunity.name}</span>
+            <span className={cn(
+              "truncate",
+              currentCommunity.name === "Nortech" ? "text-nortech-purple font-medium" : ""
+            )}>
+              {currentCommunity.name}
+            </span>
             <ChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </DropdownMenuTrigger>
