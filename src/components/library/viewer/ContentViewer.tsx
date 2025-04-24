@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -15,6 +14,8 @@ import ContentProgress from '@/components/library/viewer/ContentProgress';
 import { ArrowRight, Lock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getContentDuration, getCompletionCriteria } from './contentViewerUtils';
+import { Share2, Bookmark, Flag } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface ContentViewerProps {
   item: ContentItem | null;
@@ -47,6 +48,28 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
     onClose();
   };
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast({
+      title: "Link copied!",
+      description: "The course link has been copied to your clipboard.",
+    });
+  };
+
+  const handleSave = () => {
+    toast({
+      title: "Course saved",
+      description: "The course has been added to your saved items.",
+    });
+  };
+
+  const handleReport = () => {
+    toast({
+      title: "Report submitted",
+      description: "Thank you for your feedback. We'll review this content.",
+    });
+  };
+
   if (item.format === 'course') {
     return (
       <Dialog open={!!item} onOpenChange={onClose}>
@@ -60,42 +83,41 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6">
               <h2 className="text-2xl font-bold text-white mb-2">{item.title}</h2>
-              <p className="text-slate-200 text-sm line-clamp-2">{item.description}</p>
+              <p className="text-slate-200 text-sm line-clamp-2 mb-4">{item.description}</p>
+              
+              <div className="flex items-center gap-2">
+                <Button 
+                  onClick={handleStartCourse}
+                  size="lg"
+                  className="bg-primary text-white hover:bg-primary/90"
+                >
+                  Start Course
+                </Button>
+
+                <div className="flex gap-2 ml-auto">
+                  <Button variant="outline" size="icon" onClick={handleShare} className="bg-black/40 border-white/30 text-white hover:bg-black/60">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={handleSave} className="bg-black/40 border-white/30 text-white hover:bg-black/60">
+                    <Bookmark className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={handleReport} className="bg-black/40 border-white/30 text-white hover:bg-black/60">
+                    <Flag className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
           
           <div className="p-6">
-            <div className="flex flex-col gap-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-semibold mb-1">Course Overview</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {item.modules?.length || 0} modules • {Math.round((item.duration || 0) / 60)} minutes
-                  </p>
-                </div>
-                
-                {item.accessLevel === 'premium' ? (
-                  <Button variant="secondary" className="gap-2 bg-amber-500 text-white hover:bg-amber-600">
-                    <Lock className="h-4 w-4" />
-                    Unlock Premium
-                  </Button>
-                ) : (
-                  <Button onClick={handleStartCourse} className="gap-2">
-                    Start Course 
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-              
-              <div className="space-y-4">
-                <h4 className="font-medium">What you'll learn:</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Build modern React applications from scratch</li>
-                  <li>• Master React hooks and state management</li>
-                  <li>• Create reusable components and custom hooks</li>
-                  <li>• Implement responsive designs with Tailwind CSS</li>
-                </ul>
-              </div>
+            <div className="space-y-4">
+              <h4 className="font-medium">What you'll learn:</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>• Build modern React applications from scratch</li>
+                <li>• Master React hooks and state management</li>
+                <li>• Create reusable components and custom hooks</li>
+                <li>• Implement responsive designs with Tailwind CSS</li>
+              </ul>
             </div>
           </div>
         </DialogContent>

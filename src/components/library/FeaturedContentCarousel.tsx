@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ContentItem } from '@/types/library';
 import { 
@@ -8,6 +7,7 @@ import {
   CarouselNext, 
   CarouselPrevious 
 } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 import { Button } from '@/components/ui/button';
 import { Play, Crown, Info, Clock, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -24,18 +24,20 @@ const FeaturedContentCarousel: React.FC<FeaturedContentCarouselProps> = ({
   onItemSelect 
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [autoplayEnabled, setAutoplayEnabled] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   
+  const autoplayPlugin = React.useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: true })
+  );
+
   useEffect(() => {
-    // Only autoplay when not hovered and autoplay is enabled
-    if (!isHovered && autoplayEnabled && items.length > 1) {
+    if (!isHovered && autoplayPlugin.current) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % items.length);
       }, 5000);
       return () => clearInterval(interval);
     }
-  }, [isHovered, autoplayEnabled, items.length]);
+  }, [isHovered, autoplayPlugin.current, items.length]);
   
   if (!items.length) return null;
   
@@ -64,6 +66,7 @@ const FeaturedContentCarousel: React.FC<FeaturedContentCarouselProps> = ({
           loop: true,
           align: 'start'
         }}
+        plugins={[autoplayPlugin.current]}
         className="w-full"
         setApi={(api) => {
           api?.on('select', () => {
@@ -75,26 +78,21 @@ const FeaturedContentCarousel: React.FC<FeaturedContentCarouselProps> = ({
           {items.map((item) => (
             <CarouselItem key={item.id}>
               <div className="relative aspect-[21/9] overflow-hidden rounded-xl group">
-                {/* Feature image */}
                 <img 
                   src={item.thumbnailUrl || item.thumbnail || '/placeholder.svg'} 
                   alt={item.title}
                   className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
                 />
                 
-                {/* Gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
                 
-                {/* Content overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 lg:p-10 lg:max-w-3xl">
                   <div className="flex items-center gap-2 mb-3">
-                    {/* Format badge */}
                     <Badge variant="outline" className="bg-background/20 border-none text-white">
                       {getFormatIcon(item.format)}
                       <span className="ml-1">{item.format.charAt(0).toUpperCase() + item.format.slice(1)}</span>
                     </Badge>
                     
-                    {/* Premium badge */}
                     {item.accessLevel === 'premium' && (
                       <Badge className="bg-amber-500 text-white border-none">
                         <Crown size={14} className="mr-1" />
@@ -102,7 +100,6 @@ const FeaturedContentCarousel: React.FC<FeaturedContentCarouselProps> = ({
                       </Badge>
                     )}
                     
-                    {/* Duration */}
                     {item.duration > 0 && (
                       <span className="flex items-center text-sm text-white/70">
                         <Clock size={14} className="mr-1" />
@@ -152,13 +149,11 @@ const FeaturedContentCarousel: React.FC<FeaturedContentCarouselProps> = ({
           ))}
         </CarouselContent>
         
-        {/* Navigation controls */}
         <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
           <CarouselPrevious className="left-4 bg-black/40 border-none hover:bg-black/70 text-white" />
           <CarouselNext className="right-4 bg-black/40 border-none hover:bg-black/70 text-white" />
         </div>
         
-        {/* Indicators */}
         {items.length > 1 && (
           <div className="absolute bottom-4 right-4 flex gap-1.5">
             {items.map((_, index) => (
