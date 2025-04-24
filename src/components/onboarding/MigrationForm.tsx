@@ -2,64 +2,32 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Form } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Upload, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-
-const formSchema = z.object({
-  migrationType: z.enum(['new', 'existing']),
-  platform: z.string().optional(),
-  file: z.any().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
+import { migrationFormSchema, MigrationFormData } from './migration/types';
+import MigrationTypeSelector from './migration/MigrationTypeSelector';
+import PlatformSelector from './migration/PlatformSelector';
+import FileUploader from './migration/FileUploader';
 
 const MigrationForm: React.FC = () => {
   const navigate = useNavigate();
   const [showUpload, setShowUpload] = useState(false);
   const [showBadge, setShowBadge] = useState(false);
   
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<MigrationFormData>({
+    resolver: zodResolver(migrationFormSchema),
     defaultValues: {
       migrationType: 'new',
       platform: '',
     },
   });
   
-  // Watch the migrationType to conditionally show platform selection
   const migrationType = form.watch('migrationType');
-  
-  const onSubmit = (data: FormData) => {
-    console.log('Migration data:', data);
-    
-    // Store migration data
-    localStorage.setItem('migrationData', JSON.stringify(data));
-    localStorage.setItem('onboardingStep', '2');
-    
-    // Show achievement badge
-    setShowBadge(true);
-    
-    // Show achievement toast
-    toast({
-      title: "🎖️ Achievement Unlocked!",
-      description: "Migration preference set (+15 XP) - 33% completed!",
-      duration: 3000,
-    });
-    
-    setTimeout(() => {
-      navigate('/onboarding/community-type');
-    }, 1500);
-  };
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -70,6 +38,23 @@ const MigrationForm: React.FC = () => {
         duration: 3000,
       });
     }
+  };
+  
+  const onSubmit = (data: MigrationFormData) => {
+    console.log('Migration data:', data);
+    localStorage.setItem('migrationData', JSON.stringify(data));
+    localStorage.setItem('onboardingStep', '2');
+    setShowBadge(true);
+    
+    toast({
+      title: "🎖️ Achievement Unlocked!",
+      description: "Migration preference set (+15 XP) - 33% completed!",
+      duration: 3000,
+    });
+    
+    setTimeout(() => {
+      navigate('/onboarding/community-type');
+    }, 1500);
   };
 
   return (
@@ -99,101 +84,15 @@ const MigrationForm: React.FC = () => {
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="migrationType"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Você está começando uma nova comunidade ou migrando uma existente?</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setShowUpload(value === 'existing');
-                      }}
-                      defaultValue={field.value}
-                      className="flex flex-col space-y-1"
-                    >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="new" />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          🚀 Estou começando do zero
-                        </FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="existing" />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          🔁 Estou migrando uma comunidade existente
-                        </FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                </FormItem>
-              )}
+            <MigrationTypeSelector 
+              form={form} 
+              onTypeChange={(value) => setShowUpload(value === 'existing')} 
             />
             
             {migrationType === 'existing' && (
               <>
-                <FormField
-                  control={form.control}
-                  name="platform"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>De qual plataforma você está migrando?</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione a plataforma" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="discord">Discord</SelectItem>
-                          <SelectItem value="circle">Circle</SelectItem>
-                          <SelectItem value="facebook">Facebook Groups</SelectItem>
-                          <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                          <SelectItem value="telegram">Telegram</SelectItem>
-                          <SelectItem value="slack">Slack</SelectItem>
-                          <SelectItem value="other">Outra plataforma</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Isso nos ajudará a personalizar sua experiência.
-                      </FormDescription>
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="space-y-2">
-                  <Label htmlFor="memberList">Upload da lista de membros (opcional)</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-500 mb-2">
-                      Arraste um arquivo CSV ou clique para selecionar
-                    </p>
-                    <Input 
-                      id="memberList" 
-                      type="file" 
-                      accept=".csv,.xlsx" 
-                      className="hidden" 
-                      onChange={handleFileChange}
-                    />
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => document.getElementById('memberList')?.click()}
-                      className="mt-2"
-                    >
-                      Selecionar arquivo
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Formatos aceitos: CSV. Tamanho máximo: 5MB.
-                  </p>
-                </div>
+                <PlatformSelector form={form} />
+                <FileUploader form={form} onFileChange={handleFileChange} />
               </>
             )}
             
