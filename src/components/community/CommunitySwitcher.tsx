@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronDown, Check, Plus, Search } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import CreateCommunityDialog from './CreateCommunityDialog';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 interface Community {
   id: string;
@@ -31,7 +32,19 @@ const mockCommunities: Community[] = [
 export function CommunitySwitcher() {
   const [showCreateDialog, setShowCreateDialog] = React.useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
   const currentCommunity = mockCommunities[0];
+
+  const handleCommunityChange = (community: Community) => {
+    // Logic for changing community context
+    console.log(`Switching to community: ${community.name}`);
+  };
+
+  const handleCreateCommunity = () => {
+    setShowCreateDialog(true);
+    localStorage.setItem('newCommunityName', '');
+    localStorage.setItem('newCommunityCategory', '');
+  };
 
   return (
     <>
@@ -39,26 +52,14 @@ export function CommunitySwitcher() {
         <DropdownMenuTrigger asChild>
           <Button 
             variant="ghost" 
-            className={cn(
-              "gap-2 h-10 w-full lg:w-60 justify-start",
-              currentCommunity.name === "Nortech" ? "bg-purple-100 dark:bg-purple-900/20" : ""
-            )}
+            className="p-1 hover:bg-transparent"
           >
-            <Avatar className="h-6 w-6">
+            <Avatar className="h-8 w-8">
               <AvatarImage src={currentCommunity.logo} alt={currentCommunity.name} />
-              <AvatarFallback className={cn(
-                currentCommunity.name === "Nortech" ? "bg-nortech-purple text-white" : ""
-              )}>
+              <AvatarFallback className="bg-nortech-purple text-white">
                 {currentCommunity.name[0]}
               </AvatarFallback>
             </Avatar>
-            <span className={cn(
-              "truncate",
-              currentCommunity.name === "Nortech" ? "text-nortech-purple font-medium" : ""
-            )}>
-              {currentCommunity.name}
-            </span>
-            <ChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="start" forceMount>
@@ -66,27 +67,24 @@ export function CommunitySwitcher() {
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             {mockCommunities.map((community) => (
-              <DropdownMenuItem key={community.id}>
+              <DropdownMenuItem 
+                key={community.id} 
+                onSelect={() => handleCommunityChange(community)}
+              >
                 <Avatar className="h-5 w-5 mr-2">
                   <AvatarImage src={community.logo} alt={community.name} />
                   <AvatarFallback>{community.name[0]}</AvatarFallback>
                 </Avatar>
                 {community.name}
                 {community.id === currentCommunity.id && (
-                  <Check className="ml-auto h-4 w-4 text-primary" />
+                  <ChevronDown className="ml-auto h-4 w-4 text-primary" />
                 )}
               </DropdownMenuItem>
             ))}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setShowCreateDialog(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Criar nova comunidade
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem disabled className="text-muted-foreground">
-            <Search className="mr-2 h-4 w-4" />
-            Explorar comunidades públicas (em breve)
+          <DropdownMenuItem onSelect={handleCreateCommunity}>
+            <span className="text-nortech-purple font-medium">Criar nova comunidade</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
