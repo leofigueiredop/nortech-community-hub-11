@@ -72,7 +72,7 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
               <Input
                 type="search"
-                placeholder="Search content..."
+                placeholder="Search courses, files or tags..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-10 h-10"
@@ -103,12 +103,17 @@ const ContentFilters: React.FC<ContentFiltersProps> = ({
                 </SelectItem>
                 <SelectItem value="popular">
                   <div className="flex items-center gap-2">
-                    <span>Most Viewed</span>
+                    <span>Most Popular</span>
                   </div>
                 </SelectItem>
-                <SelectItem value="recommended">
+                <SelectItem value="longest">
                   <div className="flex items-center gap-2">
-                    <span>Recommended</span>
+                    <span>Longest</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="shortest">
+                  <div className="flex items-center gap-2">
+                    <span>Shortest</span>
                   </div>
                 </SelectItem>
               </SelectContent>
