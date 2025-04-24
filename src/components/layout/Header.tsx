@@ -1,7 +1,7 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CommunitySwitcher } from '@/components/community/CommunitySwitcher';
-import PointsBadge from '@/components/points/PointsBadge';
+import { PointsBadge } from '@/components/points/PointsBadge';
 import { Trophy, Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,14 +20,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export const HeaderPointsBadge: React.FC = () => {
-  return (
-    <div className="mr-2">
-      <PointsBadge size="sm" />
-    </div>
-  );
-};
-
 const Header: React.FC<{
   title?: string;
   children?: React.ReactNode;
@@ -39,7 +31,6 @@ const Header: React.FC<{
       <div className="flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-2">
           {children}
-          <CommunitySwitcher />
           {title && <h1 className="font-medium">{title}</h1>}
         </div>
 
@@ -84,7 +75,7 @@ const Header: React.FC<{
           
           <NotificationBell />
           
-          <HeaderPointsBadge />
+          <PointsBadge size="sm" />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

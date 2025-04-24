@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   SidebarHeader, 
@@ -5,7 +6,6 @@ import {
   SidebarGroup,
 } from '@/components/ui/sidebar';
 import { CommunitySwitcher } from '@/components/community/CommunitySwitcher';
-import { Link } from 'react-router-dom';
 import HomeSection from './sidebar/HomeSection';
 import GetStartedSection from './sidebar/GetStartedSection';
 import ContentSection from './sidebar/ContentSection';
@@ -16,15 +16,17 @@ const SidebarMenuContent: React.FC = () => {
   return (
     <>
       <SidebarHeader className="border-b border-nortech-gray-light dark:border-gray-800 px-3 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center rounded-lg font-bold transform transition-all duration-200 group-hover:scale-110 shadow-md">
-            N
+        <div className="flex items-center gap-3 group relative">
+          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center rounded-lg font-bold transform transition-all duration-200 group-hover:scale-110 shadow-md relative">
+            <span>N</span>
+            <div className="absolute -top-1 -right-1">
+              <CommunitySwitcher />
+            </div>
           </div>
           <span className="font-semibold text-xl bg-gradient-to-r from-purple-700 to-indigo-700 bg-clip-text text-transparent">
             Nortech
           </span>
         </div>
-        <CommunitySwitcher />
       </SidebarHeader>
       
       <div className="p-3 mt-2">
