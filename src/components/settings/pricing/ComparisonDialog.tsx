@@ -9,28 +9,37 @@ import {
   DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Check, X } from 'lucide-react';
-import { Plan } from './PricingPlans';
+import { Check, X, HelpCircle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-interface ComparisonDialogProps {
-  plans: Plan[];
-  open: boolean;
-  setOpen: (open: boolean) => void;
+interface Feature {
+  name: string;
+  tooltip?: string;
+  starter: string | boolean;
+  professional: string | boolean;
+  business: string | boolean;
+  enterprise: string | boolean;
+  whiteLabel?: string | boolean;
 }
 
-export const ComparisonDialog: React.FC<ComparisonDialogProps> = ({ plans, open, setOpen }) => {
-  const features = [
-    { name: 'Membros inclusos', values: {1: '100', 2: '1.000', 3: '10.000', 4: 'Ilimitado', 5: 'Ilimitado'} },
-    { name: 'Cursos e Salas', values: {1: false, 2: true, 3: true, 4: true, 5: true} },
-    { name: 'Workflows', values: {1: false, 2: false, 3: true, 4: true, 5: true} },
-    { name: 'Agentes IA / Terminal', values: {1: false, 2: false, 3: false, 4: true, 5: true} },
-    { name: 'API / Campos Customizados', values: {1: false, 2: false, 3: true, 4: true, 5: true} },
-    { name: 'White-label e App próprio', values: {1: false, 2: false, 3: false, 4: false, 5: true} },
-    { name: 'Suporte Prioritário', values: {1: false, 2: false, 3: false, 4: true, 5: true} }
-  ];
+interface ComparisonDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  features: Feature[];
+  isMobile?: boolean;
+}
+
+export const ComparisonDialog: React.FC<ComparisonDialogProps> = ({ 
+  features, 
+  open, 
+  onOpenChange,
+  isMobile = false
+}) => {
+  // Plan names for column headers
+  const planNames = ['Starter', 'Professional', 'Business', 'Enterprise', 'White Label'];
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">Comparação de Planos</DialogTitle>
@@ -46,13 +55,13 @@ export const ComparisonDialog: React.FC<ComparisonDialogProps> = ({ plans, open,
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Recurso
                 </th>
-                {plans.map((plan) => (
+                {planNames.map((planName, index) => (
                   <th 
-                    key={plan.id}
+                    key={index}
                     className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider 
-                      ${plan.recommended ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}
+                      ${index === 1 ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}
                   >
-                    {plan.name}
+                    {planName}
                   </th>
                 ))}
               </tr>
@@ -60,25 +69,80 @@ export const ComparisonDialog: React.FC<ComparisonDialogProps> = ({ plans, open,
             <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-gray-700">
               {features.map((feature, idx) => (
                 <tr key={idx} className={idx % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800/50' : ''}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center gap-1">
                     {feature.name}
+                    {feature.tooltip && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span>
+                              <HelpCircle className="h-4 w-4 text-gray-400" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{feature.tooltip}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                   </td>
-                  {plans.map((plan) => (
-                    <td 
-                      key={plan.id} 
-                      className={`px-6 py-4 whitespace-nowrap text-sm ${plan.recommended ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}
-                    >
-                      {typeof feature.values[plan.id as keyof typeof feature.values] === 'boolean' ? (
-                        feature.values[plan.id as keyof typeof feature.values] ? (
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${planNames[0] === 'Professional' ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}>
+                    {typeof feature.starter === 'boolean' ? (
+                      feature.starter ? (
+                        <Check className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <X className="h-5 w-5 text-gray-400" />
+                      )
+                    ) : (
+                      <span>{feature.starter}</span>
+                    )}
+                  </td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${planNames[1] === 'Professional' ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}>
+                    {typeof feature.professional === 'boolean' ? (
+                      feature.professional ? (
+                        <Check className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <X className="h-5 w-5 text-gray-400" />
+                      )
+                    ) : (
+                      <span>{feature.professional}</span>
+                    )}
+                  </td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${planNames[2] === 'Professional' ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}>
+                    {typeof feature.business === 'boolean' ? (
+                      feature.business ? (
+                        <Check className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <X className="h-5 w-5 text-gray-400" />
+                      )
+                    ) : (
+                      <span>{feature.business}</span>
+                    )}
+                  </td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${planNames[3] === 'Professional' ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}>
+                    {typeof feature.enterprise === 'boolean' ? (
+                      feature.enterprise ? (
+                        <Check className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <X className="h-5 w-5 text-gray-400" />
+                      )
+                    ) : (
+                      <span>{feature.enterprise}</span>
+                    )}
+                  </td>
+                  {feature.whiteLabel !== undefined && (
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${planNames[4] === 'Professional' ? 'bg-purple-50 dark:bg-purple-900/20' : ''}`}>
+                      {typeof feature.whiteLabel === 'boolean' ? (
+                        feature.whiteLabel ? (
                           <Check className="h-5 w-5 text-green-500" />
                         ) : (
                           <X className="h-5 w-5 text-gray-400" />
                         )
                       ) : (
-                        <span>{feature.values[plan.id as keyof typeof feature.values]}</span>
+                        <span>{feature.whiteLabel}</span>
                       )}
                     </td>
-                  ))}
+                  )}
                 </tr>
               ))}
             </tbody>
