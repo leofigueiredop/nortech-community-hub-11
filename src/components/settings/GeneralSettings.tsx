@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,15 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useTranslation } from 'react-i18next';
-import { useLanguage } from '@/context/LanguageContext';
 
 const GeneralSettings: React.FC = () => {
-  const { t } = useTranslation();
-  const { language, changeLanguage } = useLanguage();
   const { toast } = useToast();
   const [communityName, setCommunityName] = useState("Pablo's Community");
-  const [selectedLanguage, setSelectedLanguage] = useState(language);
+  const [language, setLanguage] = useState("english");
   const [isPrivate, setIsPrivate] = useState(true);
   const [communityUrl, setCommunityUrl] = useState("pablos-community-9de6a");
   const [isSaving, setIsSaving] = useState(false);
@@ -43,15 +38,9 @@ const GeneralSettings: React.FC = () => {
     // Simulate API call
     setTimeout(() => {
       setIsSaving(false);
-      
-      // Apply language change if it was modified
-      if (selectedLanguage !== language) {
-        changeLanguage(selectedLanguage as 'en' | 'pt-BR');
-      }
-      
       toast({
-        title: t('settings.general.settingsSaved'),
-        description: `${t('settings.general.settingsSaved')} ${new Date().toLocaleTimeString()}`,
+        title: "Settings saved",
+        description: `Changes were saved successfully at ${new Date().toLocaleTimeString()}`,
       });
     }, 800);
   };
@@ -73,22 +62,22 @@ const GeneralSettings: React.FC = () => {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Settings2 className="h-5 w-5 text-gray-500" />
-            <CardTitle>{t('settings.general.manageSettings')}</CardTitle>
+            <CardTitle>Manage General Settings</CardTitle>
           </div>
-          <CardDescription>{t('settings.general.generalDescription')}</CardDescription>
+          <CardDescription>Configure basic information about your community</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <Label htmlFor="community-name" className="text-base font-semibold mb-2 block">
-                {t('settings.general.communityName')}
+                Community Name
               </Label>
-              <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">{t('settings.general.communityNameDescription')}</p>
+              <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">Your brand name shown to members</p>
             </div>
             <div>
               <Input 
                 id="community-name" 
-                placeholder={t('settings.general.communityName')}
+                placeholder="Enter community name" 
                 value={communityName}
                 onChange={(e) => setCommunityName(e.target.value)}
                 className="w-full"
@@ -99,21 +88,20 @@ const GeneralSettings: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <Label htmlFor="default-language" className="text-base font-semibold mb-2 block">
-                {t('common.language')}
+                Language
               </Label>
-              <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">{t('settings.general.languageDescription')}</p>
+              <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">Default for new members</p>
             </div>
             <div>
-              <Select 
-                value={selectedLanguage} 
-                onValueChange={(value) => setSelectedLanguage(value as 'en' | 'pt-BR')}
-              >
+              <Select value={language} onValueChange={setLanguage}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder={t('common.language')} />
+                  <SelectValue placeholder="Select a language" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">{t('common.english')}</SelectItem>
-                  <SelectItem value="pt-BR">{t('common.portuguese')}</SelectItem>
+                  <SelectItem value="english">English</SelectItem>
+                  <SelectItem value="portuguese">Portuguese</SelectItem>
+                  <SelectItem value="spanish">Spanish</SelectItem>
+                  <SelectItem value="french">French</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -122,9 +110,9 @@ const GeneralSettings: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <Label htmlFor="community-id" className="text-base font-semibold mb-2 block">
-                {t('settings.general.communityId')}
+                Community ID
               </Label>
-              <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">{t('settings.general.communityIdDescription')}</p>
+              <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">For support identification</p>
             </div>
             <div>
               <Input 
@@ -142,18 +130,18 @@ const GeneralSettings: React.FC = () => {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Globe className="h-5 w-5 text-gray-500" />
-            <CardTitle>{t('settings.general.visibilityAccess')}</CardTitle>
+            <CardTitle>Visibility & Access</CardTitle>
           </div>
-          <CardDescription>{t('settings.general.visibilityAccessDescription')}</CardDescription>
+          <CardDescription>Control how users can access your community</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <Label htmlFor="community-url" className="text-base font-semibold mb-2 block">
-                {t('settings.general.communityUrl')}
+                Community URL
               </Label>
               <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">
-                {t('settings.general.communityUrlDescription')}
+                Your community's web address
               </p>
             </div>
             <div className="space-y-3">
@@ -182,7 +170,7 @@ const GeneralSettings: React.FC = () => {
                 onClick={() => {window.location.href = '/settings/domain'}}
               >
                 <Globe className="h-4 w-4" />
-                {t('settings.general.setupCustomDomain')}
+                Set up custom domain
               </Button>
             </div>
           </div>
@@ -190,10 +178,10 @@ const GeneralSettings: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
               <Label className="text-base font-semibold mb-2 block">
-                {t('settings.general.privateCommunity')}
+                Private Community
               </Label>
               <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">
-                {t('settings.general.privateCommunityDescription')}
+                Only invited users can join
               </p>
             </div>
             <div className="flex justify-end items-center gap-3">
@@ -203,7 +191,7 @@ const GeneralSettings: React.FC = () => {
                     <Lock className="h-4 w-4 text-gray-400" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{t('settings.general.privateCommunityDescription')}</p>
+                    <p>When enabled, users must be invited to join</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -217,10 +205,10 @@ const GeneralSettings: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <Label htmlFor="custom-signup-link" className="text-base font-semibold mb-2 block">
-                {t('settings.general.invitationLink')}
+                Invitation Link
               </Label>
               <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">
-                {t('settings.general.invitationLinkDescription')}
+                Share this to onboard users
               </p>
             </div>
             <div className="flex gap-2">
@@ -248,7 +236,7 @@ const GeneralSettings: React.FC = () => {
           size="lg"
           className="bg-nortech-purple hover:bg-nortech-purple/90 shadow-lg"
         >
-          {isSaving ? t('settings.general.saving') : t('settings.general.saveChanges')}
+          {isSaving ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>
     </div>

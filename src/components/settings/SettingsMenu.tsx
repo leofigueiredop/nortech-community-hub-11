@@ -9,10 +9,54 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Star } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+
+const settingsGroups = [
+  {
+    title: '🛠 Community Setup',
+    description: 'Configure the foundational setup of your community',
+    items: [
+      { name: 'General Settings', icon: <Settings className="mr-2 h-5 w-5" />, path: '/settings/general', description: 'Basic community configuration and options' },
+      { name: 'Branding', icon: <Palette className="mr-2 h-5 w-5" />, path: '/settings/branding', description: 'Customize the look and feel of your community' },
+      { name: 'Domain', icon: <Globe className="mr-2 h-5 w-5" />, path: '/settings/domain', description: 'Connect and manage custom domains' },
+      { name: 'Migration', icon: <RefreshCw className="mr-2 h-5 w-5" />, path: '/settings/migration', description: 'Import or export community data' },
+    ]
+  },
+  {
+    title: '🧩 Content & Engagement',
+    description: 'Manage how content is created, automated, moderated and gamified',
+    items: [
+      { name: 'Marketing', icon: <MessageSquare className="mr-2 h-5 w-5" />, path: '/settings/marketing', description: 'Tools to grow and promote your community' },
+      { name: 'Posts', icon: <FileText className="mr-2 h-5 w-5" />, path: '/settings/posts', description: 'Configure post types and settings' },
+      { name: 'Spaces', icon: <Layout className="mr-2 h-5 w-5" />, path: '/settings/spaces', description: 'Organize community content into spaces' },
+      { name: 'Moderation', icon: <Shield className="mr-2 h-5 w-5" />, path: '/settings/moderation', description: 'Tools to maintain community standards' },
+      { name: 'Workflows', icon: <Workflow className="mr-2 h-5 w-5" />, path: '/settings/workflows', description: 'Automate community processes and actions' },
+      { name: 'AI Agents', icon: <Bot className="mr-2 h-5 w-5" />, path: '/settings/ai-agents', description: 'Configure AI assistants for your community' },
+      { name: 'Points Configuration', icon: <Trophy className="mr-2 h-5 w-5" />, path: '/settings/points-configuration', description: 'Set up gamification and rewards' },
+    ]
+  },
+  {
+    title: '💸 Monetization',
+    description: 'Manage pricing, track revenue and activate growth tools',
+    items: [
+      { name: 'Nortech Plans', icon: <CreditCard className="mr-2 h-5 w-5" />, path: '/settings/plans', description: 'Configure subscription plans and pricing' },
+      { name: 'Member Subscriptions', icon: <DollarSign className="mr-2 h-5 w-5" />, path: '/settings/subscriptions', description: 'Manage member subscription settings' },
+      { name: 'Paywall Setup', icon: <DollarSign className="mr-2 h-5 w-5" />, path: '/settings/paywall', description: 'Configure content access rules' },
+      { name: 'Analytics', icon: <BarChart3 className="mr-2 h-5 w-5" />, path: '/settings/analytics', description: 'Community growth and engagement metrics' },
+      { name: 'Affiliates', icon: <Share2 className="mr-2 h-5 w-5" />, path: '/settings/affiliates', description: 'Manage affiliate programs and tracking' },
+    ]
+  },
+  {
+    title: '🧑‍🤝‍🧑 Member Experience',
+    description: 'Configure how members interact, receive messages and see legal terms',
+    items: [
+      { name: 'Legal', icon: <FileText className="mr-2 h-5 w-5" />, path: '/settings/legal', description: 'Manage terms of service and privacy policies' },
+      { name: 'Digest', icon: <Mail className="mr-2 h-5 w-5" />, path: '/settings/digest', description: 'Configure email digests and newsletters' },
+      { name: 'Notifications', icon: <Bell className="mr-2 h-5 w-5" />, path: '/settings/notifications', description: 'Manage notification preferences' },
+    ]
+  }
+];
 
 const SettingsMenu: React.FC = () => {
-  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [pinnedItems, setPinnedItems] = React.useState(["analytics", "branding"]);
   
@@ -23,53 +67,6 @@ const SettingsMenu: React.FC = () => {
         : [...prev, itemName]
     );
   };
-  
-  // Define settings groups with translations
-  const settingsGroups = [
-    {
-      title: '🛠 ' + t('settings.general.title'),
-      description: t('settings.general.generalDescription'),
-      items: [
-        { name: t('settings.general.title'), icon: <Settings className="mr-2 h-5 w-5" />, path: '/settings/general', description: t('settings.general.generalDescription') },
-        { name: t('settings.branding.title'), icon: <Palette className="mr-2 h-5 w-5" />, path: '/settings/branding', description: 'Customize the look and feel of your community' },
-        { name: 'Domain', icon: <Globe className="mr-2 h-5 w-5" />, path: '/settings/domain', description: 'Connect and manage custom domains' },
-        { name: 'Migration', icon: <RefreshCw className="mr-2 h-5 w-5" />, path: '/settings/migration', description: 'Import or export community data' },
-      ]
-    },
-    {
-      title: '🧩 ' + t('settings.contentEngagement.title'),
-      description: t('settings.contentEngagement.description'),
-      items: [
-        { name: 'Marketing', icon: <MessageSquare className="mr-2 h-5 w-5" />, path: '/settings/marketing', description: 'Tools to grow and promote your community' },
-        { name: 'Posts', icon: <FileText className="mr-2 h-5 w-5" />, path: '/settings/posts', description: 'Configure post types and settings' },
-        { name: 'Spaces', icon: <Layout className="mr-2 h-5 w-5" />, path: '/settings/spaces', description: 'Organize community content into spaces' },
-        { name: 'Moderation', icon: <Shield className="mr-2 h-5 w-5" />, path: '/settings/moderation', description: 'Tools to maintain community standards' },
-        { name: 'Workflows', icon: <Workflow className="mr-2 h-5 w-5" />, path: '/settings/workflows', description: 'Automate community processes and actions' },
-        { name: 'AI Agents', icon: <Bot className="mr-2 h-5 w-5" />, path: '/settings/ai-agents', description: 'Configure AI assistants for your community' },
-        { name: 'Points Configuration', icon: <Trophy className="mr-2 h-5 w-5" />, path: '/settings/points-configuration', description: 'Set up gamification and rewards' },
-      ]
-    },
-    {
-      title: '💸 ' + t('settings.monetization.title'),
-      description: t('settings.monetization.description'),
-      items: [
-        { name: 'Nortech Plans', icon: <CreditCard className="mr-2 h-5 w-5" />, path: '/settings/plans', description: 'Configure subscription plans and pricing' },
-        { name: 'Member Subscriptions', icon: <DollarSign className="mr-2 h-5 w-5" />, path: '/settings/subscriptions', description: 'Manage member subscription settings' },
-        { name: 'Paywall Setup', icon: <DollarSign className="mr-2 h-5 w-5" />, path: '/settings/paywall', description: 'Configure content access rules' },
-        { name: 'Analytics', icon: <BarChart3 className="mr-2 h-5 w-5" />, path: '/settings/analytics', description: 'Community growth and engagement metrics' },
-        { name: 'Affiliates', icon: <Share2 className="mr-2 h-5 w-5" />, path: '/settings/affiliates', description: 'Manage affiliate programs and tracking' },
-      ]
-    },
-    {
-      title: '🧑‍🤝‍🧑 ' + t('settings.memberExperience.title'),
-      description: t('settings.memberExperience.description'),
-      items: [
-        { name: 'Legal', icon: <FileText className="mr-2 h-5 w-5" />, path: '/settings/legal', description: 'Manage terms of service and privacy policies' },
-        { name: 'Digest', icon: <Mail className="mr-2 h-5 w-5" />, path: '/settings/digest', description: 'Configure email digests and newsletters' },
-        { name: 'Notifications', icon: <Bell className="mr-2 h-5 w-5" />, path: '/settings/notifications', description: 'Manage notification preferences' },
-      ]
-    }
-  ];
   
   // Filter settings based on search query
   const filteredGroups = searchQuery.trim() === "" 
@@ -87,7 +84,7 @@ const SettingsMenu: React.FC = () => {
       <div className="relative max-w-md mx-auto md:mx-0">
         <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
         <Input
-          placeholder={t('common.search')}
+          placeholder="Search settings..."
           className="pl-9 bg-white dark:bg-gray-800"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
