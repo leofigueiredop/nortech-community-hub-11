@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Bell, Calendar, MessageSquare, FileText, Megaphone, Award, UserPlus, Mail, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from "@/hooks/use-toast";
 
 const NotificationSettings: React.FC = () => {
+  const { toast } = useToast();
   const [preferences, setPreferences] = useState({
     posts: true,
     replies: true,
@@ -42,19 +44,29 @@ const NotificationSettings: React.FC = () => {
       [key]: !prev[key]
     }));
   };
+  
+  const handleSave = () => {
+    toast({
+      title: "Preferências salvas",
+      description: "Suas configurações de notificação foram atualizadas com sucesso.",
+    });
+  };
 
   return (
-    <div className="bg-gray-900 p-8 rounded-lg text-white">
-      <p className="mb-8">
-        Customize how and when you receive notifications from Nortech Communities.
-        These settings apply across all spaces you're a member of.
-      </p>
+    <div className="bg-gray-900 p-8 rounded-2xl text-white shadow-lg">
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Configurações de notificações</h2>
+        <p>
+          Personalize como e quando você recebe notificações da Nortech Communities.
+          Essas configurações se aplicam a todos os espaços dos quais você é membro.
+        </p>
+      </div>
 
       <Tabs defaultValue="types" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 bg-gray-800">
-          <TabsTrigger value="types">Notification Types</TabsTrigger>
-          <TabsTrigger value="channels">Delivery Channels</TabsTrigger>
-          <TabsTrigger value="frequency">Frequency</TabsTrigger>
+          <TabsTrigger value="types">Tipos de notificações</TabsTrigger>
+          <TabsTrigger value="channels">Canais de entrega</TabsTrigger>
+          <TabsTrigger value="frequency">Frequência</TabsTrigger>
         </TabsList>
 
         <TabsContent value="types" className="space-y-6">
@@ -63,8 +75,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <FileText className="h-5 w-5 text-blue-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">New posts</Label>
-                  <p className="text-gray-400 text-sm">When someone posts in a space you follow</p>
+                  <Label className="text-base font-semibold text-white">Novas postagens</Label>
+                  <p className="text-gray-400 text-sm">Quando alguém publica em um espaço que você segue</p>
                 </div>
               </div>
               <Switch 
@@ -79,8 +91,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-5 w-5 text-purple-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">Replies to your posts</Label>
-                  <p className="text-gray-400 text-sm">When someone replies to your post or comment</p>
+                  <Label className="text-base font-semibold text-white">Respostas às suas postagens</Label>
+                  <p className="text-gray-400 text-sm">Quando alguém responde à sua postagem ou comentário</p>
                 </div>
               </div>
               <Switch 
@@ -95,8 +107,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Calendar className="h-5 w-5 text-green-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">Events and live sessions</Label>
-                  <p className="text-gray-400 text-sm">Upcoming events you've registered for</p>
+                  <Label className="text-base font-semibold text-white">Eventos e sessões ao vivo</Label>
+                  <p className="text-gray-400 text-sm">Próximos eventos para os quais você se registrou</p>
                 </div>
               </div>
               <Switch 
@@ -111,8 +123,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <FileText className="h-5 w-5 text-teal-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">New content</Label>
-                  <p className="text-gray-400 text-sm">When new content is added to courses you're enrolled in</p>
+                  <Label className="text-base font-semibold text-white">Novo conteúdo</Label>
+                  <p className="text-gray-400 text-sm">Quando novo conteúdo é adicionado a cursos em que você está inscrito</p>
                 </div>
               </div>
               <Switch 
@@ -127,8 +139,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <UserPlus className="h-5 w-5 text-pink-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">Invitations</Label>
-                  <p className="text-gray-400 text-sm">Space invitations and membership approvals</p>
+                  <Label className="text-base font-semibold text-white">Convites</Label>
+                  <p className="text-gray-400 text-sm">Convites para espaços e aprovações de membros</p>
                 </div>
               </div>
               <Switch 
@@ -143,8 +155,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Award className="h-5 w-5 text-amber-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">Milestones and achievements</Label>
-                  <p className="text-gray-400 text-sm">When you complete courses or earn new badges</p>
+                  <Label className="text-base font-semibold text-white">Conquistas e emblemas</Label>
+                  <p className="text-gray-400 text-sm">Quando você completa cursos ou ganha novos emblemas</p>
                 </div>
               </div>
               <Switch 
@@ -159,8 +171,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Megaphone className="h-5 w-5 text-red-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">Announcements</Label>
-                  <p className="text-gray-400 text-sm">Important community announcements from admins</p>
+                  <Label className="text-base font-semibold text-white">Anúncios</Label>
+                  <p className="text-gray-400 text-sm">Anúncios importantes da comunidade feitos por administradores</p>
                 </div>
               </div>
               <Switch 
@@ -177,8 +189,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Bell className="h-5 w-5 text-indigo-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">In-app notifications</Label>
-                  <p className="text-gray-400 text-sm">Notifications in the notification center</p>
+                  <Label className="text-base font-semibold text-white">Notificações no aplicativo</Label>
+                  <p className="text-gray-400 text-sm">Notificações no centro de notificações</p>
                 </div>
               </div>
               <Switch 
@@ -193,8 +205,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-cyan-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">Email notifications</Label>
-                  <p className="text-gray-400 text-sm">Send notifications to your email</p>
+                  <Label className="text-base font-semibold text-white">Notificações por email</Label>
+                  <p className="text-gray-400 text-sm">Enviar notificações para seu email</p>
                 </div>
               </div>
               <Switch 
@@ -209,8 +221,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Bell className="h-5 w-5 text-orange-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">Push notifications</Label>
-                  <p className="text-gray-400 text-sm">Notifications on your mobile device</p>
+                  <Label className="text-base font-semibold text-white">Notificações push</Label>
+                  <p className="text-gray-400 text-sm">Notificações no seu dispositivo móvel</p>
                 </div>
               </div>
               <Switch 
@@ -225,8 +237,8 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-rose-400" />
                 <div>
-                  <Label className="text-base font-semibold text-white">Digest emails</Label>
-                  <p className="text-gray-400 text-sm">Receive a summary of activities</p>
+                  <Label className="text-base font-semibold text-white">Emails de resumo</Label>
+                  <p className="text-gray-400 text-sm">Receber um resumo das atividades</p>
                 </div>
               </div>
               <Switch 
@@ -239,8 +251,8 @@ const NotificationSettings: React.FC = () => {
 
         <TabsContent value="frequency" className="space-y-6">
           <div className="space-y-6">
-            <Label className="text-base font-semibold text-white">Notification frequency</Label>
-            <p className="text-gray-400 text-sm mb-4">Choose how often you receive notifications</p>
+            <Label className="text-base font-semibold text-white">Frequência de notificações</Label>
+            <p className="text-gray-400 text-sm mb-4">Escolha com que frequência você recebe notificações</p>
 
             <RadioGroup 
               value={frequency} 
@@ -250,24 +262,24 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="realtime" id="realtime" />
                 <Label htmlFor="realtime" className="text-white">
-                  <span className="font-semibold">Real-time</span>
-                  <p className="text-gray-400 text-sm">Receive notifications as they happen</p>
+                  <span className="font-semibold">Tempo real</span>
+                  <p className="text-gray-400 text-sm">Receba notificações assim que acontecerem</p>
                 </Label>
               </div>
               
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="daily" id="daily" />
                 <Label htmlFor="daily" className="text-white">
-                  <span className="font-semibold">Daily digest</span>
-                  <p className="text-gray-400 text-sm">Receive a summary once a day</p>
+                  <span className="font-semibold">Resumo diário</span>
+                  <p className="text-gray-400 text-sm">Receba um resumo uma vez por dia</p>
                 </Label>
               </div>
               
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="weekly" id="weekly" />
                 <Label htmlFor="weekly" className="text-white">
-                  <span className="font-semibold">Weekly digest</span>
-                  <p className="text-gray-400 text-sm">Receive a summary once a week</p>
+                  <span className="font-semibold">Resumo semanal</span>
+                  <p className="text-gray-400 text-sm">Receba um resumo uma vez por semana</p>
                 </Label>
               </div>
             </RadioGroup>
@@ -276,8 +288,8 @@ const NotificationSettings: React.FC = () => {
       </Tabs>
 
       <div className="flex justify-end mt-8">
-        <Button className="bg-nortech-purple hover:bg-nortech-purple/90">
-          Save preferences
+        <Button className="bg-nortech-purple hover:bg-nortech-purple/90" onClick={handleSave}>
+          Salvar preferências
         </Button>
       </div>
     </div>
