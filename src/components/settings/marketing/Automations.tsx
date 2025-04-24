@@ -1,11 +1,12 @@
-
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Mail, Award, Calendar, ChevronRight, Plus } from 'lucide-react';
+import { Mail, Clock, Award, Calendar, ChevronRight, Plus } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import MarketingWaitlistDialog from './MarketingWaitlistDialog';
+import { useToast } from '@/hooks/use-toast';
 
 const AutomationCard: React.FC<{
   title: string;
@@ -85,17 +86,26 @@ const Automations: React.FC = () => {
     },
   ]);
 
+  const [showWaitlist, setShowWaitlist] = useState(false);
+  const { toast } = useToast();
+
   const handleToggle = (id: number) => {
-    setAutomations(automations.map(automation => 
-      automation.id === id ? { ...automation, active: !automation.active } : automation
-    ));
+    setShowWaitlist(true);
+  };
+
+  const handleJoinWaitlist = () => {
+    toast({
+      title: "Waitlist Joined",
+      description: "You'll be notified when email automation features are available.",
+    });
+    setShowWaitlist(false);
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium">Email Automations</h2>
-        <Button variant="outline">
+        <Button variant="outline" onClick={() => setShowWaitlist(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Create New Automation
         </Button>
@@ -114,6 +124,12 @@ const Automations: React.FC = () => {
           />
         ))}
       </div>
+
+      <MarketingWaitlistDialog 
+        isOpen={showWaitlist}
+        onClose={() => setShowWaitlist(false)}
+        onJoinWaitlist={handleJoinWaitlist}
+      />
     </div>
   );
 };

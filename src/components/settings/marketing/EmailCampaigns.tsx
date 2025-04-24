@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, FileText, Send, Trash } from 'lucide-react';
 import CampaignWizard from './campaign/CampaignWizard';
 import CampaignReport from './campaign/CampaignReport';
+import { useToast } from '@/hooks/use-toast';
+import MarketingWaitlistDialog from './MarketingWaitlistDialog';
 
 // Mock data for campaigns
 const mockCampaigns = [
@@ -46,6 +47,8 @@ const EmailCampaigns: React.FC = () => {
   const [showWizard, setShowWizard] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
+  const [showWaitlist, setShowWaitlist] = useState(false);
+  const { toast } = useToast();
   
   const handleViewReport = (campaignId: string) => {
     setSelectedCampaign(campaignId);
@@ -57,14 +60,19 @@ const EmailCampaigns: React.FC = () => {
     setShowWizard(true);
   };
 
+  const handleJoinWaitlist = () => {
+    toast({
+      title: "Waitlist Joined",
+      description: "You'll be notified when email marketing features are available.",
+    });
+    setShowWaitlist(false);
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-medium">Email Campaigns</h2>
-        <Button onClick={() => {
-          setSelectedCampaign(null);
-          setShowWizard(true);
-        }}>
+        <Button onClick={() => setShowWaitlist(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Create Campaign
         </Button>
@@ -172,6 +180,13 @@ const EmailCampaigns: React.FC = () => {
           onClose={() => setShowReport(false)}
         />
       )}
+
+      {/* Waitlist Dialog */}
+      <MarketingWaitlistDialog 
+        isOpen={showWaitlist}
+        onClose={() => setShowWaitlist(false)}
+        onJoinWaitlist={handleJoinWaitlist}
+      />
     </div>
   );
 };
