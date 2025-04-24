@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Info } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 import BillingToggles from './pricing/BillingToggles';
 import PlanCard from './pricing/PlanCard';
 import { ComparisonDialog } from './pricing/ComparisonDialog';
@@ -78,7 +77,6 @@ const PricingPlans: React.FC = () => {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annually'>('monthly');
   const [currency, setCurrency] = useState<'USD' | 'BRL'>('USD');
   const [showComparisonDialog, setShowComparisonDialog] = useState(false);
-  const { isMobile } = useIsMobile();
 
   const plans = [
     {
@@ -181,7 +179,6 @@ const PricingPlans: React.FC = () => {
         open={showComparisonDialog}
         onOpenChange={setShowComparisonDialog}
         features={featuresComparison}
-        isMobile={isMobile}
       />
 
       <PricingFAQ />
