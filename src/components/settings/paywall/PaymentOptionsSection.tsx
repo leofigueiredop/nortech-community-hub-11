@@ -1,13 +1,17 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import PaymentIcon from './PaymentIcon';
 import { Badge } from '@/components/ui/badge';
 import { Check, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import FiatGatewayDialog from './modals/FiatGatewayDialog';
+import CryptoGatewayDialog from './modals/CryptoGatewayDialog';
 
 const PaymentOptionsSection: React.FC = () => {
+  const [fiatDialogOpen, setFiatDialogOpen] = useState(false);
+  const [cryptoDialogOpen, setCryptoDialogOpen] = useState(false);
+
   return (
     <div className="max-w-5xl mx-auto mb-12">
       <h2 className="text-xl md:text-2xl font-bold mb-6">Payment Gateways</h2>
@@ -134,7 +138,13 @@ const PaymentOptionsSection: React.FC = () => {
             </div>
             
             <div className="flex mt-4">
-              <Button variant="outline" className="w-full">Configure Fiat Gateways</Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setFiatDialogOpen(true)}
+              >
+                Configure Fiat Gateways
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -177,11 +187,27 @@ const PaymentOptionsSection: React.FC = () => {
             </div>
             
             <div className="flex mt-4">
-              <Button variant="outline" className="w-full">Configure Crypto Gateway</Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setCryptoDialogOpen(true)}
+              >
+                Configure Crypto Gateway
+              </Button>
             </div>
           </CardContent>
         </Card>
       </div>
+      
+      <FiatGatewayDialog 
+        open={fiatDialogOpen}
+        onOpenChange={setFiatDialogOpen}
+      />
+
+      <CryptoGatewayDialog
+        open={cryptoDialogOpen}
+        onOpenChange={setCryptoDialogOpen}
+      />
       
       <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-lg text-center mt-8">
         <div className="flex items-center justify-center gap-2 mb-3">
