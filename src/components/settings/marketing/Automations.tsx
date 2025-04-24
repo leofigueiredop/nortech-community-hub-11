@@ -7,6 +7,7 @@ import { Mail, Clock, Award, Calendar, ChevronRight, Plus } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import MarketingWaitlistDialog from './MarketingWaitlistDialog';
+import AutomationConfigDialog from './AutomationConfigDialog';
 import { useToast } from '@/hooks/use-toast';
 
 const AutomationCard: React.FC<{
@@ -16,7 +17,8 @@ const AutomationCard: React.FC<{
   steps: number;
   active: boolean;
   onToggle: () => void;
-}> = ({ title, description, icon, steps, active, onToggle }) => {
+  onConfigure: () => void;
+}> = ({ title, description, icon, steps, active, onToggle, onConfigure }) => {
   return (
     <Card className="overflow-hidden">
       <CardHeader className="bg-gray-50 dark:bg-gray-800 pb-4">
@@ -42,7 +44,12 @@ const AutomationCard: React.FC<{
           <div className="text-sm text-gray-600 dark:text-gray-400">
             {steps} email{steps !== 1 ? 's' : ''} in sequence
           </div>
-          <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/30">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
+            onClick={onConfigure}
+          >
             Configure <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
         </div>
@@ -88,18 +95,26 @@ const Automations: React.FC = () => {
   ]);
 
   const [showWaitlist, setShowWaitlist] = useState(false);
+  const [selectedAutomation, setSelectedAutomation] = useState<any>(null);
   const { toast } = useToast();
 
   const handleToggle = (id: number) => {
-    setShowWaitlist(true);
+    setAutomations(prev =>
+      prev.map(automation =>
+        automation.id === id
+          ? { ...automation, active: !automation.active }
+          : automation
+      )
+    );
+    
+    toast({
+      title: "Automation Updated",
+      description: "The automation status has been updated.",
+    });
   };
 
-  const handleJoinWaitlist = () => {
-    toast({
-      title: "Waitlist Joined",
-      description: "You'll be notified when email automation features are available.",
-    });
-    setShowWaitlist(false);
+  const handleConfigure = (automation: any) => {
+    setSelectedAutomation(automation);
   };
 
   return (
@@ -122,6 +137,7 @@ const Automations: React.FC = () => {
             steps={automation.steps}
             active={automation.active}
             onToggle={() => handleToggle(automation.id)}
+            onConfigure={() => handleConfigure(automation)}
           />
         ))}
       </div>
@@ -129,8 +145,22 @@ const Automations: React.FC = () => {
       <MarketingWaitlistDialog 
         isOpen={showWaitlist}
         onClose={() => setShowWaitlist(false)}
-        onJoinWaitlist={handleJoinWaitlist}
+        onJoinWaitlist={() => {
+          toast({
+            title: "Waitlist Joined",
+            description: "You'll be notified when new automation features are available.",
+          });
+          setShowWaitlist(false);
+        }}
       />
+
+      {selectedAutomation && (
+        <AutomationConfigDialog
+          isOpen={!!selectedAutomation}
+          onClose={() => setSelectedAutomation(null)}
+          automation={selectedAutomation}
+        />
+      )}
     </div>
   );
 };
