@@ -9,22 +9,27 @@ import AISuggestions from '@/components/dashboard/AISuggestions';
 import MiniCalendar from '@/components/dashboard/MiniCalendar';
 import CreateSpaceDialog from '@/components/dashboard/CreateSpaceDialog';
 import GuidedTour from '@/components/dashboard/GuidedTour';
-import CommunitySwitcher from '@/components/dashboard/CommunitySwitcher';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle } from 'lucide-react';
+import { PlusCircle, Eye } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Dashboard: React.FC = () => {
   const [createSpaceOpen, setCreateSpaceOpen] = useState(false);
   const { toast } = useToast();
   const { viewAs, setViewAs } = useViewContext();
 
-  const handleViewAsMember = () => {
-    setViewAs(viewAs === 'admin' ? 'member' : 'admin');
+  const handleViewChange = (newView: 'admin' | 'member' | 'premium' | 'premiumPlus') => {
+    setViewAs(newView);
     
     toast({
-      title: `Viewing as ${viewAs === 'admin' ? 'Member' : 'Admin'}`,
-      description: `You are now viewing your community as a ${viewAs === 'admin' ? 'regular member' : 'admin'} would see it.`,
+      title: `Viewing as ${newView.charAt(0).toUpperCase() + newView.slice(1)}`,
+      description: `You are now viewing your community as a ${newView} would see it.`,
       duration: 3000,
     });
   };
@@ -33,17 +38,32 @@ const Dashboard: React.FC = () => {
     <MainLayout>
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-3">
-          <CommunitySwitcher />
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <Button 
-            variant={viewAs === 'admin' ? "ghost" : "outline"} 
-            size="icon" 
-            className={`h-8 w-8 rounded-full ${viewAs !== 'admin' ? "bg-purple-100 text-purple-600" : ""}`}
-            onClick={handleViewAsMember}
-            title={viewAs === 'admin' ? "View as Member" : "View as Admin"}
-          >
-            <Eye size={16} />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 rounded-full hover:bg-purple-100 hover:text-purple-600"
+              >
+                <Eye size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem onClick={() => handleViewChange('admin')}>
+                View as Admin
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewChange('member')}>
+                View as Free Member
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewChange('premium')}>
+                View as Premium Member
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewChange('premiumPlus')}>
+                View as Premium+ Member
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
         {viewAs === 'admin' && (
