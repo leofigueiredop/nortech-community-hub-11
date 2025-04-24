@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import ContentFilters from '@/components/library/ContentFilters';
@@ -8,6 +9,7 @@ import { ContentItem } from '@/types/library';
 
 interface TabContentsProps {
   activeTab: string;
+  setActiveTab: (tab: string) => void; // Added this missing prop
   formatFilter: string;
   tagFilter: string;
   accessFilter: string;
@@ -30,6 +32,7 @@ interface TabContentsProps {
 
 const TabContents: React.FC<TabContentsProps> = ({ 
   activeTab,
+  setActiveTab, // Added to props destructuring
   formatFilter,
   tagFilter,
   accessFilter,

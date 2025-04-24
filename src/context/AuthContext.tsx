@@ -191,22 +191,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentOnboardingStep(step);
   };
 
+  const value = {
+    user, 
+    isLoading, 
+    communityContext,
+    setCommunityContext,
+    login, 
+    register, 
+    loginWithGoogle, 
+    logout,
+    updateProfile,
+    updateOnboardingStep,
+    currentOnboardingStep
+  };
+
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isLoading, 
-        communityContext,
-        setCommunityContext,
-        login, 
-        register, 
-        loginWithGoogle, 
-        logout,
-        updateProfile,
-        updateOnboardingStep,
-        currentOnboardingStep
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
