@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Home, Gauge } from 'lucide-react';
-import { SidebarLink } from './SidebarLink';
+import SidebarLink from './SidebarLink';
 import { useTranslation } from 'react-i18next';
 
 const HomeSection: React.FC = () => {
