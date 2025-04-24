@@ -11,13 +11,17 @@ const WelcomeCard: React.FC = () => {
   return (
     <Card className="bg-gradient-to-r from-nortech-purple to-purple-700 text-white">
       <CardHeader>
-        <CardTitle className="text-2xl">Welcome to Nortech Communities</CardTitle>
+        <CardTitle className="text-2xl flex items-center gap-2">
+          <span className="text-amber-200">✨</span> 
+          Welcome to Nortech Communities
+        </CardTitle>
         <CardDescription className="text-gray-200">
           Your all-in-one platform for community building, education, and engagement
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="mb-6">
+        <p className="mb-6 flex items-center">
+          <span className="mr-2">🚀</span>
           Follow the setup guide to complete your community configuration. You can customize your branding, 
           invite members, create content, and more.
         </p>
