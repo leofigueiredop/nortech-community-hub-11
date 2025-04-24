@@ -1,16 +1,14 @@
-
 import React from 'react';
 import { ContentItem } from '@/types/library';
-import { Eye, Clock, Star, CheckCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { formatDuration } from '../viewer/contentViewerUtils';
-import { useContentProgress } from '@/hooks/useContentProgress';
 
-interface ContentCardInfoProps {
+export interface ContentCardInfoProps {
   item: ContentItem;
+  showAuthor?: boolean;
+  showPoints?: boolean;
+  isCompact?: boolean;
 }
 
-const ContentCardInfo: React.FC<ContentCardInfoProps> = ({ item }) => {
+const ContentCardInfo = ({ item, showAuthor, showPoints, isCompact }: ContentCardInfoProps) => {
   const { getProgress } = useContentProgress();
   const progress = getProgress(item.id);
   const isCompleted = progress?.completed || false;

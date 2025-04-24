@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { ContentItem } from '@/types/library';
 import { useContentProgress } from '@/hooks/useContentProgress';
 import { usePoints } from '@/context/PointsContext';
@@ -10,11 +12,9 @@ import ContentPreview from '@/components/library/viewer/ContentPreview';
 import ContentDetails from '@/components/library/viewer/ContentDetails';
 import ContentComments from '@/components/library/viewer/ContentComments';
 import ContentProgress from '@/components/library/viewer/ContentProgress';
+import { ArrowRight, Lock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  getContentDuration, 
-  getCompletionCriteria 
-} from './contentViewerUtils';
+import { getContentDuration, getCompletionCriteria } from './contentViewerUtils';
 
 interface ContentViewerProps {
   item: ContentItem | null;
@@ -22,6 +22,7 @@ interface ContentViewerProps {
 }
 
 const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('details');
   const [hasAccess, setHasAccess] = useState(false);
   const { addProgress, updateProgress, getProgress, awardPoints } = useContentProgress();
@@ -30,114 +31,91 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
 
   useEffect(() => {
     if (item) {
-      // Reset state when item changes
       setActiveTab('details');
-      
-      // Check if user has free access to this content
-      const hasFreeAccess = 
-        item.accessLevel === 'free' || 
-        (item.accessLevel === 'premium' && item.freeAccessesLeft && item.freeAccessesLeft > 0);
-      
-      setHasAccess(hasFreeAccess);
-      
-      // Add to progress tracking if not already there
+      setHasAccess(item.accessLevel === 'free');
       addProgress(item.id);
     }
   }, [item, addProgress]);
-
-  // Dialog open state
-  const isOpen = !!item;
-
-  // Handle content view
-  const handleContentView = () => {
-    if (!item) return;
-    
-    // Set view start time
-    setViewStartTime(Date.now());
-    
-    // Add initial progress if needed
-    const progress = getProgress(item.id);
-    if (!progress || progress.progress === 0) {
-      updateProgress(item.id, 10); // Start with 10% progress
-    }
-  };
-
-  // Handle content progress (called from content preview components)
-  const handleProgress = (progressPercentage: number) => {
-    if (!item) return;
-    
-    updateProgress(item.id, progressPercentage);
-    
-    // Award points if applicable and completed
-    if (progressPercentage >= 100 && item.pointsEnabled) {
-      const progress = getProgress(item.id);
-      if (progress && !progress.pointsAwarded) {
-        awardPoints(item.id);
-        if (item.pointsValue) {
-          addUserPoints({
-            type: 'content_completion',
-            description: `Completed "${item.title}"`,
-            points: item.pointsValue
-          });
-        }
-      }
-    }
-  };
-
-  // Calculate time spent viewing content
-  const calculateTimeSpent = () => {
-    if (!viewStartTime) return 0;
-    return Math.floor((Date.now() - viewStartTime) / 1000); // in seconds
-  };
-
-  // Handle content access (e.g., unlocking premium content)
-  const handleAccess = () => {
-    setHasAccess(true);
-  };
-
-  // Handle dialog close
-  const handleClose = () => {
-    if (!item) return;
-    
-    // Save progress before closing
-    const timeSpent = calculateTimeSpent();
-    if (timeSpent > 10) { // Only count if more than 10 seconds spent
-      const currentProgress = getProgress(item.id);
-      if (currentProgress) {
-        // Increase progress based on time spent (simplified logic)
-        const newProgress = Math.min(
-          100, 
-          currentProgress.progress + Math.floor(timeSpent / 10)
-        );
-        updateProgress(item.id, newProgress);
-      }
-    }
-    
-    // Reset state
-    setViewStartTime(null);
-    
-    // Call parent close handler
-    onClose();
-  };
 
   if (!item) return null;
 
   const progress = getProgress(item.id)?.progress || 0;
   const isCompleted = progress >= 100;
 
+  const handleStartCourse = () => {
+    navigate(`/course/${item.id}`);
+    onClose();
+  };
+
+  if (item.format === 'course') {
+    return (
+      <Dialog open={!!item} onOpenChange={onClose}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden">
+          <div className="relative aspect-video w-full overflow-hidden">
+            <img 
+              src={item.thumbnail} 
+              alt={item.title} 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-6">
+              <h2 className="text-2xl font-bold text-white mb-2">{item.title}</h2>
+              <p className="text-slate-200 text-sm line-clamp-2">{item.description}</p>
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="flex flex-col gap-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-semibold mb-1">Course Overview</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {item.modules?.length || 0} modules • {Math.round((item.duration || 0) / 60)} minutes
+                  </p>
+                </div>
+                
+                {item.accessLevel === 'premium' ? (
+                  <Button variant="premium" className="gap-2">
+                    <Lock className="h-4 w-4" />
+                    Unlock Premium
+                  </Button>
+                ) : (
+                  <Button onClick={handleStartCourse} className="gap-2">
+                    Start Course 
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="font-medium">What you'll learn:</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li>• Build modern React applications from scratch</li>
+                  <li>• Master React hooks and state management</li>
+                  <li>• Create reusable components and custom hooks</li>
+                  <li>• Implement responsive designs with Tailwind CSS</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // For non-course content, show the regular content viewer
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden" onPointerDownOutside={(e) => e.preventDefault()}>
+    <Dialog open={!!item} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
         <ScrollArea className="h-[calc(100vh-10rem)]">
           <div className="p-6">
-            <ContentHeader item={item} onBack={handleClose} />
+            <ContentHeader item={item} onBack={onClose} />
             
             <ContentPreview 
               item={item} 
               hasAccess={hasAccess}
-              onContentView={handleContentView}
-              onProgress={handleProgress}
-              handleAccess={handleAccess}
+              onContentView={() => setViewStartTime(Date.now())}
+              handleAccess={() => setHasAccess(true)}
             />
             
             <ContentProgress 
@@ -156,9 +134,6 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
                 )}
                 {item.allowComments !== false && (
                   <TabsTrigger value="comments" className="flex-1">Comments</TabsTrigger>
-                )}
-                {item.format === 'course' && (
-                  <TabsTrigger value="modules" className="flex-1">Modules</TabsTrigger>
                 )}
               </TabsList>
               
@@ -181,14 +156,6 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
               {item.allowComments !== false && (
                 <TabsContent value="comments">
                   <ContentComments itemId={item.id} />
-                </TabsContent>
-              )}
-              
-              {item.format === 'course' && (
-                <TabsContent value="modules">
-                  <div className="text-sm text-muted-foreground">
-                    <p className="mb-4">This course has no modules yet.</p>
-                  </div>
                 </TabsContent>
               )}
             </Tabs>
