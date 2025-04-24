@@ -11,6 +11,7 @@ interface WorkflowStep {
   title: string;
   day?: number | string;
   iconColor: string;
+  enabled?: boolean;
 }
 
 interface WorkflowCardProps {

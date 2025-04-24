@@ -12,7 +12,8 @@ import {
   Calendar, 
   Settings, 
   Link, 
-  ZapOff
+  ZapOff,
+  Clock
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import WorkflowCard from '@/components/settings/workflows/WorkflowCard';
@@ -23,13 +24,35 @@ import ComingSoonAlert from '@/components/settings/workflows/ComingSoonAlert';
 import SupportCTA from '@/components/settings/marketing/SupportCTA';
 import { toast } from '@/components/ui/use-toast';
 
+// Define WorkflowStep type
+interface WorkflowStep {
+  order: number;
+  title: string;
+  day: string | number;
+  iconColor: string;
+  enabled: boolean;
+}
+
+// Define Workflow type
+interface WorkflowData {
+  id: string;
+  title: string;
+  description: string;
+  status: 'active' | 'paused' | 'coming-soon';
+  icon: React.ReactNode;
+  iconColor: string;
+  steps: WorkflowStep[];
+  impactCount: number;
+  tags: string[];
+}
+
 // Workflow data
-const workflowsData = [
+const workflowsData: WorkflowData[] = [
   {
     id: 'onboarding',
     title: 'New Member Onboarding',
     description: 'Workflow for welcoming and onboarding new community members',
-    status: 'active' as const,
+    status: 'active',
     icon: <User className="h-4 w-4 text-indigo-600" />,
     iconColor: '#6366f1',
     steps: [
@@ -45,7 +68,7 @@ const workflowsData = [
     id: 'content',
     title: 'Content Engagement',
     description: 'Workflow to increase engagement with published content',
-    status: 'active' as const,
+    status: 'active',
     icon: <MessageSquare className="h-4 w-4 text-purple-600" />,
     iconColor: '#9333ea',
     steps: [
@@ -61,7 +84,7 @@ const workflowsData = [
     id: 'events',
     title: 'Event Reminders',
     description: 'Workflow for event notifications and follow-ups',
-    status: 'paused' as const,
+    status: 'paused',
     icon: <Calendar className="h-4 w-4 text-blue-600" />,
     iconColor: '#2563eb',
     steps: [
@@ -129,12 +152,12 @@ const integrationsData = [
 
 const Workflows: React.FC = () => {
   const [activeTab, setActiveTab] = useState('presets');
-  const [selectedWorkflow, setSelectedWorkflow] = useState<any>(null);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowData | null>(null);
   const [selectedIntegration, setSelectedIntegration] = useState<any>(null);
   const [isWorkflowModalOpen, setIsWorkflowModalOpen] = useState(false);
   const [isIntegrationModalOpen, setIsIntegrationModalOpen] = useState(false);
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
-  const [workflowsState, setWorkflowsState] = useState(workflowsData);
+  const [workflowsState, setWorkflowsState] = useState<WorkflowData[]>(workflowsData);
   
   // Toggle workflow status
   const handleToggleWorkflowStatus = (id: string) => {
@@ -148,7 +171,7 @@ const Workflows: React.FC = () => {
           });
           return {
             ...workflow,
-            status: newStatus as 'active' | 'paused'
+            status: newStatus
           };
         }
         return workflow;
@@ -161,11 +184,11 @@ const Workflows: React.FC = () => {
     const workflowToDuplicate = workflowsState.find(w => w.id === id);
     if (!workflowToDuplicate) return;
     
-    const duplicate = {
+    const duplicate: WorkflowData = {
       ...workflowToDuplicate,
       id: `${id}-copy-${Date.now()}`,
       title: `${workflowToDuplicate.title} (Copy)`,
-      status: 'paused' as const,
+      status: 'paused',
       impactCount: 0
     };
     
@@ -192,7 +215,7 @@ const Workflows: React.FC = () => {
     
     setSelectedWorkflow({
       ...selectedWorkflow,
-      steps: selectedWorkflow.steps.map((step: any) => 
+      steps: selectedWorkflow.steps.map((step) => 
         step.order === stepOrder 
           ? { ...step, enabled: !step.enabled } 
           : step
@@ -202,7 +225,7 @@ const Workflows: React.FC = () => {
     toast({
       title: 'Step updated',
       description: `Workflow step has been ${
-        selectedWorkflow.steps.find((s: any) => s.order === stepOrder)?.enabled ? 'disabled' : 'enabled'
+        selectedWorkflow.steps.find((s) => s.order === stepOrder)?.enabled ? 'disabled' : 'enabled'
       }.`,
     });
   };
