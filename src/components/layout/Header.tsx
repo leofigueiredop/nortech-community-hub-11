@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PointsBadge } from '@/components/points/PointsBadge';
+import PointsBadge from '@/components/points/PointsBadge';
 import { Trophy, Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
