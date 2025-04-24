@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import SettingsLayout from '@/components/settings/SettingsLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -20,6 +19,8 @@ import AffiliateDetailsDialog from '@/components/settings/affiliates/modals/Affi
 import ManageBannersDialog from '@/components/settings/affiliates/modals/ManageBannersDialog';
 import EditEmailTemplatesDialog from '@/components/settings/affiliates/modals/EditEmailTemplatesDialog';
 import ManageSocialPostsDialog from '@/components/settings/affiliates/modals/ManageSocialPostsDialog';
+import PreviewAffiliateDialog from '@/components/settings/affiliates/modals/PreviewAffiliateDialog';
+import PayoutHistorySection from '@/components/settings/affiliates/PayoutHistorySection';
 
 const Affiliates: React.FC = () => {
   const [programEnabled, setProgramEnabled] = useState(true);
@@ -29,6 +30,7 @@ const Affiliates: React.FC = () => {
   const [bannersDialogOpen, setBannersDialogOpen] = useState(false);
   const [emailTemplatesDialogOpen, setEmailTemplatesDialogOpen] = useState(false);
   const [socialPostsDialogOpen, setSocialPostsDialogOpen] = useState(false);
+  const [previewAffiliateOpen, setPreviewAffiliateOpen] = useState(false);
 
   return (
     <SettingsLayout activeSection="affiliates" title="Affiliate Program">
@@ -372,12 +374,20 @@ const Affiliates: React.FC = () => {
           <TabsContent value="affiliates" className="space-y-4">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium">Affiliate Management</h3>
-              <Button 
-                onClick={() => setInviteDialogOpen(true)}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                Invite Affiliates
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => setPreviewAffiliateOpen(true)}
+                >
+                  Preview Affiliate Page
+                </Button>
+                <Button 
+                  onClick={() => setInviteDialogOpen(true)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  Invite Affiliates
+                </Button>
+              </div>
             </div>
             
             <Card>
@@ -526,166 +536,7 @@ const Affiliates: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="payouts" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Payout Settings</CardTitle>
-                <CardDescription>Configure affiliate payment options</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Minimum Payout Amount
-                    </label>
-                    <div className="relative flex">
-                      <div className="bg-gray-100 dark:bg-gray-800 border border-r-0 border-gray-300 dark:border-gray-700 px-3 flex items-center rounded-l-md">
-                        $
-                      </div>
-                      <Input 
-                        type="number" 
-                        min="0" 
-                        defaultValue="50" 
-                        className="rounded-l-none"
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Minimum amount required for payout
-                    </p>
-                  </div>
-                  
-                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Payout Schedule
-                    </label>
-                    <select className="w-full border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 bg-white dark:bg-gray-800">
-                      <option>Monthly</option>
-                      <option>Bi-weekly</option>
-                      <option>Weekly</option>
-                    </select>
-                  </div>
-                  
-                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <h4 className="font-medium mb-3">Payment Methods</h4>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                        <div className="flex items-center">
-                          <DollarSign className="h-4 w-4 text-green-500 mr-2" />
-                          <span>PayPal</span>
-                        </div>
-                        <Switch defaultChecked />
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                        <div className="flex items-center">
-                          <DollarSign className="h-4 w-4 text-blue-500 mr-2" />
-                          <span>Stripe</span>
-                        </div>
-                        <Switch defaultChecked />
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                        <div className="flex items-center">
-                          <DollarSign className="h-4 w-4 text-gray-500 mr-2" />
-                          <span>Bank Transfer</span>
-                        </div>
-                        <Switch defaultChecked />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div>
-                      <h4 className="font-medium">Automatic Payouts</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Process payouts automatically on schedule
-                      </p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Pending Payouts</span>
-                  <span className="text-sm font-normal text-gray-500">Next payout: May 1, 2025</span>
-                </CardTitle>
-                <CardDescription>Review and approve pending payouts</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-                  <Table>
-                    <TableHeader className="bg-gray-50 dark:bg-gray-800">
-                      <TableRow>
-                        <TableHead>Affiliate</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Method</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-300">
-                              JD
-                            </div>
-                            <div className="ml-3">
-                              <div className="text-sm font-medium">John Doe</div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">$236.50</TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <DollarSign className="h-4 w-4 text-green-500 mr-1" />
-                            <span>PayPal</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="outline" size="sm" className="mr-2">Approve</Button>
-                          <Button variant="outline" size="sm" className="text-red-500 border-red-200 hover:bg-red-50">Hold</Button>
-                        </TableCell>
-                      </TableRow>
-                      
-                      <TableRow>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-300">
-                              MS
-                            </div>
-                            <div className="ml-3">
-                              <div className="text-sm font-medium">Maria Smith</div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">$142.25</TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <DollarSign className="h-4 w-4 text-blue-500 mr-1" />
-                            <span>Stripe</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="outline" size="sm" className="mr-2">Approve</Button>
-                          <Button variant="outline" size="sm" className="text-red-500 border-red-200 hover:bg-red-50">Hold</Button>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-                
-                <div className="flex justify-between items-center mt-4">
-                  <span className="text-sm font-medium">Total pending: $378.75</span>
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                    Process All Payouts
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <PayoutHistorySection />
           </TabsContent>
         </Tabs>
       </div>
@@ -716,6 +567,11 @@ const Affiliates: React.FC = () => {
       <ManageSocialPostsDialog 
         open={socialPostsDialogOpen}
         onOpenChange={setSocialPostsDialogOpen}
+      />
+
+      <PreviewAffiliateDialog 
+        open={previewAffiliateOpen}
+        onOpenChange={setPreviewAffiliateOpen}
       />
     </SettingsLayout>
   );
