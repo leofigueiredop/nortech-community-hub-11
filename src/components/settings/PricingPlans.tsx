@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Info } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import BillingToggles from './pricing/BillingToggles';
 import PlanCard from './pricing/PlanCard';
-import ComparisonDialog from './pricing/ComparisonDialog';
+import { ComparisonDialog } from './pricing/ComparisonDialog';
 import PricingFAQ from './pricing/PricingFAQ';
 
 const featuresComparison = [
