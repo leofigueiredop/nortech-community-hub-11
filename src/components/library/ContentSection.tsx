@@ -66,7 +66,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
                 <CarouselItem key={item.id} className="pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
                   <EnhancedContentCard
                     item={item}
-                    onClick={() => onItemSelect(item)}
+                    onSelect={() => onItemSelect(item)}
                     isNew={showNewBadge}
                   />
                 </CarouselItem>
@@ -82,7 +82,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
             <EnhancedContentCard
               key={item.id}
               item={item}
-              onClick={() => onItemSelect(item)}
+              onSelect={() => onItemSelect(item)}
               isNew={showNewBadge && new Date(item.createdAt).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000}
             />
           ))}

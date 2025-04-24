@@ -36,6 +36,7 @@ export interface ContentItem {
   isNew?: boolean; // Whether the content is new
   isExclusive?: boolean; // Whether the content is exclusive
   releaseDate?: string; // When the content was released
+  modules?: CourseModule[]; // Course modules for course format
 }
 
 export interface ContentCategory {

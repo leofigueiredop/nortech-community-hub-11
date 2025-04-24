@@ -56,7 +56,11 @@ const TagSuggestions: React.FC<TagSuggestionsProps> = ({
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {suggestedContent.map(item => (
-            <ContentCard key={item.id} item={item} onClick={() => onItemSelect(item)} />
+            <ContentCard 
+              key={item.id} 
+              item={item} 
+              onSelect={onItemSelect}
+            />
           ))}
         </div>
       </CardContent>

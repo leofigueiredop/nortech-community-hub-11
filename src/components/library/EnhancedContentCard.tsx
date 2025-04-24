@@ -18,6 +18,7 @@ interface EnhancedContentCardProps {
   showAuthor?: boolean;
   className?: string;
   isNew?: boolean;
+  onClick?: () => void; // Added onClick prop
 }
 
 const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ 
@@ -27,12 +28,19 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
   showBadge = true,
   showAuthor = true,
   className,
-  isNew = false
+  isNew = false,
+  onClick
 }) => {
   const { getProgress } = useContentProgress();
   const progress = getProgress(item.id)?.progress || 0;
   
   const handleClick = (e: React.MouseEvent) => {
+    if (onClick) {
+      e.preventDefault();
+      onClick();
+      return;
+    }
+    
     if (item.format === 'course') {
       // For courses, we want to show a modal first
       if (onSelect) {

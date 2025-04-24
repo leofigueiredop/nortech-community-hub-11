@@ -46,7 +46,7 @@ const ContentGrid: React.FC<ContentGridProps> = ({ items, onItemSelect }) => {
         <motion.div key={contentItem.id} variants={item}>
           <EnhancedContentCard
             item={contentItem}
-            onClick={() => onItemSelect(contentItem)}
+            onSelect={() => onItemSelect(contentItem)}
           />
         </motion.div>
       ))}

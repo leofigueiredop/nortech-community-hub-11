@@ -75,7 +75,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
                 </div>
                 
                 {item.accessLevel === 'premium' ? (
-                  <Button variant="premium" className="gap-2">
+                  <Button variant="secondary" className="gap-2 bg-amber-500 text-white hover:bg-amber-600">
                     <Lock className="h-4 w-4" />
                     Unlock Premium
                   </Button>

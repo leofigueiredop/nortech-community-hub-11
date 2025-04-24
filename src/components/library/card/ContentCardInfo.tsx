@@ -1,5 +1,9 @@
+
 import React from 'react';
 import { ContentItem } from '@/types/library';
+import { useContentProgress } from '@/hooks/useContentProgress';
+import { Badge } from '@/components/ui/badge';
+import { Star, Clock, Eye, CheckCircle } from 'lucide-react';
 
 export interface ContentCardInfoProps {
   item: ContentItem;
@@ -7,6 +11,16 @@ export interface ContentCardInfoProps {
   showPoints?: boolean;
   isCompact?: boolean;
 }
+
+// Helper function to format duration in seconds to minutes/hours
+const formatDuration = (seconds: number): string => {
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+};
 
 const ContentCardInfo = ({ item, showAuthor, showPoints, isCompact }: ContentCardInfoProps) => {
   const { getProgress } = useContentProgress();
