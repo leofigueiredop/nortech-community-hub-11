@@ -6,7 +6,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { cn } from '@/lib/utils';
 
 const MembershipPlansForm: React.FC = () => {
@@ -26,42 +25,41 @@ const MembershipPlansForm: React.FC = () => {
       id: 'starter',
       name: 'Starter',
       price: 'Free',
-      description: 'Perfect for small communities just getting started',
+      description: 'Para comunidades pequenas que estão começando',
       features: [
-        'Up to 100 members',
-        'Basic discussion forums',
-        'Simple events calendar',
-        'Community announcements'
+        'Até 100 membros',
+        'Ferramentas básicas',
+        'Espaço limitado',
+        'Branding Nortech'
       ]
     },
     {
       id: 'growth',
-      name: 'Growth',
+      name: 'Professional',
       price: 49,
       yearlyPrice: 470,
-      description: 'For growing communities with more engagement needs',
+      description: 'As principais ferramentas para construir sua comunidade',
       features: [
-        'Up to 1,000 members',
-        'Advanced discussion features',
-        'Content library & courses',
-        'Custom branding',
-        'Analytics dashboard'
+        'Até 1.000 membros',
+        'Cursos, lives e salas',
+        'Analytics e snippets',
+        'Branding personalizado',
+        'Conversão com afiliados'
       ],
       recommended: true
     },
     {
       id: 'enterprise',
-      name: 'Enterprise',
+      name: 'Business',
       price: 199,
       yearlyPrice: 1990,
-      description: 'For large communities with advanced requirements',
+      description: 'Escale sua comunidade com automações e customizações',
       features: [
-        'Unlimited members',
-        'White-label solution',
-        'SSO integration',
-        'API access',
-        'Dedicated support',
-        'Custom feature development'
+        'API para membros',
+        'Campos customizáveis',
+        'Workflows e notificações',
+        'Transcrição automática',
+        'Scores e automações'
       ]
     }
   ];
@@ -70,9 +68,9 @@ const MembershipPlansForm: React.FC = () => {
     <div className="container mx-auto">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Choose your Membership Plan</h1>
+          <h1 className="text-3xl font-bold mb-2">Escolha seu Plano</h1>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Select the plan that best fits your community needs. You can always upgrade later.
+            Selecione o plano que melhor se adapta às necessidades da sua comunidade. Você pode atualizar depois.
           </p>
           
           <div className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-800 p-1">
@@ -85,7 +83,7 @@ const MembershipPlansForm: React.FC = () => {
               )}
               onClick={() => setBillingPeriod('monthly')}
             >
-              Monthly
+              Mensal
             </Button>
             <Button
               size="sm"
@@ -96,8 +94,8 @@ const MembershipPlansForm: React.FC = () => {
               )}
               onClick={() => setBillingPeriod('annually')}
             >
-              Annually
-              <Badge variant="default" className="bg-green-600 text-white">Save 20%</Badge>
+              Anual
+              <Badge variant="default" className="bg-green-600 text-white">Economize 20%</Badge>
             </Button>
           </div>
         </div>
@@ -121,7 +119,7 @@ const MembershipPlansForm: React.FC = () => {
               >
                 {plan.recommended && (
                   <div className="bg-purple-600 text-white text-xs font-medium py-1 text-center">
-                    Recommended
+                    Recomendado
                   </div>
                 )}
                 
@@ -133,12 +131,12 @@ const MembershipPlansForm: React.FC = () => {
                         {typeof price === 'number' ? `$${price}` : price}
                       </span>
                       {typeof price === 'number' && (
-                        <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">/mo</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">/mês</span>
                       )}
                     </div>
                     {billingPeriod === 'annually' && plan.yearlyPrice && (
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        ${plan.yearlyPrice} billed annually
+                        ${plan.yearlyPrice} cobrado anualmente
                       </div>
                     )}
                   </div>
@@ -163,13 +161,13 @@ const MembershipPlansForm: React.FC = () => {
         
         <div className="flex justify-between">
           <Button variant="outline" onClick={() => navigate('/onboarding/invite')}>
-            Back
+            Voltar
           </Button>
           <Button 
             onClick={handleNext}
             disabled={!selectedPlan}
           >
-            Continue
+            Continuar
           </Button>
         </div>
         
@@ -177,12 +175,12 @@ const MembershipPlansForm: React.FC = () => {
           <div className="flex items-start gap-2">
             <Info size={20} className="text-blue-500 shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium mb-1">Need help choosing?</p>
+              <p className="font-medium mb-1">Precisa de ajuda para escolher?</p>
               <p className="text-gray-600 dark:text-gray-300">
-                Talk to our team for personalized recommendations or custom solutions for your specific community needs.
+                Fale com nosso time para recomendações personalizadas ou soluções customizadas para as necessidades específicas da sua comunidade.
               </p>
               <Button variant="link" className="p-0 h-auto text-purple-600 dark:text-purple-400">
-                Contact Sales
+                Falar com o time comercial
               </Button>
             </div>
           </div>
