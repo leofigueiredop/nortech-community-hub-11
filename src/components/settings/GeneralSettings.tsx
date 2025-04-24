@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -145,20 +144,33 @@ const GeneralSettings: React.FC = () => {
                 Your community's web address
               </p>
             </div>
-            <div className="flex gap-2">
-              <div className="flex flex-1">
-                <Input 
-                  id="community-url" 
-                  className="rounded-r-none"
-                  value={communityUrl}
-                  onChange={(e) => setCommunityUrl(e.target.value)}
-                />
-                <div className="flex items-center px-3 border border-l-0 border-gray-200 dark:border-gray-700 rounded-r-md text-gray-500 bg-gray-50 dark:bg-gray-800">
-                  .nortech.io
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <div className="flex flex-1">
+                  <Input 
+                    id="community-url" 
+                    className="rounded-r-none"
+                    value={communityUrl}
+                    onChange={(e) => setCommunityUrl(e.target.value)}
+                  />
+                  <div className="flex items-center px-3 border border-l-0 border-gray-200 dark:border-gray-700 rounded-r-md text-gray-500 bg-gray-50 dark:bg-gray-800">
+                    .nortech.app
+                  </div>
                 </div>
+                <Button variant="outline" size="icon" asChild>
+                  <a href={`https://${communityUrl}.nortech.app`} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </Button>
               </div>
-              <Button variant="outline" size="icon">
-                <ExternalLink className="h-4 w-4" />
+              
+              <Button 
+                variant="outline" 
+                className="w-full text-left flex items-center gap-2 text-sm" 
+                onClick={() => {window.location.href = '/settings/domain'}}
+              >
+                <Globe className="h-4 w-4" />
+                Set up custom domain
               </Button>
             </div>
           </div>
