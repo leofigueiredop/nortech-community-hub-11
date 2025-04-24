@@ -1,0 +1,84 @@
+
+import React from 'react';
+import { ChevronDown, Check, Plus, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuth } from '@/context/AuthContext';
+import CreateCommunityDialog from './CreateCommunityDialog';
+
+interface Community {
+  id: string;
+  name: string;
+  logo?: string;
+}
+
+const mockCommunities: Community[] = [
+  { id: '1', name: 'Nortech', logo: '/nortech-logo.png' },
+  { id: '2', name: 'Alphractal', logo: '/alphractal-logo.png' },
+  { id: '3', name: 'CryptoSync', logo: '/cryptosync-logo.png' },
+];
+
+export function CommunitySwitcher() {
+  const [showCreateDialog, setShowCreateDialog] = React.useState(false);
+  const { user } = useAuth();
+  const currentCommunity = mockCommunities[0]; // In a real app, this would come from context/state
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="gap-2 h-10 w-full lg:w-60 justify-start">
+            <Avatar className="h-6 w-6">
+              <AvatarImage src={currentCommunity.logo} alt={currentCommunity.name} />
+              <AvatarFallback>{currentCommunity.name[0]}</AvatarFallback>
+            </Avatar>
+            <span className="truncate">{currentCommunity.name}</span>
+            <ChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="start" forceMount>
+          <DropdownMenuLabel>Suas comunidades</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {mockCommunities.map((community) => (
+              <DropdownMenuItem key={community.id}>
+                <Avatar className="h-5 w-5 mr-2">
+                  <AvatarImage src={community.logo} alt={community.name} />
+                  <AvatarFallback>{community.name[0]}</AvatarFallback>
+                </Avatar>
+                {community.name}
+                {community.id === currentCommunity.id && (
+                  <Check className="ml-auto h-4 w-4 text-primary" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setShowCreateDialog(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Criar nova comunidade
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem disabled className="text-muted-foreground">
+            <Search className="mr-2 h-4 w-4" />
+            Explorar comunidades públicas (em breve)
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <CreateCommunityDialog 
+        open={showCreateDialog} 
+        onOpenChange={setShowCreateDialog}
+      />
+    </>
+  );
+}
