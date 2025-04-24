@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from 'react';
 import Header from '@/components/layout/Header';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from '@/components/ui/sidebar';
