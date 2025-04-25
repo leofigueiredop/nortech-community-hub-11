@@ -4,16 +4,51 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Users, FileText, Calendar, Palette, Megaphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 const QuickActions: React.FC = () => {
   const navigate = useNavigate();
+  
+  const handleCreatePost = () => {
+    navigate('/create-post');
+  };
+
+  const handleInviteMembers = () => {
+    // Navigate to members page with invite tab active
+    navigate('/members');
+    toast({
+      title: "Invite feature",
+      description: "The invite members dialog will appear here.",
+    });
+  };
+
+  const handleScheduleEvent = () => {
+    navigate('/create-event');
+  };
+
+  const handleCreateSpace = () => {
+    navigate('/create-space');
+  };
+
+  const handleCustomizeBrand = () => {
+    navigate('/settings/branding');
+  };
+
+  const handleSendAnnouncement = () => {
+    // Since there's no specific announcements page, we'll navigate to feed
+    navigate('/feed');
+    toast({
+      title: "Announcements",
+      description: "You can create announcements from the feed page.",
+    });
+  };
   
   const actions = [
     {
       title: 'Create Post',
       icon: <FileText size={18} />,
       emoji: '📝',
-      onClick: () => navigate('/create-post'),
+      onClick: handleCreatePost,
       bgColor: 'bg-blue-50',
       iconColor: 'text-blue-500',
       description: 'Share your ideas'
@@ -22,7 +57,7 @@ const QuickActions: React.FC = () => {
       title: 'Invite Members',
       icon: <Users size={18} />,
       emoji: '📨',
-      onClick: () => navigate('/invite'),
+      onClick: handleInviteMembers,
       bgColor: 'bg-green-50',
       iconColor: 'text-green-500',
       description: 'Grow your community'
@@ -31,7 +66,7 @@ const QuickActions: React.FC = () => {
       title: 'Schedule Event',
       icon: <Calendar size={18} />,
       emoji: '📅',
-      onClick: () => navigate('/events/create'),
+      onClick: handleScheduleEvent,
       bgColor: 'bg-purple-50',
       iconColor: 'text-purple-500',
       description: 'Host a session'
@@ -40,7 +75,7 @@ const QuickActions: React.FC = () => {
       title: 'Create Space',
       icon: <PlusCircle size={18} />,
       emoji: '🧩',
-      onClick: () => navigate('/create-space'),
+      onClick: handleCreateSpace,
       bgColor: 'bg-orange-50',
       iconColor: 'text-orange-500',
       description: 'Organize topics'
@@ -49,7 +84,7 @@ const QuickActions: React.FC = () => {
       title: 'Customize Brand',
       icon: <Palette size={18} />,
       emoji: '🎨',
-      onClick: () => navigate('/settings/branding'),
+      onClick: handleCustomizeBrand,
       bgColor: 'bg-pink-50',
       iconColor: 'text-pink-500',
       description: 'Personalize look'
@@ -58,7 +93,7 @@ const QuickActions: React.FC = () => {
       title: 'Send Announcement',
       icon: <Megaphone size={18} />,
       emoji: '📢',
-      onClick: () => navigate('/announcements/new'),
+      onClick: handleSendAnnouncement,
       bgColor: 'bg-teal-50',
       iconColor: 'text-teal-500',
       description: 'Alert all members'
