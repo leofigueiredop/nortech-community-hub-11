@@ -16,8 +16,10 @@ const CourseViewerModal: React.FC<CourseViewerModalProps> = ({ item, onClose }) 
   const navigate = useNavigate();
 
   const handleStartCourse = () => {
-    navigate(`/course/${item.id}`);
+    // Close the modal first
     onClose();
+    // Then navigate to the course page
+    navigate(`/course/${item.id}`);
   };
 
   const handleShare = () => {
@@ -52,15 +54,18 @@ const CourseViewerModal: React.FC<CourseViewerModalProps> = ({ item, onClose }) 
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-6">
-            <div className="mb-2 flex items-center gap-2">
-              <span className="bg-primary text-white text-xs px-2 py-1 rounded-md">Course</span>
-              {item.accessLevel === 'premium' && (
-                <span className="bg-amber-500 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1">
-                  <Lock className="h-3 w-3" /> Premium
-                </span>
-              )}
+          
+          {/* Premium badge */}
+          {item.accessLevel === 'premium' && (
+            <div className="absolute top-2 left-2">
+              <span className="bg-amber-500 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1">
+                <Lock className="h-3 w-3" /> Premium
+              </span>
             </div>
+          )}
+          
+          {/* Title and details */}
+          <div className="absolute bottom-0 left-0 right-0 p-4">
             <h2 className="text-2xl font-bold text-white mb-2">{item.title}</h2>
             <p className="text-slate-200 text-sm line-clamp-2 mb-4">{item.description}</p>
             
