@@ -7,7 +7,7 @@ import { useContentProgress } from '@/hooks/useContentProgress';
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Star, Clock, Eye, Book } from 'lucide-react';
+import { Star, Clock, Eye, Book, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface EnhancedContentCardProps {
@@ -18,7 +18,7 @@ interface EnhancedContentCardProps {
   showAuthor?: boolean;
   className?: string;
   isNew?: boolean;
-  onClick?: () => void; // Added onClick prop
+  onClick?: () => void;
 }
 
 const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({ 
@@ -77,6 +77,11 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
           
+          {/* Premium Overlay */}
+          {item.accessLevel === 'premium' && (
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
+          )}
+          
           {/* Progress bar */}
           {progress > 0 && (
             <div className="absolute bottom-0 left-0 right-0">
@@ -91,6 +96,25 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
               className="absolute top-2 right-2 bg-black/50 text-white border-none text-xs px-2"
             >
               {item.format}
+            </Badge>
+          )}
+          
+          {/* Premium badge */}
+          {item.accessLevel === 'premium' && (
+            <Badge 
+              className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white border-none text-xs px-2 py-1 flex items-center gap-1"
+            >
+              <Crown size={14} />
+              <span>Premium</span>
+            </Badge>
+          )}
+          
+          {/* New badge */}
+          {isNew && (
+            <Badge 
+              className="absolute top-2 left-2 bg-green-500 text-white border-none text-xs px-2"
+            >
+              New
             </Badge>
           )}
           

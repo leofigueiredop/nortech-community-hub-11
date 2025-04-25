@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { ContentItem } from '@/types/library';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Star } from 'lucide-react';
+import { Star, Crown } from 'lucide-react';
 import { useContentProgress } from '@/hooks/useContentProgress';
 
 export interface ContentCardMediaProps {
@@ -27,6 +28,15 @@ const ContentCardMedia = ({ item, isTopPick, rank, showProgress = false }: Conte
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
       
+      {/* Premium Overlay */}
+      {item.accessLevel === 'premium' && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <div className="bg-black/40 backdrop-blur-sm p-2 rounded-full">
+            <Crown className="h-8 w-8 text-amber-500" />
+          </div>
+        </div>
+      )}
+      
       {/* Top Pick Badge */}
       {isTopPick && (
         <div className="absolute top-2 left-2 bg-amber-500 text-white text-xs px-2 py-1 rounded-md font-medium">
@@ -48,6 +58,14 @@ const ContentCardMedia = ({ item, isTopPick, rank, showProgress = false }: Conte
       >
         {item.format}
       </Badge>
+      
+      {/* Premium Badge */}
+      {item.accessLevel === 'premium' && (
+        <div className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+          <Crown className="h-3 w-3" />
+          <span>Premium</span>
+        </div>
+      )}
       
       {/* Points Badge */}
       {item.pointsEnabled && item.pointsValue && (

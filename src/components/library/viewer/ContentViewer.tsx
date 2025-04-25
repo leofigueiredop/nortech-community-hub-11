@@ -12,10 +12,9 @@ import ContentPreview from '@/components/library/viewer/ContentPreview';
 import ContentDetails from '@/components/library/viewer/ContentDetails';
 import ContentComments from '@/components/library/viewer/ContentComments';
 import ContentProgress from '@/components/library/viewer/ContentProgress';
-import { ArrowRight, Lock } from 'lucide-react';
+import { ArrowRight, Lock, Share2, Bookmark, Flag } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getContentDuration, getCompletionCriteria } from './contentViewerUtils';
-import { Share2, Bookmark, Flag } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface ContentViewerProps {
@@ -53,14 +52,14 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
     navigator.clipboard.writeText(window.location.href);
     toast({
       title: "Link copied!",
-      description: "The course link has been copied to your clipboard.",
+      description: "The content link has been copied to your clipboard.",
     });
   };
 
   const handleSave = () => {
     toast({
-      title: "Course saved",
-      description: "The course has been added to your saved items.",
+      title: "Content saved",
+      description: "The content has been added to your saved items.",
     });
   };
 
@@ -84,10 +83,12 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6">
-              <div className="mb-2 flex items-center">
+              <div className="mb-2 flex items-center gap-2">
                 <span className="bg-primary text-white text-xs px-2 py-1 rounded-md">Course</span>
                 {item.accessLevel === 'premium' && (
-                  <span className="bg-amber-500 text-white text-xs px-2 py-1 rounded-md ml-2">Premium</span>
+                  <span className="bg-amber-500 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1">
+                    <Lock className="h-3 w-3" /> Premium
+                  </span>
                 )}
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">{item.title}</h2>
