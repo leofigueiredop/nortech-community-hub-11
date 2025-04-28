@@ -4,6 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import ContentForm from '../form/ContentForm';
 
 const ContentTab: React.FC = () => {
+  const handleSubmit = (data: any) => {
+    console.log('Content submitted:', data);
+    // In a real application, this would submit the data to an API
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -13,7 +18,7 @@ const ContentTab: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ContentForm />
+        <ContentForm onSubmit={handleSubmit} />
       </CardContent>
     </Card>
   );

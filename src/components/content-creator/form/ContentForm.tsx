@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { ContentItem, ContentFormat } from '@/types/library';
 import { useCategories } from '@/hooks/useCategories';
-import TagInput from '@/components/ui/tag-input';
+import { TagInput } from '@/components/ui/tag-input';
 import UploadThumbnail from '../UploadThumbnail';
 import FormatSelector from './FormatSelector';
 import PointsSettings from './PointsSettings';
@@ -29,13 +29,13 @@ const ContentForm: React.FC<ContentFormProps> = ({
   const [title, setTitle] = useState(initialData.title || '');
   const [description, setDescription] = useState(initialData.description || '');
   const [format, setFormat] = useState<ContentFormat>(initialData.format || 'video');
-  const [categoryId, setCategoryId] = useState(initialData.categoryId || '');
+  const [categoryId, setCategoryId] = useState(initialData.category_id || '');
   const [tags, setTags] = useState<string[]>(initialData.tags || []);
   const [thumbnail, setThumbnail] = useState(initialData.thumbnail || '');
   const [accessLevel, setAccessLevel] = useState<'free' | 'premium' | 'premium_plus'>(
-    initialData.accessLevel as 'free' | 'premium' | 'premium_plus' || 'free'
+    initialData.access_level as 'free' | 'premium' | 'premium_plus' || 'free'
   );
-  const [isFeatured, setIsFeatured] = useState(initialData.featured || false);
+  const [isFeatured, setIsFeatured] = useState(initialData.is_featured || false);
   const [allowComments, setAllowComments] = useState(initialData.allowComments !== false);
   const [pointsEnabled, setPointsEnabled] = useState(initialData.pointsEnabled || false);
   const [pointsValue, setPointsValue] = useState(initialData.pointsValue || 0);
@@ -47,11 +47,11 @@ const ContentForm: React.FC<ContentFormProps> = ({
       title,
       description,
       format,
-      categoryId,
+      category_id: categoryId,
       tags,
       thumbnail,
-      accessLevel,
-      featured: isFeatured,
+      access_level: accessLevel,
+      is_featured: isFeatured,
       allowComments,
       pointsEnabled,
       pointsValue
@@ -115,7 +115,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
             <TagInput
               placeholder="Add tags"
               tags={tags}
-              setTags={setTags}
+              onTagsChange={setTags}
             />
           </div>
         </div>

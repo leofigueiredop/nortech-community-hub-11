@@ -9,6 +9,7 @@ import {
   Course
 } from '@/types/library';
 
+// Class implementation
 class SupabaseContentRepository implements IContentRepository {
   private supabase = createClient();
 
