@@ -12,6 +12,16 @@ import { SupabaseDiscussionRepository } from './repositories/SupabaseDiscussionR
 import { SupabasePointsRepository } from './repositories/SupabasePointsRepository';
 import { SupabaseMigrationRepository } from './repositories/SupabaseMigrationRepository';
 
+// Default values for development
+const DEFAULT_SUPABASE_URL = "https://your-supabase-project.supabase.co";
+const DEFAULT_SUPABASE_ANON_KEY = "your-anon-key";
+
+// Export Supabase configuration to be used consistently across repositories
+export const supabaseConfig = {
+  url: import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL,
+  anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY
+};
+
 export class ApiClient {
   private static instance: ApiClient;
   private _auth: IAuthRepository;

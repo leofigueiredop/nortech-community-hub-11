@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { IDiscussionRepository } from '../interfaces/IDiscussionRepository';
 import { Discussion, DiscussionReply, DiscussionTopic } from '@/types/discussion';
 import { BaseRepository } from './BaseRepository';
+import { supabaseConfig } from '../ApiClient';
 
 export class SupabaseDiscussionRepository extends BaseRepository implements IDiscussionRepository {
   private supabase;
@@ -10,8 +11,8 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
   constructor() {
     super();
     this.supabase = createClient(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY
+      supabaseConfig.url,
+      supabaseConfig.anonKey
     );
   }
 

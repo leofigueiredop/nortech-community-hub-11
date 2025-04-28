@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { IContentRepository } from '../interfaces/IContentRepository';
 import { ContentItem } from '@/types/library';
 import { BaseRepository } from './BaseRepository';
+import { supabaseConfig } from '../ApiClient';
 
 export class SupabaseContentRepository extends BaseRepository implements IContentRepository {
   private supabase;
@@ -10,8 +11,8 @@ export class SupabaseContentRepository extends BaseRepository implements IConten
   constructor() {
     super();
     this.supabase = createClient(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY
+      supabaseConfig.url,
+      supabaseConfig.anonKey
     );
   }
 

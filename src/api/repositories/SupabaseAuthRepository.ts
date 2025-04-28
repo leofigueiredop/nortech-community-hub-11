@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { IAuthRepository } from '../interfaces/IAuthRepository';
 import { AuthUser, LoginCredentials, AuthResponse } from '@/types/api';
 import { BaseRepository } from './BaseRepository';
+import { supabaseConfig } from '../ApiClient';
 
 export class SupabaseAuthRepository extends BaseRepository implements IAuthRepository {
   private supabase;
@@ -10,8 +11,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
   constructor() {
     super();
     this.supabase = createClient(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY
+      supabaseConfig.url,
+      supabaseConfig.anonKey
     );
   }
 

@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { IMigrationRepository } from '../interfaces/IMigrationRepository';
 import { BaseRepository } from './BaseRepository';
+import { supabaseConfig } from '../ApiClient';
 
 export class SupabaseMigrationRepository extends BaseRepository implements IMigrationRepository {
   private supabase;
@@ -9,8 +10,8 @@ export class SupabaseMigrationRepository extends BaseRepository implements IMigr
   constructor() {
     super();
     this.supabase = createClient(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY
+      supabaseConfig.url,
+      supabaseConfig.anonKey
     );
   }
 

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,7 @@ import { LoaderIcon, CheckCircleIcon, AlertCircleIcon } from 'lucide-react';
 import { api } from '@/api/ApiClient';
 import { createSQLFunctions } from '@/api/migrations/createSQLFunctions';
 import { useToast } from '@/hooks/use-toast';
+import { supabaseConfig } from '@/api/ApiClient';
 
 const MigrationSettings: React.FC = () => {
   const { toast } = useToast();
@@ -17,8 +19,23 @@ const MigrationSettings: React.FC = () => {
     points: boolean;
   } | null>(null);
   const [initialized, setInitialized] = useState(false);
+  const [supabaseConfigured, setSupabaseConfigured] = useState(false);
+
+  useEffect(() => {
+    // Check if Supabase is configured correctly
+    const isConfigured = 
+      supabaseConfig.url !== "https://your-supabase-project.supabase.co" && 
+      supabaseConfig.anonKey !== "your-anon-key";
+    setSupabaseConfigured(isConfigured);
+    
+    if (isConfigured) {
+      fetchMigrationStatus();
+    }
+  }, []);
 
   const fetchMigrationStatus = async () => {
+    if (!supabaseConfigured) return;
+    
     try {
       const status = await api.migration.getMigrationStatus();
       setStatus(status);
@@ -31,10 +48,6 @@ const MigrationSettings: React.FC = () => {
       });
     }
   };
-
-  useEffect(() => {
-    fetchMigrationStatus();
-  }, []);
 
   const handleInitialize = async () => {
     setIsLoading(true);
@@ -123,6 +136,35 @@ const MigrationSettings: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  if (!supabaseConfigured) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Database Migration</CardTitle>
+            <CardDescription>
+              Create and manage your database tables
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Alert className="mb-4 border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+              <AlertCircleIcon className="h-4 w-4" />
+              <AlertTitle>Supabase Configuration Missing</AlertTitle>
+              <AlertDescription>
+                Please configure your Supabase URL and anon key in your environment variables. 
+                You need to set the following environment variables:
+                <ul className="list-disc pl-5 mt-2">
+                  <li>VITE_SUPABASE_URL</li>
+                  <li>VITE_SUPABASE_ANON_KEY</li>
+                </ul>
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

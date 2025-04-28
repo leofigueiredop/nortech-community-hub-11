@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { IPointsRepository } from '../interfaces/IPointsRepository';
 import { Reward, Redemption } from '@/types/rewards';
 import { BaseRepository } from './BaseRepository';
+import { supabaseConfig } from '../ApiClient';
 
 export class SupabasePointsRepository extends BaseRepository implements IPointsRepository {
   private supabase;
@@ -10,8 +11,8 @@ export class SupabasePointsRepository extends BaseRepository implements IPointsR
   constructor() {
     super();
     this.supabase = createClient(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY
+      supabaseConfig.url,
+      supabaseConfig.anonKey
     );
   }
 
