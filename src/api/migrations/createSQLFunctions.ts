@@ -8,6 +8,21 @@ export async function createSQLFunctions() {
     supabaseConfig.anonKey
   );
   
+  // First, create the helper function to execute SQL
+  await supabase.rpc('exec_sql', {
+    sql_string: `
+      CREATE OR REPLACE FUNCTION exec_sql(sql_string TEXT)
+      RETURNS void AS $$
+      BEGIN
+        EXECUTE sql_string;
+      END;
+      $$ LANGUAGE plpgsql;
+    `
+  }).catch(e => {
+    console.log("Creating exec_sql function (may already exist):", e);
+    // Continue execution even if this fails
+  });
+  
   // Create function for content_items table
   await supabase.rpc('exec_sql', {
     sql_string: `
@@ -170,35 +185,40 @@ export async function createSQLFunctions() {
     `
   });
   
-  // Create function for user_points table
+  // Create function for user_points table and add_points function
   await supabase.rpc('exec_sql', {
     sql_string: `
       CREATE OR REPLACE FUNCTION create_user_points_table()
       RETURNS void AS $$
       BEGIN
+        -- Create the user_points table
         CREATE TABLE IF NOT EXISTS user_points (
           id SERIAL PRIMARY KEY,
           user_id TEXT NOT NULL UNIQUE,
           points INTEGER DEFAULT 0,
           last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         );
+      END;
+      $$ LANGUAGE plpgsql;
+    `
+  });
+  
+  // Create separate add_points function
+  await supabase.rpc('exec_sql', {
+    sql_string: `
+      CREATE OR REPLACE FUNCTION add_points(user_id TEXT, points_to_add INTEGER)
+      RETURNS INTEGER AS $$
+      DECLARE
+        current_points INTEGER;
+      BEGIN
+        INSERT INTO user_points (user_id, points)
+        VALUES (user_id, points_to_add)
+        ON CONFLICT (user_id) DO UPDATE
+        SET points = user_points.points + points_to_add,
+            last_updated = NOW()
+        RETURNING points INTO current_points;
         
-        -- Add function for add_points
-        CREATE OR REPLACE FUNCTION add_points(user_id TEXT, points_to_add INTEGER)
-        RETURNS INTEGER AS $$
-        DECLARE
-          current_points INTEGER;
-        BEGIN
-          INSERT INTO user_points (user_id, points)
-          VALUES (user_id, points_to_add)
-          ON CONFLICT (user_id) DO UPDATE
-          SET points = user_points.points + points_to_add,
-              last_updated = NOW()
-          RETURNING points INTO current_points;
-          
-          RETURN current_points;
-        END;
-        $$ LANGUAGE plpgsql;
+        RETURN current_points;
       END;
       $$ LANGUAGE plpgsql;
     `
@@ -240,18 +260,6 @@ export async function createSQLFunctions() {
           status TEXT DEFAULT 'pending',
           fulfillment_details JSONB
         );
-      END;
-      $$ LANGUAGE plpgsql;
-    `
-  });
-  
-  // Create helper function to execute SQL
-  await supabase.rpc('exec_sql', {
-    sql_string: `
-      CREATE OR REPLACE FUNCTION exec_sql(sql_string TEXT)
-      RETURNS void AS $$
-      BEGIN
-        EXECUTE sql_string;
       END;
       $$ LANGUAGE plpgsql;
     `
