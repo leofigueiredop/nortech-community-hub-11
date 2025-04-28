@@ -1,3 +1,4 @@
+
 export interface Event {
   id: string;
   community_id: string;
@@ -26,7 +27,8 @@ export interface Event {
   is_virtual: boolean;
   points_awarded: number;
   
-  // Additional fields for compatibility with existing components
+  // Campos adicionais necessários para compatibilidade com componentes existentes
+  date?: Date;  // Adicionado para compatibilidade
   image?: string;
   url?: string;
   time?: string;
@@ -58,6 +60,14 @@ export interface EventAttendee {
   checkin_date?: string;
   created_at: string;
   updated_at: string;
+  registered_at?: string; // Adicionado para compatibilidade
+  attended?: boolean; // Adicionado para compatibilidade
+  profile?: {
+    id: string;
+    name: string;
+    avatar_url?: string;
+    email?: string;
+  };
 }
 
 export interface EventSeries {

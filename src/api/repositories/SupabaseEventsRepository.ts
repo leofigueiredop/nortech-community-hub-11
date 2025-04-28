@@ -1,3 +1,4 @@
+
 import { createClient } from '@/api/supabase';
 import { Event, EventAttendee } from '@/types/events';
 import { IEventsRepository } from '@/api/interfaces/IEventsRepository';
@@ -306,8 +307,12 @@ export class SupabaseEventsRepository implements IEventsRepository {
 
   // Helper methods
   private transformEventData(event: any): Event {
+    // Converte start_date para um objeto Date para compatibilidade
+    const startDate = new Date(event.start_date);
+    
     return {
       ...event,
+      date: startDate, // Garantindo compatibilidade com interfaces existentes
       image: event.banner_url,
       url: event.location_url,
       time: this.formatEventTime(event.start_date, event.end_date, event.timezone),

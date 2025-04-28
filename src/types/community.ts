@@ -14,6 +14,32 @@ export interface Community {
   updated_at: string;
 }
 
+export interface CommunitySettings {
+  id: string;
+  community_id: string;
+  type: string;
+  settings: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommunityMember {
+  id: string;
+  community_id: string;
+  user_id: string;
+  role: 'owner' | 'admin' | 'moderator' | 'member';
+  status: 'active' | 'pending' | 'banned';
+  joined_at: string;
+  points: number;
+  created_at: string;
+  updated_at: string;
+  profile?: {
+    name: string;
+    avatar_url?: string;
+    email?: string;
+  };
+}
+
 export const mockCommunities: Community[] = [
   {
     id: "comm-1",

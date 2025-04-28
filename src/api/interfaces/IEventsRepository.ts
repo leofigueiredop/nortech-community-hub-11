@@ -1,5 +1,5 @@
 
-import { Event, EventAttendee } from '@/components/events/types/EventTypes';
+import { Event, EventAttendee } from '@/types/events';
 
 export interface IEventsRepository {
   getAll(): Promise<Event[]>;
