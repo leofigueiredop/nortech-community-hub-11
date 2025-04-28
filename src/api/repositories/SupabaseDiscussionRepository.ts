@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { IDiscussionRepository } from '../interfaces/IDiscussionRepository';
 import { Discussion, DiscussionReply, DiscussionTopic } from '@/types/discussion';
@@ -6,8 +5,6 @@ import { BaseRepository } from './BaseRepository';
 import { supabaseConfig } from '../ApiClient';
 
 export class SupabaseDiscussionRepository extends BaseRepository implements IDiscussionRepository {
-  private supabase;
-
   constructor() {
     super();
     this.supabase = createClient(

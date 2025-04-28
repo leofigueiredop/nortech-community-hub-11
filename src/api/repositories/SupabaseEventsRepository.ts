@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { IEventsRepository } from '../interfaces/IEventsRepository';
 import { Event } from '@/components/events/types/EventTypes';
@@ -6,8 +5,6 @@ import { BaseRepository } from './BaseRepository';
 import { supabaseConfig } from '../ApiClient';
 
 export class SupabaseEventsRepository extends BaseRepository implements IEventsRepository {
-  private supabase;
-
   constructor() {
     super();
     this.supabase = createClient(

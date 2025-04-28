@@ -1,12 +1,9 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { IMigrationRepository } from '../interfaces/IMigrationRepository';
 import { BaseRepository } from './BaseRepository';
 import { supabaseConfig } from '../ApiClient';
 
 export class SupabaseMigrationRepository extends BaseRepository implements IMigrationRepository {
-  private supabase;
-
   constructor() {
     super();
     this.supabase = createClient(

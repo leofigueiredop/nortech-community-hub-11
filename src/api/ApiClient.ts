@@ -24,22 +24,22 @@ export const supabaseConfig = {
 export class ApiClient {
   private static instance: ApiClient;
   private _auth: IAuthRepository;
-  private _content: IContentRepository & IBaseRepository;
-  private _events: IEventsRepository & IBaseRepository;
-  private _discussions: IDiscussionRepository & IBaseRepository;
-  private _points: IPointsRepository & IBaseRepository;
+  private _content: IContentRepository;
+  private _events: IEventsRepository;
+  private _discussions: IDiscussionRepository;
+  private _points: IPointsRepository;
   private _migration: IMigrationRepository;
-  private _community: ICommunityRepository & IBaseRepository;
+  private _community: ICommunityRepository;
   private _currentCommunityId: string | null = null;
 
   private constructor() {
     this._auth = new SupabaseAuthRepository();
-    this._content = new SupabaseContentRepository() as IContentRepository & IBaseRepository;
-    this._events = new SupabaseEventsRepository() as IEventsRepository & IBaseRepository;
-    this._discussions = new SupabaseDiscussionRepository() as IDiscussionRepository & IBaseRepository;
-    this._points = new SupabasePointsRepository() as IPointsRepository & IBaseRepository;
+    this._content = new SupabaseContentRepository();
+    this._events = new SupabaseEventsRepository();
+    this._discussions = new SupabaseDiscussionRepository();
+    this._points = new SupabasePointsRepository();
     this._migration = new SupabaseMigrationRepository();
-    this._community = new SupabaseCommunityRepository() as ICommunityRepository & IBaseRepository;
+    this._community = new SupabaseCommunityRepository();
   }
 
   public static getInstance(): ApiClient {
@@ -51,12 +51,12 @@ export class ApiClient {
 
   public setCurrentCommunity(communityId: string | null) {
     this._currentCommunityId = communityId;
-    // Atualiza o contexto em todos os repositórios
-    this._content.setCommunityContext(communityId);
-    this._events.setCommunityContext(communityId);
-    this._discussions.setCommunityContext(communityId);
-    this._points.setCommunityContext(communityId);
-    this._community.setCommunityContext(communityId);
+    // Update context in all repositories
+    (this._content as unknown as IBaseRepository).setCommunityContext(communityId);
+    (this._events as unknown as IBaseRepository).setCommunityContext(communityId);
+    (this._discussions as unknown as IBaseRepository).setCommunityContext(communityId);
+    (this._points as unknown as IBaseRepository).setCommunityContext(communityId);
+    (this._community as unknown as IBaseRepository).setCommunityContext(communityId);
   }
 
   public getCurrentCommunityId(): string | null {

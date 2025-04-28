@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { IPointsRepository } from '../interfaces/IPointsRepository';
 import { Reward, Redemption } from '@/types/rewards';
@@ -6,8 +5,6 @@ import { BaseRepository } from './BaseRepository';
 import { supabaseConfig } from '../ApiClient';
 
 export class SupabasePointsRepository extends BaseRepository implements IPointsRepository {
-  private supabase;
-
   constructor() {
     super();
     this.supabase = createClient(
