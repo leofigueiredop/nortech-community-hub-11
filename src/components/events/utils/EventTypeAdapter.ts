@@ -61,10 +61,10 @@ function mapEventType(eventType: string | undefined): ComponentEventType {
       return 'course';
     case 'live':
     case 'livestream':
-      return 'other'; // Map to 'other' for compatibility
+      return 'live'; // Updated to return 'live' now that it's added to the type
     case 'mentoria':
     case 'mentorship':
-      return 'other'; // Map to 'other' for compatibility
+      return 'mentoria'; // Updated to return 'mentoria' now that it's added to the type
     default:
       return 'other';
   }
@@ -83,16 +83,18 @@ function getPlatformFromUrl(url: string): string | undefined {
 }
 
 // Get event status based on date/time
-function getEventStatus(event: EventType): 'upcoming' | 'live' | 'past' | 'cancelled' {
+function getEventStatus(event: EventType): 'upcoming' | 'live' | 'past' | 'ended' | 'happening_soon' | 'in_progress' | 'cancelled' {
   const now = new Date();
   const startDate = new Date(event.start_date);
   const endDate = new Date(event.end_date);
   
-  if (event.status) return event.status as 'upcoming' | 'live' | 'past' | 'cancelled';
+  if (event.status === 'cancelled') return 'cancelled';
+  if (event.status === 'past') return 'ended'; // Map 'past' to 'ended'
+  if (event.status) return event.status as 'upcoming' | 'live' | 'happening_soon' | 'in_progress' | 'ended';
   
   if (now < startDate) return 'upcoming';
   if (now >= startDate && now <= endDate) return 'live';
-  if (now > endDate) return 'past';
+  if (now > endDate) return 'ended'; // Use 'ended' instead of 'past'
   
   return 'upcoming';
 }

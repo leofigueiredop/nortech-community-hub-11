@@ -33,9 +33,16 @@ export interface Event {
   time?: string;
   speaker?: string;
   url?: string;
-  status?: 'upcoming' | 'live' | 'past' | 'cancelled' | 'happening_soon' | 'in_progress' | 'ended';
+  status?: 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress'; // Removed 'past' and 'cancelled'
   pointsValue?: number;
   platform?: string;
+
+  // Add missing properties from Event type
+  start_date?: string;
+  end_date?: string;
+  location_type?: 'online' | 'in_person' | 'hybrid';
+  access_level?: 'free' | 'premium' | 'premium_plus';
+  updated_at?: string;
 }
 
 export interface EventAttendee {

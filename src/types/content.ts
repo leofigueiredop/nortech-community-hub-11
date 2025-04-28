@@ -23,6 +23,14 @@ export interface ContentItem {
   likes?: number;
   duration?: number;
   access_level?: 'free' | 'premium' | 'premium_plus';
+  
+  // Additional properties needed by components
+  isNew?: boolean;
+  author?: {
+    id: string;
+    name: string;
+    avatar?: string;
+  } | null;
 }
 
 /**
@@ -35,4 +43,14 @@ export interface ContentFormData {
   format: ContentFormat;
   community_id: string;
   thumbnail_url?: string;
+}
+
+/**
+ * Props for ContentSection component
+ */
+export interface ContentSectionProps {
+  title: string;
+  items: ContentItem[];
+  isTopTen?: boolean;
+  onItemSelect?: (item: ContentItem) => void;
 }

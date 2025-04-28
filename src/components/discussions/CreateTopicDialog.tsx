@@ -47,7 +47,7 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ isOpen, onClose, 
         slug: title.toLowerCase().replace(/\s+/g, '-'),
         is_featured: false,
         is_private: false,
-        access_level: 'free',
+        access_level: 'free' as 'free' | 'premium' | 'premium_plus', // Fix by explicitly typing
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };

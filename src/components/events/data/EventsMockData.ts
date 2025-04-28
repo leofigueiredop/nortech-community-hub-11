@@ -11,8 +11,10 @@ const getDate = (daysFromNow: number, hours = 18, minutes = 0): Date => {
 export const mockEvents: Event[] = [
   {
     id: 1,
+    community_id: "default",
     title: "Community Workshop: Getting Started with AI",
     description: "Join us for an interactive workshop where we'll explore the basics of AI and how to leverage it in your projects. Perfect for beginners!",
+    event_type: "workshop",
     type: "workshop", // This is a ComponentEventType
     date: getDate(2),
     time: "18:00 - 20:00",
@@ -26,13 +28,24 @@ export const mockEvents: Event[] = [
     platform: "zoom",
     pointsValue: 10,
     status: "upcoming",
-    registeredUsers: []
+    registeredUsers: [],
+    is_virtual: true,
+    is_featured: false,
+    points_awarded: 10,
+    created_at: new Date().toISOString(),
+    start_date: getDate(2).toISOString(),
+    end_date: getDate(2, 20).toISOString(),
+    access_level: "free",
+    updated_at: new Date().toISOString(),
+    location_type: "online"
   },
   {
     id: 2,
+    community_id: "default",
     title: "Monthly Networking Mixer",
     description: "Connect with other community members in a casual setting. Share ideas, find collaborators, and expand your professional network.",
     type: "meetup",
+    event_type: "meetup",
     date: getDate(5),
     time: "19:00 - 21:00",
     location: "TechHub, 123 Innovation Street",
@@ -42,7 +55,16 @@ export const mockEvents: Event[] = [
     capacity: 30,
     isRegistered: false,
     status: "upcoming",
-    registeredUsers: []
+    registeredUsers: [],
+    is_virtual: false,
+    is_featured: false,
+    points_awarded: 0,
+    created_at: new Date().toISOString(),
+    start_date: getDate(5).toISOString(),
+    end_date: getDate(5, 21).toISOString(),
+    access_level: "free",
+    updated_at: new Date().toISOString(),
+    location_type: "in_person"
   },
   {
     id: 3,
@@ -59,7 +81,16 @@ export const mockEvents: Event[] = [
     isRegistered: false,
     pointsValue: 50,
     status: "upcoming",
-    registeredUsers: []
+    registeredUsers: [],
+    is_virtual: true,
+    is_featured: true,
+    points_awarded: 50,
+    created_at: new Date().toISOString(),
+    start_date: getDate(15).toISOString(),
+    end_date: getDate(15, 17).toISOString(),
+    access_level: "premium",
+    updated_at: new Date().toISOString(),
+    location_type: "online"
   },
   {
     id: 4,
@@ -78,7 +109,16 @@ export const mockEvents: Event[] = [
     platform: "meet",
     pointsValue: 15,
     status: "upcoming",
-    registeredUsers: []
+    registeredUsers: [],
+    is_virtual: true,
+    is_featured: false,
+    points_awarded: 15,
+    created_at: new Date().toISOString(),
+    start_date: getDate(3).toISOString(),
+    end_date: getDate(3, 18).toISOString(),
+    access_level: "free",
+    updated_at: new Date().toISOString(),
+    location_type: "online"
   },
   {
     id: 5,
@@ -94,7 +134,16 @@ export const mockEvents: Event[] = [
     capacity: 150,
     isRegistered: false,
     status: "upcoming",
-    registeredUsers: []
+    registeredUsers: [],
+    is_virtual: true,
+    is_featured: true,
+    points_awarded: 89,
+    created_at: new Date().toISOString(),
+    start_date: getDate(20).toISOString(),
+    end_date: getDate(20, 16).toISOString(),
+    access_level: "premium_plus",
+    updated_at: new Date().toISOString(),
+    location_type: "online"
   },
   {
     id: 6,
@@ -113,7 +162,16 @@ export const mockEvents: Event[] = [
     platform: "zoom",
     pointsValue: 100,
     status: "upcoming",
-    registeredUsers: []
+    registeredUsers: [],
+    is_virtual: true,
+    is_featured: false,
+    points_awarded: 100,
+    created_at: new Date().toISOString(),
+    start_date: getDate(10).toISOString(),
+    end_date: getDate(10, 20).toISOString(),
+    access_level: "free",
+    updated_at: new Date().toISOString(),
+    location_type: "online"
   },
   {
     id: 7,
@@ -130,7 +188,16 @@ export const mockEvents: Event[] = [
     isRegistered: false,
     pointsValue: 30,
     status: "upcoming",
-    registeredUsers: []
+    registeredUsers: [],
+    is_virtual: true,
+    is_featured: false,
+    points_awarded: 30,
+    created_at: new Date().toISOString(),
+    start_date: getDate(8).toISOString(),
+    end_date: getDate(8, 13).toISOString(),
+    access_level: "free",
+    updated_at: new Date().toISOString(),
+    location_type: "online"
   },
   {
     id: 8,
@@ -147,7 +214,16 @@ export const mockEvents: Event[] = [
     isRegistered: false,
     pointsValue: 75,
     status: "upcoming",
-    registeredUsers: []
+    registeredUsers: [],
+    is_virtual: true,
+    is_featured: true,
+    points_awarded: 75,
+    created_at: new Date().toISOString(),
+    start_date: getDate(25).toISOString(),
+    end_date: getDate(25, 17).toISOString(),
+    access_level: "premium",
+    updated_at: new Date().toISOString(),
+    location_type: "online"
   },
   {
     id: 9,
@@ -166,7 +242,16 @@ export const mockEvents: Event[] = [
     platform: "teams",
     pointsValue: 15,
     status: "upcoming",
-    registeredUsers: []
+    registeredUsers: [],
+    is_virtual: true,
+    is_featured: false,
+    points_awarded: 15,
+    created_at: new Date().toISOString(),
+    start_date: getDate(1, 16).toISOString(),
+    end_date: getDate(1, 17).toISOString(),
+    access_level: "free",
+    updated_at: new Date().toISOString(),
+    location_type: "online"
   },
   {
     id: 10,
@@ -185,6 +270,15 @@ export const mockEvents: Event[] = [
     platform: "meet",
     status: 'ended',
     pointsValue: 20,
-    registeredUsers: []
+    registeredUsers: [],
+    is_virtual: true,
+    is_featured: false,
+    points_awarded: 20,
+    created_at: new Date().toISOString(),
+    start_date: getDate(-1, 10).toISOString(),
+    end_date: getDate(-1, 11).toISOString(),
+    access_level: "free",
+    updated_at: new Date().toISOString(),
+    location_type: "online"
   }
 ];

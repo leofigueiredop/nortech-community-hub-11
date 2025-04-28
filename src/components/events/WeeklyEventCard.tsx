@@ -14,11 +14,21 @@ interface WeeklyEventCardProps {
 const WeeklyEventCard: React.FC<WeeklyEventCardProps> = ({ event, onRSVP }) => {
   const eventType = EVENT_TYPES[event.type];
   
-  // Get the event status
-  const status = event.status || getEventStatus(event);
+  // Get the event status directly from the event or use the utility
+  const status = event.status || getEventStatus({
+    ...event,
+    start_date: event.start_date || event.date.toISOString(),
+    end_date: event.end_date || new Date(event.date.getTime() + 2 * 60 * 60 * 1000).toISOString(),
+    date: undefined // Ensure we're using the correct date field
+  });
   
   // Check if current user is registered
-  const isRegistered = isUserRegistered(event);
+  const isRegistered = isUserRegistered({
+    ...event,
+    start_date: event.start_date || event.date.toISOString(),
+    end_date: event.end_date || new Date(event.date.getTime() + 2 * 60 * 60 * 1000).toISOString(),
+    date: undefined // Ensure we're using the correct date field
+  });
   
   return (
     <div 
