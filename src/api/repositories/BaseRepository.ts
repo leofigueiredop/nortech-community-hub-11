@@ -1,6 +1,6 @@
 
 import { createClient, PostgrestError, SupabaseClient } from '@supabase/supabase-js';
-import { supabaseConfig } from '../ApiClient';
+import { supabaseConfig } from '../config';
 import { ApiResponse } from '@/types/api';
 import { IBaseRepository } from '../interfaces/IBaseRepository';
 

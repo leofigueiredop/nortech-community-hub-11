@@ -1,8 +1,9 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { IAuthRepository } from '../interfaces/IAuthRepository';
 import { AuthUser, LoginCredentials, AuthResponse } from '@/types/api';
 import { BaseRepository } from './BaseRepository';
-import { supabaseConfig } from '../ApiClient';
+import { supabaseConfig } from '../config';
 
 export class SupabaseAuthRepository extends BaseRepository implements IAuthRepository {
   constructor() {

@@ -2,7 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { ICommunityRepository } from '../interfaces/ICommunityRepository';
 import { BaseRepository } from './BaseRepository';
-import { supabaseConfig } from '../ApiClient';
+import { supabaseConfig } from '../config';
 import { Community, CommunitySettings, CommunityMember } from '@/types/community';
 
 export class SupabaseCommunityRepository extends BaseRepository implements ICommunityRepository {

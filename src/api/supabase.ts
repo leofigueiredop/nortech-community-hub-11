@@ -1,6 +1,6 @@
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { supabaseConfig } from './ApiClient';
+import { supabaseConfig } from './config';
 
 export const createClient = () => {
   return createSupabaseClient(

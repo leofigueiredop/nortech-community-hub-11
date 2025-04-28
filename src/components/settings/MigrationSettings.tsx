@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { LoaderIcon, CheckCircleIcon, AlertCircleIcon } from 'lucide-react';
 import { api } from '@/api/ApiClient';
 import { createSQLFunctions } from '@/api/migrations/createSQLFunctions';
 import { useToast } from '@/hooks/use-toast';
-import { supabaseConfig } from '@/api/ApiClient';
+import { supabaseConfig } from '@/api/config';
 
 const MigrationSettings: React.FC = () => {
   const { toast } = useToast();

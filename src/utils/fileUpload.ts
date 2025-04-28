@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { supabaseConfig } from '@/api/ApiClient';
+import { supabaseConfig } from '@/api/config';
 import { toast } from '@/components/ui/use-toast';
 
 const supabase = createClient(
