@@ -18,6 +18,7 @@ import { Badge } from '../ui/badge';
 import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { DiscussionFilter } from '@/types/discussion';
 
 interface FilterOption {
   id: string;
@@ -26,58 +27,84 @@ interface FilterOption {
 }
 
 interface DiscussionFiltersProps {
-  topicOptions: FilterOption[];
-  formatOptions: FilterOption[];
-  tagOptions: FilterOption[];
-  statusOptions: FilterOption[];
-  selectedFilters: {
-    search: string;
-    topics: string[];
-    formats: string[];
-    tags: string[];
-    statuses: string[];
-  };
-  onFilterChange: (filterType: string, value: string | string[]) => void;
-  onClearFilters: () => void;
+  topicId?: string;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  onFilterChange: (filters: DiscussionFilter[]) => void;
+  activeFilters: DiscussionFilter[];
+  topicOptions?: FilterOption[];
+  formatOptions?: FilterOption[];
+  tagOptions?: FilterOption[];
+  statusOptions?: FilterOption[];
 }
 
 export function DiscussionFilters({
-  topicOptions,
-  formatOptions,
-  tagOptions,
-  statusOptions,
-  selectedFilters,
+  topicId,
+  searchQuery,
+  onSearchChange,
   onFilterChange,
-  onClearFilters
+  activeFilters,
+  topicOptions = [],
+  formatOptions = [],
+  tagOptions = [],
+  statusOptions = []
 }: DiscussionFiltersProps) {
-  const [searchValue, setSearchValue] = useState(selectedFilters.search || '');
+  const [searchValue, setSearchValue] = useState(searchQuery || '');
   
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onFilterChange('search', searchValue);
+    onSearchChange(searchValue);
   };
   
-  const handleCheckboxChange = (filterType: string, value: string) => {
-    let currentValues = selectedFilters[filterType as keyof typeof selectedFilters] as string[] || [];
+  const handleFilterToggle = (filter: DiscussionFilter) => {
+    // Check if filter is already active
+    const filterIndex = activeFilters.findIndex(
+      f => f.type === filter.type && f.value === filter.value
+    );
     
-    // If the value is already selected, remove it, otherwise add it
-    if (currentValues.includes(value)) {
-      currentValues = currentValues.filter(v => v !== value);
+    let newFilters = [...activeFilters];
+    if (filterIndex >= 0) {
+      // Remove filter if already active
+      newFilters.splice(filterIndex, 1);
     } else {
-      currentValues = [...currentValues, value];
+      // Add filter if not active
+      newFilters.push(filter);
     }
     
-    onFilterChange(filterType, currentValues);
+    onFilterChange(newFilters);
   };
   
-  // Count total active filters
-  const activeFilterCount = (
-    selectedFilters.topics.length +
-    selectedFilters.formats.length +
-    selectedFilters.tags.length +
-    selectedFilters.statuses.length +
-    (selectedFilters.search ? 1 : 0)
-  );
+  const clearFilters = () => {
+    onFilterChange([]);
+    onSearchChange('');
+    setSearchValue('');
+  };
+  
+  const defaultFormatOptions = [
+    { id: 'question', name: 'Questions', value: 'question' },
+    { id: 'discussion', name: 'Discussions', value: 'discussion' },
+    { id: 'announcement', name: 'Announcements', value: 'announcement' }
+  ];
+  
+  const defaultStatusOptions = [
+    { id: 'hot', name: 'Hot Topics', value: 'hot' },
+    { id: 'answered', name: 'Answered', value: 'answered' },
+    { id: 'unanswered', name: 'Unanswered', value: 'unanswered' },
+    { id: 'today', name: 'Today', value: 'today' },
+    { id: 'week', name: 'This Week', value: 'week' }
+  ];
+  
+  const defaultTagOptions = [
+    { id: 'beginner', name: 'Beginner', value: 'beginner' },
+    { id: 'intermediate', name: 'Intermediate', value: 'intermediate' },
+    { id: 'advanced', name: 'Advanced', value: 'advanced' },
+    { id: 'help', name: 'Help Needed', value: 'help' },
+    { id: 'solved', name: 'Solved', value: 'solved' }
+  ];
+  
+  const finalFormatOptions = formatOptions.length > 0 ? formatOptions : defaultFormatOptions;
+  const finalStatusOptions = statusOptions.length > 0 ? statusOptions : defaultStatusOptions;
+  const finalTagOptions = tagOptions.length > 0 ? tagOptions : defaultTagOptions;
   
   return (
     <div className="bg-card border rounded-lg overflow-hidden">
@@ -100,14 +127,14 @@ export function DiscussionFilters({
         </form>
         
         {/* Active Filters */}
-        {activeFilterCount > 0 && (
+        {activeFilters.length > 0 && (
           <div className="mt-3">
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-sm font-medium">Active Filters</h4>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={onClearFilters}
+                onClick={clearFilters}
                 className="h-7 text-xs"
               >
                 Clear All
@@ -115,63 +142,24 @@ export function DiscussionFilters({
             </div>
             
             <div className="flex flex-wrap gap-2">
-              {selectedFilters.search && (
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  Search: {selectedFilters.search}
-                  <X 
-                    className="h-3 w-3 cursor-pointer" 
-                    onClick={() => onFilterChange('search', '')}
-                  />
-                </Badge>
-              )}
-              
-              {selectedFilters.topics.map(topic => {
-                const topicName = topicOptions.find(t => t.value === topic)?.name || topic;
+              {activeFilters.map((filter, index) => {
+                const getIcon = () => {
+                  switch (filter.type) {
+                    case 'tag': return <Tag className="h-3 w-3" />;
+                    case 'format': return <MessageCircle className="h-3 w-3" />;
+                    case 'topic': return <Layers className="h-3 w-3" />;
+                    case 'status': return <CheckCircle className="h-3 w-3" />;
+                    default: return null;
+                  }
+                };
+                
                 return (
-                  <Badge key={topic} variant="secondary" className="flex items-center gap-1">
-                    <Layers className="h-3 w-3" /> {topicName}
+                  <Badge key={`${filter.type}-${filter.value}-${index}`} variant="secondary" className="flex items-center gap-1">
+                    {getIcon()}
+                    {filter.label}
                     <X 
                       className="h-3 w-3 cursor-pointer" 
-                      onClick={() => handleCheckboxChange('topics', topic)}
-                    />
-                  </Badge>
-                );
-              })}
-              
-              {selectedFilters.formats.map(format => {
-                const formatName = formatOptions.find(f => f.value === format)?.name || format;
-                return (
-                  <Badge key={format} variant="secondary" className="flex items-center gap-1">
-                    <MessageCircle className="h-3 w-3" /> {formatName}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
-                      onClick={() => handleCheckboxChange('formats', format)}
-                    />
-                  </Badge>
-                );
-              })}
-              
-              {selectedFilters.tags.map(tag => {
-                const tagName = tagOptions.find(t => t.value === tag)?.name || tag;
-                return (
-                  <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                    <Tag className="h-3 w-3" /> {tagName}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
-                      onClick={() => handleCheckboxChange('tags', tag)}
-                    />
-                  </Badge>
-                );
-              })}
-              
-              {selectedFilters.statuses.map(status => {
-                const statusName = statusOptions.find(s => s.value === status)?.name || status;
-                return (
-                  <Badge key={status} variant="secondary" className="flex items-center gap-1">
-                    <CheckCircle className="h-3 w-3" /> {statusName}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
-                      onClick={() => handleCheckboxChange('statuses', status)}
+                      onClick={() => handleFilterToggle(filter)}
                     />
                   </Badge>
                 );
@@ -186,61 +174,32 @@ export function DiscussionFilters({
       {/* Filter Options */}
       <div className="p-4">
         <Accordion type="multiple" className="space-y-2">
-          {/* Topics Filter */}
-          <AccordionItem value="topics" className="border rounded-md overflow-hidden">
-            <AccordionTrigger className="px-4 py-2 text-sm hover:bg-accent hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Layers className="h-4 w-4" />
-                <span>Topics</span>
-                {selectedFilters.topics.length > 0 && (
-                  <Badge variant="secondary" className="ml-auto">
-                    {selectedFilters.topics.length}
-                  </Badge>
-                )}
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 py-2">
-              <div className="space-y-2">
-                {topicOptions.map(topic => (
-                  <div key={topic.id} className="flex items-center space-x-2">
-                    <Checkbox 
-                      id={`topic-${topic.id}`}
-                      checked={selectedFilters.topics.includes(topic.value)}
-                      onCheckedChange={() => handleCheckboxChange('topics', topic.value)}
-                    />
-                    <Label
-                      htmlFor={`topic-${topic.id}`}
-                      className="text-sm cursor-pointer flex-grow"
-                    >
-                      {topic.name}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-          
           {/* Format Filter */}
           <AccordionItem value="formats" className="border rounded-md overflow-hidden">
             <AccordionTrigger className="px-4 py-2 text-sm hover:bg-accent hover:no-underline">
               <div className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4" />
                 <span>Format</span>
-                {selectedFilters.formats.length > 0 && (
+                {activeFilters.filter(f => f.type === 'format').length > 0 && (
                   <Badge variant="secondary" className="ml-auto">
-                    {selectedFilters.formats.length}
+                    {activeFilters.filter(f => f.type === 'format').length}
                   </Badge>
                 )}
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 py-2">
               <div className="space-y-2">
-                {formatOptions.map(format => (
+                {finalFormatOptions.map(format => (
                   <div key={format.id} className="flex items-center space-x-2">
                     <Checkbox 
                       id={`format-${format.id}`}
-                      checked={selectedFilters.formats.includes(format.value)}
-                      onCheckedChange={() => handleCheckboxChange('formats', format.value)}
+                      checked={activeFilters.some(f => f.type === 'format' && f.value === format.value)}
+                      onCheckedChange={() => handleFilterToggle({
+                        id: format.id,
+                        type: 'format',
+                        value: format.value,
+                        label: format.name
+                      })}
                     />
                     <Label
                       htmlFor={`format-${format.id}`}
@@ -260,21 +219,26 @@ export function DiscussionFilters({
               <div className="flex items-center gap-2">
                 <Tag className="h-4 w-4" />
                 <span>Tags</span>
-                {selectedFilters.tags.length > 0 && (
+                {activeFilters.filter(f => f.type === 'tag').length > 0 && (
                   <Badge variant="secondary" className="ml-auto">
-                    {selectedFilters.tags.length}
+                    {activeFilters.filter(f => f.type === 'tag').length}
                   </Badge>
                 )}
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 py-2">
               <div className="space-y-2">
-                {tagOptions.map(tag => (
+                {finalTagOptions.map(tag => (
                   <div key={tag.id} className="flex items-center space-x-2">
                     <Checkbox 
                       id={`tag-${tag.id}`}
-                      checked={selectedFilters.tags.includes(tag.value)}
-                      onCheckedChange={() => handleCheckboxChange('tags', tag.value)}
+                      checked={activeFilters.some(f => f.type === 'tag' && f.value === tag.value)}
+                      onCheckedChange={() => handleFilterToggle({
+                        id: tag.id,
+                        type: 'tag',
+                        value: tag.value,
+                        label: tag.name
+                      })}
                     />
                     <Label
                       htmlFor={`tag-${tag.id}`}
@@ -294,21 +258,26 @@ export function DiscussionFilters({
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4" />
                 <span>Status</span>
-                {selectedFilters.statuses.length > 0 && (
+                {activeFilters.filter(f => f.type === 'status').length > 0 && (
                   <Badge variant="secondary" className="ml-auto">
-                    {selectedFilters.statuses.length}
+                    {activeFilters.filter(f => f.type === 'status').length}
                   </Badge>
                 )}
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 py-2">
               <div className="space-y-2">
-                {statusOptions.map(status => (
+                {finalStatusOptions.map(status => (
                   <div key={status.id} className="flex items-center space-x-2">
                     <Checkbox 
                       id={`status-${status.id}`}
-                      checked={selectedFilters.statuses.includes(status.value)}
-                      onCheckedChange={() => handleCheckboxChange('statuses', status.value)}
+                      checked={activeFilters.some(f => f.type === 'status' && f.value === status.value)}
+                      onCheckedChange={() => handleFilterToggle({
+                        id: status.id,
+                        type: 'status',
+                        value: status.value,
+                        label: status.name
+                      })}
                     />
                     <Label
                       htmlFor={`status-${status.id}`}
@@ -326,3 +295,6 @@ export function DiscussionFilters({
     </div>
   );
 }
+
+// Adding a default export for the component
+export default DiscussionFilters;
