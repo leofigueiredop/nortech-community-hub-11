@@ -37,8 +37,8 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ isOpen, onClose, 
     setIsSubmitting(true);
     
     try {
-      // Create new topic with required field title
-      const newTopic: Omit<DiscussionTopic, 'id' | 'created_at' | 'updated_at' | 'discussionCount' | 'memberCount' | 'recentActivity'> = {
+      // Create new topic with required fields
+      const newTopic = {
         title: title,
         description: description,
         community_id: 'default',
@@ -47,7 +47,9 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ isOpen, onClose, 
         slug: title.toLowerCase().replace(/\s+/g, '-'),
         is_featured: false,
         is_private: false,
-        access_level: 'free'
+        access_level: 'free',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
       
       const createdTopic = await createTopic(newTopic);

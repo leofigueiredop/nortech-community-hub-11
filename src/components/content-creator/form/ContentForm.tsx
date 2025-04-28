@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -8,11 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useCommunities } from '@/hooks/useCommunities';
-import { ContentFormat } from '@/types/content';
+import { ContentFormat, ContentFormData } from '@/types/content';
 
 interface ContentFormProps {
-  onSubmit: (data: any) => void;
-  initialValues?: any;
+  onSubmit: (data: ContentFormData) => void;
+  initialValues?: Partial<ContentFormData>;
 }
 
 const ContentForm: React.FC<ContentFormProps> = ({ onSubmit, initialValues }) => {
@@ -31,7 +32,7 @@ const ContentForm: React.FC<ContentFormProps> = ({ onSubmit, initialValues }) =>
       setTitle(initialValues.title || '');
       setDescription(initialValues.description || '');
       setUrl(initialValues.url || '');
-      setFormat(initialValues.format || 'video');
+      setFormat((initialValues.format as ContentFormat) || 'video');
       setCommunityId(initialValues.community_id || '');
     }
   }, [initialValues]);
@@ -39,7 +40,7 @@ const ContentForm: React.FC<ContentFormProps> = ({ onSubmit, initialValues }) =>
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || !description.trim() || !url.trim() || !format || !communityId) {
+    if (!title.trim() || !description.trim() || !url?.trim() || !format || !communityId) {
       toast({
         title: "Missing fields",
         description: "Please fill in all fields.",
@@ -51,7 +52,7 @@ const ContentForm: React.FC<ContentFormProps> = ({ onSubmit, initialValues }) =>
     setIsSubmitting(true);
 
     try {
-      const contentData = {
+      const contentData: ContentFormData = {
         title: title,
         description: description,
         url: url,
@@ -118,7 +119,7 @@ const ContentForm: React.FC<ContentFormProps> = ({ onSubmit, initialValues }) =>
           </div>
           <div>
             <Label htmlFor="format">Format</Label>
-            <Select onValueChange={(value) => setFormat(value as ContentFormat)}>
+            <Select onValueChange={(value: string) => setFormat(value as ContentFormat)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a format" />
               </SelectTrigger>
@@ -148,7 +149,7 @@ const ContentForm: React.FC<ContentFormProps> = ({ onSubmit, initialValues }) =>
               </Select>
             )}
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => navigate('/library')}>Cancel</Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Creating..." : "Create Content"}

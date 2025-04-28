@@ -12,26 +12,34 @@ export function adaptEventForComponent(event: EventType): ComponentEvent {
     title: event.title,
     description: event.description || '',
     date: event.date || new Date(event.start_date),
-    time: event.time || `${new Date(event.start_date).getHours()}:00 - ${new Date(event.end_date).getHours()}:00`,
-    type: mapEventType(event.event_type),
-    event_type: mapEventType(event.event_type),
     location: event.location || event.location_address || (event.is_virtual ? 'Online' : ''),
-    speaker: event.speaker_name || (event.speaker ? event.speaker.name : ''),
-    image: event.banner_url || event.image,
-    attendees: event.attendees || 0,
-    capacity: event.max_attendees || 100,
-    community_id: event.community_id,
+    image_url: event.banner_url || event.image,
+    event_type: mapEventType(event.event_type),
+    capacity: event.max_attendees,
     is_virtual: event.is_virtual,
+    meeting_link: event.location_url,
     is_featured: event.is_featured,
     points_awarded: event.points_awarded,
     created_at: event.created_at,
+    community_id: event.community_id,
+    space_id: undefined,
+    attendees: event.attendees || 0,
+    
+    // Additional properties needed for components
+    image: event.banner_url || event.image,
+    type: mapEventType(event.event_type),
+    time: event.time || `${new Date(event.start_date).getHours()}:00 - ${new Date(event.end_date).getHours()}:00`,
+    speaker: event.speaker_name || (event.speaker ? event.speaker.name : ''),
+    url: event.location_url,
     isRegistered: event.isRegistered || false,
     isPremium: event.isPremium || event.access_level === 'premium' || event.access_level === 'premium_plus',
-    url: event.location_url || event.url,
     platform: getPlatformFromUrl(event.location_url || event.url || ''),
     status: getEventStatus(event),
     pointsValue: event.points_awarded || event.points_value || event.pointsValue,
-    registeredUsers: event.registeredUsers || []
+    registeredUsers: event.registeredUsers || [],
+    price: undefined,
+    ticketUrl: undefined,
+    organizer_id: undefined
   };
 }
 
@@ -53,10 +61,10 @@ function mapEventType(eventType: string | undefined): ComponentEventType {
       return 'course';
     case 'live':
     case 'livestream':
-      return 'live';
+      return 'other'; // Map to 'other' for compatibility
     case 'mentoria':
     case 'mentorship':
-      return 'mentoria';
+      return 'other'; // Map to 'other' for compatibility
     default:
       return 'other';
   }

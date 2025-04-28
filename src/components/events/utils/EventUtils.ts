@@ -1,10 +1,10 @@
 
-import { Event } from '../types/EventTypes';
+import { Event } from '@/types/events';
 
 // Helper functions for event status
 export const getEventStatus = (event: Event): 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress' => {
   const now = new Date();
-  const eventDate = new Date(event.date);
+  const eventDate = new Date(event.date || event.start_date);
   
   if (!event.time) {
     // If no time is provided, just compare dates
@@ -19,8 +19,14 @@ export const getEventStatus = (event: Event): 'upcoming' | 'live' | 'ended' | 'h
     }
   }
   
-  const eventTime = event.time.split(' - ')[0]; // Get start time
-  const [hourStr, minuteStr] = eventTime.split(':');
+  const eventTime = (event.time || "").split(' - ')[0]; // Get start time
+  const [hourStr, minuteStr] = (eventTime || "").split(':');
+  
+  if (!hourStr || !minuteStr) {
+    // Fallback if time format is invalid
+    return now > eventDate ? 'ended' : 'upcoming';
+  }
+  
   const hour = parseInt(hourStr);
   const minute = parseInt(minuteStr);
   
