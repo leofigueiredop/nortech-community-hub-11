@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 export type EventType = 'workshop' | 'webinar' | 'meetup' | 'conference' | 'course' | 'other' | 'live' | 'mentoria';
 
 export interface Event {
-  id: number | string;
+  id: string | number;
   community_id: string;
   title: string;
   description: string;
@@ -26,6 +26,9 @@ export interface Event {
   isPremium?: boolean;
   price?: number;
   ticketUrl?: string;
+  start_date?: string;
+  end_date?: string;
+  updated_at?: string;
   
   // Additional properties needed by components
   image?: string;
@@ -36,13 +39,8 @@ export interface Event {
   status?: 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress';
   pointsValue?: number;
   platform?: string;
-
-  // Add missing properties from Event type
-  start_date?: string;
-  end_date?: string;
   location_type?: 'online' | 'in_person' | 'hybrid';
   access_level?: 'free' | 'premium' | 'premium_plus';
-  updated_at?: string;
 }
 
 export interface EventAttendee {

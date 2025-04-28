@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
-import { ContentItem, ContentFormat } from '@/types/library';
+import { ContentItem, ContentFormat } from '@/types/content';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { v4 as uuidv4 } from 'uuid';
 import ContentBasicInfo from './form/ContentBasicInfo';
@@ -30,7 +30,7 @@ const formSchema = z.object({
   format: z.string().min(1, "Format is required"),
   resourceUrl: z.string().optional(),
   tags: z.string().optional(),
-  accessLevel: z.enum(["free", "premium"]),
+  accessLevel: z.enum(["free", "premium", "premium_plus"]),
   visibility: z.enum(["public", "premium", "points", "hidden", "vip-only", "limited-time"]).optional(),
   categoryId: z.string().optional(),
   pointsEnabled: z.boolean().default(false),
@@ -68,20 +68,20 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
     if (editItem) {
       form.reset({
         title: editItem.title,
-        description: editItem.description,
+        description: editItem.description || '',
         format: editItem.format,
-        resourceUrl: editItem.resourceUrl || '',
-        tags: editItem.tags.join(', '),
-        accessLevel: editItem.accessLevel === 'unlockable' ? 'premium' : editItem.accessLevel,
-        visibility: editItem.visibility as any || 'public',
-        categoryId: editItem.categoryId || '',
+        resourceUrl: editItem.resourceUrl || editItem.url || '',
+        tags: editItem.tags ? editItem.tags.join(', ') : '',
+        accessLevel: editItem.accessLevel || editItem.access_level || 'free',
+        visibility: editItem.visibility || 'public',
+        categoryId: editItem.categoryId || editItem.category_id || '',
         pointsEnabled: editItem.pointsEnabled || false,
         pointsValue: editItem.pointsValue || POINTS_VALUES.content_completion,
         completionCriteria: editItem.completionCriteria as any || 'view',
         completionThreshold: editItem.completionThreshold || 80
       });
-      setSelectedTags(editItem.tags);
-      setPreviewImage(editItem.thumbnailUrl || null);
+      setSelectedTags(editItem.tags || []);
+      setPreviewImage(editItem.thumbnailUrl || editItem.thumbnail || null);
     } else {
       form.reset({
         title: '',
@@ -112,23 +112,28 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
       title: values.title,
       description: values.description,
       format: values.format as ContentFormat,
+      url: values.resourceUrl || (file ? `mock-file-path/${file.name}` : ''),
       resourceUrl: values.resourceUrl || (file ? `mock-file-path/${file.name}` : ''),
       thumbnail: previewImage || '/placeholder.svg',
       thumbnailUrl: previewImage || '/placeholder.svg',
       author: editItem?.author || 'System User',
       duration: editItem?.duration || 0,
       tags: selectedTags,
+      access_level: values.accessLevel,
       accessLevel: values.accessLevel,
-      createdAt: editItem?.createdAt || now,
-      updatedAt: now,
+      created_at: editItem?.created_at || now,
+      updated_at: now,
       views: editItem?.views || 0,
+      category_id: values.categoryId === 'none' ? undefined : values.categoryId,
       categoryId: values.categoryId === 'none' ? undefined : values.categoryId,
       visibility: values.visibility || 'public',
+      is_featured: editItem?.is_featured || false,
       featured: editItem?.featured || false,
       pointsEnabled: values.pointsEnabled,
       pointsValue: values.pointsValue,
       completionCriteria: values.completionCriteria,
-      completionThreshold: values.completionThreshold
+      completionThreshold: values.completionThreshold,
+      community_id: editItem?.community_id || '1',
     };
     
     // Add optional fields based on format

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ContentItem } from '@/types/library';
+import { ContentItem } from '@/types/content';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ContentFormatIcon } from '../utils/ContentFormatIcon';
@@ -26,11 +26,11 @@ const ContentGridView: React.FC<ContentGridViewProps> = ({
         <Card key={item.id} className="overflow-hidden">
           <div className="aspect-video relative bg-slate-100 dark:bg-slate-800">
             <img 
-              src={item.thumbnailUrl || '/placeholder.svg'} 
+              src={item.thumbnail || item.thumbnailUrl || '/placeholder.svg'} 
               alt={item.title}
               className="w-full h-full object-cover"
             />
-            {item.accessLevel === 'premium' && (
+            {(item.access_level === 'premium' || item.accessLevel === 'premium') && (
               <div className="absolute top-2 right-2">
                 <Badge variant="secondary" className="bg-amber-500 text-white">
                   <Lock size={12} className="mr-1" /> Premium
@@ -47,7 +47,7 @@ const ContentGridView: React.FC<ContentGridViewProps> = ({
                   <span className="ml-1">{item.format.toUpperCase()}</span>
                   <span className="mx-1">•</span>
                   <Eye size={12} className="mr-1" />
-                  {item.views.toLocaleString()}
+                  {(item.views || 0).toLocaleString()}
                 </div>
               </div>
               <ContentItemActions 

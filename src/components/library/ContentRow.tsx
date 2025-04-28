@@ -1,11 +1,6 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { ContentItem } from '@/types/library';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
-import EnhancedContentCard from './EnhancedContentCard';
 import ContentSection from './ContentSection';
 
 interface ContentRowProps {
@@ -21,7 +16,7 @@ const ContentRow: React.FC<ContentRowProps> = ({
   isTopTen = false,
   title 
 }) => {
-  // Now using the ContentSection component which handles all the layout and animations
+  // Use the ContentSection component which now handles all the layout and animations
   return (
     <ContentSection
       title={title}

@@ -3,10 +3,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Calendar, Clock, Star, Zap, Lock } from 'lucide-react';
+import { Eye, Calendar, Clock, Lock } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { formatDate, formatDuration } from '@/lib/utils';
 import { ContentItem } from '@/types/library';
 import { ContentFormatIcon } from './management/utils/ContentFormatIcon';
 
@@ -15,6 +14,10 @@ interface ContentSectionProps {
   title: string;
   description?: string;
   viewAll?: string;
+  onItemSelect?: (item: ContentItem) => void;
+  isTopTen?: boolean;
+  viewAllUrl?: string;
+  showNewBadge?: boolean;
 }
 
 const ContentSection: React.FC<ContentSectionProps> = ({
@@ -22,10 +25,25 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   title,
   description,
   viewAll,
+  onItemSelect,
+  isTopTen = false,
+  viewAllUrl,
+  showNewBadge = false,
 }) => {
   if (items.length === 0) {
     return null;
   }
+
+  const handleItemClick = (item: ContentItem) => {
+    if (onItemSelect) {
+      onItemSelect(item);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString();
+  };
 
   return (
     <section className="py-6">
@@ -36,8 +54,8 @@ const ContentSection: React.FC<ContentSectionProps> = ({
             <p className="text-sm text-muted-foreground mt-1">{description}</p>
           )}
         </div>
-        {viewAll && (
-          <Link to={viewAll} className="text-sm text-primary hover:underline">
+        {(viewAll || viewAllUrl) && (
+          <Link to={viewAllUrl || viewAll || "#"} className="text-sm text-primary hover:underline">
             View all
           </Link>
         )}
@@ -47,32 +65,31 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         {items.map((item) => (
           <Card
             key={item.id}
-            className={cn("overflow-hidden transition-all", 
-              item.featured && "border-primary/30 bg-primary/5"
+            className={cn("overflow-hidden transition-all cursor-pointer", 
+              item.is_featured && "border-primary/30 bg-primary/5"
             )}
+            onClick={() => handleItemClick(item)}
           >
             <div className="relative">
-              <Link to={`/library/view/${item.id}`}>
-                <img
-                  src={item.thumbnail || "/placeholder.svg"}
-                  alt={item.title}
-                  className="w-full h-40 object-cover"
-                />
-              </Link>
+              <img
+                src={item.thumbnail || "/placeholder.svg"}
+                alt={item.title}
+                className="w-full h-40 object-cover"
+              />
               <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
                 <Badge 
                   className={cn(
                     "flex items-center gap-1",
-                    item.accessLevel === "premium" && "bg-amber-500", 
-                    item.accessLevel === "premium_plus" && "bg-purple-500"
+                    item.access_level === "premium" && "bg-amber-500", 
+                    item.access_level === "premium_plus" && "bg-purple-500"
                   )}
                 >
-                  {item.accessLevel === "free" ? (
+                  {item.access_level === "free" ? (
                     <>Free</>
                   ) : (
                     <>
                       <Lock className="w-3 h-3" />
-                      {item.accessLevel === "premium" ? "Premium" : "Premium+"}
+                      {item.access_level === "premium" ? "Premium" : "Premium+"}
                     </>
                   )}
                 </Badge>
@@ -81,21 +98,19 @@ const ContentSection: React.FC<ContentSectionProps> = ({
                 
                 {item.pointsEnabled && item.pointsValue ? (
                   <Badge variant="outline" className="bg-emerald-100 text-emerald-800 border-0">
-                    <Zap className="w-3 h-3 mr-1" />
                     {item.pointsValue} pts
                   </Badge>
                 ) : null}
                 
-                {item.isNew && (
+                {/* Only use isNew if showNewBadge is true */}
+                {showNewBadge && (
                   <Badge className="bg-blue-500">New</Badge>
                 )}
               </div>
             </div>
 
             <CardHeader className="p-4 pb-0">
-              <Link to={`/library/view/${item.id}`} className="hover:underline">
-                <h3 className="font-semibold line-clamp-2">{item.title}</h3>
-              </Link>
+              <h3 className="font-semibold line-clamp-2">{item.title}</h3>
             </CardHeader>
 
             <CardContent className="p-4 pt-2">
@@ -113,7 +128,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
               {item.duration && (
                 <div className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
-                  <span>{formatDuration(item.duration)}</span>
+                  <span>{Math.floor(item.duration / 60)} min</span>
                 </div>
               )}
 
@@ -126,15 +141,17 @@ const ContentSection: React.FC<ContentSectionProps> = ({
                 {typeof item.author === 'string' ? (
                   <span>{item.author}</span>
                 ) : (
-                  <div className="flex items-center gap-1">
-                    <Avatar className="w-4 h-4">
-                      <AvatarImage src={item.author.avatar} />
-                      <AvatarFallback className="text-[8px]">
-                        {item.author.name[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="truncate max-w-[100px]">{item.author.name}</span>
-                  </div>
+                  item.author && (
+                    <div className="flex items-center gap-1">
+                      <Avatar className="w-4 h-4">
+                        <AvatarImage src={item.author?.avatar} />
+                        <AvatarFallback className="text-[8px]">
+                          {item.author?.name ? item.author.name[0] : '?'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="truncate max-w-[100px]">{item.author?.name || 'Unknown'}</span>
+                    </div>
+                  )
                 )}
               </div>
             </CardFooter>

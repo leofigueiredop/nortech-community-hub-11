@@ -7,7 +7,7 @@ import { useContentProgress } from '@/hooks/useContentProgress';
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Star, Clock, Eye, Book, Crown } from 'lucide-react';
+import { Star, Clock, Eye, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface EnhancedContentCardProps {
@@ -78,7 +78,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
           
           {/* Premium Overlay */}
-          {item.accessLevel === 'premium' && (
+          {item.access_level === 'premium' && (
             <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
           )}
           
@@ -100,7 +100,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
           )}
           
           {/* Premium badge */}
-          {item.accessLevel === 'premium' && (
+          {item.access_level === 'premium' && (
             <Badge 
               className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white border-none text-xs px-2 py-1 flex items-center gap-1"
             >
@@ -153,20 +153,30 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
             {item.description}
           </p>
           
-          {showAuthor && typeof item.author === 'object' && (
+          {showAuthor && (
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full overflow-hidden bg-muted">
-                {item.author.avatar && (
-                  <img 
-                    src={item.author.avatar} 
-                    alt={item.author.name}
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-              <span className="text-xs text-muted-foreground">
-                {item.author.name} • {formatDistanceToNow(new Date(item.updatedAt), { addSuffix: true })}
-              </span>
+              {item.author && typeof item.author !== 'string' && (
+                <>
+                  <div className="w-6 h-6 rounded-full overflow-hidden bg-muted">
+                    {item.author.avatar && (
+                      <img 
+                        src={item.author.avatar} 
+                        alt={item.author.name || 'Author'}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {item.author.name || 'Anonymous'} • {formatDistanceToNow(new Date(item.updated_at), { addSuffix: true })}
+                  </span>
+                </>
+              )}
+              
+              {typeof item.author === 'string' && (
+                <span className="text-xs text-muted-foreground">
+                  {item.author} • {formatDistanceToNow(new Date(item.updated_at), { addSuffix: true })}
+                </span>
+              )}
             </div>
           )}
         </div>

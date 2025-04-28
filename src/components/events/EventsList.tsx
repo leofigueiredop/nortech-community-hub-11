@@ -8,8 +8,8 @@ import { Event, EVENT_TYPES } from './types/EventTypes';
 
 interface EventsListProps {
   events: Event[];
-  onRSVP: (eventId: number) => void;
-  onOpenAttendanceModal: (eventId: number) => void;
+  onRSVP: (eventId: string | number) => void;
+  onOpenAttendanceModal: (eventId: string | number) => void;
 }
 
 const EventsList: React.FC<EventsListProps> = ({ events, onRSVP, onOpenAttendanceModal }) => {

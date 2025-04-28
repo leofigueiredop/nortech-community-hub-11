@@ -95,9 +95,13 @@ function getEventStatus(event: EventType): 'upcoming' | 'live' | 'ended' | 'happ
   const startDate = new Date(event.start_date);
   const endDate = new Date(event.end_date);
   
+  // Convert old status names to new ones
   if (event.status === 'past' || event.status === 'ended') return 'ended';
   if (event.status === 'cancelled') return 'ended';
-  if (event.status) return event.status as 'upcoming' | 'live' | 'happening_soon' | 'in_progress' | 'ended';
+  if (typeof event.status === 'string' && 
+      ['upcoming', 'live', 'happening_soon', 'in_progress', 'ended'].includes(event.status)) {
+    return event.status as 'upcoming' | 'live' | 'happening_soon' | 'in_progress' | 'ended';
+  }
   
   if (now < startDate) return 'upcoming';
   if (now >= startDate && now <= endDate) return 'live';

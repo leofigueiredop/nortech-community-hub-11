@@ -9,8 +9,8 @@ import { Event, EVENT_TYPES } from './types/EventTypes';
 interface EventGridProps {
   events: Event[];
   viewType: 'grid' | 'list';
-  onRSVP: (eventId: number) => void;
-  onOpenAttendanceModal: (eventId: number) => void;
+  onRSVP: (eventId: string | number) => void;
+  onOpenAttendanceModal: (eventId: string | number) => void;
 }
 
 const EventGrid: React.FC<EventGridProps> = ({ events, viewType, onRSVP, onOpenAttendanceModal }) => {

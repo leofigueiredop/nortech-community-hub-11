@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ContentItem, ContentCategory } from '@/types/library';
+import { ContentItem, ContentCategory } from '@/types/content';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ContentFormatIcon } from '../utils/ContentFormatIcon';
@@ -68,10 +68,10 @@ const ContentListView: React.FC<ContentListViewProps> = ({
           </TableHead>
           <TableHead 
             className="cursor-pointer"
-            onClick={() => handleSort('updatedAt')}
+            onClick={() => handleSort('updated_at')}
           >
             <div className="flex items-center gap-1">
-              Updated {renderSortIcon('updatedAt')}
+              Updated {renderSortIcon('updated_at')}
             </div>
           </TableHead>
           <TableHead className="text-right">Actions</TableHead>
@@ -85,9 +85,9 @@ const ContentListView: React.FC<ContentListViewProps> = ({
               <div className="font-medium">{item.title}</div>
               <div className="text-xs text-slate-500 line-clamp-1">{item.description}</div>
             </TableCell>
-            <TableCell>{getCategoryName(item.categoryId)}</TableCell>
+            <TableCell>{getCategoryName(item.category_id || item.categoryId)}</TableCell>
             <TableCell>
-              {item.accessLevel === 'premium' ? (
+              {(item.access_level === 'premium' || item.accessLevel === 'premium') ? (
                 <Badge variant="secondary" className="bg-amber-500 text-white">
                   <Lock size={12} className="mr-1" /> Premium
                 </Badge>
@@ -95,9 +95,9 @@ const ContentListView: React.FC<ContentListViewProps> = ({
                 <Badge variant="outline">Free</Badge>
               )}
             </TableCell>
-            <TableCell className="text-right">{item.views.toLocaleString()}</TableCell>
+            <TableCell className="text-right">{(item.views || 0).toLocaleString()}</TableCell>
             <TableCell>
-              {new Date(item.updatedAt).toLocaleDateString()}
+              {new Date(item.updated_at).toLocaleDateString()}
             </TableCell>
             <TableCell className="text-right">
               <ContentItemActions 

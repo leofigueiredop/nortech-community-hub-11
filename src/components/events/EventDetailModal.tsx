@@ -20,7 +20,7 @@ interface EventDetailModalProps {
   event: Event;
   isOpen: boolean;
   onClose: () => void;
-  onRSVP: (eventId: number) => void;
+  onRSVP: (eventId: string | number) => void;
 }
 
 const EventDetailModal: React.FC<EventDetailModalProps> = ({
@@ -181,7 +181,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
               </Button>
             ) : (
               <EventCardActions 
-                status={event.status}
+                status={event.status || 'upcoming'}
                 isRegistered={event.isRegistered}
                 attendees={event.attendees}
                 capacity={event.capacity}
@@ -199,7 +199,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
                 description={event.description}
                 location={event.location}
                 isRegistered={event.isRegistered}
-                status={event.status}
+                status={event.status || 'upcoming'}
               />
             )}
             

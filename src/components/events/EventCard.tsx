@@ -16,7 +16,7 @@ import EventCalendarButtons from './card/EventCalendarButtons';
 
 interface EventCardProps {
   event: Event;
-  onRSVP: (eventId: number | string) => void;
+  onRSVP: (eventId: string | number) => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
@@ -92,7 +92,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
           <DialogHeader>
             <DialogTitle>Attendance Management - {event.title}</DialogTitle>
           </DialogHeader>
-          <EventAttendanceManager eventId={event.id} eventTitle={event.title} />
+          <EventAttendanceManager eventId={String(event.id)} eventTitle={event.title} />
         </DialogContent>
       </Dialog>
 

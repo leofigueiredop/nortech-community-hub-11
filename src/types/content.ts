@@ -2,7 +2,7 @@
 /**
  * Content format types
  */
-export type ContentFormat = 'video' | 'text' | 'document';
+export type ContentFormat = 'video' | 'text' | 'document' | 'audio' | 'course' | 'image' | 'link' | 'youtube' | 'vimeo' | 'gdoc' | 'pdf';
 
 /**
  * Content item interface
@@ -14,7 +14,6 @@ export interface ContentItem {
   url?: string;
   format: ContentFormat;
   thumbnail?: string;
-  thumbnailUrl?: string;
   community_id: string;
   created_at: string;
   updated_at: string;
@@ -24,7 +23,8 @@ export interface ContentItem {
   likes?: number;
   duration?: number;
   access_level?: 'free' | 'premium' | 'premium_plus';
-  resourceUrl?: string;
+  category_id?: string;
+  tags?: string[];
   
   // Additional properties needed by components
   isNew?: boolean;
@@ -35,7 +35,18 @@ export interface ContentItem {
     id: string;
     name: string;
     avatar?: string;
-  } | null;
+  } | string | null;
+  
+  // Properties used in various components
+  thumbnailUrl?: string;
+  resourceUrl?: string;
+  categoryId?: string;
+  visibility?: 'public' | 'premium' | 'points' | 'hidden' | 'vip-only' | 'limited-time';
+  completionCriteria?: 'view' | 'scroll_end' | 'watch_percent' | 'time_spent';
+  completionThreshold?: number;
+  fileSize?: number;
+  accessLevel?: 'free' | 'premium' | 'premium_plus';
+  featured?: boolean;
 }
 
 /**
@@ -58,4 +69,23 @@ export interface ContentSectionProps {
   items: ContentItem[];
   isTopTen?: boolean;
   onItemSelect?: (item: ContentItem) => void;
+  viewAllUrl?: string;
+  showNewBadge?: boolean;
+  description?: string;
+  viewAll?: string;
+}
+
+/**
+ * Content category
+ */
+export interface ContentCategory {
+  id: string;
+  name: string;
+  description?: string;
+  slug: string;
+  parent_id?: string;
+  icon?: string;
+  created_at: string;
+  updated_at: string;
+  itemCount?: number; // Added for UI convenience
 }

@@ -7,7 +7,7 @@ import { Event, EVENT_TYPES } from './types/EventTypes';
 
 interface WeeklyEventCardProps {
   event: Event;
-  onRSVP: (eventId: number | string) => void;
+  onRSVP: (eventId: string | number) => void;
 }
 
 const WeeklyEventCard: React.FC<WeeklyEventCardProps> = ({ event, onRSVP }) => {

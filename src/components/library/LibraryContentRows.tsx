@@ -18,12 +18,12 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
 }) => {
   // Top 10 content
   const topTenContent = [...content]
-    .sort((a, b) => b.views - a.views)
+    .sort((a, b) => (b.views || 0) - (a.views || 0))
     .slice(0, 10);
     
   // New releases
   const newReleases = [...content]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 10);
   
   // Content by format - refined grouping with clear labels
@@ -44,7 +44,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
   
   // For personalized recommendations based on visited tags
   const recommendedContent = content
-    .filter(item => item.tags.some(tag => visitedTags.includes(tag)))
+    .filter(item => item.tags && item.tags.some(tag => visitedTags.includes(tag)))
     .slice(0, 10);
 
   return (
