@@ -7,55 +7,91 @@ import { useToast } from '@/hooks/use-toast';
 const MOCK_REWARDS: Reward[] = [
   {
     id: '1',
+    name: 'Community Member Badge',
     title: 'Community Member Badge',
     description: 'Show off your community membership with this exclusive badge on your profile.',
     imageUrl: '/placeholder.svg',
+    image_url: '/placeholder.svg',
+    points_cost: 100,
     pointsCost: 100,
     type: 'free',
+    reward_type: 'free',
     visibility: 'public',
     stock: null,
+    quantity_available: null,
     expiresAt: null,
+    expires_at: null,
+    created_at: new Date().toISOString(),
     createdAt: new Date().toISOString(),
-    redeemCount: 42
+    is_active: true,
+    redeemCount: 42,
+    community_id: 'default'
   },
   {
     id: '2',
+    name: 'Premium E-Book Bundle',
     title: 'Premium E-Book Bundle',
     description: 'Access to 5 premium e-books on web development and design.',
     imageUrl: '/placeholder.svg',
+    image_url: '/placeholder.svg',
+    points_cost: 500,
     pointsCost: 500,
     type: 'downloadable',
+    reward_type: 'downloadable',
     visibility: 'public',
     stock: 10,
+    quantity_available: 10,
     expiresAt: null,
+    expires_at: null,
+    created_at: new Date().toISOString(),
     createdAt: new Date().toISOString(),
-    redeemCount: 15
+    is_active: true,
+    redeemCount: 15,
+    community_id: 'default'
   },
   {
     id: '3',
+    name: 'Private Discord Channel Access',
     title: 'Private Discord Channel Access',
     description: 'Get exclusive access to our private Discord channels for 30 days.',
     imageUrl: '/placeholder.svg',
+    image_url: '/placeholder.svg',
+    points_cost: 250,
     pointsCost: 250,
     type: 'access',
+    reward_type: 'access',
     visibility: 'vip',
     stock: null,
+    quantity_available: null,
     expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date().toISOString(),
     createdAt: new Date().toISOString(),
-    redeemCount: 28
+    is_active: true,
+    redeemCount: 28,
+    community_id: 'default'
   },
   {
     id: '4',
+    name: 'Limited Edition NFT',
     title: 'Limited Edition NFT',
     description: 'Claim this limited edition NFT to show your early membership in our community.',
     imageUrl: '/placeholder.svg',
+    image_url: '/placeholder.svg',
+    points_cost: 1000,
     pointsCost: 1000,
     type: 'nft',
+    reward_type: 'nft',
     visibility: 'limited',
     stock: 5,
+    quantity_available: 5,
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date().toISOString(),
     createdAt: new Date().toISOString(),
-    redeemCount: 3
+    is_active: true,
+    redeemCount: 3,
+    community_id: 'default'
   },
 ];
 
@@ -88,17 +124,26 @@ export const useRewardsAdmin = () => {
     
     const newReward: Reward = {
       id: Date.now().toString(),
+      name: rewardData.title || '',
       title: rewardData.title || '',
       description: rewardData.description || '',
+      image_url: rewardData.imageUrl || undefined,
       imageUrl: rewardData.imageUrl || undefined,
+      points_cost: rewardData.pointsCost || 0,
       pointsCost: rewardData.pointsCost || 0,
       type: rewardData.type || 'free',
+      reward_type: rewardData.type || 'free',
       visibility: rewardData.visibility || 'public',
+      quantity_available: rewardData.stock !== undefined ? rewardData.stock : null,
       stock: rewardData.stock !== undefined ? rewardData.stock : null,
+      expires_at: rewardData.expiresAt || null,
       expiresAt: rewardData.expiresAt || null,
+      created_at: new Date().toISOString(),
       createdAt: new Date().toISOString(),
+      is_active: true,
       redeemCount: 0,
-      actionUrl: rewardData.actionUrl
+      actionUrl: rewardData.actionUrl,
+      community_id: 'default'
     };
     
     setRewards(prev => [newReward, ...prev]);

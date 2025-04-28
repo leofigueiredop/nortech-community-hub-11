@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { usePoints } from '@/context/PointsContext';
 import { useContentProgress } from '@/hooks/useContentProgress';
@@ -15,6 +14,7 @@ import {
 const TOPIC_CATEGORIES: DiscussionTopic[] = [
   {
     id: "renda-extra",
+    title: "Renda Extra",
     name: "Renda Extra",
     description: "Discussões sobre formas de gerar renda extra e oportunidades financeiras",
     icon: "TrendingUp",
@@ -22,11 +22,19 @@ const TOPIC_CATEGORIES: DiscussionTopic[] = [
     memberCount: 147,
     recentActivity: "1 hora atrás",
     slug: "renda-extra",
+    community_id: "default",
+    color: "#4CAF50",
+    is_featured: true,
+    is_private: false,
+    access_level: "free",
+    created_at: "2024-01-15",
+    updated_at: "2024-01-15",
     createdAt: "2024-01-15",
     createdBy: "admin"
   },
   {
     id: "networking",
+    title: "Networking",
     name: "Networking",
     description: "Dicas e discussões sobre como expandir sua rede profissional e criar conexões valiosas",
     icon: "Users",
@@ -34,11 +42,19 @@ const TOPIC_CATEGORIES: DiscussionTopic[] = [
     memberCount: 253,
     recentActivity: "30 minutos atrás",
     slug: "networking",
+    community_id: "default",
+    color: "#2196F3",
+    is_featured: false,
+    is_private: false,
+    access_level: "free",
+    created_at: "2024-01-20",
+    updated_at: "2024-01-20",
     createdAt: "2024-01-20",
     createdBy: "admin"
   },
   {
     id: "perguntas-da-semana",
+    title: "Perguntas da Semana",
     name: "Perguntas da Semana",
     description: "Questões relevantes e dúvidas frequentes desta semana na comunidade",
     icon: "Clock",
@@ -46,6 +62,13 @@ const TOPIC_CATEGORIES: DiscussionTopic[] = [
     memberCount: 312,
     recentActivity: "2 horas atrás",
     slug: "perguntas-da-semana",
+    community_id: "default",
+    color: "#FF9800",
+    is_featured: true,
+    is_private: false,
+    access_level: "free",
+    created_at: "2024-02-01",
+    updated_at: "2024-02-01",
     createdAt: "2024-02-01",
     createdBy: "admin"
   }
@@ -70,10 +93,14 @@ const DISCUSSION_DATA: Record<string, Discussion[]> = {
       tags: ["Freelancing", "Desenvolvimento", "Iniciantes"],
       isHot: true,
       lastActivity: "1 hora atrás",
-      createdAt: "2024-03-15",
-      viewCount: 45,
+      created_at: "2024-03-15",
+      updated_at: "2024-03-15",
+      view_count: 45,
       upvotes: 8,
-      format: "question"
+      format: "question",
+      topic_id: "renda-extra",
+      user_id: "user1",
+      community_id: "default"
     },
     {
       id: "102",
@@ -91,10 +118,14 @@ const DISCUSSION_DATA: Record<string, Discussion[]> = {
       tags: ["Investimentos", "Finanças", "Iniciantes"],
       isHot: false,
       lastActivity: "5 horas atrás",
-      createdAt: "2024-03-14", 
-      viewCount: 67,
+      created_at: "2024-03-14", 
+      updated_at: "2024-03-14",
+      view_count: 67,
       upvotes: 12,
-      format: "discussion"
+      format: "discussion",
+      topic_id: "renda-extra",
+      user_id: "user2",
+      community_id: "default"
     }
   ],
   "networking": [
@@ -114,10 +145,14 @@ const DISCUSSION_DATA: Record<string, Discussion[]> = {
       tags: ["Eventos", "São Paulo", "Tecnologia"],
       isHot: true,
       lastActivity: "2 horas atrás",
-      createdAt: "2024-03-16",
-      viewCount: 89,
+      created_at: "2024-03-16",
+      updated_at: "2024-03-16",
+      view_count: 89,
       upvotes: 15,
-      format: "question"
+      format: "question",
+      topic_id: "networking",
+      user_id: "user3",
+      community_id: "default"
     }
   ],
   "perguntas-da-semana": [
@@ -137,11 +172,15 @@ const DISCUSSION_DATA: Record<string, Discussion[]> = {
       tags: ["Psicologia", "Carreira", "Autoconfiança"],
       isHot: true,
       lastActivity: "3 horas atrás",
-      createdAt: "2024-03-13",
-      viewCount: 156,
+      created_at: "2024-03-13",
+      updated_at: "2024-03-13",
+      view_count: 156,
       upvotes: 32,
       isAnswered: true,
-      format: "question"
+      format: "question",
+      topic_id: "perguntas-da-semana",
+      user_id: "user4",
+      community_id: "default"
     }
   ]
 };
@@ -159,8 +198,11 @@ const DISCUSSION_REPLIES: Record<string, DiscussionReply[]> = {
         level: 7,
         xp: 1200
       },
-      createdAt: "2024-03-15 14:30",
+      created_at: "2024-03-15 14:30",
+      discussion_id: "101",
+      user_id: "user5",
       upvotes: 5,
+      is_answer: true,
       isAcceptedAnswer: true
     },
     {
@@ -173,8 +215,11 @@ const DISCUSSION_REPLIES: Record<string, DiscussionReply[]> = {
         level: 4,
         xp: 450
       },
-      createdAt: "2024-03-15 15:45",
-      upvotes: 3
+      created_at: "2024-03-15 15:45",
+      discussion_id: "101",
+      user_id: "user6",
+      upvotes: 3,
+      is_answer: false
     }
   ]
 };
@@ -245,14 +290,18 @@ export const useDiscussions = () => {
   }, [replies]);
 
   // Create a new discussion
-  const createDiscussion = useCallback((topicId: string, discussion: Omit<Discussion, 'id' | 'createdAt' | 'lastActivity' | 'replies' | 'participants'>) => {
+  const createDiscussion = useCallback((topicId: string, discussion: Omit<Discussion, 'id' | 'created_at' | 'updated_at' | 'replies' | 'participants'>) => {
     const newDiscussion: Discussion = {
       ...discussion,
       id: `discussion-${Date.now()}`,
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       lastActivity: 'agora mesmo',
       replies: 0,
-      participants: 1
+      participants: 1,
+      view_count: 0,
+      topic_id: topicId,
+      community_id: "default"
     };
 
     setDiscussions(prev => ({
@@ -283,12 +332,15 @@ export const useDiscussions = () => {
   }, [setDiscussions, setTopics, awardPoints]);
 
   // Add a reply to a discussion
-  const addReply = useCallback((discussionId: string, reply: Omit<DiscussionReply, 'id' | 'createdAt' | 'upvotes'>) => {
+  const addReply = useCallback((discussionId: string, reply: Omit<DiscussionReply, 'id' | 'created_at' | 'upvotes'>) => {
     const newReply: DiscussionReply = {
       ...reply,
       id: `reply-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      upvotes: 0
+      created_at: new Date().toISOString(),
+      discussion_id: discussionId,
+      user_id: reply.author?.id || 'anonymous',
+      upvotes: 0,
+      is_answer: false
     };
 
     setReplies(prev => ({
@@ -302,12 +354,13 @@ export const useDiscussions = () => {
         ...prev,
         [topicId]: prev[topicId].map(d => {
           if (d.id === discussionId) {
+            const currentReplies = typeof d.replies === 'number' ? d.replies : 0;
             const currentParticipants = prev[topicId].find(disc => disc.id === discussionId)?.participants || 0;
             const newParticipantsCount = currentParticipants + 1;
             
             return {
               ...d,
-              replies: d.replies + 1,
+              replies: currentReplies + 1,
               participants: newParticipantsCount,
               lastActivity: 'agora mesmo'
             };
@@ -327,8 +380,19 @@ export const useDiscussions = () => {
     return newReply;
   }, [setReplies, discussions, setDiscussions, awardPoints]);
 
+  // Fix for the error TS2365: Operator '+' cannot be applied to types 'number | DiscussionComment[]' and 'number'
+  const addToReplies = (current: number | DiscussionComment[] | undefined, amount: number): number => {
+    if (typeof current === 'number') {
+      return current + amount;
+    }
+    if (Array.isArray(current)) {
+      return current.length + amount;
+    }
+    return amount;
+  };
+
   // Create a new topic
-  const createTopic = useCallback((topic: Omit<DiscussionTopic, 'id' | 'discussionCount' | 'memberCount' | 'recentActivity' | 'createdAt'>) => {
+  const createTopic = useCallback((topic: Omit<DiscussionTopic, 'id' | 'discussionCount' | 'memberCount' | 'recentActivity' | 'createdAt' | 'slug'>>) => {
     const newTopic: DiscussionTopic = {
       ...topic,
       id: `topic-${Date.now()}`,
@@ -336,7 +400,9 @@ export const useDiscussions = () => {
       discussionCount: 0,
       memberCount: 1,
       recentActivity: 'agora mesmo',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      community_id: "default"
     };
 
     setTopics(prev => [...prev, newTopic]);

@@ -138,7 +138,9 @@ const DiscussionTopic = () => {
               </div>
               
               {canCreateDiscussion && (
-                <CreateDiscussionDialog topicId={topicId} topicName={topicData.name} />
+                <CreateDiscussionDialog 
+                  topic={topicData}
+                />
               )}
             </div>
             

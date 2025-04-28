@@ -77,7 +77,7 @@ const DiscussionDetail = () => {
     addReply(discussionId, {
       content: replyContent,
       author,
-      parentId: undefined
+      parent_id: undefined
     });
     
     toast({
@@ -218,11 +218,11 @@ const DiscussionDetail = () => {
                 <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-muted-foreground">
                   <span>Por {discussion.author.name}</span>
                   <span className="text-gray-400">•</span>
-                  <span>{discussion.createdAt}</span>
+                  <span>{discussion.created_at}</span>
                   <span className="text-gray-400">•</span>
                   <div className="flex items-center gap-1">
                     <Eye size={14} />
-                    <span>{discussion.viewCount || 0} visualizações</span>
+                    <span>{discussion.view_count || 0} visualizações</span>
                   </div>
                 </div>
               </div>
@@ -286,7 +286,7 @@ const DiscussionDetail = () => {
                 <ThumbsUp size={14} /> {discussion.upvotes || 0} {likedDiscussion && '(votado)'}
               </Button>
               <Button variant="ghost" size="sm" className="text-xs flex items-center gap-1">
-                <MessageSquare size={14} /> {discussion.replies} respostas
+                <MessageSquare size={14} /> {typeof discussion.replies === 'number' ? discussion.replies : 0} respostas
               </Button>
             </div>
             <Button variant="ghost" size="sm" onClick={handleShare} className="text-xs flex items-center gap-1">
