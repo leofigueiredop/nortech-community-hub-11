@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { supabaseConfig } from '../ApiClient';
 
@@ -9,19 +8,21 @@ export async function createSQLFunctions() {
   );
   
   // First, create the helper function to execute SQL
-  await supabase.rpc('exec_sql', {
-    sql_string: `
-      CREATE OR REPLACE FUNCTION exec_sql(sql_string TEXT)
-      RETURNS void AS $$
-      BEGIN
-        EXECUTE sql_string;
-      END;
-      $$ LANGUAGE plpgsql;
-    `
-  }).catch(e => {
+  try {
+    await supabase.rpc('exec_sql', {
+      sql_string: `
+        CREATE OR REPLACE FUNCTION exec_sql(sql_string TEXT)
+        RETURNS void AS $$
+        BEGIN
+          EXECUTE sql_string;
+        END;
+        $$ LANGUAGE plpgsql;
+      `
+    });
+  } catch (e) {
     console.log("Creating exec_sql function (may already exist):", e);
     // Continue execution even if this fails
-  });
+  }
   
   // Create function for content_items table
   await supabase.rpc('exec_sql', {
