@@ -36,6 +36,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
     onRSVP(event.id);
   };
 
+  // Convert the event.id to string for the EventAttendanceManager
+  const eventIdString = String(event.id);
+
   return (
     <>
       <Card 
@@ -92,7 +95,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
           <DialogHeader>
             <DialogTitle>Attendance Management - {event.title}</DialogTitle>
           </DialogHeader>
-          <EventAttendanceManager eventId={String(event.id)} eventTitle={event.title} />
+          <EventAttendanceManager eventId={eventIdString} eventTitle={event.title} />
         </DialogContent>
       </Dialog>
 

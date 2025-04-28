@@ -16,15 +16,20 @@ interface RewardCardProps {
 const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
   const { openRedeemDialog } = useRewardRedeem();
   
+  // Get the reward type
+  const rewardType = reward.type || reward.reward_type || 'free';
+  
   const getRewardTypeIcon = () => {
-    switch (reward.type) {
+    switch (rewardType) {
       case 'free':
+      case 'digital':
         return <Gift className="h-4 w-4" />;
       case 'downloadable':
         return <Download className="h-4 w-4" />;
       case 'access':
         return <Key className="h-4 w-4" />;
       case 'nft':
+      case 'experience':
         return <Award className="h-4 w-4" />;
       default:
         return <Tag className="h-4 w-4" />;
@@ -32,7 +37,7 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
   };
   
   const getRewardTypeLabel = () => {
-    switch (reward.type) {
+    switch (rewardType) {
       case 'free':
         return 'Free';
       case 'downloadable':
@@ -41,6 +46,10 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
         return 'Access';
       case 'nft':
         return 'NFT';
+      case 'digital':
+        return 'Digital';
+      case 'experience':
+        return 'Experience';
       default:
         return 'Other';
     }
@@ -59,15 +68,18 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
     }
   };
 
+  // Use either imageUrl or image_url
+  const imageUrl = reward.imageUrl || reward.image_url || '/placeholder.svg';
+
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow">
       <div 
         className="h-40 bg-cover bg-center" 
-        style={{ backgroundImage: `url(${reward.imageUrl || '/placeholder.svg'})` }}
+        style={{ backgroundImage: `url(${imageUrl})` }}
       />
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <h3 className="font-bold">{reward.title}</h3>
+          <h3 className="font-bold">{reward.title || reward.name}</h3>
           {getVisibilityLabel()}
         </div>
         <div className="flex items-center space-x-2 text-xs text-muted-foreground">
@@ -85,7 +97,7 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
             </Tooltip>
           </TooltipProvider>
           
-          {reward.expiresAt && (
+          {(reward.expiresAt || reward.expires_at) && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -95,7 +107,7 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Expires on {new Date(reward.expiresAt).toLocaleDateString()}</p>
+                  <p>Expires on {new Date(reward.expiresAt || reward.expires_at).toLocaleDateString()}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -107,7 +119,7 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
       </CardContent>
       <CardFooter className="border-t pt-4 flex justify-between items-center">
         <div className="font-bold text-purple-600 dark:text-purple-400">
-          {reward.pointsCost} Points
+          {reward.pointsCost || reward.points_cost} Points
         </div>
         <Button 
           onClick={() => openRedeemDialog(reward)}

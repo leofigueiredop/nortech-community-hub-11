@@ -71,7 +71,7 @@ export interface ContentSectionProps {
   title: string;
   items: ContentItem[];
   isTopTen?: boolean;
-  onItemSelect?: (item: ContentItem) => void;
+  onItemSelect?: (item: ContentItem) => void; // Added to fix property error
   viewAllUrl?: string;
   showNewBadge?: boolean;
   description?: string;

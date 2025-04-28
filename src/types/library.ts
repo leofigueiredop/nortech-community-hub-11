@@ -9,7 +9,7 @@ export interface ContentItem {
   title: string;
   description: string;
   content?: string;
-  format: string;
+  format: ContentFormat | string;
   url?: string;
   thumbnail?: string;
   thumbnailUrl?: string;
@@ -22,25 +22,26 @@ export interface ContentItem {
   category_id?: string;
   categoryId?: string;
   tags?: string[];
-  access_level: string;
+  access_level?: string;
   accessLevel?: string;
   is_featured?: boolean;
   featured?: boolean;
   views?: number;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
   createdAt?: string;
   updatedAt?: string;
   pointsEnabled?: boolean;
   pointsValue?: number;
   allowComments?: boolean;
-  community_id: string;
+  community_id?: string;
   isNew?: boolean;
   visibility?: string;
   completionCriteria?: string;
   completionThreshold?: number;
   resourceUrl?: string;
   fileSize?: number;
+  freeAccessesLeft?: number;
 }
 
 export interface ContentInteraction {

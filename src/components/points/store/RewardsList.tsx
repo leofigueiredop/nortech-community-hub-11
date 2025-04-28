@@ -14,11 +14,16 @@ const RewardsList: React.FC<RewardsListProps> = ({ searchQuery, categoryFilter, 
   
   // Filter rewards based on search query and type
   const filteredRewards = rewards.filter(reward => {
-    const matchesSearch = searchQuery === '' || 
-      reward.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      reward.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const rewardName = reward.title || reward.name || '';
+    const rewardDesc = reward.description || '';
     
-    const matchesCategory = categoryFilter === 'all' || reward.type === categoryFilter;
+    const matchesSearch = searchQuery === '' || 
+      rewardName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rewardDesc.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Get reward type from either type or reward_type property
+    const rewardType = reward.type || reward.reward_type || '';
+    const matchesCategory = categoryFilter === 'all' || rewardType === categoryFilter;
     
     return matchesSearch && matchesCategory;
   });
@@ -27,14 +32,20 @@ const RewardsList: React.FC<RewardsListProps> = ({ searchQuery, categoryFilter, 
   const sortedRewards = [...filteredRewards].sort((a, b) => {
     switch (sortBy) {
       case 'newest':
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        const aDate = new Date(a.createdAt || a.created_at).getTime();
+        const bDate = new Date(b.createdAt || b.created_at).getTime();
+        return bDate - aDate;
       case 'price-low':
-        return a.pointsCost - b.pointsCost;
+        const aCost = a.pointsCost || a.points_cost;
+        const bCost = b.pointsCost || b.points_cost;
+        return aCost - bCost;
       case 'price-high':
-        return b.pointsCost - a.pointsCost;
+        const aCostHigh = a.pointsCost || a.points_cost;
+        const bCostHigh = b.pointsCost || b.points_cost;
+        return bCostHigh - aCostHigh;
       case 'popular':
       default:
-        return b.redeemCount - a.redeemCount;
+        return (b.redeemCount || 0) - (a.redeemCount || 0);
     }
   });
 

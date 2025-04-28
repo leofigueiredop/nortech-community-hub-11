@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { ContentItem } from '@/types/content';
+import { ContentItem } from '@/types/library';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ContentSection from './ContentSection';
 import LibraryCategories from './LibraryCategories';
 import { motion } from 'framer-motion';
 import FeaturedContent from './FeaturedContent';
+import { adaptLibraryArrayToContentType } from '@/utils/contentTypeAdapter';
 
 interface LibraryContentProps {
   content: ContentItem[];
@@ -23,6 +24,15 @@ const LibraryContent: React.FC<LibraryContentProps> = ({
 
   // Get featured content (most viewed)
   const featuredContent = [topTenContent[0]].filter(Boolean);
+
+  // Create an adapter function to handle the onItemSelect with content type
+  const handleItemSelect = (item: any) => {
+    // Find the original item from the content array to maintain type consistency
+    const originalItem = content.find(c => c.id === item.id);
+    if (originalItem) {
+      onItemSelect(originalItem);
+    }
+  };
 
   return (
     <ScrollArea className="h-[calc(100vh-12rem)]">
@@ -43,9 +53,10 @@ const LibraryContent: React.FC<LibraryContentProps> = ({
           
           <ContentSection 
             title="" 
-            items={topTenContent} 
-            onItemSelect={onItemSelect}
+            items={adaptLibraryArrayToContentType(topTenContent)} 
+            onItemSelect={handleItemSelect}
             isTopTen={true}
+            layout="horizontal"
           />
         </div>
 

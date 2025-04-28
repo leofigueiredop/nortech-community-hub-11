@@ -31,8 +31,12 @@ const RedemptionHistory: React.FC = () => {
   }
 
   const getActionButton = (redemption: any) => {
-    switch (redemption.reward.type) {
+    // Get the type from either reward.type or reward.reward_type
+    const rewardType = redemption.reward?.type || redemption.reward?.reward_type || '';
+    
+    switch (rewardType) {
       case 'downloadable':
+      case 'digital':
         return (
           <Button size="sm" variant="outline" className="flex items-center">
             <Download className="h-4 w-4 mr-1" /> Download
@@ -40,6 +44,7 @@ const RedemptionHistory: React.FC = () => {
         );
       case 'access':
       case 'nft':
+      case 'experience':
         return (
           <Button size="sm" variant="outline" className="flex items-center">
             <ExternalLink className="h-4 w-4 mr-1" /> Access
@@ -53,10 +58,12 @@ const RedemptionHistory: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
+      case 'fulfilled':
         return <Badge variant="default" className="bg-green-500">Completed</Badge>;
       case 'pending':
         return <Badge variant="outline" className="border-amber-500 text-amber-500">Pending</Badge>;
       case 'failed':
+      case 'cancelled':
         return <Badge variant="destructive">Failed</Badge>;
       default:
         return <Badge variant="secondary">Processing</Badge>;
@@ -80,10 +87,10 @@ const RedemptionHistory: React.FC = () => {
             {redemptions.map((redemption) => (
               <TableRow key={redemption.id}>
                 <TableCell className="font-medium">
-                  {new Date(redemption.createdAt).toLocaleDateString()}
+                  {new Date(redemption.createdAt || redemption.redeemed_at).toLocaleDateString()}
                 </TableCell>
-                <TableCell>{redemption.reward.title}</TableCell>
-                <TableCell>{redemption.pointsSpent}</TableCell>
+                <TableCell>{redemption.reward?.title || redemption.reward?.name}</TableCell>
+                <TableCell>{redemption.pointsSpent || redemption.points_spent}</TableCell>
                 <TableCell>{getStatusBadge(redemption.status)}</TableCell>
                 <TableCell className="text-right">
                   {getActionButton(redemption)}

@@ -78,19 +78,24 @@ const CreateContentModal: React.FC<CreateContentModalProps> = ({ isOpen, onClose
       thumbnail: file ? `mock-file-path/${file.name}` : '',
       thumbnailUrl: previewImage || '/placeholder.svg',
       tags: selectedTags,
+      access_level: values.accessLevel === 'unlockable' ? 'premium' : values.accessLevel,
       accessLevel: values.accessLevel === 'unlockable' ? 'premium' : values.accessLevel,
+      created_at: now,
       createdAt: now,
+      updated_at: now,
       updatedAt: now,
       views: 0,
-      duration: 0, // Adding the required duration property
-      author: 'System User', // Adding the required author property
+      duration: 0, 
+      author: 'System User',
       featured: values.featured,
+      is_featured: values.featured,
       pointsEnabled: values.accessLevel === 'unlockable' || values.pointsEnabled,
       pointsValue: values.pointsValue,
       visibility: values.accessLevel,
       resourceUrl: file ? `mock-file-path/${file.name}` : '',
       completionCriteria: 'view',
       completionThreshold: 80,
+      community_id: 'default-community', // Add required property
     };
     
     // Add the content to the library

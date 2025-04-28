@@ -27,14 +27,19 @@ const RedeemDialog: React.FC<RedeemDialogProps> = ({ isOpen, onClose, reward, on
   
   if (!reward) return null;
   
-  const canAfford = totalPoints >= reward.pointsCost;
-  const isOutOfStock = reward.stock !== null && reward.stock <= 0;
+  // Use either pointsCost or points_cost from the reward
+  const rewardCost = reward.pointsCost || reward.points_cost;
+  const canAfford = totalPoints >= rewardCost;
+  
+  // Use either stock or quantity_available from the reward
+  const stockAvailable = reward.stock !== undefined ? reward.stock : reward.quantity_available;
+  const isOutOfStock = stockAvailable !== null && stockAvailable !== undefined && stockAvailable <= 0;
   
   const handleConfirm = () => {
     if (!canAfford) {
       toast({
         title: "Not enough points",
-        description: `You need ${reward.pointsCost - totalPoints} more points to redeem this reward.`,
+        description: `You need ${rewardCost - totalPoints} more points to redeem this reward.`,
         variant: "destructive",
       });
       return;
@@ -64,15 +69,15 @@ const RedeemDialog: React.FC<RedeemDialogProps> = ({ isOpen, onClose, reward, on
         
         <div className="py-4">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-medium">{reward.title}</h4>
-            <span className="font-bold text-purple-600 dark:text-purple-400">{reward.pointsCost} Points</span>
+            <h4 className="font-medium">{reward.title || reward.name}</h4>
+            <span className="font-bold text-purple-600 dark:text-purple-400">{rewardCost} Points</span>
           </div>
           
           <p className="text-sm text-muted-foreground mb-4">{reward.description}</p>
           
-          {reward.stock !== null && (
+          {stockAvailable !== null && stockAvailable !== undefined && (
             <div className="text-sm text-muted-foreground mt-2">
-              Stock: {reward.stock} remaining
+              Stock: {stockAvailable} remaining
             </div>
           )}
           
@@ -88,7 +93,7 @@ const RedeemDialog: React.FC<RedeemDialogProps> = ({ isOpen, onClose, reward, on
               </p>
               <p className="text-sm text-muted-foreground">
                 Your balance: {totalPoints} points
-                {!canAfford && ` (Need ${reward.pointsCost - totalPoints} more)`}
+                {!canAfford && ` (Need ${rewardCost - totalPoints} more)`}
               </p>
             </div>
           </div>
