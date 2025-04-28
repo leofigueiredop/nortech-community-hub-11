@@ -1,3 +1,4 @@
+
 import { IContentRepository } from '@/api/interfaces/IContentRepository';
 import { createClient } from '@/api/supabase';
 import { 
@@ -8,10 +9,16 @@ import {
   ContentComment,
   Course
 } from '@/types/library';
+import { IBaseRepository } from '../interfaces/IBaseRepository';
 
 // Class implementation
-class SupabaseContentRepository implements IContentRepository {
+export class SupabaseContentRepository implements IContentRepository, IBaseRepository {
   private supabase = createClient();
+  private communityId: string | null = null;
+  
+  setCommunityContext(communityId: string | null): void {
+    this.communityId = communityId;
+  }
 
   async getAll(): Promise<ContentItem[]> {
     try {
@@ -211,4 +218,6 @@ class SupabaseContentRepository implements IContentRepository {
   }
 }
 
-export default new SupabaseContentRepository();
+// Export an instance of the repository
+const supabaseContentRepository = new SupabaseContentRepository();
+export default supabaseContentRepository;
