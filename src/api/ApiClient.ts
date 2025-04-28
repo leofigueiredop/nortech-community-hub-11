@@ -1,4 +1,3 @@
-
 import { IAuthRepository } from './interfaces/IAuthRepository';
 import { IContentRepository } from './interfaces/IContentRepository';
 import { IEventsRepository } from './interfaces/IEventsRepository';
@@ -12,14 +11,10 @@ import { SupabaseDiscussionRepository } from './repositories/SupabaseDiscussionR
 import { SupabasePointsRepository } from './repositories/SupabasePointsRepository';
 import { SupabaseMigrationRepository } from './repositories/SupabaseMigrationRepository';
 
-// Default values for development
-const DEFAULT_SUPABASE_URL = "https://your-supabase-project.supabase.co";
-const DEFAULT_SUPABASE_ANON_KEY = "your-anon-key";
-
-// Export Supabase configuration to be used consistently across repositories
+// Supabase configuration
 export const supabaseConfig = {
-  url: import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL,
-  anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY
+  url: "https://theslnawxkmheczpiokc.supabase.co",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZXNsbmF3eGttaGVjenBpb2tjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU4MDY0ODEsImV4cCI6MjA2MTM4MjQ4MX0.s3zC4dJi9ZtRJMZ4vutJteXFP71FJoNR2NkFb-2V6nA"
 };
 
 export class ApiClient {
