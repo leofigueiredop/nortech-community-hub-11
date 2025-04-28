@@ -17,6 +17,7 @@ const Discussions = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('topics');
   const [activeFilters, setActiveFilters] = useState<DiscussionFilter[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   const { viewAs } = useViewContext();
   const { 
@@ -94,7 +95,12 @@ const Discussions = () => {
       <div className="mb-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Fóruns de Discussão</h1>
-          {canCreateTopic && <CreateTopicDialog />}
+          {canCreateTopic && (
+            <CreateTopicDialog 
+              isOpen={isDialogOpen}
+              onClose={() => setIsDialogOpen(false)}
+            />
+          )}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

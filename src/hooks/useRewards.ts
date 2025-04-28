@@ -14,7 +14,7 @@ const MOCK_REWARDS: Reward[] = [
     points_cost: 100,
     pointsCost: 100,
     type: 'free',
-    reward_type: 'free',
+    reward_type: 'digital', // Updated to match allowed type
     visibility: 'public',
     stock: null,
     quantity_available: null,
@@ -36,7 +36,7 @@ const MOCK_REWARDS: Reward[] = [
     points_cost: 500,
     pointsCost: 500,
     type: 'downloadable',
-    reward_type: 'downloadable',
+    reward_type: 'digital', // Updated to match allowed type
     visibility: 'public',
     stock: 10,
     quantity_available: 10,
@@ -58,7 +58,7 @@ const MOCK_REWARDS: Reward[] = [
     points_cost: 250,
     pointsCost: 250,
     type: 'access',
-    reward_type: 'access',
+    reward_type: 'digital', // Updated to match allowed type
     visibility: 'vip',
     stock: null,
     quantity_available: null,
@@ -80,7 +80,7 @@ const MOCK_REWARDS: Reward[] = [
     points_cost: 1000,
     pointsCost: 1000,
     type: 'nft',
-    reward_type: 'nft',
+    reward_type: 'digital', // Updated to match allowed type
     visibility: 'limited',
     stock: 5,
     quantity_available: 5,

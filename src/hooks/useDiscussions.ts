@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { usePoints } from '@/context/PointsContext';
 import { useContentProgress } from '@/hooks/useContentProgress';
@@ -204,7 +203,7 @@ const DISCUSSION_REPLIES: Record<string, DiscussionReply[]> = {
       discussion_id: "101",
       user_id: "user5",
       upvotes: 5,
-      is_answer: true,
+      is_solution: true,
       isAcceptedAnswer: true
     },
     {
@@ -221,7 +220,7 @@ const DISCUSSION_REPLIES: Record<string, DiscussionReply[]> = {
       discussion_id: "101",
       user_id: "user6",
       upvotes: 3,
-      is_answer: false
+      is_solution: false
     }
   ]
 };
@@ -342,7 +341,7 @@ export const useDiscussions = () => {
       discussion_id: discussionId,
       user_id: reply.author?.id || 'anonymous',
       upvotes: 0,
-      is_answer: false
+      is_solution: false
     };
 
     setReplies(prev => ({

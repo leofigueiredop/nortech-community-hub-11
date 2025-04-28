@@ -10,12 +10,13 @@ import CategoriesManagement from '@/components/library/management/CategoriesMana
 import { ContentItem } from '@/types/library';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { useToast } from '@/hooks/use-toast';
+import { adaptLibraryArrayToContentType } from '@/utils/contentTypeAdapter';
 
 const ContentManagement: React.FC = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<ContentItem | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const { content, categories, addContent, updateContent, deleteContent } = useLibraryContent();
+  const { content, categories, addContent, updateContent, deleteContent, addCategory, updateCategory, deleteCategory } = useLibraryContent();
   const { toast } = useToast();
 
   const handleSaveContent = (newContent: ContentItem) => {
@@ -48,6 +49,8 @@ const ContentManagement: React.FC = () => {
       description: "The content has been removed from your library."
     });
   };
+
+  const adaptedContent = adaptLibraryArrayToContentType(content);
 
   return (
     <MainLayout title="Content Management">
@@ -98,7 +101,12 @@ const ContentManagement: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="categories">
-            <CategoriesManagement />
+            <CategoriesManagement 
+              categories={categories}
+              onAddCategory={addCategory}
+              onUpdateCategory={updateCategory}
+              onDeleteCategory={deleteCategory}
+            />
           </TabsContent>
         </Tabs>
       </div>

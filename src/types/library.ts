@@ -1,4 +1,8 @@
-import { ContentFormat, ContentCategory as BaseContentCategory } from './content';
+
+import { ContentFormat as BaseContentFormat, ContentCategory as BaseContentCategory } from './content';
+
+// Re-export ContentFormat to avoid conflicts
+export type ContentFormat = BaseContentFormat;
 
 export interface ContentCategory extends BaseContentCategory {
   itemCount?: number;
@@ -28,6 +32,7 @@ export interface ContentItem {
   is_featured?: boolean;
   featured?: boolean;
   views?: number;
+  likes?: number;
   created_at?: string;
   updated_at?: string;
   createdAt?: string;
@@ -36,89 +41,9 @@ export interface ContentItem {
   pointsValue?: number;
   allowComments?: boolean;
   community_id?: string;
-  isNew?: boolean;
+  fileSize?: string;
+  resourceUrl?: string;
   visibility?: string;
   completionCriteria?: string;
   completionThreshold?: number;
-  resourceUrl?: string;
-  fileSize?: number;
-  freeAccessesLeft?: number;
-  isExclusive?: boolean;
 }
-
-export interface ContentInteraction {
-  id: string;
-  user_id: string;
-  content_id: string;
-  type: string;
-  percentage_complete?: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ContentComment {
-  id: string;
-  user_id: string;
-  content_id: string;
-  parent_id?: string;
-  message: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ContentProgress {
-  id: string;
-  userId: string;
-  contentId: string;
-  progress: number;
-  completed: boolean;
-  lastAccessedAt: string;
-  pointsAwarded: boolean;
-  progress_percent?: number;
-  completed_at?: string;
-  last_accessed_at?: string;
-  points_awarded?: boolean;
-  user_id?: string;
-  content_id?: string;
-}
-
-export interface CourseModule {
-  id: string;
-  title: string;
-  description?: string;
-  order?: number;
-  items: CourseModuleItem[];
-}
-
-export interface CourseModuleItem {
-  id: string;
-  title: string;
-  type: 'video' | 'document' | 'quiz' | 'exercise' | 'text' | 'assignment';
-  duration?: number;
-  completed?: boolean;
-  url?: string;
-  content?: string;
-  contentId?: string;
-}
-
-export interface Course extends ContentItem {
-  modules: CourseModule[];
-  totalDuration?: number;
-  progress?: number;
-  completedLessons?: number;
-  totalLessons?: number;
-}
-
-export type ContentFormat = 
-  | 'video'
-  | 'audio'
-  | 'pdf'
-  | 'document'
-  | 'course'
-  | 'image'
-  | 'text'
-  | 'link'
-  | 'youtube'
-  | 'vimeo'
-  | 'gdoc'
-  | string;

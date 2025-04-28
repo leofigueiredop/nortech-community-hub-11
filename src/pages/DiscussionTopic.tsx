@@ -20,6 +20,7 @@ const DiscussionTopic = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilters, setActiveFilters] = useState<DiscussionFilter[]>([]);
   const [activeTab, setActiveTab] = useState('all');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   const { viewAs } = useViewContext();
   const { 
@@ -140,6 +141,8 @@ const DiscussionTopic = () => {
               {canCreateDiscussion && (
                 <CreateDiscussionDialog 
                   topic={topicData}
+                  open={isDialogOpen} 
+                  onOpenChange={setIsDialogOpen}
                 />
               )}
             </div>
@@ -214,7 +217,7 @@ const DiscussionTopic = () => {
               <div className="text-sm text-muted-foreground space-y-2">
                 <p><strong>Membros:</strong> {topicData.memberCount}</p>
                 <p><strong>Discussões:</strong> {topicData.discussionCount}</p>
-                <p><strong>Criado em:</strong> {new Date(topicData.createdAt).toLocaleDateString('pt-BR')}</p>
+                <p><strong>Criado em:</strong> {new Date(topicData.createdAt || topicData.created_at).toLocaleDateString('pt-BR')}</p>
                 <p><strong>Atividade recente:</strong> {topicData.recentActivity}</p>
               </div>
               

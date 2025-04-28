@@ -1,16 +1,44 @@
 
-import { Community, CommunitySettings, CommunityMember } from '@/types/community';
+// Define and export the Community interface so it can be used elsewhere
+export interface Community {
+  id: string;
+  name: string;
+  description?: string;
+  slug: string;
+  owner_id: string;
+  created_at: string;
+  updated_at: string;
+  logo_url?: string;
+  banner_url?: string;
+  is_private: boolean;
+  access_code?: string;
+  domain?: string;
+  custom_domain?: string;
+  status: 'active' | 'inactive' | 'pending';
+  theme?: {
+    primary_color?: string;
+    secondary_color?: string;
+    accent_color?: string;
+    logo_position?: 'left' | 'center';
+    font_family?: string;
+  };
+  settings?: Record<string, any>;
+  analytics?: {
+    member_count?: number;
+    activity_score?: number;
+    engagement_rate?: number;
+  };
+  features?: string[];
+}
 
 export interface ICommunityRepository {
-  getCommunityById(id: string): Promise<Community>;
-  getCommunityByDomain(domain: string): Promise<Community | null>;
-  createCommunity(community: Partial<Community>): Promise<Community>;
-  updateCommunity(id: string, community: Partial<Community>): Promise<Community>;
-  getSettings(type: string): Promise<CommunitySettings>;
-  updateSettings(type: string, settings: any): Promise<CommunitySettings>;
-  getMemberById(userId: string): Promise<CommunityMember | null>;
-  addMember(member: Partial<CommunityMember>): Promise<CommunityMember>;
-  updateMember(userId: string, member: Partial<CommunityMember>): Promise<CommunityMember>;
-  removeMember(userId: string): Promise<void>;
-  getAllMembers(page?: number, limit?: number): Promise<{ members: CommunityMember[], total: number }>;
+  getCommunity(id: string): Promise<Community>;
+  getCommunityBySlug(slug: string): Promise<Community>;
+  createCommunity(data: Partial<Community>): Promise<Community>;
+  updateCommunity(id: string, data: Partial<Community>): Promise<Community>;
+  deleteCommunity(id: string): Promise<void>;
+  listCommunities(userId?: string): Promise<Community[]>;
+  joinCommunity(communityId: string, userId: string): Promise<void>;
+  leaveCommunity(communityId: string, userId: string): Promise<void>;
+  isMember(communityId: string, userId: string): Promise<boolean>;
 }

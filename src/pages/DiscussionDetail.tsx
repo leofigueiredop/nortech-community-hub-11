@@ -77,7 +77,9 @@ const DiscussionDetail = () => {
     addReply(discussionId, {
       content: replyContent,
       author,
-      parent_id: undefined
+      parent_id: undefined,
+      user_id: 'current-user',
+      discussion_id: discussionId
     });
     
     toast({
@@ -189,7 +191,7 @@ const DiscussionDetail = () => {
   }
 
   // Determine if current user is the author (in real app, compare with user ID)
-  const isAuthor = discussion.author.id === 'current-user';
+  const isAuthor = discussion.author?.id === 'current-user';
   
   // Determine if current user can mark answers as accepted
   const canAcceptAnswer = isAuthor || viewAs === 'admin' || viewAs === 'moderator';
@@ -216,7 +218,7 @@ const DiscussionDetail = () => {
               <div>
                 <h1 className="text-xl font-bold">{discussion.title}</h1>
                 <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-muted-foreground">
-                  <span>Por {discussion.author.name}</span>
+                  <span>Por {discussion.author?.name}</span>
                   <span className="text-gray-400">•</span>
                   <span>{discussion.created_at}</span>
                   <span className="text-gray-400">•</span>
@@ -259,8 +261,8 @@ const DiscussionDetail = () => {
             <div className="flex items-start space-x-4 mt-2">
               <div className="hidden sm:block">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={discussion.author.avatar} alt={discussion.author.name} />
-                  <AvatarFallback>{discussion.author.name[0]}</AvatarFallback>
+                  <AvatarImage src={discussion.author?.avatar} alt={discussion.author?.name} />
+                  <AvatarFallback>{discussion.author?.name?.[0]}</AvatarFallback>
                 </Avatar>
               </div>
               <div className="flex-1">
@@ -286,7 +288,7 @@ const DiscussionDetail = () => {
                 <ThumbsUp size={14} /> {discussion.upvotes || 0} {likedDiscussion && '(votado)'}
               </Button>
               <Button variant="ghost" size="sm" className="text-xs flex items-center gap-1">
-                <MessageSquare size={14} /> {typeof discussion.replies === 'number' ? discussion.replies : 0} respostas
+                <MessageSquare size={14} /> {typeof discussion.replies === 'number' ? discussion.replies : (Array.isArray(discussion.replies) ? discussion.replies.length : 0)} respostas
               </Button>
             </div>
             <Button variant="ghost" size="sm" onClick={handleShare} className="text-xs flex items-center gap-1">
@@ -307,13 +309,13 @@ const DiscussionDetail = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <Avatar>
-                          <AvatarImage src={reply.author.avatar} alt={reply.author.name} />
-                          <AvatarFallback>{reply.author.name[0]}</AvatarFallback>
+                          <AvatarImage src={reply.author?.avatar} alt={reply.author?.name} />
+                          <AvatarFallback>{reply.author?.name?.[0]}</AvatarFallback>
                         </Avatar>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-medium">{reply.author.name}</span>
-                            {reply.author.level && (
+                            <span className="font-medium">{reply.author?.name}</span>
+                            {reply.author?.level && (
                               <Badge variant="outline" className="text-xs h-5 px-1.5">
                                 Nível {reply.author.level}
                               </Badge>
@@ -326,7 +328,7 @@ const DiscussionDetail = () => {
                             )}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {reply.createdAt}
+                            {reply.createdAt || reply.created_at}
                           </div>
                         </div>
                       </div>
@@ -355,7 +357,7 @@ const DiscussionDetail = () => {
                     <div className="prose prose-sm dark:prose-invert max-w-none">
                       <p className="whitespace-pre-line">{reply.content}</p>
                     </div>
-                    {reply.author.xp !== undefined && (
+                    {reply.author?.xp !== undefined && (
                       <div className="flex items-center gap-2 mt-3">
                         <span className="text-xs text-amber-500 flex items-center">
                           <Star size={12} className="mr-0.5" />

@@ -17,7 +17,7 @@ export interface Reward {
   expires_at?: string;
   expiresAt?: string; // Added for UI components
   redemption_instructions?: string;
-  reward_type?: 'physical' | 'digital' | 'experience';
+  reward_type?: 'physical' | 'digital' | 'experience' | string; // Modified to allow string values from legacy code
   type?: string; // Added for UI components 
   visibility?: string; // Added for UI components
   redeemCount?: number; // Added for UI components

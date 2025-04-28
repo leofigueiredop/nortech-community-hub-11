@@ -33,7 +33,7 @@ export function adaptLibraryToContentType(item: ContentLibraryItem): ContentType
     community_id: item.community_id || 'default-community',
     created_at: item.created_at || item.createdAt || new Date().toISOString(),
     updated_at: item.updated_at || item.updatedAt || new Date().toISOString(),
-    author_id: item.author_id,
+    author_id: typeof item.author === 'object' && item.author ? item.author.id : undefined,
     is_featured: item.is_featured || item.featured || false,
     views: item.views || 0,
     likes: item.likes || 0,

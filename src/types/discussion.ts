@@ -100,6 +100,7 @@ export interface DiscussionReply {
   content: string;
   parent_id?: string;
   is_solution?: boolean;
+  is_answer?: boolean; // Add this property to match the code
   upvotes: number;
   created_at: string;
   createdAt?: string; // Adding for UI compatibility
