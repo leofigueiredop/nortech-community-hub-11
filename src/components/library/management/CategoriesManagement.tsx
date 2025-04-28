@@ -1,255 +1,236 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { ContentCategory } from '@/types/content';
-import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import { Edit, Trash2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Edit, Trash, Plus, Folder } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 
-const CategoriesManagement: React.FC = () => {
-  const { 
-    categories, 
-    createCategory, 
-    updateCategory, 
-    deleteCategory,
-    content 
-  } = useLibraryContent();
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [newCategoryDescription, setNewCategoryDescription] = useState('');
-  const [editCategoryId, setEditCategoryId] = useState<string | null>(null);
-  const [editCategoryName, setEditCategoryName] = useState('');
-  const [editCategoryDescription, setEditCategoryDescription] = useState('');
+interface CategoriesManagementProps {
+  categories: ContentCategory[];
+  onAddCategory: (category: ContentCategory) => void;
+  onUpdateCategory: (category: ContentCategory) => void;
+  onDeleteCategory: (id: string) => void;
+}
+
+const CategoriesManagement: React.FC<CategoriesManagementProps> = ({
+  categories,
+  onAddCategory,
+  onUpdateCategory,
+  onDeleteCategory
+}) => {
+  const [showDialog, setShowDialog] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+  const [currentCategory, setCurrentCategory] = useState<ContentCategory | null>(null);
+  const [nameInput, setNameInput] = useState('');
+  const [descriptionInput, setDescriptionInput] = useState('');
+  const [slugInput, setSlugInput] = useState('');
+  const [parentId, setParentId] = useState<string | undefined>(undefined);
+  const [iconInput, setIconInput] = useState('');
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (editCategoryId) {
-      const categoryToEdit = categories.find(cat => cat.id === editCategoryId);
-      if (categoryToEdit) {
-        setEditCategoryName(categoryToEdit.name);
-        setEditCategoryDescription(categoryToEdit.description || '');
-      }
-    }
-  }, [editCategoryId, categories]);
-
-  const handleCreateCategory = async () => {
-    if (newCategoryName.trim() === '') {
-      toast({
-        title: "Error",
-        description: "Category name cannot be empty.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const newCategory: Omit<ContentCategory, 'id' | 'created_at' | 'updated_at'> = {
-      name: newCategoryName,
-      description: newCategoryDescription,
-      slug: newCategoryName.toLowerCase().replace(/\s+/g, '-'),
-    };
-
-    await createCategory(newCategory);
-    setNewCategoryName('');
-    setNewCategoryDescription('');
-    toast({
-      title: "Success",
-      description: "Category created successfully.",
-    });
+  const openAddDialog = () => {
+    setDialogMode('add');
+    setNameInput('');
+    setDescriptionInput('');
+    setSlugInput('');
+    setParentId(undefined);
+    setIconInput('');
+    setShowDialog(true);
   };
 
-  const handleUpdateCategory = async () => {
-    if (!editCategoryId) return;
-
-    if (editCategoryName.trim() === '') {
-      toast({
-        title: "Error",
-        description: "Category name cannot be empty.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const updatedCategory: Partial<ContentCategory> = {
-      id: editCategoryId,
-      name: editCategoryName,
-      description: editCategoryDescription,
-      slug: editCategoryName.toLowerCase().replace(/\s+/g, '-'),
-    };
-
-    await updateCategory(editCategoryId, updatedCategory);
-    setEditCategoryId(null);
-    setEditCategoryName('');
-    setEditCategoryDescription('');
-    toast({
-      title: "Success",
-      description: "Category updated successfully.",
-    });
+  const openEditDialog = (category: ContentCategory) => {
+    setDialogMode('edit');
+    setCurrentCategory(category);
+    setNameInput(category.name);
+    setDescriptionInput(category.description || '');
+    setSlugInput(category.slug);
+    setParentId(category.parent_id);
+    setIconInput(category.icon || '');
+    setShowDialog(true);
   };
 
-  const handleDeleteCategory = async (id: string) => {
-    const categoryToDelete = categories.find(cat => cat.id === id);
-    if (!categoryToDelete) return;
-
-    // Check if any content items are associated with this category
-    const itemCount = content.filter(item => item.categoryId === id).length;
-
-    if (itemCount > 0) {
+  const handleSave = () => {
+    if (!nameInput || !slugInput) {
       toast({
-        title: "Error",
-        description: `Cannot delete category. ${itemCount} content items are associated with it.`,
+        title: "Required fields missing",
+        description: "Name and slug are required fields.",
         variant: "destructive"
       });
       return;
     }
 
-    await deleteCategory(id);
-    toast({
-      title: "Success",
-      description: "Category deleted successfully.",
-    });
+    const categoryData: ContentCategory = {
+      id: dialogMode === 'add' ? `cat-${Date.now()}` : currentCategory!.id,
+      name: nameInput,
+      description: descriptionInput || undefined,
+      slug: slugInput,
+      parent_id: parentId,
+      icon: iconInput || undefined,
+      created_at: dialogMode === 'add' ? new Date().toISOString() : currentCategory!.created_at,
+      updated_at: new Date().toISOString(),
+      itemCount: dialogMode === 'edit' ? (currentCategory?.itemCount || 0) : 0
+    };
+
+    if (dialogMode === 'add') {
+      onAddCategory(categoryData);
+      toast({
+        title: "Category created",
+        description: `Category "${nameInput}" has been created successfully.`
+      });
+    } else {
+      onUpdateCategory(categoryData);
+      toast({
+        title: "Category updated",
+        description: `Category "${nameInput}" has been updated successfully.`
+      });
+    }
+
+    setShowDialog(false);
+  };
+
+  const handleDelete = (id: string, name: string) => {
+    if (confirm(`Are you sure you want to delete category "${name}"? This cannot be undone.`)) {
+      onDeleteCategory(id);
+      toast({
+        title: "Category deleted",
+        description: `Category "${name}" has been deleted.`
+      });
+    }
   };
 
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold tracking-tight">Manage Categories</h2>
-        <p className="text-muted-foreground">
-          Create, edit, and delete content categories.
-        </p>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Categories Management</h2>
+        <Button onClick={openAddDialog} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          <span>Add Category</span>
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h3 className="text-xl font-medium mb-4">Create New Category</h3>
-          <div className="space-y-3">
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                placeholder="Category name"
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Input
-                id="description"
-                placeholder="Category description"
-                value={newCategoryDescription}
-                onChange={(e) => setNewCategoryDescription(e.target.value)}
-              />
-            </div>
-            <Button onClick={handleCreateCategory}>Create Category</Button>
+      <div className="border rounded-md">
+        {categories.length === 0 ? (
+          <div className="p-8 text-center">
+            <Folder className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+            <h3 className="text-lg font-medium mb-1">No categories yet</h3>
+            <p className="text-sm text-gray-500 mb-4">Create your first category to organize content</p>
+            <Button onClick={openAddDialog} variant="outline">Add Category</Button>
           </div>
-        </div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-muted/50">
+              <tr className="border-b">
+                <th className="text-left px-4 py-3 font-medium">Name</th>
+                <th className="text-left px-4 py-3 font-medium">Slug</th>
+                <th className="text-left px-4 py-3 font-medium">Parent</th>
+                <th className="text-center px-4 py-3 font-medium">Content Items</th>
+                <th className="text-right px-4 py-3 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map(category => (
+                <tr key={category.id} className="border-b">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      {category.icon && <span>{category.icon}</span>}
+                      <span>{category.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-gray-500">{category.slug}</td>
+                  <td className="px-4 py-3 text-gray-500">
+                    {category.parent_id ? categories.find(c => c.id === category.parent_id)?.name : '-'}
+                  </td>
+                  <td className="px-4 py-3 text-center">{category.itemCount || 0}</td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex gap-2 justify-end">
+                      <Button variant="ghost" size="sm" onClick={() => openEditDialog(category)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(category.id, category.name)}>
+                        <Trash className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
-        <div>
-          <h3 className="text-xl font-medium mb-4">Edit Category</h3>
-          {editCategoryId ? (
-            <div className="space-y-3">
-              <div>
-                <Label htmlFor="edit-name">Name</Label>
-                <Input
-                  id="edit-name"
-                  placeholder="Category name"
-                  value={editCategoryName}
-                  onChange={(e) => setEditCategoryName(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-description">Description</Label>
-                <Input
-                  id="edit-description"
-                  placeholder="Category description"
-                  value={editCategoryDescription}
-                  onChange={(e) => setEditCategoryDescription(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={handleUpdateCategory}>Update Category</Button>
-                <Button variant="secondary" onClick={() => setEditCategoryId(null)}>
-                  Cancel
-                </Button>
-              </div>
+      {/* Add/Edit Category Dialog */}
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{dialogMode === 'add' ? 'Add New Category' : 'Edit Category'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name *</Label>
+              <Input 
+                id="name" 
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                placeholder="e.g., Programming Tutorials"
+              />
             </div>
-          ) : (
-            <p className="text-muted-foreground">Select a category to edit.</p>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-8">
-        <h3 className="text-xl font-medium mb-4">Categories List</h3>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[200px]">Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {categories.map((category) => {
-                const itemCount = content.filter(item => item.categoryId === category.id).length;
-                return (
-                  <TableRow key={category.id}>
-                    <TableCell className="font-medium">{category.name}</TableCell>
-                    <TableCell>{category.description}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setEditCategoryId(category.id)}
-                        >
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteCategory(category.id)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              {categories.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-center">
-                    No categories created yet.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="slug">Slug *</Label>
+              <Input 
+                id="slug" 
+                value={slugInput}
+                onChange={(e) => setSlugInput(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                placeholder="e.g., programming-tutorials"
+              />
+              <p className="text-sm text-muted-foreground">Used in URLs, automatically generated from name</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Input 
+                id="description" 
+                value={descriptionInput}
+                onChange={(e) => setDescriptionInput(e.target.value)}
+                placeholder="Brief description of this category"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="parent">Parent Category</Label>
+              <select 
+                id="parent"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                value={parentId || ''}
+                onChange={(e) => setParentId(e.target.value === '' ? undefined : e.target.value)}
+              >
+                <option value="">None (Top Level)</option>
+                {categories
+                  .filter(cat => cat.id !== (currentCategory?.id || ''))
+                  .map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))
+                }
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="icon">Icon (emoji)</Label>
+              <Input 
+                id="icon" 
+                value={iconInput}
+                onChange={(e) => setIconInput(e.target.value)}
+                placeholder="e.g., 💻"
+              />
+              <p className="text-sm text-muted-foreground">Use a single emoji as an icon</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDialog(false)}>Cancel</Button>
+            <Button onClick={handleSave}>{dialogMode === 'add' ? 'Create Category' : 'Update Category'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

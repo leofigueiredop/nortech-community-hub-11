@@ -101,7 +101,7 @@ function getEventStatus(event: EventType): 'upcoming' | 'live' | 'ended' | 'happ
   
   // Check if status is already one of the valid types
   if (typeof event.status === 'string' && 
-      ['upcoming', 'live', 'happening_soon', 'in_progress', 'ended'].includes(event.status as string)) {
+      ['upcoming', 'live', 'ended', 'happening_soon', 'in_progress'].includes(event.status as string)) {
     return event.status as 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress';
   }
   

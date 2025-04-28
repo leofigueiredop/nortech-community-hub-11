@@ -155,7 +155,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
           
           {showAuthor && (
             <div className="flex items-center gap-2">
-              {item.author && typeof item.author !== 'string' && typeof item.author === 'object' ? (
+              {item.author && typeof item.author === 'object' && item.author !== null ? (
                 <>
                   <div className="w-6 h-6 rounded-full overflow-hidden bg-muted">
                     {item.author.avatar && (

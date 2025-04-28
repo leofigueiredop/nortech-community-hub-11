@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ContentItem } from '@/types/library';
+import { ContentItem } from '@/types/content';
 import ContentSection from './ContentSection';
 
 interface ContentRowProps {

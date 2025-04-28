@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { ContentItem } from '@/types/library';
+import { ContentItem } from '@/types/content';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -43,7 +44,7 @@ const FeaturedContent: React.FC<FeaturedContentProps> = ({ items, onItemSelect }
               <Badge className="bg-nortech-purple/80 hover:bg-nortech-purple">
                 <FileVideo size={14} className="mr-1" /> Featured
               </Badge>
-              {featured.accessLevel === 'premium' && (
+              {featured.access_level === 'premium' && (
                 <Badge variant="outline" className="ml-2 border-amber-500 text-amber-500">
                   <Lock size={12} className="mr-1" /> Premium
                 </Badge>
@@ -54,7 +55,7 @@ const FeaturedContent: React.FC<FeaturedContentProps> = ({ items, onItemSelect }
             <p className="text-gray-300 text-sm line-clamp-2">{featured.description}</p>
             
             <div className="flex flex-wrap gap-2 mb-2">
-              {featured.tags.map(tag => (
+              {featured.tags && featured.tags.map(tag => (
                 <Badge key={tag} variant="secondary" className="bg-white/10 hover:bg-white/20 text-white text-xs">
                   {tag}
                 </Badge>

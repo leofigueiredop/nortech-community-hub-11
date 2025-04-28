@@ -23,7 +23,7 @@ export interface ContentItem {
   views?: number;
   likes?: number;
   duration?: number;
-  access_level?: 'free' | 'premium' | 'premium_plus';
+  access_level: 'free' | 'premium' | 'premium_plus';
   category_id?: string;
   tags?: string[];
   
@@ -49,6 +49,7 @@ export interface ContentItem {
   featured?: boolean;
   createdAt?: string; // Alias for created_at
   updatedAt?: string; // Alias for updated_at
+  allowComments?: boolean;
 }
 
 /**

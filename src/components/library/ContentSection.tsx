@@ -104,7 +104,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
                   </Badge>
                 ) : null}
                 
-                {/* Only use isNew if showNewBadge is true */}
+                {/* Only use isNew if showNewBadge is true and item has isNew property */}
                 {showNewBadge && item.isNew && (
                   <Badge className="bg-blue-500">New</Badge>
                 )}
@@ -140,9 +140,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
               </div>
 
               <div className="flex gap-1 ml-auto items-center">
-                {item.author && typeof item.author === 'string' ? (
-                  <span>{item.author}</span>
-                ) : item.author && typeof item.author === 'object' ? (
+                {item.author && typeof item.author === 'object' && item.author !== null ? (
                   <div className="flex items-center gap-1">
                     <Avatar className="w-4 h-4">
                       <AvatarImage src={item.author.avatar} />
@@ -152,6 +150,8 @@ const ContentSection: React.FC<ContentSectionProps> = ({
                     </Avatar>
                     <span className="truncate max-w-[100px]">{item.author.name || 'Unknown'}</span>
                   </div>
+                ) : item.author && typeof item.author === 'string' ? (
+                  <span>{item.author}</span>
                 ) : (
                   <span>Anonymous</span>
                 )}

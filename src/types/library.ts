@@ -1,19 +1,13 @@
-export interface ContentCategory {
-  id: string;
-  name: string;
-  description?: string;
-  slug: string;
-  parent_id?: string;
-  icon?: string;
-  created_at: string;
-  updated_at: string;
+import { ContentFormat, ContentCategory as BaseContentCategory } from './content';
+
+export interface ContentCategory extends BaseContentCategory {
   itemCount?: number;
 }
 
 export interface ContentItem {
   id: string;
   title: string;
-  description?: string;
+  description: string;
   content?: string;
   format: string;
   url?: string;
@@ -40,7 +34,7 @@ export interface ContentItem {
   pointsEnabled?: boolean;
   pointsValue?: number;
   allowComments?: boolean;
-  community_id?: string;
+  community_id: string;
   isNew?: boolean;
   visibility?: string;
   completionCriteria?: string;
@@ -119,4 +113,7 @@ export type ContentFormat =
   | 'course'
   | 'image'
   | 'text'
-  | 'link';
+  | 'link'
+  | 'youtube'
+  | 'vimeo'
+  | 'gdoc';

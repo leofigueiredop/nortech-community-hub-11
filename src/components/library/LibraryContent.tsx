@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ContentItem } from '@/types/library';
+import { ContentItem } from '@/types/content';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ContentSection from './ContentSection';
 import LibraryCategories from './LibraryCategories';
@@ -18,7 +18,7 @@ const LibraryContent: React.FC<LibraryContentProps> = ({
 }) => {
   // Get top 10 content by views
   const topTenContent = [...content]
-    .sort((a, b) => b.views - a.views)
+    .sort((a, b) => (b.views || 0) - (a.views || 0))
     .slice(0, 10);
 
   // Get featured content (most viewed)
@@ -46,7 +46,6 @@ const LibraryContent: React.FC<LibraryContentProps> = ({
             items={topTenContent} 
             onItemSelect={onItemSelect}
             isTopTen={true}
-            layout="carousel"
           />
         </div>
 

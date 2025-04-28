@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ContentItem, ContentCategory } from '@/types/library';
+import { ContentItem, ContentCategory } from '@/types/content';
 import ContentListView from './list/ContentListView';
 import ContentGridView from './grid/ContentGridView';
 import { DeleteConfirmation, CloneConfirmation } from './dialogs/ConfirmationDialogs';
@@ -22,7 +22,7 @@ const ContentList: React.FC<ContentListProps> = ({
   onDelete, 
   categories 
 }) => {
-  const [sortBy, setSortBy] = useState<string>('updatedAt');
+  const [sortBy, setSortBy] = useState<string>('updated_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [cloneId, setCloneId] = useState<string | null>(null);
@@ -34,13 +34,13 @@ const ContentList: React.FC<ContentListProps> = ({
     if (sortBy === 'title') {
       comparison = a.title.localeCompare(b.title);
     } else if (sortBy === 'format') {
-      comparison = a.format.localeCompare(b.format);
-    } else if (sortBy === 'accessLevel') {
-      comparison = a.accessLevel.localeCompare(b.accessLevel);
-    } else if (sortBy === 'updatedAt') {
-      comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+      comparison = String(a.format).localeCompare(String(b.format));
+    } else if (sortBy === 'access_level') {
+      comparison = String(a.access_level).localeCompare(String(b.access_level));
+    } else if (sortBy === 'updated_at') {
+      comparison = new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
     } else if (sortBy === 'views') {
-      comparison = a.views - b.views;
+      comparison = (a.views || 0) - (b.views || 0);
     }
     
     return sortOrder === 'asc' ? comparison : -comparison;
@@ -75,13 +75,13 @@ const ContentList: React.FC<ContentListProps> = ({
     if (cloneId) {
       const original = items.find(item => item.id === cloneId);
       if (original) {
-        const clone = {
+        const clone: ContentItem = {
           ...original,
           id: `clone-${cloneId}`,
           title: `Copy of ${original.title}`,
           views: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         };
         onEdit(clone);
         toast({
