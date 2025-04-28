@@ -1,38 +1,60 @@
 
 import React from 'react';
-import { Film, FileText, Link, Music, Image, FileBox, BookOpen, File } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { File, FileText, Video, FileQuestion, Code } from 'lucide-react';
 
 interface ContentFormatIconProps {
-  format: string;
-  size?: number;
-  className?: string;
+  format?: string;
 }
 
-export const ContentFormatIcon: React.FC<ContentFormatIconProps> = ({ 
-  format, 
-  size = 16, 
-  className = '' 
-}) => {
-  switch (format) {
+export const ContentFormatIcon: React.FC<ContentFormatIconProps> = ({ format }) => {
+  if (!format) return null;
+  
+  switch (format.toLowerCase()) {
     case 'video':
-    case 'youtube':
-    case 'vimeo':
-      return <Film size={size} className={className} />;
+      return (
+        <Badge variant="outline" className="bg-blue-100 text-blue-800 border-0">
+          <Video className="w-3 h-3 mr-1" />
+          Video
+        </Badge>
+      );
+    case 'document':
     case 'pdf':
+      return (
+        <Badge variant="outline" className="bg-red-100 text-red-800 border-0">
+          <File className="w-3 h-3 mr-1" />
+          Document
+        </Badge>
+      );
     case 'text':
-      return <FileText size={size} className={className} />;
-    case 'link':
-    case 'url':
-      return <Link size={size} className={className} />;
-    case 'audio':
-      return <Music size={size} className={className} />;
-    case 'image':
-      return <Image size={size} className={className} />;
-    case 'gdoc':
-      return <FileBox size={size} className={className} />;
-    case 'course':
-      return <BookOpen size={size} className={className} />;
+    case 'article':
+      return (
+        <Badge variant="outline" className="bg-green-100 text-green-800 border-0">
+          <FileText className="w-3 h-3 mr-1" />
+          Article
+        </Badge>
+      );
+    case 'quiz':
+    case 'assessment':
+      return (
+        <Badge variant="outline" className="bg-purple-100 text-purple-800 border-0">
+          <FileQuestion className="w-3 h-3 mr-1" />
+          Quiz
+        </Badge>
+      );
+    case 'code':
+    case 'exercise':
+      return (
+        <Badge variant="outline" className="bg-amber-100 text-amber-800 border-0">
+          <Code className="w-3 h-3 mr-1" />
+          Exercise
+        </Badge>
+      );
     default:
-      return <File size={size} className={className} />;
+      return (
+        <Badge variant="outline" className="bg-gray-100 text-gray-800 border-0">
+          {format}
+        </Badge>
+      );
   }
 };

@@ -11,13 +11,16 @@ import { useNotifications } from '@/context/NotificationsContext';
 import EventsList from '@/components/events/EventsList';
 import EventGrid from '@/components/events/EventGrid';
 import { mockEvents } from '@/components/events/data/EventsMockData';
-import { EventType } from '@/components/events/types/EventTypes';
+import { Event as ComponentEvent } from '@/components/events/types/EventTypes';
 import EventConfirmDialog from '@/components/events/EventConfirmDialog';
+import { adaptEventForComponent } from '@/components/events/utils/EventTypeAdapter';
 
 const Events = () => {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
-  const [allEvents, setAllEvents] = useState(mockEvents);
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  
+  // Use the adapted events for components
+  const [allEvents, setAllEvents] = useState<ComponentEvent[]>(mockEvents);
+  const [filteredEvents, setFilteredEvents] = useState<ComponentEvent[]>(mockEvents);
   const [confirmEvent, setConfirmEvent] = useState<number | null>(null);
   const [selectedPremiumFilter, setSelectedPremiumFilter] = useState<'all' | 'premium' | 'free'>('all');
   

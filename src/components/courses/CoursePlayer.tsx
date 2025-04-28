@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Settings } from 'lucide-react';
 import { ContentItem, CourseModuleItem } from '@/types/library';
@@ -30,7 +29,6 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
   const [hasAccess, setHasAccess] = useState(true);
   const { user } = useAuth();
   
-  // Check if user has access to this content
   useEffect(() => {
     if (course.accessLevel === 'premium' && user?.accessLevel !== 'premium') {
       setHasAccess(false);
@@ -39,7 +37,6 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
     }
   }, [course, user]);
   
-  // Handle video events
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -128,12 +125,10 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
   };
   
   const handleSubscribe = () => {
-    // Implement subscription logic
     console.log('Subscribe clicked');
   };
   
   const handleUsePoints = () => {
-    // Implement points usage logic
     console.log('Use points clicked');
     setHasAccess(true);
   };
@@ -147,7 +142,6 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
       );
     }
     
-    // If premium content and no access
     if (!hasAccess) {
       return (
         <div className="relative w-full h-[400px] bg-slate-800">
@@ -157,9 +151,9 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
             className="w-full h-full object-cover opacity-40"
           />
           <PremiumContentOverlay 
-            pointsEnabled={course.pointsEnabled}
-            pointsValue={course.pointsValue}
-            freeAccessLeft={course.freeAccessesLeft}
+            pointsEnabled={!!course.pointsEnabled}
+            pointsValue={course.pointsValue || 0}
+            freeAccessLeft={0}
             onSubscribe={handleSubscribe}
             onUsePoints={handleUsePoints}
           />
@@ -167,24 +161,20 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
       );
     }
     
-    // Media type rendering logic
     const lessonType = (lesson.type || '').toLowerCase();
     
     if (lessonType === 'video') {
-      // Video content
       return (
         <div className={`relative aspect-video w-full ${isDarkMode ? 'bg-slate-800' : 'bg-slate-100'}`}>
           <video
             ref={videoRef}
             className="w-full h-full"
-            src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" // Placeholder
+            src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
             poster={course.thumbnail}
             preload="metadata"
           />
           
-          {/* Video Controls Overlay */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-            {/* Timeline */}
             <div className="mb-4">
               <Slider
                 value={[duration ? (currentTime / duration) * 100 : 0]}
@@ -195,7 +185,6 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
               />
             </div>
             
-            {/* Controls */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Button 
@@ -251,18 +240,16 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
         </div>
       );
     } else if (lessonType === 'pdf') {
-      // PDF content
       return (
         <div className={`flex items-center justify-center h-[400px] ${isDarkMode ? 'bg-slate-800' : 'bg-slate-100'}`}>
           <iframe 
-            src={lesson.contentId ? `/api/pdf/${lesson.contentId}` : '/placeholder.svg'} 
+            src={lesson.content ? `/api/pdf/${lesson.content}` : '/placeholder.svg'} 
             className="w-full h-full" 
             title="PDF Viewer"
           />
         </div>
       );
     } else if (lessonType === 'quiz') {
-      // Quiz content
       return (
         <div className={`flex flex-col items-center justify-center h-[400px] ${isDarkMode ? 'bg-slate-800' : 'bg-slate-100'} p-6`}>
           <h2 className="text-xl font-bold mb-4">Quiz: {lesson.title}</h2>
@@ -273,7 +260,6 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
         </div>
       );
     } else {
-      // Default/Text content
       return (
         <div className={`flex items-center justify-center h-[400px] ${isDarkMode ? 'bg-slate-800' : 'bg-slate-100'} p-6`}>
           <div className="prose dark:prose-invert max-w-3xl">

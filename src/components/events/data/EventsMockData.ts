@@ -1,4 +1,3 @@
-
 import { Event } from '../types/EventTypes';
 
 // Helper to create dates relative to today
@@ -14,7 +13,7 @@ export const mockEvents: Event[] = [
     id: 1,
     title: "Community Workshop: Getting Started with AI",
     description: "Join us for an interactive workshop where we'll explore the basics of AI and how to leverage it in your projects. Perfect for beginners!",
-    type: "workshop",
+    type: "workshop", // This is a ComponentEventType
     date: getDate(2),
     time: "18:00 - 20:00",
     location: "Online via Zoom",
@@ -25,7 +24,9 @@ export const mockEvents: Event[] = [
     isRegistered: false,
     url: "https://zoom.us/j/123456789",
     platform: "zoom",
-    pointsValue: 10
+    pointsValue: 10,
+    status: "upcoming",
+    registeredUsers: []
   },
   {
     id: 2,
@@ -39,7 +40,9 @@ export const mockEvents: Event[] = [
     image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80",
     attendees: 18,
     capacity: 30,
-    isRegistered: false
+    isRegistered: false,
+    status: "upcoming",
+    registeredUsers: []
   },
   {
     id: 3,
@@ -54,7 +57,9 @@ export const mockEvents: Event[] = [
     attendees: 120,
     capacity: 200,
     isRegistered: false,
-    pointsValue: 50
+    pointsValue: 50,
+    status: "upcoming",
+    registeredUsers: []
   },
   {
     id: 4,
@@ -71,13 +76,15 @@ export const mockEvents: Event[] = [
     isRegistered: false,
     url: "https://meet.google.com/abc-defg-hij",
     platform: "meet",
-    pointsValue: 15
+    pointsValue: 15,
+    status: "upcoming",
+    registeredUsers: []
   },
   {
     id: 5,
     title: "Career Fair: Tech Jobs 2023",
     description: "Connect with top employers in the tech industry. Bring your resume and be ready for on-site interviews!",
-    type: "career_fair",
+    type: "meetup",
     date: getDate(20),
     time: "10:00 - 16:00",
     location: "University Tech Center",
@@ -85,7 +92,9 @@ export const mockEvents: Event[] = [
     image: "https://images.unsplash.com/photo-1560523159-4a9692d222f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
     attendees: 89,
     capacity: 150,
-    isRegistered: false
+    isRegistered: false,
+    status: "upcoming",
+    registeredUsers: []
   },
   {
     id: 6,
@@ -102,13 +111,15 @@ export const mockEvents: Event[] = [
     isRegistered: false,
     url: "https://zoom.us/j/987654321",
     platform: "zoom",
-    pointsValue: 100
+    pointsValue: 100,
+    status: "upcoming",
+    registeredUsers: []
   },
   {
     id: 7,
     title: "Community Service: Tech for Nonprofits",
     description: "Give back to the community by helping local nonprofits with their technology needs. All skill levels welcome!",
-    type: "volunteer",
+    type: "workshop",
     date: getDate(8),
     time: "09:00 - 13:00",
     location: "Community Center, 456 Main Street",
@@ -117,13 +128,15 @@ export const mockEvents: Event[] = [
     attendees: 12,
     capacity: 20,
     isRegistered: false,
-    pointsValue: 30
+    pointsValue: 30,
+    status: "upcoming",
+    registeredUsers: []
   },
   {
     id: 8,
     title: "Hackathon: Build a Solution in 48 Hours",
     description: "Form a team and compete to build innovative solutions to real-world problems. Prizes for the top three teams!",
-    type: "competition",
+    type: "live",
     date: getDate(25),
     time: "09:00 - 17:00 (spans 2 days)",
     location: "TechHub Innovation Space",
@@ -132,7 +145,9 @@ export const mockEvents: Event[] = [
     attendees: 45,
     capacity: 60,
     isRegistered: false,
-    pointsValue: 75
+    pointsValue: 75,
+    status: "upcoming",
+    registeredUsers: []
   },
   {
     id: 9,
@@ -149,7 +164,9 @@ export const mockEvents: Event[] = [
     isRegistered: false,
     url: "https://teams.microsoft.com/l/meetup-join/abc123",
     platform: "teams",
-    pointsValue: 15
+    pointsValue: 15,
+    status: "upcoming",
+    registeredUsers: []
   },
   {
     id: 10,
@@ -167,6 +184,7 @@ export const mockEvents: Event[] = [
     url: "https://meet.google.com/xyz-abcd-123",
     platform: "meet",
     status: 'ended',
-    pointsValue: 20
+    pointsValue: 20,
+    registeredUsers: []
   }
 ];

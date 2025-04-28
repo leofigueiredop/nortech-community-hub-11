@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { formatDate, formatDuration } from '@/lib/utils';
 import { ContentItem } from '@/types/library';
-import { ContentFormatIcon } from '../library/management/utils/ContentFormatIcon';
+import { ContentFormatIcon } from './management/utils/ContentFormatIcon';
 
 interface ContentSectionProps {
   items: ContentItem[];
