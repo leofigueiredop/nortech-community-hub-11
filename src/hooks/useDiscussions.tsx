@@ -1,7 +1,7 @@
 
-import { useState, useEffect } from 'react';
-import { DiscussionTopic, Discussion, DiscussionReply, DiscussionVote } from '@/types/discussion';
-import { api } from '@/api/ApiClient';
+import { useState, useEffect, useCallback } from 'react';
+import { DiscussionTopic, Discussion, DiscussionReply, DiscussionFilter } from '@/types/discussion';
+import { SupabaseDiscussionsRepository } from '@/api/repositories/SupabaseDiscussionsRepository';
 
 interface ActiveUser {
   user: {
@@ -18,6 +18,10 @@ export const useDiscussions = () => {
   const [loading, setLoading] = useState(false);
   const [topics, setTopics] = useState<DiscussionTopic[]>([]);
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
+  const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
+  
+  // Initialize repository
+  const repository = new SupabaseDiscussionsRepository();
 
   useEffect(() => {
     // Load initial data
@@ -27,45 +31,8 @@ export const useDiscussions = () => {
   const fetchTopics = async () => {
     setLoading(true);
     try {
-      // In a real implementation, this would fetch from the API
-      // const response = await api.discussions.getTopics();
-      // setTopics(response);
-
-      // For now, use mock data
-      setTopics([
-        {
-          id: 'topic-1',
-          community_id: 'comm-1',
-          title: 'General Discussion',
-          description: 'Talk about anything related to our community',
-          icon: 'MessageSquare',
-          color: 'blue',
-          is_featured: true,
-          is_private: false,
-          access_level: 'free',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          discussionCount: 24,
-          memberCount: 156,
-          recentActivity: new Date().toISOString()
-        },
-        {
-          id: 'topic-2',
-          community_id: 'comm-1',
-          title: 'Feature Requests',
-          description: 'Suggest new features for our platform',
-          icon: 'Lightbulb',
-          color: 'amber',
-          is_featured: false,
-          is_private: false,
-          access_level: 'free',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          discussionCount: 15,
-          memberCount: 89,
-          recentActivity: new Date(Date.now() - 86400000).toISOString()
-        },
-      ]);
+      const fetchedTopics = await repository.getTopics();
+      setTopics(fetchedTopics);
     } catch (error) {
       console.error('Error fetching topics:', error);
     } finally {
@@ -76,61 +43,8 @@ export const useDiscussions = () => {
   const fetchDiscussions = async (topicId?: string) => {
     setLoading(true);
     try {
-      // In a real implementation, this would fetch from the API
-      // const response = await api.discussions.getDiscussions({ topicId });
-      // setDiscussions(response);
-
-      // For now, use mock data
-      setDiscussions([
-        {
-          id: 'disc-1',
-          community_id: 'comm-1',
-          topic_id: topicId || 'topic-1',
-          user_id: 'user-1',
-          title: 'Welcome to our community!',
-          content: 'This is a welcome post for all new members.',
-          format: 'discussion',
-          is_locked: false,
-          is_featured: true,
-          is_anonymous: false,
-          votes: 12,
-          view_count: 89,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          author: {
-            id: 'user-1',
-            name: 'John Admin',
-            avatar_url: 'https://ui-avatars.com/api/?name=John+Admin',
-            level: 5,
-            xp: 2500
-          },
-          replies: []
-        },
-        {
-          id: 'disc-2',
-          community_id: 'comm-1',
-          topic_id: topicId || 'topic-1',
-          user_id: 'user-2',
-          title: 'How do I get started with the platform?',
-          content: 'I just joined and I am not sure where to begin...',
-          format: 'question',
-          is_locked: false,
-          is_featured: false,
-          is_anonymous: false,
-          votes: 3,
-          view_count: 42,
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-          updated_at: new Date(Date.now() - 86400000).toISOString(),
-          author: {
-            id: 'user-2',
-            name: 'New Member',
-            avatar_url: 'https://ui-avatars.com/api/?name=New+Member',
-            level: 1,
-            xp: 150
-          },
-          replies: []
-        },
-      ]);
+      const fetchedDiscussions = await repository.getDiscussions(topicId);
+      setDiscussions(fetchedDiscussions);
     } catch (error) {
       console.error('Error fetching discussions:', error);
     } finally {
@@ -138,29 +52,33 @@ export const useDiscussions = () => {
     }
   };
 
-  const createTopic = async (topicData: Partial<DiscussionTopic>): Promise<DiscussionTopic> => {
+  const fetchActiveUsers = async () => {
+    try {
+      const users = await repository.getActiveUsers();
+      setActiveUsers(users);
+    } catch (error) {
+      console.error('Error fetching active users:', error);
+    }
+  };
+
+  const createTopic = async (topicData: Partial<DiscussionTopic>) => {
     setLoading(true);
     try {
-      // In a real implementation, this would call the API
-      // const response = await api.discussions.createTopic(topicData);
+      if (!topicData.title) {
+        throw new Error("Topic title is required");
+      }
       
-      // For now, create a mock response
-      const newTopic: DiscussionTopic = {
-        id: `topic-${Date.now()}`,
-        community_id: topicData.community_id || 'comm-1',
-        title: topicData.title || 'New Topic',
+      const newTopic = await repository.createTopic({
+        community_id: topicData.community_id || 'default',
+        title: topicData.title,
         description: topicData.description,
         icon: topicData.icon,
         color: topicData.color,
+        slug: topicData.slug,
         is_featured: topicData.is_featured || false,
         is_private: topicData.is_private || false,
-        access_level: topicData.access_level || 'free',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        discussionCount: 0,
-        memberCount: 1,
-        recentActivity: new Date().toISOString()
-      };
+        access_level: topicData.access_level || 'free'
+      });
       
       setTopics(prev => [...prev, newTopic]);
       return newTopic;
@@ -172,38 +90,29 @@ export const useDiscussions = () => {
     }
   };
 
-  const createDiscussion = async (discussionData: Partial<Discussion>): Promise<Discussion> => {
+  const createDiscussion = async (discussionData: Partial<Discussion>) => {
     setLoading(true);
     try {
-      // In a real implementation, this would call the API
-      // const response = await api.discussions.createDiscussion(discussionData);
+      if (!discussionData.title || !discussionData.content || !discussionData.topic_id) {
+        throw new Error("Title, content, and topic_id are required");
+      }
       
-      // For now, create a mock response
-      const newDiscussion: Discussion = {
-        id: `disc-${Date.now()}`,
-        community_id: discussionData.community_id || 'comm-1',
-        topic_id: discussionData.topic_id || 'topic-1',
-        user_id: discussionData.user_id || 'user-1',
-        title: discussionData.title || 'New Discussion',
-        content: discussionData.content || '',
+      const newDiscussion = await repository.createDiscussion({
+        community_id: discussionData.community_id || 'default',
+        topic_id: discussionData.topic_id,
+        user_id: discussionData.user_id || 'anonymous',
+        title: discussionData.title,
+        content: discussionData.content,
         format: discussionData.format || 'discussion',
         is_locked: discussionData.is_locked || false,
         is_featured: discussionData.is_featured || false,
         is_anonymous: discussionData.is_anonymous || false,
         tags: discussionData.tags || [],
         votes: 0,
-        view_count: 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        author: discussionData.author || {
-          id: 'user-1',
-          name: 'Current User',
-          avatar_url: 'https://ui-avatars.com/api/?name=Current+User'
-        },
-        replies: []
-      };
+        view_count: 0
+      });
       
-      setDiscussions(prev => [...prev, newDiscussion]);
+      setDiscussions(prev => [newDiscussion, ...prev]);
       return newDiscussion;
     } catch (error) {
       console.error('Error creating discussion:', error);
@@ -213,54 +122,47 @@ export const useDiscussions = () => {
     }
   };
 
-  const getActiveUsers = (): ActiveUser[] => {
-    // In a real implementation, this would fetch from the API
-    // return await api.discussions.getActiveUsers();
-    
-    // For now, return mock data
-    return [
-      {
-        user: {
-          id: 'user-1',
-          name: 'John Admin',
-          avatar: 'https://ui-avatars.com/api/?name=John+Admin',
-          level: 5,
-          xp: 2500
-        },
-        count: 42
-      },
-      {
-        user: {
-          id: 'user-2',
-          name: 'Content Creator',
-          avatar: 'https://ui-avatars.com/api/?name=Content+Creator',
-          level: 4,
-          xp: 1800
-        },
-        count: 37
-      },
-      {
-        user: {
-          id: 'user-3',
-          name: 'Super Helper',
-          avatar: 'https://ui-avatars.com/api/?name=Super+Helper',
-          level: 3,
-          xp: 1250
-        },
-        count: 29
-      },
-      {
-        user: {
-          id: 'user-4',
-          name: 'Regular Member',
-          avatar: 'https://ui-avatars.com/api/?name=Regular+Member',
-          level: 2,
-          xp: 780
-        },
-        count: 15
-      }
-    ];
-  };
+  // Helper functions for UI components that expect the old API
+  const getAllTopics = useCallback(() => {
+    return topics;
+  }, [topics]);
+  
+  const getTopic = useCallback((id: string) => {
+    return topics.find(topic => topic.id === id) || null;
+  }, [topics]);
+  
+  const getDiscussions = useCallback((topicId: string) => {
+    return discussions.filter(discussion => discussion.topic_id === topicId);
+  }, [discussions]);
+  
+  const filterDiscussions = useCallback((filters: DiscussionFilter[]) => {
+    return discussions.filter(discussion => {
+      return filters.every(filter => {
+        switch (filter.type) {
+          case 'topic':
+            return discussion.topic_id === filter.value;
+          case 'format':
+            return discussion.format === filter.value;
+          case 'tag':
+            return discussion.tags.includes(filter.value);
+          case 'status':
+            if (filter.value === 'hot') return discussion.isHot;
+            if (filter.value === 'answered') return discussion.isAnswered;
+            if (filter.value === 'unanswered') return !discussion.isAnswered;
+            return true;
+          default:
+            return true;
+        }
+      });
+    });
+  }, [discussions]);
+  
+  const getActiveUsers = useCallback(() => {
+    if (activeUsers.length === 0) {
+      fetchActiveUsers();
+    }
+    return activeUsers;
+  }, [activeUsers]);
 
   return {
     loading,
@@ -270,6 +172,11 @@ export const useDiscussions = () => {
     fetchDiscussions,
     createTopic,
     createDiscussion,
+    // Compatibility with old code
+    getAllTopics,
+    getTopic,
+    getDiscussions,
+    filterDiscussions,
     getActiveUsers
   };
 };

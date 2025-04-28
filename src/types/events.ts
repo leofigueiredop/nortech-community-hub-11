@@ -29,6 +29,7 @@ export interface Event {
   url?: string;
   time?: string;
   type?: string;
+  location?: string;
   speaker?: {
     id: string;
     name: string;
@@ -36,7 +37,13 @@ export interface Event {
     bio?: string;
   };
   status?: 'upcoming' | 'live' | 'past' | 'cancelled';
+  attendees?: number;
+  capacity?: number;
+  isRegistered?: boolean;
+  isPremium?: boolean;
   pointsValue?: number;
+  registeredUsers?: string[];
+  platform?: string;
 }
 
 export interface EventAttendee {

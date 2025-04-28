@@ -1,265 +1,213 @@
+
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { ContentItem } from '@/types/library';
-import { useContentProgress } from '@/hooks/useContentProgress';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
+import { ArrowLeft, Check } from 'lucide-react';
+import { useContentItem } from '@/hooks/useContentItem';
+import { useUser } from '@/hooks/use-user';
 import { usePoints } from '@/context/PointsContext';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import ContentHeader from '@/components/library/viewer/ContentHeader';
-import ContentPreview from '@/components/library/viewer/ContentPreview';
-import ContentDetails from '@/components/library/viewer/ContentDetails';
-import ContentComments from '@/components/library/viewer/ContentComments';
-import ContentProgress from '@/components/library/viewer/ContentProgress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  getContentDuration, 
-  getCompletionCriteria 
-} from './viewer/contentViewerUtils';
-import { usePointsTracking } from '@/utils/pointsTracking';
-import { Progress } from '@/components/ui/progress';
+import VideoPlayer from './content/VideoPlayer';
+import PdfViewer from './content/PdfViewer';
+import AudioPlayer from './content/AudioPlayer';
+import ContentText from './content/ContentText';
+import LinkPreview from './content/LinkPreview';
+import CourseViewer from './course/CourseViewer';
+import ProgressBar from './ProgressBar';
+import { ContentProgress } from '@/types/library';
+import { createClient } from '@/api/supabase';
 
-interface ContentViewerProps {
-  item: ContentItem | null;
-  onClose: () => void;
-}
-
-const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
-  const [activeTab, setActiveTab] = useState('details');
-  const [hasAccess, setHasAccess] = useState(false);
-  const [earnedBadges, setEarnedBadges] = useState<{name: string, description: string}[]>([]);
-  const { addProgress, updateProgress, getProgress, awardPoints, getAllProgress } = useContentProgress();
-  const { awardPoints: addUserPoints } = usePoints();
-  const { trackContentCompletion, awardCustomBadge } = usePointsTracking();
-  const [viewStartTime, setViewStartTime] = useState<number | null>(null);
-
+const ContentViewer = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { user } = useUser();
+  const { awardPoints } = usePoints();
+  const { contentItem, loading, error } = useContentItem(id || '');
+  
+  const [progress, setProgress] = useState<ContentProgress | null>(null);
+  const supabase = createClient();
+  
   useEffect(() => {
-    if (item) {
-      setActiveTab('details');
+    // Load user's progress for this content
+    const loadProgress = async () => {
+      if (!id || !user?.id) return;
       
-      const hasFreeAccess = 
-        item.accessLevel === 'free' || 
-        (item.accessLevel === 'premium' && item.freeAccessesLeft && item.freeAccessesLeft > 0);
-      
-      setHasAccess(hasFreeAccess);
-      
-      addProgress(item.id);
-      
-      checkForBadges(item);
-    }
-  }, [item, addProgress]);
-
-  const checkForBadges = (currentItem: ContentItem) => {
-    const allProgress = getAllProgress();
-    const badges: {name: string, description: string}[] = [];
-    
-    if (currentItem.format === 'pdf') {
-      const completedPDFs = allProgress.filter(p => 
-        p.completed && 
-        p.contentId.includes('pdf')
-      );
-      
-      if (completedPDFs.length >= 3) {
-        const badge = {
-          name: "PDF Master",
-          description: "Completed 3 PDF documents"
-        };
-        badges.push(badge);
-        awardCustomBadge(badge.name, badge.description, 'achievement');
-      }
-    }
-    
-    if (currentItem.format === 'course' && getProgress(currentItem.id)?.completed) {
-      const badge = {
-        name: `${currentItem.title} Graduate`,
-        description: `Completed the ${currentItem.title} course`
-      };
-      badges.push(badge);
-    }
-    
-    if (getProgress(currentItem.id)?.completed) {
-      badges.push({
-        name: "Completionist",
-        description: "Finished a piece of content"
-      });
-    }
-    
-    setEarnedBadges(badges);
-  };
-
-  const isOpen = !!item;
-
-  const handleContentView = () => {
-    if (!item) return;
-    
-    setViewStartTime(Date.now());
-    
-    const progress = getProgress(item.id);
-    if (!progress || progress.progress === 0) {
-      updateProgress(item.id, 10);
-    }
-  };
-
-  const handleProgress = (progressPercentage: number) => {
-    if (!item) return;
-    
-    let shouldComplete = false;
-    if (item.format === 'pdf' && progressPercentage >= 90) shouldComplete = true;
-    else if (item.format === 'audio' && progressPercentage >= 70) shouldComplete = true;
-    else if (progressPercentage >= 100) shouldComplete = true;
-    
-    const finalProgress = shouldComplete ? 100 : progressPercentage;
-    updateProgress(item.id, finalProgress);
-    
-    if (shouldComplete && item.pointsEnabled) {
-      const progress = getProgress(item.id);
-      if (progress && !progress.pointsAwarded) {
-        awardPoints(item.id);
-        if (item.pointsValue) {
-          addUserPoints({
-            type: 'content_completion',
-            description: `Completed "${item.title}"`,
-            points: item.pointsValue
-          });
+      try {
+        const { data, error } = await supabase
+          .from('content_progress')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('content_id', id)
+          .single();
           
-          trackContentCompletion(item);
-          checkForBadges(item);
-        }
-      }
-    }
-  };
-
-  const calculateTimeSpent = () => {
-    if (!viewStartTime) return 0;
-    return Math.floor((Date.now() - viewStartTime) / 1000);
-  };
-
-  const handleAccess = () => {
-    setHasAccess(true);
-  };
-
-  const handleClose = () => {
-    if (!item) return;
-    
-    const timeSpent = calculateTimeSpent();
-    if (timeSpent > 10) {
-      const currentProgress = getProgress(item.id);
-      if (currentProgress) {
-        let progressIncrement = Math.floor(timeSpent / 10);
-        
-        if (item.format === 'video' && item.duration > 0) {
-          progressIncrement = Math.floor((timeSpent / item.duration) * 100);
-        } else if (item.format === 'audio' && item.duration > 0) {
-          progressIncrement = Math.floor((timeSpent / item.duration) * 100);
+        if (error) {
+          if (error.code !== 'PGRST116') { // PGRST116 is "not found" error code
+            console.error('Error loading progress:', error);
+          }
+          return;
         }
         
-        const newProgress = Math.min(
-          100, 
-          currentProgress.progress + progressIncrement
-        );
-        
-        updateProgress(item.id, newProgress);
-        handleProgress(newProgress);
+        setProgress(data);
+      } catch (err) {
+        console.error('Error loading progress:', err);
       }
+    };
+    
+    loadProgress();
+  }, [id, user?.id]);
+  
+  const updateProgress = async (newProgressPercent: number) => {
+    if (!id || !user?.id) return;
+    
+    const isCompleted = newProgressPercent >= 100;
+    const now = new Date().toISOString();
+    
+    try {
+      if (progress) {
+        // Update existing progress
+        const { error } = await supabase
+          .from('content_progress')
+          .update({
+            progress_percent: newProgressPercent,
+            completed_at: isCompleted ? now : progress.completed_at,
+            last_accessed_at: now,
+          })
+          .eq('id', progress.id);
+          
+        if (error) throw error;
+        
+        setProgress({
+          ...progress,
+          progress_percent: newProgressPercent,
+          completed_at: isCompleted ? now : progress.completed_at,
+          last_accessed_at: now
+        });
+      } else {
+        // Create new progress record
+        const { data, error } = await supabase
+          .from('content_progress')
+          .insert({
+            user_id: user.id,
+            content_id: id,
+            progress_percent: newProgressPercent,
+            completed_at: isCompleted ? now : null,
+            last_accessed_at: now,
+            points_awarded: false
+          })
+          .select()
+          .single();
+          
+        if (error) throw error;
+        
+        setProgress(data);
+      }
+      
+      // Award points for completion if needed
+      if (isCompleted && 
+          contentItem?.pointsEnabled && 
+          contentItem?.pointsValue && 
+          (!progress?.points_awarded)) {
+        
+        // Award points
+        awardPoints({
+          type: 'content_completion',
+          description: `Completed "${contentItem.title}"`,
+          points: contentItem.pointsValue
+        });
+        
+        // Mark points as awarded
+        if (progress?.id) {
+          await supabase
+            .from('content_progress')
+            .update({ points_awarded: true })
+            .eq('id', progress.id);
+            
+          setProgress({
+            ...progress,
+            points_awarded: true
+          });
+        }
+        
+        toast({
+          title: "Points Awarded!",
+          description: `You earned ${contentItem.pointsValue} points for completing this content.`,
+        });
+      }
+      
+    } catch (err) {
+      console.error('Error updating progress:', err);
     }
-    
-    setViewStartTime(null);
-    
-    onClose();
   };
-
-  if (!item) return null;
-
-  const progress = getProgress(item.id)?.progress || 0;
-  const isCompleted = progress >= 100;
-
+  
+  const handleMarkAsComplete = () => {
+    updateProgress(100);
+  };
+  
+  const handleGoBack = () => {
+    navigate('/library');
+  };
+  
+  if (loading) {
+    return <div className="p-8 text-center">Loading content...</div>;
+  }
+  
+  if (error || !contentItem) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-red-500 mb-4">Error loading content</p>
+        <Button onClick={handleGoBack}>Back to Library</Button>
+      </div>
+    );
+  }
+  
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden" onPointerDownOutside={(e) => e.preventDefault()}>
-        <ScrollArea className="h-[calc(100vh-10rem)]">
-          <div className="p-6">
-            <ContentHeader item={item} onBack={handleClose} />
-            
-            <ContentPreview 
-              item={item} 
-              hasAccess={hasAccess}
-              onContentView={handleContentView}
-              onProgress={handleProgress}
-              handleAccess={handleAccess}
-            />
-            
-            <ContentProgress 
-              progress={progress}
-              showProgress={true}
-              pointsValue={item.pointsValue || 0}
-              pointsEnabled={!!item.pointsEnabled}
-              isCompleted={isCompleted}
-              format={item.format}
-              badges={earnedBadges}
-            />
-            
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-              <TabsList className="w-full">
-                <TabsTrigger value="details" className="flex-1">Details</TabsTrigger>
-                {item.format === 'video' && (
-                  <TabsTrigger value="transcript" className="flex-1">Transcript</TabsTrigger>
-                )}
-                {item.allowComments !== false && (
-                  <TabsTrigger value="comments" className="flex-1">Comments</TabsTrigger>
-                )}
-                {item.format === 'course' && (
-                  <TabsTrigger value="modules" className="flex-1">Modules</TabsTrigger>
-                )}
-              </TabsList>
-              
-              <TabsContent value="details">
-                <ContentDetails 
-                  item={item} 
-                  duration={getContentDuration(item.duration || 0)} 
-                  completionCriteria={getCompletionCriteria(item)} 
-                />
-              </TabsContent>
-              
-              {item.format === 'video' && (
-                <TabsContent value="transcript">
-                  <div className="text-sm text-muted-foreground">
-                    <p className="mb-4">Transcript not available for this content.</p>
-                  </div>
-                </TabsContent>
-              )}
-              
-              {item.allowComments !== false && (
-                <TabsContent value="comments">
-                  <ContentComments itemId={item.id} />
-                </TabsContent>
-              )}
-              
-              {item.format === 'course' && (
-                <TabsContent value="modules">
-                  <div className="py-4 space-y-4">
-                    <h3 className="text-lg font-medium">Course Modules</h3>
-                    <div className="space-y-2">
-                      {[1, 2, 3].map((module) => (
-                        <div key={module} className="border rounded-md p-3">
-                          <div className="flex justify-between items-center mb-2">
-                            <h4 className="font-medium">Module {module}: Introduction</h4>
-                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                              {module === 1 ? 'Completed' : module === 2 ? 'In Progress' : 'Locked'}
-                            </span>
-                          </div>
-                          <Progress value={module === 1 ? 100 : module === 2 ? 40 : 0} className="h-1.5 mb-2" />
-                          <div className="text-xs text-muted-foreground">
-                            {module === 1 ? 'Completed on Apr 10, 2023' : module === 2 ? '40% complete' : 'Unlock by completing previous modules'}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </TabsContent>
-              )}
-            </Tabs>
-          </div>
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+    <div className="container max-w-5xl py-8">
+      <div className="flex justify-between items-center mb-6">
+        <Button variant="outline" onClick={handleGoBack} className="flex items-center gap-1">
+          <ArrowLeft size={16} />
+          <span>Back to Library</span>
+        </Button>
+        
+        <div className="flex items-center gap-2">
+          {progress?.completed_at && (
+            <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+              <Check size={14} />
+              Completed
+            </span>
+          )}
+          
+          <Button 
+            onClick={handleMarkAsComplete} 
+            disabled={progress?.completed_at !== undefined}
+            variant="outline"
+          >
+            Mark as Complete
+          </Button>
+        </div>
+      </div>
+      
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-2">{contentItem.title}</h1>
+        <p className="text-gray-500 dark:text-gray-400 mb-4">{contentItem.description}</p>
+        
+        <div className="w-full mb-4">
+          <ProgressBar 
+            progress={progress?.progress_percent || 0} 
+            onProgressChange={updateProgress}
+          />
+        </div>
+      </div>
+      
+      <div className="content-viewer bg-card border rounded-lg overflow-hidden">
+        {contentItem.format === 'video' && <VideoPlayer url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" onProgress={updateProgress} />}
+        {contentItem.format === 'pdf' && <PdfViewer url="/sample.pdf" onProgress={updateProgress} />}
+        {contentItem.format === 'audio' && <AudioPlayer url="/sample.mp3" onProgress={updateProgress} />}
+        {contentItem.format === 'text' && <ContentText content={contentItem.content || contentItem.description} />}
+        {contentItem.format === 'link' && <LinkPreview url={contentItem.url || "https://example.com"} />}
+        {contentItem.format === 'course' && <CourseViewer course={contentItem} onProgress={updateProgress} />}
+      </div>
+    </div>
   );
 };
 
