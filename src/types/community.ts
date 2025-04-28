@@ -2,11 +2,101 @@
 export interface Community {
   id: string;
   name: string;
-  logo?: string;
+  description?: string;
+  logo_url?: string;
+  banner_url?: string;
+  domain?: string;
+  creator_id: string;
+  created_at: string;
+  updated_at: string;
+  status: 'active' | 'inactive' | 'pending';
+  theme_config?: {
+    primaryColor?: string;
+    secondaryColor?: string;
+    fontFamily?: string;
+    customCss?: string;
+  };
+  api_keys?: {
+    stripe?: string;
+    googleAnalytics?: string;
+    mailchimp?: string;
+  };
 }
 
-export const mockCommunities: Community[] = [
-  { id: '1', name: 'Nortech', logo: '/nortech-logo.png' },
-  { id: '2', name: 'Alphractal', logo: '/alphractal-logo.png' },
-  { id: '3', name: 'CryptoSync', logo: '/cryptosync-logo.png' },
-];
+export interface CommunitySettings {
+  id: string;
+  community_id: string;
+  settings_type: string;
+  settings_data: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommunityMember {
+  id: string;
+  community_id: string;
+  user_id: string;
+  role: 'owner' | 'admin' | 'moderator' | 'member';
+  status: 'active' | 'pending' | 'suspended';
+  subscription_plan_id?: string;
+  joined_at: string;
+  subscription_start_date?: string;
+  subscription_end_date?: string;
+  custom_fields?: {
+    bio?: string;
+    interests?: string[];
+    socialLinks?: {
+      type: string;
+      url: string;
+    }[];
+    [key: string]: any;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Space {
+  id: string;
+  community_id: string;
+  name: string;
+  description?: string;
+  type: 'forum' | 'library' | 'events' | 'courses' | 'posts' | 'ai' | 'challenge';
+  icon?: string;
+  banner_url?: string;
+  config?: any;
+  visibility: 'public' | 'members' | 'premium' | 'private';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SubscriptionPlan {
+  id: string;
+  community_id: string;
+  name: string;
+  description?: string;
+  price: number;
+  interval: 'month' | 'year' | 'one_time';
+  features?: string[];
+  is_active: boolean;
+  trial_days?: number;
+  max_members?: number;
+  visibility: 'public' | 'private' | 'hidden';
+  progressive_content: boolean;
+  retention_days?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaymentGateway {
+  id: string;
+  community_id: string;
+  gateway_type: 'stripe' | 'paypal' | 'manual';
+  is_active: boolean;
+  config?: {
+    publishableKey?: string;
+    webhookSecret?: string;
+    [key: string]: any;
+  };
+  created_at: string;
+  updated_at: string;
+}

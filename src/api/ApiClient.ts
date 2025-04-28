@@ -6,6 +6,7 @@ import { IDiscussionRepository } from './interfaces/IDiscussionRepository';
 import { IPointsRepository } from './interfaces/IPointsRepository';
 import { IMigrationRepository } from './interfaces/IMigrationRepository';
 import { ICommunityRepository } from './interfaces/ICommunityRepository';
+import { IPostRepository } from './interfaces/IPostRepository';
 import { IBaseRepository } from './interfaces/IBaseRepository'; 
 import { SupabaseAuthRepository } from './repositories/SupabaseAuthRepository';
 import { SupabaseContentRepository } from './repositories/SupabaseContentRepository';
@@ -14,6 +15,7 @@ import { SupabaseDiscussionRepository } from './repositories/SupabaseDiscussionR
 import { SupabasePointsRepository } from './repositories/SupabasePointsRepository';
 import { SupabaseMigrationRepository } from './repositories/SupabaseMigrationRepository';
 import { SupabaseCommunityRepository } from './repositories/SupabaseCommunityRepository';
+import { SupabasePostRepository } from './repositories/SupabasePostRepository';
 
 // Supabase configuration
 export const supabaseConfig = {
@@ -30,6 +32,7 @@ export class ApiClient {
   private _points: IPointsRepository;
   private _migration: IMigrationRepository;
   private _community: ICommunityRepository;
+  private _posts: IPostRepository;
   private _currentCommunityId: string | null = null;
 
   private constructor() {
@@ -40,6 +43,7 @@ export class ApiClient {
     this._points = new SupabasePointsRepository();
     this._migration = new SupabaseMigrationRepository();
     this._community = new SupabaseCommunityRepository();
+    this._posts = new SupabasePostRepository();
   }
 
   public static getInstance(): ApiClient {
@@ -57,6 +61,7 @@ export class ApiClient {
     (this._discussions as unknown as IBaseRepository).setCommunityContext(communityId);
     (this._points as unknown as IBaseRepository).setCommunityContext(communityId);
     (this._community as unknown as IBaseRepository).setCommunityContext(communityId);
+    (this._posts as unknown as IBaseRepository).setCommunityContext(communityId);
   }
 
   public getCurrentCommunityId(): string | null {
@@ -89,6 +94,10 @@ export class ApiClient {
   
   get community(): ICommunityRepository {
     return this._community;
+  }
+  
+  get posts(): IPostRepository {
+    return this._posts;
   }
 }
 

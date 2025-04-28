@@ -1,84 +1,53 @@
 
-export type ContentFormat = 'audio' | 'pdf' | 'text' | 'url' | 'youtube' | 'vimeo' | 'gdoc' | 'image' | 'course' | 'link' | 'video';
-
-export interface Author {
-  id: string;
-  name: string;
-  avatar?: string;
-}
-
 export interface ContentItem {
   id: string;
+  community_id: string;
   title: string;
-  description: string;
-  format: ContentFormat;
-  thumbnail: string;
-  author: Author | string; // Can be either an Author object or just a string
+  description?: string;
+  format: 'video' | 'audio' | 'pdf' | 'document' | 'link' | 'image' | 'course';
+  thumbnail?: string;
+  thumbnail_url?: string;
+  resource_url?: string;
+  author?: string;
+  duration?: number;
   tags: string[];
-  createdAt: string;
-  updatedAt: string;
+  access_level: 'free' | 'premium';
+  created_at: string;
+  updated_at: string;
   views: number;
-  duration: number; // Duration in seconds
-  accessLevel: 'free' | 'premium' | 'unlockable';
+  category_id?: string;
+  visibility: 'public' | 'members' | 'premium' | 'private';
   featured: boolean;
-  categoryId?: string;
-  pointsEnabled?: boolean;
-  pointsValue?: number;
-  resourceUrl?: string; // URL for the content resource
-  visibility?: string; // Public, premium-only, etc.
-  completionCriteria?: string; // Watch, read, etc.
-  completionThreshold?: number; // Percentage or time needed for completion
-  addToCarousel?: boolean;
-  thumbnailUrl?: string; // For consistent image usage
-  fileSize?: number; // Size of the content file
-  allowComments?: boolean; // Whether comments are allowed
-  freeAccessesLeft?: number; // Number of free accesses for premium content
-  isNew?: boolean; // Whether the content is new
-  isExclusive?: boolean; // Whether the content is exclusive
-  releaseDate?: string; // When the content was released
-  modules?: CourseModule[]; // Course modules for course format
+  points_enabled: boolean;
+  points_value: number;
+  completion_criteria: 'view' | 'percent' | 'quiz';
+  completion_threshold: number;
+  file_size?: number;
+  space_id?: string;
 }
 
 export interface ContentCategory {
   id: string;
+  community_id: string;
   name: string;
   description?: string;
-  itemCount: number;
-  icon?: string;
-  count?: number; // For backward compatibility
-  updatedAt?: string; // For tracking when category was last updated
-  createdAt?: string; // When the category was created
+  parent_id?: string;
+  created_at: string;
+  sort_order: number;
 }
 
-export interface ContentProgress {
+export interface ContentInteraction {
   id: string;
-  userId: string;
-  contentId: string;
-  progress: number;
-  completed: boolean;
-  lastAccessedAt: string;
-  pointsAwarded: boolean;
-}
-
-export interface Course {
-  id: string;
-  title: string;
-  description: string;
-  thumbnail: string;
-  modules: CourseModule[];
-  accessLevel: 'free' | 'premium';
-}
-
-export interface CourseModule {
-  id: string;
-  title: string;
-  items: CourseModuleItem[];
-}
-
-export interface CourseModuleItem {
-  id: string;
-  title: string;
-  type: 'video' | 'quiz' | 'text' | 'assignment';
-  contentId?: string;
-  completed?: boolean;
+  content_id: string;
+  user_id: string;
+  community_id: string;
+  interaction_type: 'view' | 'completion' | 'like' | 'bookmark' | 'comment' | 'share';
+  interaction_data?: {
+    percent?: number;
+    comment?: string;
+    rating?: number;
+    [key: string]: any;
+  };
+  created_at: string;
+  updated_at: string;
 }

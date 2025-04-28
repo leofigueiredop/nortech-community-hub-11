@@ -1,70 +1,72 @@
 
-export interface DiscussionUser {
-  id: string;
-  name: string;
-  avatar: string;
-  role?: string;
-  level?: number;
-  xp?: number;
-  badges?: DiscussionBadge[];
-}
-
-export interface DiscussionBadge {
-  id: string;
-  name: string;
-  description: string;
-  icon?: string;
-  category?: 'achievement' | 'participation' | 'moderation' | 'custom';
-}
-
 export interface DiscussionTopic {
   id: string;
+  community_id: string;
   name: string;
-  description: string;
-  icon: React.ReactNode;
-  discussionCount: number;
-  memberCount: number;
-  recentActivity: string;
-  slug: string;
-  createdAt: string;
-  createdBy: string;
-  pinnedDiscussions?: Discussion[];
-  isActive?: boolean;
+  description?: string;
+  icon?: string;
+  created_at: string;
+  updated_at: string;
+  space_id?: string;
 }
 
 export interface Discussion {
   id: string;
   title: string;
-  description: string;
-  author: DiscussionUser;
-  createdAt: string;
-  lastActivity: string;
-  replies: number;
-  participants: number;
-  tags: string[];
+  content: string;
+  topic_id: string;
+  author_id: string;
+  author?: {
+    id: string;
+    name: string;
+    avatar_url?: string;
+  };
+  created_at: string;
+  updated_at: string;
+  is_pinned: boolean;
+  view_count: number;
+  is_closed: boolean;
+  community_id: string;
+  tags?: string[];
+  format?: 'question' | 'discussion' | 'announcement';
   isHot?: boolean;
-  isPinned?: boolean;
-  isLocked?: boolean;
   isAnswered?: boolean;
-  viewCount?: number;
+  lastActivity?: string;
   upvotes?: number;
-  downvotes?: number;
-  format?: 'discussion' | 'question' | 'announcement';
+  replies?: DiscussionReply[];
+  replies_count?: number;
+  description?: string;
 }
 
 export interface DiscussionReply {
   id: string;
   content: string;
-  author: DiscussionUser;
-  createdAt: string;
-  upvotes: number;
-  isAcceptedAnswer?: boolean;
-  parentId?: string;
-  attachments?: string[];
+  discussion_id: string;
+  author_id: string;
+  author?: {
+    id: string;
+    name: string;
+    avatar_url?: string;
+  };
+  created_at: string;
+  updated_at: string;
+  is_solution: boolean;
+  upvotes?: number;
+  downvotes?: number;
+}
+
+export interface DiscussionReaction {
+  id: string;
+  user_id: string;
+  target_id: string; // Can be discussion_id or reply_id
+  target_type: 'discussion' | 'reply';
+  reaction_type: 'upvote' | 'downvote' | 'heart' | 'laugh' | 'sad' | 'angry';
+  created_at: string;
 }
 
 export interface DiscussionFilter {
-  type: 'tag' | 'status' | 'time' | 'author' | 'format';
+  id: string;
+  type: 'tag' | 'status' | 'time' | 'format';
   value: string;
   label: string;
 }

@@ -1,6 +1,12 @@
 
-import { api } from '@/api/ApiClient';
+import { createClient } from '@supabase/supabase-js';
+import { supabaseConfig } from '@/api/ApiClient';
 import { toast } from '@/components/ui/use-toast';
+
+const supabase = createClient(
+  supabaseConfig.url,
+  supabaseConfig.anonKey
+);
 
 export const uploadFile = async (
   file: File, 
@@ -16,24 +22,16 @@ export const uploadFile = async (
     const fileName = `${timestamp}-${Math.random().toString(36).substring(2, 15)}.${fileExtension}`;
     const fullPath = path ? `${path}/${fileName}` : fileName;
     
-    // For now, since we don't have the storage API implemented
-    // This is a placeholder for the actual implementation
-    // In a real implementation, we would call supabase storage
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage.from(bucket).upload(fullPath, file);
     
-    // Mock successful upload
-    // This would be replaced with:
-    // const { data, error } = await supabase.storage.from(bucket).upload(fullPath, file);
-    // if (error) throw error;
-    // const publicUrl = supabase.storage.from(bucket).getPublicUrl(fullPath).data.publicUrl;
+    if (error) throw error;
     
-    // Mock successful upload with a delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Get the public URL
+    const publicUrl = supabase.storage.from(bucket).getPublicUrl(fullPath).data.publicUrl;
     
-    // Return a mock URL
-    const mockUrl = `https://supabase-mock-storage.com/${bucket}/${fullPath}`;
-    
-    console.log(`File uploaded: ${mockUrl}`);
-    return mockUrl;
+    console.log(`File uploaded: ${publicUrl}`);
+    return publicUrl;
     
   } catch (error) {
     console.error('Error uploading file:', error);
@@ -53,18 +51,19 @@ export const deleteFile = async (
   try {
     if (!filePath) return false;
     
-    // For now, since we don't have the storage API implemented
-    // This is a placeholder for the actual implementation
+    // Extract file path from URL if it's a full URL
+    let path = filePath;
+    if (filePath.includes(bucket)) {
+      const urlParts = filePath.split(bucket + '/');
+      path = urlParts.length > 1 ? urlParts[1] : filePath;
+    }
     
-    // Mock successful deletion
-    // This would be replaced with:
-    // const { error } = await supabase.storage.from(bucket).remove([filePath]);
-    // if (error) throw error;
+    // Delete from Supabase Storage
+    const { error } = await supabase.storage.from(bucket).remove([path]);
     
-    // Mock successful deletion with a delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    if (error) throw error;
     
-    console.log(`File deleted: ${filePath}`);
+    console.log(`File deleted: ${path}`);
     return true;
     
   } catch (error) {

@@ -1,26 +1,44 @@
 
 export interface Reward {
   id: string;
-  title: string;
-  description: string;
-  imageUrl?: string;
-  pointsCost: number;
-  type: 'digital' | 'nft' | 'badge' | 'access' | 'physical' | 'free' | 'downloadable';
-  visibility: 'public' | 'vip' | 'limited';
-  stock: number | null;
-  expiresAt: string | null;
-  createdAt: string;
-  redeemCount: number;
-  actionUrl?: string;
+  community_id: string;
+  name: string;
+  description?: string;
+  image_url?: string;
+  points_cost: number;
+  is_active: boolean;
+  quantity_available?: number;
+  created_at: string;
+  expires_at?: string;
+  redemption_instructions?: string;
+  reward_type?: 'physical' | 'digital' | 'experience';
 }
 
 export interface Redemption {
   id: string;
-  userId: string;
-  rewardId: string;
-  pointsSpent: number;
-  status: 'pending' | 'completed' | 'failed';
-  createdAt: string;
-  completedAt?: string;
-  reward: Reward;
+  user_id: string;
+  reward_id: string;
+  redeemed_at: string;
+  status: 'pending' | 'fulfilled' | 'cancelled' | 'expired';
+  fulfillment_details?: {
+    delivery_info?: any;
+    notes?: string;
+    fulfillment_date?: string;
+    code?: string;
+    [key: string]: any;
+  };
+  community_id: string;
+  reward?: Reward;
+}
+
+export interface PointsTransaction {
+  id: string;
+  user_id: string;
+  community_id: string;
+  points: number;
+  source: string;
+  description: string;
+  created_at: string;
+  reference_id?: string;
+  reference_type?: string;
 }
