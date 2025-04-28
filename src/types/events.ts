@@ -1,4 +1,3 @@
-
 export interface Event {
   id: string;
   community_id: string;
@@ -23,6 +22,12 @@ export interface Event {
   points_value?: number;
   created_at: string;
   updated_at: string;
+  
+  // Additional required fields from EventTypes
+  date: string;
+  event_type: string;
+  is_virtual: boolean;
+  points_awarded: number;
   
   // Additional fields for compatibility with existing components
   image?: string;
