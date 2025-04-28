@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ContentItem } from '@/types/library';
 import { Card, CardContent } from '@/components/ui/card';
@@ -24,7 +23,7 @@ const FeaturedContent: React.FC<FeaturedContentProps> = ({ items, onItemSelect }
           <div className="md:w-2/5 relative">
             <div className="aspect-video md:aspect-auto md:h-full relative overflow-hidden">
               <img 
-                src={featured.thumbnailUrl || '/placeholder.svg'} 
+                src={featured.thumbnail || '/placeholder.svg'} 
                 alt={featured.title}
                 className="w-full h-full object-cover opacity-60"
               />

@@ -1,4 +1,3 @@
-
 export interface ContentCategory {
   id: string;
   name: string;
@@ -8,6 +7,7 @@ export interface ContentCategory {
   icon?: string;
   created_at: string;
   updated_at: string;
+  itemCount?: number;
 }
 
 export interface ContentItem {
@@ -18,20 +18,35 @@ export interface ContentItem {
   format: string;
   url?: string;
   thumbnail?: string;
+  thumbnailUrl?: string;
   duration?: number;
-  author?: string;
+  author?: string | {
+    id: string;
+    name: string;
+    avatar?: string;
+  } | null;
   category_id?: string;
+  categoryId?: string;
   tags?: string[];
   access_level: string;
+  accessLevel?: string;
   is_featured?: boolean;
+  featured?: boolean;
   views?: number;
   created_at: string;
   updated_at: string;
+  createdAt?: string;
+  updatedAt?: string;
   pointsEnabled?: boolean;
   pointsValue?: number;
-  accessLevel?: string;
-  featured?: boolean;
   allowComments?: boolean;
+  community_id?: string;
+  isNew?: boolean;
+  visibility?: string;
+  completionCriteria?: string;
+  completionThreshold?: number;
+  resourceUrl?: string;
+  fileSize?: number;
 }
 
 export interface ContentInteraction {

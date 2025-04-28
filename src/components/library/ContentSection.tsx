@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Eye, Calendar, Clock, Lock } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { ContentItem } from '@/types/library';
+import { ContentItem } from '@/types/content';
 import { ContentFormatIcon } from './management/utils/ContentFormatIcon';
 
 interface ContentSectionProps {
@@ -18,6 +18,7 @@ interface ContentSectionProps {
   isTopTen?: boolean;
   viewAllUrl?: string;
   showNewBadge?: boolean;
+  layout?: string;
 }
 
 const ContentSection: React.FC<ContentSectionProps> = ({
@@ -29,6 +30,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   isTopTen = false,
   viewAllUrl,
   showNewBadge = false,
+  layout,
 }) => {
   if (items.length === 0) {
     return null;
@@ -72,7 +74,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
           >
             <div className="relative">
               <img
-                src={item.thumbnail || "/placeholder.svg"}
+                src={item.thumbnail || item.thumbnailUrl || "/placeholder.svg"}
                 alt={item.title}
                 className="w-full h-40 object-cover"
               />
@@ -103,7 +105,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
                 ) : null}
                 
                 {/* Only use isNew if showNewBadge is true */}
-                {showNewBadge && (
+                {showNewBadge && item.isNew && (
                   <Badge className="bg-blue-500">New</Badge>
                 )}
               </div>
@@ -134,24 +136,24 @@ const ContentSection: React.FC<ContentSectionProps> = ({
 
               <div className="flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" />
-                <span>{formatDate(item.created_at)}</span>
+                <span>{formatDate(item.created_at || item.createdAt || '')}</span>
               </div>
 
               <div className="flex gap-1 ml-auto items-center">
-                {typeof item.author === 'string' ? (
+                {item.author && typeof item.author === 'string' ? (
                   <span>{item.author}</span>
+                ) : item.author && typeof item.author === 'object' ? (
+                  <div className="flex items-center gap-1">
+                    <Avatar className="w-4 h-4">
+                      <AvatarImage src={item.author.avatar} />
+                      <AvatarFallback className="text-[8px]">
+                        {item.author.name ? item.author.name[0] : '?'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate max-w-[100px]">{item.author.name || 'Unknown'}</span>
+                  </div>
                 ) : (
-                  item.author && (
-                    <div className="flex items-center gap-1">
-                      <Avatar className="w-4 h-4">
-                        <AvatarImage src={item.author?.avatar} />
-                        <AvatarFallback className="text-[8px]">
-                          {item.author?.name ? item.author.name[0] : '?'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="truncate max-w-[100px]">{item.author?.name || 'Unknown'}</span>
-                    </div>
-                  )
+                  <span>Anonymous</span>
                 )}
               </div>
             </CardFooter>

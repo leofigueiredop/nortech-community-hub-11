@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ContentItem } from '@/types/library';
+import { ContentItem } from '@/types/content';
 import { useContentProgress } from '@/hooks/useContentProgress';
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
@@ -69,7 +69,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
       <div onClick={handleClick} className="cursor-pointer h-full">
         <div className="relative aspect-video w-full overflow-hidden">
           <img 
-            src={item.thumbnail} 
+            src={item.thumbnail || item.thumbnailUrl} 
             alt={item.title} 
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
@@ -78,7 +78,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
           
           {/* Premium Overlay */}
-          {item.access_level === 'premium' && (
+          {(item.access_level === 'premium' || item.accessLevel === 'premium') && (
             <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
           )}
           
@@ -100,7 +100,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
           )}
           
           {/* Premium badge */}
-          {item.access_level === 'premium' && (
+          {(item.access_level === 'premium' || item.accessLevel === 'premium') && (
             <Badge 
               className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white border-none text-xs px-2 py-1 flex items-center gap-1"
             >
@@ -155,7 +155,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
           
           {showAuthor && (
             <div className="flex items-center gap-2">
-              {item.author && typeof item.author !== 'string' && (
+              {item.author && typeof item.author !== 'string' && typeof item.author === 'object' ? (
                 <>
                   <div className="w-6 h-6 rounded-full overflow-hidden bg-muted">
                     {item.author.avatar && (
@@ -167,14 +167,16 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
                     )}
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {item.author.name || 'Anonymous'} • {formatDistanceToNow(new Date(item.updated_at), { addSuffix: true })}
+                    {item.author.name || 'Anonymous'} • {formatDistanceToNow(new Date(item.updated_at || item.updatedAt || ''), { addSuffix: true })}
                   </span>
                 </>
-              )}
-              
-              {typeof item.author === 'string' && (
+              ) : item.author && typeof item.author === 'string' ? (
                 <span className="text-xs text-muted-foreground">
-                  {item.author} • {formatDistanceToNow(new Date(item.updated_at), { addSuffix: true })}
+                  {item.author} • {formatDistanceToNow(new Date(item.updated_at || item.updatedAt || ''), { addSuffix: true })}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">
+                  Anonymous • {formatDistanceToNow(new Date(item.updated_at || item.updatedAt || ''), { addSuffix: true })}
                 </span>
               )}
             </div>

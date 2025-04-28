@@ -14,6 +14,7 @@ export interface ContentItem {
   url?: string;
   format: ContentFormat;
   thumbnail?: string;
+  thumbnailUrl?: string; // Added for compatibility with existing components
   community_id: string;
   created_at: string;
   updated_at: string;
@@ -38,7 +39,6 @@ export interface ContentItem {
   } | string | null;
   
   // Properties used in various components
-  thumbnailUrl?: string;
   resourceUrl?: string;
   categoryId?: string;
   visibility?: 'public' | 'premium' | 'points' | 'hidden' | 'vip-only' | 'limited-time';
@@ -47,6 +47,8 @@ export interface ContentItem {
   fileSize?: number;
   accessLevel?: 'free' | 'premium' | 'premium_plus';
   featured?: boolean;
+  createdAt?: string; // Alias for created_at
+  updatedAt?: string; // Alias for updated_at
 }
 
 /**
@@ -73,6 +75,7 @@ export interface ContentSectionProps {
   showNewBadge?: boolean;
   description?: string;
   viewAll?: string;
+  layout?: string; // Added for components that use this prop
 }
 
 /**
