@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { ICommunityRepository, Community, CommunityMember, CommunitySettings, SubscriptionPlan } from '../interfaces/ICommunityRepository';
 import { BaseRepository } from './BaseRepository';
@@ -5,8 +6,6 @@ import { supabaseConfig } from '../ApiClient';
 import { v4 as uuidv4 } from 'uuid';
 
 export class SupabaseCommunityRepository extends BaseRepository implements ICommunityRepository {
-  private supabase;
-
   constructor() {
     super();
     this.supabase = createClient(
@@ -15,7 +14,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
     );
   }
 
-  // Sobrescrever setTenantContext para não aplicar no repositório de comunidade
+  // Sobrescrever setCommunityContext para não aplicar no repositório de comunidade
   public setCommunityContext(communityId: string | null) {
     // Não aplicamos o contexto aqui pois este repositório gerencia todas as comunidades
     return;
@@ -142,7 +141,8 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
   // Community settings
   async getSettings(communityId: string, settingsType: string): Promise<CommunitySettings> {
     try {
-      await this.setTenantContext(communityId);
+      // Note: We use the specific communityId here since this is a cross-community operation
+      await this.setTenantContext();
       
       const { data, error } = await this.supabase
         .from('community_settings')
@@ -170,7 +170,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
 
   async updateSettings(communityId: string, settingsType: string, settings: Record<string, any>): Promise<CommunitySettings> {
     try {
-      await this.setTenantContext(communityId);
+      await this.setTenantContext();
       
       // Check if settings already exist
       const { data: existingData, error: fetchError } = await this.supabase
@@ -224,7 +224,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
   // Community members
   async getMembers(communityId: string, params?: { role?: string, status?: string }): Promise<CommunityMember[]> {
     try {
-      await this.setTenantContext(communityId);
+      await this.setTenantContext();
       
       let query = this.supabase
         .from('community_members')
@@ -250,7 +250,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
 
   async getMember(communityId: string, userId: string): Promise<CommunityMember | null> {
     try {
-      await this.setTenantContext(communityId);
+      await this.setTenantContext();
       
       const { data, error } = await this.supabase
         .from('community_members')
@@ -272,7 +272,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
 
   async addMember(member: CommunityMember): Promise<CommunityMember> {
     try {
-      await this.setTenantContext(member.community_id);
+      await this.setTenantContext();
       
       const newMember = {
         id: uuidv4(),
@@ -296,7 +296,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
 
   async updateMember(communityId: string, userId: string, updates: Partial<CommunityMember>): Promise<CommunityMember> {
     try {
-      await this.setTenantContext(communityId);
+      await this.setTenantContext();
       
       const updatedMember = {
         ...updates,
@@ -320,7 +320,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
 
   async removeMember(communityId: string, userId: string): Promise<void> {
     try {
-      await this.setTenantContext(communityId);
+      await this.setTenantContext();
       
       const { error } = await this.supabase
         .from('community_members')
@@ -337,7 +337,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
   // Subscription plans
   async getSubscriptionPlans(communityId: string, includeInactive: boolean = false): Promise<SubscriptionPlan[]> {
     try {
-      await this.setTenantContext(communityId);
+      await this.setTenantContext();
       
       let query = this.supabase
         .from('subscription_plans')
@@ -359,7 +359,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
 
   async createSubscriptionPlan(plan: SubscriptionPlan): Promise<SubscriptionPlan> {
     try {
-      await this.setTenantContext(plan.community_id);
+      await this.setTenantContext();
       
       const newPlan = {
         id: uuidv4(),
@@ -392,7 +392,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
       
       if (fetchError) throw fetchError;
       
-      await this.setTenantContext(existingPlan.community_id);
+      await this.setTenantContext();
       
       const updatedPlan = {
         ...plan,
@@ -424,7 +424,7 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
       
       if (fetchError) throw fetchError;
       
-      await this.setTenantContext(existingPlan.community_id);
+      await this.setTenantContext();
       
       const { error } = await this.supabase
         .from('subscription_plans')

@@ -1,6 +1,7 @@
 
 export class BaseRepository {
   protected currentCommunityId: string | null = null;
+  protected supabase: any;
 
   public setCommunityContext(communityId: string | null) {
     this.currentCommunityId = communityId;
@@ -19,5 +20,10 @@ export class BaseRepository {
       throw new Error(response.error.message);
     }
     return response.data;
+  }
+
+  protected handleError<T>(error: any): T {
+    console.error("Repository error:", error);
+    throw new Error(error?.message || "An unexpected error occurred");
   }
 }
