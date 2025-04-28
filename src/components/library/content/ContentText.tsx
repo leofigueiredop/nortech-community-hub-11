@@ -9,8 +9,8 @@ interface ContentTextProps {
 
 const ContentText: React.FC<ContentTextProps> = ({ content, onProgress }) => {
   React.useEffect(() => {
-    // Quando o componente for montado, consideramos o progresso como 100%
-    // Isso é útil para conteúdo que não tem uma medida clara de progresso como vídeos
+    // When the component is mounted, consider the progress as 100%
+    // This is useful for content that doesn't have a clear measure of progress like videos
     if (onProgress) {
       onProgress(100);
     }

@@ -27,6 +27,11 @@ export interface ContentItem {
   views?: number;
   created_at: string;
   updated_at: string;
+  pointsEnabled?: boolean;
+  pointsValue?: number;
+  accessLevel?: string;
+  featured?: boolean;
+  allowComments?: boolean;
 }
 
 export interface ContentInteraction {
@@ -48,3 +53,55 @@ export interface ContentComment {
   created_at: string;
   updated_at: string;
 }
+
+export interface ContentProgress {
+  id: string;
+  userId: string;
+  contentId: string;
+  progress: number;
+  completed: boolean;
+  lastAccessedAt: string;
+  pointsAwarded: boolean;
+  progress_percent?: number;
+  completed_at?: string;
+  last_accessed_at?: string;
+  points_awarded?: boolean;
+  user_id?: string;
+  content_id?: string;
+}
+
+export interface CourseModule {
+  id: string;
+  title: string;
+  description?: string;
+  order: number;
+  items: CourseModuleItem[];
+}
+
+export interface CourseModuleItem {
+  id: string;
+  title: string;
+  type: 'video' | 'document' | 'quiz' | 'exercise' | 'text';
+  duration?: number;
+  completed?: boolean;
+  url?: string;
+  content?: string;
+}
+
+export interface Course extends ContentItem {
+  modules: CourseModule[];
+  totalDuration?: number;
+  progress?: number;
+  completedLessons?: number;
+  totalLessons?: number;
+}
+
+export type ContentFormat = 
+  | 'video'
+  | 'audio'
+  | 'pdf'
+  | 'document'
+  | 'course'
+  | 'image'
+  | 'text'
+  | 'link';
