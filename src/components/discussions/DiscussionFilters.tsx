@@ -1,217 +1,328 @@
-import React, { useState, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import {
-  SlidersHorizontal,
-  Search,
-  CheckCircle2,
-  LucideIcon
-} from "lucide-react"
-import { cn } from "@/lib/utils"
-import { DiscussionFilter } from '@/types/discussion';
 
-interface DiscussionFiltersProps {
-  topicId: string;
-  onFilterChange: (filters: DiscussionFilter[]) => void;
+import React, { useState } from 'react';
+import { 
+  Bookmark, 
+  CheckCircle, 
+  ChevronDown, 
+  Filter, 
+  Tag, 
+  User, 
+  Layers, 
+  MessageCircle, 
+  X 
+} from 'lucide-react';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Separator } from '../ui/separator';
+import { Badge } from '../ui/badge';
+import { Label } from '../ui/label';
+import { Checkbox } from '../ui/checkbox';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+
+interface FilterOption {
+  id: string;
+  name: string;
+  value: string;
 }
 
-export default function DiscussionFilters({
-  topicId,
-  onFilterChange
+interface DiscussionFiltersProps {
+  topicOptions: FilterOption[];
+  formatOptions: FilterOption[];
+  tagOptions: FilterOption[];
+  statusOptions: FilterOption[];
+  selectedFilters: {
+    search: string;
+    topics: string[];
+    formats: string[];
+    tags: string[];
+    statuses: string[];
+  };
+  onFilterChange: (filterType: string, value: string | string[]) => void;
+  onClearFilters: () => void;
+}
+
+export function DiscussionFilters({
+  topicOptions,
+  formatOptions,
+  tagOptions,
+  statusOptions,
+  selectedFilters,
+  onFilterChange,
+  onClearFilters
 }: DiscussionFiltersProps) {
-  const [activeFilters, setActiveFilters] = useState<DiscussionFilter[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Mock data for filters
-  const discussionFormats = ['question', 'discussion', 'announcement'];
-  const discussionStatuses = ['open', 'closed', 'pending'];
-  const discussionTags = ['help', 'advice', 'feedback', 'general', 'ideas'];
-
-  useEffect(() => {
-    onFilterChange(activeFilters);
-  }, [activeFilters, onFilterChange]);
-
-  const handleFormatFilter = (format: string, active: boolean) => {
-    if (active) {
-      setActiveFilters(prev => [...prev, {
-        id: `format-${format}`,
-        type: 'format',
-        value: format,
-        label: format.charAt(0).toUpperCase() + format.slice(1)
-      }]);
-    } else {
-      setActiveFilters(prev => 
-        prev.filter(f => !(f.type === 'format' && f.value === format))
-      );
-    }
+  const [searchValue, setSearchValue] = useState(selectedFilters.search || '');
+  
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onFilterChange('search', searchValue);
   };
-
-  const handleStatusFilter = (status: string, active: boolean) => {
-    if (active) {
-      setActiveFilters(prev => [...prev, {
-        id: `status-${status}`,
-        type: 'status',
-        value: status,
-        label: status.charAt(0).toUpperCase() + status.slice(1)
-      }]);
+  
+  const handleCheckboxChange = (filterType: string, value: string) => {
+    let currentValues = selectedFilters[filterType as keyof typeof selectedFilters] as string[] || [];
+    
+    // If the value is already selected, remove it, otherwise add it
+    if (currentValues.includes(value)) {
+      currentValues = currentValues.filter(v => v !== value);
     } else {
-      setActiveFilters(prev => 
-        prev.filter(f => !(f.type === 'status' && f.value === status))
-      );
+      currentValues = [...currentValues, value];
     }
+    
+    onFilterChange(filterType, currentValues);
   };
-
-  const handleTagFilter = (tag: string, active: boolean) => {
-    if (active) {
-      setActiveFilters(prev => [...prev, {
-        id: `tag-${tag}`,
-        type: 'tag',
-        value: tag,
-        label: tag
-      }]);
-    } else {
-      setActiveFilters(prev => 
-        prev.filter(f => !(f.type === 'tag' && f.value === tag))
-      );
-    }
-  };
-
+  
+  // Count total active filters
+  const activeFilterCount = (
+    selectedFilters.topics.length +
+    selectedFilters.formats.length +
+    selectedFilters.tags.length +
+    selectedFilters.statuses.length +
+    (selectedFilters.search ? 1 : 0)
+  );
+  
   return (
-    <div className="w-full">
-      {/* Search Filter */}
-      <div className="mb-4">
-        <Label htmlFor="search">
-          <Search className="mr-2 h-4 w-4 inline-block" />
-          Search Discussions
-        </Label>
-        <Input
-          type="search"
-          id="search"
-          placeholder="Search by title or content..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mt-1"
-        />
-      </div>
-
-      <Separator className="mb-4" />
-
-      {/* Active Filters */}
-      {activeFilters.length > 0 && (
-        <div className="mb-4">
-          <Label>Active Filters:</Label>
-          <div className="flex flex-wrap gap-2 mt-1">
-            {activeFilters.map(filter => (
-              <Badge
-                key={filter.id}
-                variant="secondary"
-                className="cursor-pointer"
-                onClick={() => {
-                  if (filter.type === 'format') {
-                    handleFormatFilter(filter.value, false);
-                  } else if (filter.type === 'status') {
-                    handleStatusFilter(filter.value, false);
-                  } else if (filter.type === 'tag') {
-                    handleTagFilter(filter.value, false);
-                  }
-                }}
+    <div className="bg-card border rounded-lg overflow-hidden">
+      {/* Search and Filter Header */}
+      <div className="p-4">
+        <form onSubmit={handleSearchSubmit} className="flex gap-2">
+          <Input 
+            placeholder="Search discussions..." 
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="flex-grow"
+          />
+          <Button 
+            type="submit" 
+            variant="secondary"
+            size="icon"
+          >
+            <Filter className="h-4 w-4" />
+          </Button>
+        </form>
+        
+        {/* Active Filters */}
+        {activeFilterCount > 0 && (
+          <div className="mt-3">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-sm font-medium">Active Filters</h4>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={onClearFilters}
+                className="h-7 text-xs"
               >
-                {filter.label}
-              </Badge>
-            ))}
+                Clear All
+              </Button>
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              {selectedFilters.search && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  Search: {selectedFilters.search}
+                  <X 
+                    className="h-3 w-3 cursor-pointer" 
+                    onClick={() => onFilterChange('search', '')}
+                  />
+                </Badge>
+              )}
+              
+              {selectedFilters.topics.map(topic => {
+                const topicName = topicOptions.find(t => t.value === topic)?.name || topic;
+                return (
+                  <Badge key={topic} variant="secondary" className="flex items-center gap-1">
+                    <Layers className="h-3 w-3" /> {topicName}
+                    <X 
+                      className="h-3 w-3 cursor-pointer" 
+                      onClick={() => handleCheckboxChange('topics', topic)}
+                    />
+                  </Badge>
+                );
+              })}
+              
+              {selectedFilters.formats.map(format => {
+                const formatName = formatOptions.find(f => f.value === format)?.name || format;
+                return (
+                  <Badge key={format} variant="secondary" className="flex items-center gap-1">
+                    <MessageCircle className="h-3 w-3" /> {formatName}
+                    <X 
+                      className="h-3 w-3 cursor-pointer" 
+                      onClick={() => handleCheckboxChange('formats', format)}
+                    />
+                  </Badge>
+                );
+              })}
+              
+              {selectedFilters.tags.map(tag => {
+                const tagName = tagOptions.find(t => t.value === tag)?.name || tag;
+                return (
+                  <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                    <Tag className="h-3 w-3" /> {tagName}
+                    <X 
+                      className="h-3 w-3 cursor-pointer" 
+                      onClick={() => handleCheckboxChange('tags', tag)}
+                    />
+                  </Badge>
+                );
+              })}
+              
+              {selectedFilters.statuses.map(status => {
+                const statusName = statusOptions.find(s => s.value === status)?.name || status;
+                return (
+                  <Badge key={status} variant="secondary" className="flex items-center gap-1">
+                    <CheckCircle className="h-3 w-3" /> {statusName}
+                    <X 
+                      className="h-3 w-3 cursor-pointer" 
+                      onClick={() => handleCheckboxChange('statuses', status)}
+                    />
+                  </Badge>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
-
-      {/* Accordion Filters */}
-      <Accordion type="multiple" collapsible className="w-full">
-        {/* Format Filter */}
-        <AccordionItem value="format">
-          <AccordionTrigger>
-            <SlidersHorizontal className="mr-2 h-4 w-4" />
-            Format
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="grid gap-2">
-              {discussionFormats.map(format => (
-                <div key={format} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`format-${format}`}
-                    checked={activeFilters.some(f => f.type === 'format' && f.value === format)}
-                    onCheckedChange={(checked) => handleFormatFilter(format, checked)}
-                  />
-                  <Label htmlFor={`format-${format}`} className="capitalize">{format}</Label>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* Status Filter */}
-        <AccordionItem value="status">
-          <AccordionTrigger>
-            <CheckCircle2 className="mr-2 h-4 w-4" />
-            Status
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="grid gap-2">
-              {discussionStatuses.map(status => (
-                <div key={status} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`status-${status}`}
-                    checked={activeFilters.some(f => f.type === 'status' && f.value === status)}
-                    onCheckedChange={(checked) => handleStatusFilter(status, checked)}
-                  />
-                  <Label htmlFor={`status-${status}`} className="capitalize">{status}</Label>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* Tags Filter */}
-        <AccordionItem value="tags">
-          <AccordionTrigger>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-4 h-4 mr-2"
-            >
-              <path
-                fillRule="evenodd"
-                d="M3 6a3 3 0 013-3h7.455a3 3 0 012.122.879l4.5 4.5A3 3 0 0119 15v1a2 2 0 01-2 2h-1v-1.586a3 3 0 00-3-3H5a3 3 0 00-3 3V19h-1a2 2 0 01-2-2v-1a3 3 0 013-3zm6.121-2.121a1.5 1.5 0 012.122 0l2.121 2.121a1.5 1.5 0 010 2.122L12.364 9.5A1.5 1.5 0 0110.243 7.379L12.364 5.258z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Tags
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="grid gap-2">
-              {discussionTags.map(tag => (
-                <div key={tag} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`tag-${tag}`}
-                    checked={activeFilters.some(f => f.type === 'tag' && f.value === tag)}
-                    onCheckedChange={(checked) => handleTagFilter(tag, checked)}
-                  />
-                  <Label htmlFor={`tag-${tag}`} className="capitalize">{tag}</Label>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+        )}
+      </div>
+      
+      <Separator />
+      
+      {/* Filter Options */}
+      <div className="p-4">
+        <Accordion type="multiple" className="space-y-2">
+          {/* Topics Filter */}
+          <AccordionItem value="topics" className="border rounded-md overflow-hidden">
+            <AccordionTrigger className="px-4 py-2 text-sm hover:bg-accent hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Layers className="h-4 w-4" />
+                <span>Topics</span>
+                {selectedFilters.topics.length > 0 && (
+                  <Badge variant="secondary" className="ml-auto">
+                    {selectedFilters.topics.length}
+                  </Badge>
+                )}
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 py-2">
+              <div className="space-y-2">
+                {topicOptions.map(topic => (
+                  <div key={topic.id} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`topic-${topic.id}`}
+                      checked={selectedFilters.topics.includes(topic.value)}
+                      onCheckedChange={() => handleCheckboxChange('topics', topic.value)}
+                    />
+                    <Label
+                      htmlFor={`topic-${topic.id}`}
+                      className="text-sm cursor-pointer flex-grow"
+                    >
+                      {topic.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          
+          {/* Format Filter */}
+          <AccordionItem value="formats" className="border rounded-md overflow-hidden">
+            <AccordionTrigger className="px-4 py-2 text-sm hover:bg-accent hover:no-underline">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                <span>Format</span>
+                {selectedFilters.formats.length > 0 && (
+                  <Badge variant="secondary" className="ml-auto">
+                    {selectedFilters.formats.length}
+                  </Badge>
+                )}
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 py-2">
+              <div className="space-y-2">
+                {formatOptions.map(format => (
+                  <div key={format.id} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`format-${format.id}`}
+                      checked={selectedFilters.formats.includes(format.value)}
+                      onCheckedChange={() => handleCheckboxChange('formats', format.value)}
+                    />
+                    <Label
+                      htmlFor={`format-${format.id}`}
+                      className="text-sm cursor-pointer flex-grow"
+                    >
+                      {format.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          
+          {/* Tags Filter */}
+          <AccordionItem value="tags" className="border rounded-md overflow-hidden">
+            <AccordionTrigger className="px-4 py-2 text-sm hover:bg-accent hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Tag className="h-4 w-4" />
+                <span>Tags</span>
+                {selectedFilters.tags.length > 0 && (
+                  <Badge variant="secondary" className="ml-auto">
+                    {selectedFilters.tags.length}
+                  </Badge>
+                )}
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 py-2">
+              <div className="space-y-2">
+                {tagOptions.map(tag => (
+                  <div key={tag.id} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`tag-${tag.id}`}
+                      checked={selectedFilters.tags.includes(tag.value)}
+                      onCheckedChange={() => handleCheckboxChange('tags', tag.value)}
+                    />
+                    <Label
+                      htmlFor={`tag-${tag.id}`}
+                      className="text-sm cursor-pointer flex-grow"
+                    >
+                      {tag.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          
+          {/* Status Filter */}
+          <AccordionItem value="statuses" className="border rounded-md overflow-hidden">
+            <AccordionTrigger className="px-4 py-2 text-sm hover:bg-accent hover:no-underline">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                <span>Status</span>
+                {selectedFilters.statuses.length > 0 && (
+                  <Badge variant="secondary" className="ml-auto">
+                    {selectedFilters.statuses.length}
+                  </Badge>
+                )}
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 py-2">
+              <div className="space-y-2">
+                {statusOptions.map(status => (
+                  <div key={status.id} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`status-${status.id}`}
+                      checked={selectedFilters.statuses.includes(status.value)}
+                      onCheckedChange={() => handleCheckboxChange('statuses', status.value)}
+                    />
+                    <Label
+                      htmlFor={`status-${status.id}`}
+                      className="text-sm cursor-pointer flex-grow"
+                    >
+                      {status.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
     </div>
   );
 }

@@ -1,17 +1,10 @@
 
-import { Reward, Redemption, PointsTransaction } from '@/types/rewards';
+import { PointsActivity, PointsRedemption } from '@/types/points';
 
 export interface IPointsRepository {
   getUserPoints(userId: string): Promise<number>;
-  addPoints(userId: string, points: number, source: string, description: string): Promise<number>;
-  getPointsHistory(userId: string): Promise<PointsTransaction[]>;
-  getRewards(): Promise<Reward[]>;
-  getRewardById(rewardId: string): Promise<Reward>;
-  createReward(reward: Partial<Reward>): Promise<Reward>;
-  updateReward(rewardId: string, reward: Partial<Reward>): Promise<Reward>;
-  deleteReward(rewardId: string): Promise<void>;
-  redeemReward(userId: string, rewardId: string): Promise<Redemption>;
-  getRedemptions(userId: string): Promise<Redemption[]>;
-  updateRedemptionStatus(redemptionId: string, status: string, details?: any): Promise<Redemption>;
-  getLeaderboard(limit?: number): Promise<{ user_id: string; points: number; name: string; avatar_url?: string; }[]>;
+  addPoints(userId: string, points: number, activityType: string, entityId?: string): Promise<boolean>;
+  getPointsHistory(userId: string, limit?: number, offset?: number): Promise<PointsActivity[]>;
+  redeemPoints(userId: string, rewardId: string, pointsCost: number): Promise<boolean>;
+  getRedemptions(userId: string, limit?: number, offset?: number): Promise<PointsRedemption[]>;
 }

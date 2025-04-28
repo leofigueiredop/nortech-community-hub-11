@@ -16,6 +16,7 @@ export interface DiscussionTopic {
   recentActivity?: string; // For compatibility with existing code
   created_at: string;
   updated_at: string;
+  name?: string; // For backward compatibility
 }
 
 export interface Discussion {

@@ -1,9 +1,14 @@
 
-import { IContentRepository } from '../interfaces/IContentRepository';
 import { BaseRepository } from './BaseRepository';
-import { createClient } from '@supabase/supabase-js';
-import { supabaseConfig } from '../ApiClient';
-import { ContentItem, ContentCategory, ContentInteraction } from '@/types/library';
+import { IContentRepository } from '../interfaces/IContentRepository';
+import { 
+  ContentItem, 
+  ContentCategory, 
+  ContentProgress, 
+  ContentInteraction, 
+  ContentComment,
+  Course 
+} from '@/types/library';
 
 export class SupabaseContentRepository extends BaseRepository implements IContentRepository {
   constructor() {

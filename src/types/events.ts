@@ -1,0 +1,62 @@
+
+export interface Event {
+  id: string;
+  community_id: string;
+  title: string;
+  description?: string;
+  content?: string;
+  start_date: string;
+  end_date: string;
+  timezone?: string;
+  location_type: 'online' | 'in_person' | 'hybrid';
+  location_url?: string;
+  location_address?: string;
+  location_details?: string;
+  max_attendees?: number;
+  access_level: 'free' | 'premium' | 'premium_plus';
+  is_featured: boolean;
+  speaker_id?: string;
+  speaker_name?: string;
+  speaker_bio?: string;
+  speaker_avatar?: string;
+  banner_url?: string;
+  points_value?: number;
+  created_at: string;
+  updated_at: string;
+  
+  // Additional fields for compatibility with existing components
+  image?: string;
+  url?: string;
+  time?: string;
+  type?: string;
+  speaker?: {
+    id: string;
+    name: string;
+    avatar?: string;
+    bio?: string;
+  };
+  status?: 'upcoming' | 'live' | 'past' | 'cancelled';
+  pointsValue?: number;
+}
+
+export interface EventAttendee {
+  id: string;
+  event_id: string;
+  user_id: string;
+  status: 'registered' | 'confirmed' | 'attended' | 'cancelled' | 'no_show';
+  notes?: string;
+  registration_date: string;
+  checkin_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EventSeries {
+  id: string;
+  community_id: string;
+  title: string;
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}

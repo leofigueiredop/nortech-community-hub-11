@@ -44,6 +44,9 @@ export interface ContentItem {
   pointsEnabled?: boolean;
   pointsValue?: number;
   freeAccessesLeft?: number;
+  format?: string;
+  thumbnail?: string;
+  allowComments?: boolean;
 }
 
 // Course-specific types
@@ -57,6 +60,7 @@ export interface CourseModule {
   duration?: number; // In minutes
   created_at: string;
   updated_at: string;
+  items?: CourseModuleItem[];
 }
 
 export interface CourseModuleItem {
@@ -77,6 +81,9 @@ export interface CourseModuleItem {
   pointsEnabled?: boolean;
   pointsValue?: number;
   freeAccessesLeft?: number;
+  type?: string;
+  completed?: boolean;
+  contentId?: string;
 }
 
 export interface Course extends ContentItem {
@@ -116,4 +123,28 @@ export interface ContentView {
   view_duration?: number;
   device_info?: string;
   community_id: string;
+}
+
+export interface ContentInteraction {
+  id: string;
+  user_id: string;
+  content_id: string;
+  interaction_type: 'view' | 'like' | 'share' | 'download' | 'comment' | 'complete';
+  interaction_data?: any;
+  created_at: string;
+}
+
+export interface ContentComment {
+  id: string;
+  content_id: string;
+  user_id: string;
+  parent_id?: string;
+  text: string;
+  created_at: string;
+  updated_at: string;
+  user?: {
+    id: string;
+    name: string;
+    avatar_url?: string;
+  };
 }

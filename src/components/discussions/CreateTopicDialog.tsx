@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useDiscussions } from '@/hooks/useDiscussions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DiscussionTopic } from '@/types/discussion';
 
 interface CreateTopicDialogProps {
   open: boolean;
@@ -51,7 +53,7 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ open, onOpenChang
       community_id: 'current-community-id' // This should be replaced with actual community ID
     };
     
-    // Mock API call
+    // Call the API function
     createTopic(newTopic)
       .then(() => {
         toast({
