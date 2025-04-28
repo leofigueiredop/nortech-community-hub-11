@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ReloadIcon, CheckCircleIcon, AlertCircleIcon } from 'lucide-react';
+import { LoaderIcon, CheckCircleIcon, AlertCircleIcon } from 'lucide-react';
 import { api } from '@/api/ApiClient';
 import { createSQLFunctions } from '@/api/migrations/createSQLFunctions';
 import { useToast } from '@/hooks/use-toast';
@@ -151,7 +150,7 @@ const MigrationSettings: React.FC = () => {
               >
                 {isLoading ? (
                   <>
-                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                    <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
                     Initializing...
                   </>
                 ) : (
@@ -169,7 +168,7 @@ const MigrationSettings: React.FC = () => {
             >
               {isLoading ? (
                 <>
-                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                  <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
                   Running Migrations...
                 </>
               ) : (
