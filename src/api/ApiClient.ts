@@ -1,15 +1,18 @@
+
 import { IAuthRepository } from './interfaces/IAuthRepository';
 import { IContentRepository } from './interfaces/IContentRepository';
 import { IEventsRepository } from './interfaces/IEventsRepository';
 import { IDiscussionRepository } from './interfaces/IDiscussionRepository';
 import { IPointsRepository } from './interfaces/IPointsRepository';
 import { IMigrationRepository } from './interfaces/IMigrationRepository';
+import { ICommunityRepository } from './interfaces/ICommunityRepository';
 import { SupabaseAuthRepository } from './repositories/SupabaseAuthRepository';
 import { SupabaseContentRepository } from './repositories/SupabaseContentRepository';
 import { SupabaseEventsRepository } from './repositories/SupabaseEventsRepository';
 import { SupabaseDiscussionRepository } from './repositories/SupabaseDiscussionRepository';
 import { SupabasePointsRepository } from './repositories/SupabasePointsRepository';
 import { SupabaseMigrationRepository } from './repositories/SupabaseMigrationRepository';
+import { SupabaseCommunityRepository } from './repositories/SupabaseCommunityRepository';
 
 // Supabase configuration
 export const supabaseConfig = {
@@ -25,6 +28,7 @@ export class ApiClient {
   private _discussions: IDiscussionRepository;
   private _points: IPointsRepository;
   private _migration: IMigrationRepository;
+  private _community: ICommunityRepository;
 
   private constructor() {
     this._auth = new SupabaseAuthRepository();
@@ -33,6 +37,7 @@ export class ApiClient {
     this._discussions = new SupabaseDiscussionRepository();
     this._points = new SupabasePointsRepository();
     this._migration = new SupabaseMigrationRepository();
+    this._community = new SupabaseCommunityRepository();
   }
 
   public static getInstance(): ApiClient {
@@ -64,6 +69,10 @@ export class ApiClient {
 
   get migration(): IMigrationRepository {
     return this._migration;
+  }
+  
+  get community(): ICommunityRepository {
+    return this._community;
   }
 }
 
