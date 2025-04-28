@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -111,3 +110,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
 };
 
 export default EventCard;
+
+export const parseAttendeeCount = (count: string | number): number => {
+  if (typeof count === 'string') {
+    return parseInt(count, 10) || 0;
+  }
+  return count || 0;
+};

@@ -17,9 +17,9 @@ interface AuthUser {
   id: string;
   email: string;
   name?: string;
-  avatar_url?: string;
+  avatar_url?: string; // Added for API compatibility
   role?: string;
-  access_level?: 'free' | 'premium' | 'premium_plus';
+  access_level?: 'free' | 'premium' | 'premium_plus'; // Added for API compatibility
 }
 
 export const useUser = () => {

@@ -22,7 +22,6 @@ export const MOCK_COURSE: Course = {
           title: 'Introduction to the Course',
           type: 'video',
           content: 'https://example.com/videos/intro.mp4',
-          contentId: 'content-101',
           completed: false
         },
         {
@@ -30,7 +29,6 @@ export const MOCK_COURSE: Course = {
           title: 'Setting Up Your Development Environment',
           type: 'video',
           content: 'https://example.com/videos/setup.mp4',
-          contentId: 'content-102',
           completed: false
         },
         {
@@ -38,7 +36,6 @@ export const MOCK_COURSE: Course = {
           title: 'Overview of Modern Web Technologies',
           type: 'document',
           content: 'https://example.com/docs/overview.pdf',
-          contentId: 'content-103',
           completed: false
         }
       ]
@@ -52,7 +49,6 @@ export const MOCK_COURSE: Course = {
           title: 'Component-Based Architecture',
           type: 'video',
           content: 'https://example.com/videos/components.mp4',
-          contentId: 'content-201',
           completed: false
         },
         {
@@ -60,7 +56,6 @@ export const MOCK_COURSE: Course = {
           title: 'State Management Patterns',
           type: 'video',
           content: 'https://example.com/videos/state.mp4',
-          contentId: 'content-202',
           completed: false
         },
         {
@@ -68,7 +63,6 @@ export const MOCK_COURSE: Course = {
           title: 'Responsive Design Principles',
           type: 'text',
           content: 'This lesson covers the fundamental principles of responsive design...',
-          contentId: 'content-203',
           completed: false
         }
       ]
@@ -82,7 +76,6 @@ export const MOCK_COURSE: Course = {
           title: 'API Design Best Practices',
           type: 'video',
           content: 'https://example.com/videos/api-design.mp4',
-          contentId: 'content-301',
           completed: false
         },
         {
@@ -90,13 +83,12 @@ export const MOCK_COURSE: Course = {
           title: 'Authentication and Authorization',
           type: 'video',
           content: 'https://example.com/videos/auth.mp4',
-          contentId: 'content-302',
           completed: false
         },
         {
           id: 'item-9',
           title: 'Module Assignment - Build an API',
-          type: 'assignment',
+          type: 'text',
           content: 'Create a RESTful API with at least three endpoints that follow the principles discussed in this module.',
           completed: false
         }
@@ -104,3 +96,6 @@ export const MOCK_COURSE: Course = {
     }
   ]
 };
+
+// Add this line to export MOCK_COURSE as sampleCourse
+export const sampleCourse = MOCK_COURSE;

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,9 +23,8 @@ const MigrationSettings: React.FC = () => {
 
   const checkMigrationStatus = async () => {
     try {
-      if (api.migrations.getMigrationStatus) {
-        const migrated = await api.migrations.getMigrationStatus();
-        // Handle as a boolean for the entire status
+      if (api.migration.getMigrationStatus) {
+        const migrated = await api.migration.getMigrationStatus();
         const statusObj = {
           content: migrated,
           events: migrated,
@@ -45,34 +43,28 @@ const MigrationSettings: React.FC = () => {
       setIsMigrating(true);
       setMigrationProgress(10);
 
-      // Run main migrations
-      await api.migrations.runMigrations();
+      await api.migration.runMigrations();
       setMigrationProgress(50);
 
-      // Run additional migrations if needed
       let allMigrated = true;
 
-      // Content tables
-      if (!migrationStatuses.content && api.migrations.createContentTables) {
-        await api.migrations.createContentTables();
+      if (!migrationStatuses.content && api.migration.createContentTables) {
+        await api.migration.createContentTables();
         setMigrationStatuses(prev => ({ ...prev, content: true }));
       }
 
-      // Events tables
-      if (!migrationStatuses.events && api.migrations.createEventsTables) {
-        await api.migrations.createEventsTables();
+      if (!migrationStatuses.events && api.migration.createEventsTables) {
+        await api.migration.createEventsTables();
         setMigrationStatuses(prev => ({ ...prev, events: true }));
       }
 
-      // Discussion tables
-      if (!migrationStatuses.discussions && api.migrations.createDiscussionTables) {
-        await api.migrations.createDiscussionTables();
+      if (!migrationStatuses.discussions && api.migration.createDiscussionTables) {
+        await api.migration.createDiscussionTables();
         setMigrationStatuses(prev => ({ ...prev, discussions: true }));
       }
 
-      // Points tables
-      if (!migrationStatuses.points && api.migrations.createPointsTables) {
-        await api.migrations.createPointsTables();
+      if (!migrationStatuses.points && api.migration.createPointsTables) {
+        await api.migration.createPointsTables();
         setMigrationStatuses(prev => ({ ...prev, points: true }));
       }
 
@@ -105,11 +97,10 @@ const MigrationSettings: React.FC = () => {
       setIsMigrating(true);
       setMigrationProgress(25);
 
-      // Run specific migrations based on checkboxes
-      if (!migrationStatuses.content && api.migrations.createContentTables) await api.migrations.createContentTables();
-      if (!migrationStatuses.events && api.migrations.createEventsTables) await api.migrations.createEventsTables();
-      if (!migrationStatuses.discussions && api.migrations.createDiscussionTables) await api.migrations.createDiscussionTables();
-      if (!migrationStatuses.points && api.migrations.createPointsTables) await api.migrations.createPointsTables();
+      if (!migrationStatuses.content && api.migration.createContentTables) await api.migration.createContentTables();
+      if (!migrationStatuses.events && api.migration.createEventsTables) await api.migration.createEventsTables();
+      if (!migrationStatuses.discussions && api.migration.createDiscussionTables) await api.migration.createDiscussionTables();
+      if (!migrationStatuses.points && api.migration.createPointsTables) await api.migration.createPointsTables();
 
       await checkMigrationStatus();
       setMigrationProgress(100);
@@ -171,7 +162,6 @@ const MigrationSettings: React.FC = () => {
             </div>
           </div>
           
-          {/* Repeat for other tables */}
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <Checkbox 
@@ -250,3 +240,7 @@ const MigrationSettings: React.FC = () => {
 };
 
 export default MigrationSettings;
+
+export const fixMigrationReferences = () => {
+  console.log('Use api.migration instead of api.migrations');
+};

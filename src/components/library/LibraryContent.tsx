@@ -1,27 +1,14 @@
+
 import React from 'react';
 import { ContentItem } from '@/types/library';
 import LibraryContentRows from './LibraryContentRows';
+import LibraryCategories from './LibraryCategories';
 import { adaptLibraryArrayToContentType } from '@/utils/contentTypeAdapter';
 
 interface LibraryContentProps {
   content: ContentItem[];
   onItemSelect: (item: ContentItem) => void;
 }
-
-interface LibraryCategoriesProps {
-  content: ContentItem[];
-  onItemSelect: (item: ContentItem) => void;
-}
-
-const LibraryCategories: React.FC<LibraryCategoriesProps> = ({ content, onItemSelect }) => {
-  // You can implement the LibraryCategories component here
-  // For example, display content categories as a list or grid
-  return (
-    <div>
-      {/* Categories content here */}
-    </div>
-  );
-};
 
 const LibraryContent: React.FC<LibraryContentProps> = ({ content, onItemSelect }) => {
   // Filter content by different criteria
@@ -44,9 +31,6 @@ const LibraryContent: React.FC<LibraryContentProps> = ({ content, onItemSelect }
     item => (item.access_level || item.accessLevel) === 'premium' || (item.access_level || item.accessLevel) === 'premium_plus'
   );
   
-  // Convert library items for components that use ContentItem from /types/content
-  const adaptedContent = adaptLibraryArrayToContentType(content);
-  
   return (
     <div className="container py-6 max-w-screen-2xl space-y-10">
       <LibraryContentRows 
@@ -59,7 +43,7 @@ const LibraryContent: React.FC<LibraryContentProps> = ({ content, onItemSelect }
         onItemSelect={onItemSelect}
       />
 
-      {/* Add library categories section if you want it */}
+      {/* Library categories section */}
       <LibraryCategories 
         content={content} 
         onItemSelect={onItemSelect} 
