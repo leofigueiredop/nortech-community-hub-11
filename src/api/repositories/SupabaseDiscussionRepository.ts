@@ -1,9 +1,9 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { IDiscussionRepository } from '../interfaces/IDiscussionRepository';
-import { Discussion, DiscussionReply, DiscussionTopic } from '@/types/discussion';
 import { BaseRepository } from './BaseRepository';
-import { supabaseConfig } from '../ApiClient';
+import { supabaseConfig } from '../config';
+import { DiscussionTopic, Discussion, DiscussionReply } from '@/types/discussion';
 
 export class SupabaseDiscussionRepository extends BaseRepository implements IDiscussionRepository {
   constructor() {

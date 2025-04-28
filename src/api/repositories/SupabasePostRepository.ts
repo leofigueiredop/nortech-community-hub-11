@@ -1,9 +1,9 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { IPostRepository } from '../interfaces/IPostRepository';
-import { Post, PostComment, PostReaction } from '@/types/post';
 import { BaseRepository } from './BaseRepository';
-import { supabaseConfig } from '../ApiClient';
+import { supabaseConfig } from '../config';
+import { Post, PostComment, PostReaction } from '@/types/post';
 
 export class SupabasePostRepository extends BaseRepository implements IPostRepository {
   constructor() {

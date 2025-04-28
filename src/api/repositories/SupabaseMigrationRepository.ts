@@ -2,7 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { IMigrationRepository } from '../interfaces/IMigrationRepository';
 import { BaseRepository } from './BaseRepository';
-import { supabaseConfig } from '../ApiClient';
+import { supabaseConfig } from '../config';
 import { createSQLFunctions } from '../migrations/createSQLFunctions';
 
 export class SupabaseMigrationRepository extends BaseRepository implements IMigrationRepository {

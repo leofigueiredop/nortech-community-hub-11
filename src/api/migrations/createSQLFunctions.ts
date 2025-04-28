@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { supabaseConfig } from '../ApiClient';
+import { supabaseConfig } from '../config';
 
 export async function createSQLFunctions() {
   const supabase = createClient(
