@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,6 +11,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { User, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { api } from '@/api/ApiClient';
 
 const formSchema = z.object({
   fullName: z.string().min(2, 'Nome completo é obrigatório'),
@@ -24,6 +24,7 @@ type FormData = z.infer<typeof formSchema>;
 const CreatorForm: React.FC = () => {
   const navigate = useNavigate();
   const [showBadge, setShowBadge] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -34,50 +35,86 @@ const CreatorForm: React.FC = () => {
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log('Form data:', data);
+  const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
     
-    // Store user data in localStorage
-    localStorage.setItem('userData', JSON.stringify(data));
-    localStorage.setItem('onboardingStep', '1');
-    
-    // Show achievement badge
-    setShowBadge(true);
-    
-    setTimeout(() => {
-      // Corrigido: direcionar para a página de tipo de comunidade
-      navigate('/onboarding/community-type');
-    }, 1500);
-    
-    // Show achievement toast
-    toast({
-      title: "🎖️ Achievement Unlocked!",
-      description: "First step completed: Account Created (+15 XP)",
-      duration: 3000,
-    });
+    try {
+      // Call the API to register the creator
+      await api.auth.register({ 
+        email: data.email, 
+        password: data.password, 
+        name: data.fullName 
+      });
+      
+      // Store user data in localStorage for onboarding flow
+      localStorage.setItem('userData', JSON.stringify(data));
+      localStorage.setItem('onboardingStep', '1');
+      
+      // Show achievement badge
+      setShowBadge(true);
+      
+      toast({
+        title: "🎖️ Achievement Unlocked!",
+        description: "First step completed: Account Created (+15 XP)",
+        duration: 3000,
+      });
+      
+      setTimeout(() => {
+        navigate('/onboarding/community-type');
+      }, 1500);
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Registration failed",
+        description: error instanceof Error ? error.message : "Could not create your account",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    // Integrate with Google Auth here
-    console.log('Google sign-in clicked');
+  const handleGoogleSignIn = async () => {
+    setIsSubmitting(true);
     
-    // Store onboarding step
-    localStorage.setItem('onboardingStep', '1');
-    
-    // Show achievement badge
-    setShowBadge(true);
-    
-    setTimeout(() => {
-      // Corrigido: direcionar para a página de tipo de comunidade
-      navigate('/onboarding/community-type');
-    }, 1500);
-    
-    // Show achievement toast
-    toast({
-      title: "🎖️ Achievement Unlocked!",
-      description: "First step completed: Account Created (+15 XP)",
-      duration: 3000,
-    });
+    try {
+      // Note: This is a placeholder for Google auth with Supabase
+      toast({
+        title: "Google Sign-in",
+        description: "Google authentication is not fully implemented yet with Supabase",
+        duration: 3000,
+      });
+      
+      // This would be replaced with actual Google auth
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Store onboarding step
+      localStorage.setItem('onboardingStep', '1');
+      
+      // Show achievement badge
+      setShowBadge(true);
+      
+      setTimeout(() => {
+        navigate('/onboarding/community-type');
+      }, 1500);
+      
+      toast({
+        title: "🎖️ Achievement Unlocked!",
+        description: "First step completed: Account Created (+15 XP)",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Google sign-in error:', error);
+      toast({
+        title: "Sign-in failed",
+        description: "There was an error signing in with Google",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

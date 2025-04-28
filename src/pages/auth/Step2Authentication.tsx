@@ -67,11 +67,7 @@ const Step2Authentication: React.FC = () => {
       });
       navigate('/auth/profile-setup');
     } catch (error) {
-      toast({
-        title: "Login failed",
-        description: "Please check your credentials and try again",
-        variant: "destructive"
-      });
+      // Error handling is done in the login function
     }
   };
 
@@ -84,11 +80,7 @@ const Step2Authentication: React.FC = () => {
       });
       navigate('/auth/profile-setup');
     } catch (error) {
-      toast({
-        title: "Registration failed",
-        description: "There was an error creating your account",
-        variant: "destructive"
-      });
+      // Error handling is done in the register function
     }
   };
 
@@ -101,11 +93,7 @@ const Step2Authentication: React.FC = () => {
       });
       navigate('/auth/profile-setup');
     } catch (error) {
-      toast({
-        title: "Login failed",
-        description: "There was an error signing in with Google",
-        variant: "destructive"
-      });
+      // Error handling is done in the loginWithGoogle function
     }
   };
 

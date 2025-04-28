@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { UploadCloud, X } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
+import { uploadFile, deleteFile } from '@/utils/fileUpload';
 
 interface FileUploaderProps {
   label: string;
@@ -13,6 +14,8 @@ interface FileUploaderProps {
   id: string;
   placeholder?: string;
   helpText?: string;
+  bucket?: string;
+  path?: string;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({
@@ -23,11 +26,14 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   accept = '*',
   id,
   placeholder = 'Click to upload',
-  helpText
+  helpText,
+  bucket = 'public',
+  path = ''
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(previewImage || null);
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClick = () => {
@@ -60,26 +66,57 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     }
   };
 
-  const handleFile = (file: File) => {
-    // Simulate upload process
+  const handleFile = async (file: File) => {
     setIsUploading(true);
-    setTimeout(() => {
-      onFileChange(file);
-      setIsUploading(false);
-      
-      // If it's an image, show preview
-      if (file.type.startsWith('image/')) {
-        const url = URL.createObjectURL(file);
-        setPreviewUrl(url);
-        if (onPreviewChange) {
-          onPreviewChange(url);
-        }
+    setCurrentFile(file);
+    onFileChange(file);
+    
+    // If it's an image, show preview immediately (local blob URL)
+    if (file.type.startsWith('image/')) {
+      const localUrl = URL.createObjectURL(file);
+      setPreviewUrl(localUrl);
+      if (onPreviewChange) {
+        onPreviewChange(localUrl);
       }
-    }, 1000);
+    }
+    
+    try {
+      // Upload to Supabase storage
+      const uploadedUrl = await uploadFile(file, bucket, path);
+      
+      // If upload was successful, update preview URL to the persistent storage URL
+      if (uploadedUrl && onPreviewChange) {
+        onPreviewChange(uploadedUrl);
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
-  const clearFile = () => {
+  const clearFile = async () => {
+    // If we have a preview URL from storage, try to delete it
+    if (previewUrl && !previewUrl.startsWith('blob:')) {
+      try {
+        // Extract filename from URL for deletion
+        const urlParts = previewUrl.split('/');
+        const filename = urlParts[urlParts.length - 1];
+        
+        // Delete the file from storage
+        await deleteFile(`${path}/${filename}`, bucket);
+      } catch (error) {
+        console.error('Error deleting file:', error);
+      }
+    }
+    
+    // Release object URL if it's a blob
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    
     onFileChange(null);
+    setCurrentFile(null);
     setPreviewUrl(null);
     if (onPreviewChange) {
       onPreviewChange(null);
