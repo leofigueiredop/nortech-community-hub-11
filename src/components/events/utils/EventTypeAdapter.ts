@@ -97,9 +97,9 @@ function getEventStatus(event: EventType): 'upcoming' | 'live' | 'ended' | 'happ
   
   // Fix comparisons with strings using type guards
   if (typeof event.status === 'string') {
-    // Convert legacy status values to compatible ones
-    if (event.status === 'past') return 'ended';
-    if (event.status === 'cancelled') return 'ended';
+    // Convert legacy status values to compatible ones using if-else instead of direct comparison
+    if (event.status.toLowerCase() === 'past') return 'ended';
+    if (event.status.toLowerCase() === 'cancelled') return 'ended';
     
     // If the status is already a valid type, use it
     const validStatuses = ['upcoming', 'live', 'ended', 'happening_soon', 'in_progress'];

@@ -1,3 +1,4 @@
+
 export interface Reward {
   id: string;
   community_id: string;
@@ -29,7 +30,8 @@ export interface Redemption {
   reward_id: string;
   redeemed_at: string;
   createdAt?: string; // Added for UI components
-  status: 'pending' | 'fulfilled' | 'cancelled' | 'expired';
+  created_at?: string; // Added to support both formats
+  status: 'pending' | 'fulfilled' | 'cancelled' | 'expired' | 'completed';
   fulfillment_details?: {
     delivery_info?: any;
     notes?: string;

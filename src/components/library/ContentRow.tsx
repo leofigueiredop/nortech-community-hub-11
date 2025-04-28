@@ -28,10 +28,12 @@ const ContentRow: React.FC<ContentRowProps> = ({
   };
 
   // Use the ContentSection component with adapted items
+  const adaptedItems = adaptLibraryArrayToContentType(items);
+
   return (
     <ContentSection
       title={title}
-      items={adaptLibraryArrayToContentType(items)}
+      items={adaptedItems}
       onItemSelect={handleItemSelect}
       isTopTen={isTopTen}
     />

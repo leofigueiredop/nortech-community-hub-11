@@ -4,6 +4,15 @@ import { api } from '@/api/ApiClient';
 import { AuthUser } from '@/types/api';
 import { toast } from '@/components/ui/use-toast';
 
+// Extend the IAuthRepository interface to add the updateProfile method
+interface ExtendedAuthRepository {
+  getCurrentUser(): Promise<AuthUser | null>;
+  login(credentials: { email: string; password: string }): Promise<{ user: AuthUser; token: string }>;
+  register(userData: { email: string; password: string; name: string }): Promise<{ user: AuthUser; token: string }>;
+  logout(): Promise<void>;
+  updateProfile(userData: Partial<AuthUser>): Promise<AuthUser>;
+}
+
 export const useAuth = () => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -98,7 +107,12 @@ export const useAuth = () => {
     try {
       if (!user?.id) throw new Error("User not logged in");
       
-      const updated = await api.auth.updateProfile(userdata);
+      const extendedAuthRepository = api.auth as unknown as ExtendedAuthRepository;
+      if (!extendedAuthRepository.updateProfile) {
+        throw new Error("Update profile method not available");
+      }
+      
+      const updated = await extendedAuthRepository.updateProfile(userdata);
       setUser(prev => prev ? { ...prev, ...updated } : updated);
       return updated;
     } catch (error) {

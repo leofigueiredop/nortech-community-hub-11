@@ -1,11 +1,6 @@
-
 import React from 'react';
 import { ContentItem } from '@/types/library';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import ContentSection from './ContentSection';
-import LibraryCategories from './LibraryCategories';
-import { motion } from 'framer-motion';
-import FeaturedContent from './FeaturedContent';
+import LibraryContentRows from './LibraryContentRows';
 import { adaptLibraryArrayToContentType } from '@/utils/contentTypeAdapter';
 
 interface LibraryContentProps {
@@ -13,67 +8,63 @@ interface LibraryContentProps {
   onItemSelect: (item: ContentItem) => void;
 }
 
-const LibraryContent: React.FC<LibraryContentProps> = ({
-  content,
-  onItemSelect
-}) => {
-  // Get top 10 content by views
-  const topTenContent = [...content]
-    .sort((a, b) => (b.views || 0) - (a.views || 0))
-    .slice(0, 10);
+interface LibraryCategoriesProps {
+  content: ContentItem[];
+  onItemSelect: (item: ContentItem) => void;
+}
 
-  // Get featured content (most viewed)
-  const featuredContent = [topTenContent[0]].filter(Boolean);
-
-  // Create an adapter function to handle the onItemSelect with content type
-  const handleItemSelect = (item: any) => {
-    // Find the original item from the content array to maintain type consistency
-    const originalItem = content.find(c => c.id === item.id);
-    if (originalItem) {
-      onItemSelect(originalItem);
-    }
-  };
-
+const LibraryCategories: React.FC<LibraryCategoriesProps> = ({ content, onItemSelect }) => {
+  // You can implement the LibraryCategories component here
+  // For example, display content categories as a list or grid
   return (
-    <ScrollArea className="h-[calc(100vh-12rem)]">
-      <div className="container py-6 max-w-screen-2xl space-y-8">
-        {/* Featured Content */}
-        <FeaturedContent items={featuredContent} onItemSelect={onItemSelect} />
+    <div>
+      {/* Categories content here */}
+    </div>
+  );
+};
 
-        {/* Top 10 Section */}
-        <div className="space-y-6">
-          <motion.h2 
-            className="text-3xl font-bold text-center mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Top 10 This Week 🏆
-          </motion.h2>
-          
-          <ContentSection 
-            title="" 
-            items={adaptLibraryArrayToContentType(topTenContent)} 
-            onItemSelect={handleItemSelect}
-            isTopTen={true}
-            layout="horizontal"
-          />
-        </div>
+const LibraryContent: React.FC<LibraryContentProps> = ({ content, onItemSelect }) => {
+  // Filter content by different criteria
+  const featuredContent = content.filter(item => item.is_featured || item.featured);
+  const newContent = content.filter(item => item.isNew);
+  const popularContent = [...content].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 8);
+  const recommendedContent = content.slice(0, 8); // Mock recommendation logic
+  
+  // Get trending content (using views or other metrics)
+  const trendingContent = [...content]
+    .sort((a, b) => {
+      const aValue = a.views || 0;
+      const bValue = b.views || 0;
+      return bValue - aValue;
+    })
+    .slice(0, 10);
+  
+  // Get premium content
+  const premiumContent = content.filter(
+    item => (item.access_level || item.accessLevel) === 'premium' || (item.access_level || item.accessLevel) === 'premium_plus'
+  );
+  
+  // Convert library items for components that use ContentItem from /types/content
+  const adaptedContent = adaptLibraryArrayToContentType(content);
+  
+  return (
+    <div className="container py-6 max-w-screen-2xl space-y-10">
+      <LibraryContentRows 
+        featuredContent={featuredContent}
+        newContent={newContent}
+        popularContent={popularContent}
+        recommendedContent={recommendedContent} 
+        trendingContent={trendingContent}
+        premiumContent={premiumContent}
+        onItemSelect={onItemSelect}
+      />
 
-        {/* Categories Navigation */}
-        <div className="space-y-4">
-          <motion.h2 
-            className="text-2xl font-semibold text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
-            Explore by Category
-          </motion.h2>
-          <LibraryCategories />
-        </div>
-      </div>
-    </ScrollArea>
+      {/* Add library categories section if you want it */}
+      <LibraryCategories 
+        content={content} 
+        onItemSelect={onItemSelect} 
+      />
+    </div>
   );
 };
 

@@ -12,6 +12,16 @@ interface User {
   access_level?: 'free' | 'premium' | 'premium_plus';
 }
 
+// Extended AuthUser interface to match what's used in the code
+interface AuthUser {
+  id: string;
+  email: string;
+  name?: string;
+  avatar_url?: string;
+  role?: string;
+  access_level?: 'free' | 'premium' | 'premium_plus';
+}
+
 export const useUser = () => {
   const [user, setUser] = useState<User>({
     id: 'user-1', // Default mock user

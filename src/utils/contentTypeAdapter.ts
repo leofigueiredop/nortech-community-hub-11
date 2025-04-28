@@ -7,12 +7,27 @@ import { ContentItem as ContentTypeItem, ContentFormat } from '@/types/content';
  * This addresses the incompatibility between the two types
  */
 export function adaptLibraryToContentType(item: ContentLibraryItem): ContentTypeItem {
+  // Ensure format is a valid ContentFormat
+  let format: ContentFormat;
+  if (typeof item.format === 'string') {
+    format = item.format as ContentFormat;
+  } else {
+    format = 'text'; // Default format if invalid
+  }
+
+  // Ensure description is not undefined (it's required in ContentTypeItem)
+  const description = item.description || '';
+
+  // Ensure access_level is valid
+  const accessLevel = (item.access_level || item.accessLevel || 'free') as 'free' | 'premium' | 'premium_plus';
+
+  // Create properly typed ContentTypeItem
   return {
     id: item.id,
     title: item.title,
-    description: item.description || '',
+    description: description,
     url: item.url,
-    format: item.format as ContentFormat,
+    format: format,
     thumbnail: item.thumbnail || item.thumbnailUrl,
     thumbnailUrl: item.thumbnailUrl || item.thumbnail,
     community_id: item.community_id || 'default-community',
@@ -23,7 +38,7 @@ export function adaptLibraryToContentType(item: ContentLibraryItem): ContentType
     views: item.views || 0,
     likes: item.likes || 0,
     duration: item.duration || 0,
-    access_level: (item.access_level || item.accessLevel || 'free') as 'free' | 'premium' | 'premium_plus',
+    access_level: accessLevel,
     category_id: item.category_id || item.categoryId,
     tags: item.tags || [],
     isNew: item.isNew,
@@ -36,7 +51,7 @@ export function adaptLibraryToContentType(item: ContentLibraryItem): ContentType
     completionCriteria: item.completionCriteria as any,
     completionThreshold: item.completionThreshold,
     fileSize: item.fileSize,
-    accessLevel: (item.accessLevel || item.access_level || 'free') as 'free' | 'premium' | 'premium_plus',
+    accessLevel: accessLevel,
     featured: item.featured || item.is_featured || false,
     createdAt: item.createdAt || item.created_at || new Date().toISOString(),
     updatedAt: item.updatedAt || item.updated_at || new Date().toISOString(),

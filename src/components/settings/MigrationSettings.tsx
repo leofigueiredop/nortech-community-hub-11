@@ -1,319 +1,251 @@
+
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { LoaderIcon, CheckCircleIcon, AlertCircleIcon } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/api/ApiClient';
-import { createSQLFunctions } from '@/api/migrations/createSQLFunctions';
-import { useToast } from '@/hooks/use-toast';
-import { supabaseConfig } from '@/api/config';
+import { Progress } from '@/components/ui/progress';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const MigrationSettings: React.FC = () => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState<{
-    content: boolean;
-    events: boolean;
-    discussions: boolean;
-    points: boolean;
-  } | null>(null);
-  const [initialized, setInitialized] = useState(false);
-  const [supabaseConfigured, setSupabaseConfigured] = useState(false);
+  const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationProgress, setMigrationProgress] = useState(0);
+  const [migrationStatuses, setMigrationStatuses] = useState({
+    content: false,
+    events: false,
+    discussions: false,
+    points: false
+  });
 
   useEffect(() => {
-    // Check if Supabase is configured correctly
-    const isConfigured = 
-      supabaseConfig.url !== "https://your-supabase-project.supabase.co" && 
-      supabaseConfig.anonKey !== "your-anon-key";
-    setSupabaseConfigured(isConfigured);
-    
-    if (isConfigured) {
-      fetchMigrationStatus();
-    }
+    checkMigrationStatus();
   }, []);
 
-  const fetchMigrationStatus = async () => {
-    if (!supabaseConfigured) return;
-    
+  const checkMigrationStatus = async () => {
     try {
-      const status = await api.migration.getMigrationStatus();
-      setStatus(status);
-    } catch (error) {
-      console.error('Error fetching migration status:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to fetch migration status',
-      });
-    }
-  };
-
-  const handleInitialize = async () => {
-    setIsLoading(true);
-    try {
-      await createSQLFunctions();
-      setInitialized(true);
-      toast({
-        title: 'SQL Functions Created',
-        description: 'Database functions have been created successfully.',
-      });
-    } catch (error) {
-      console.error('Error initializing:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Initialization Error',
-        description: 'Failed to create SQL functions',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleMigrate = async (type: 'content' | 'events' | 'discussions' | 'points') => {
-    setIsLoading(true);
-    try {
-      switch (type) {
-        case 'content':
-          await api.migration.createContentTables();
-          break;
-        case 'events':
-          await api.migration.createEventsTables();
-          break;
-        case 'discussions':
-          await api.migration.createDiscussionTables();
-          break;
-        case 'points':
-          await api.migration.createPointsTables();
-          break;
+      if (api.migrations.getMigrationStatus) {
+        const migrated = await api.migrations.getMigrationStatus();
+        // Handle as a boolean for the entire status
+        const statusObj = {
+          content: migrated,
+          events: migrated,
+          discussions: migrated,
+          points: migrated
+        };
+        setMigrationStatuses(statusObj);
       }
-      
-      await fetchMigrationStatus();
-      
-      toast({
-        title: 'Migration Successful',
-        description: `${type.charAt(0).toUpperCase() + type.slice(1)} tables created successfully.`,
-      });
     } catch (error) {
-      console.error(`Error migrating ${type}:`, error);
-      toast({
-        variant: 'destructive',
-        title: 'Migration Error',
-        description: `Failed to create ${type} tables`,
-      });
-    } finally {
-      setIsLoading(false);
+      console.error('Error checking migration status:', error);
     }
   };
 
-  const handleRunAllMigrations = async () => {
-    setIsLoading(true);
+  const handleMigrate = async () => {
     try {
-      if (!initialized) {
-        await createSQLFunctions();
-        setInitialized(true);
+      setIsMigrating(true);
+      setMigrationProgress(10);
+
+      // Run main migrations
+      await api.migrations.runMigrations();
+      setMigrationProgress(50);
+
+      // Run additional migrations if needed
+      let allMigrated = true;
+
+      // Content tables
+      if (!migrationStatuses.content && api.migrations.createContentTables) {
+        await api.migrations.createContentTables();
+        setMigrationStatuses(prev => ({ ...prev, content: true }));
       }
-      
-      await api.migration.createContentTables();
-      await api.migration.createEventsTables();
-      await api.migration.createDiscussionTables();
-      await api.migration.createPointsTables();
-      
-      await fetchMigrationStatus();
-      
+
+      // Events tables
+      if (!migrationStatuses.events && api.migrations.createEventsTables) {
+        await api.migrations.createEventsTables();
+        setMigrationStatuses(prev => ({ ...prev, events: true }));
+      }
+
+      // Discussion tables
+      if (!migrationStatuses.discussions && api.migrations.createDiscussionTables) {
+        await api.migrations.createDiscussionTables();
+        setMigrationStatuses(prev => ({ ...prev, discussions: true }));
+      }
+
+      // Points tables
+      if (!migrationStatuses.points && api.migrations.createPointsTables) {
+        await api.migrations.createPointsTables();
+        setMigrationStatuses(prev => ({ ...prev, points: true }));
+      }
+
+      setMigrationProgress(100);
+
       toast({
-        title: 'All Migrations Complete',
-        description: 'All database tables have been created successfully.',
+        title: "Migration Complete",
+        description: "The database schema has been successfully migrated."
       });
+
+      setTimeout(() => {
+        setIsMigrating(false);
+        setMigrationProgress(0);
+      }, 1000);
+
     } catch (error) {
-      console.error('Error running migrations:', error);
+      console.error('Migration failed:', error);
+      setIsMigrating(false);
+      setMigrationProgress(0);
       toast({
-        variant: 'destructive',
-        title: 'Migration Error',
-        description: 'Failed to run all migrations',
+        title: "Migration Failed",
+        description: "There was an error during the migration process.",
+        variant: "destructive"
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  if (!supabaseConfigured) {
-    return (
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Database Migration</CardTitle>
-            <CardDescription>
-              Create and manage your database tables
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Alert className="mb-4 border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-              <AlertCircleIcon className="h-4 w-4" />
-              <AlertTitle>Supabase Configuration Missing</AlertTitle>
-              <AlertDescription>
-                Please configure your Supabase URL and anon key in your environment variables. 
-                You need to set the following environment variables:
-                <ul className="list-disc pl-5 mt-2">
-                  <li>VITE_SUPABASE_URL</li>
-                  <li>VITE_SUPABASE_ANON_KEY</li>
-                </ul>
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const runSpecificMigrations = async () => {
+    try {
+      setIsMigrating(true);
+      setMigrationProgress(25);
+
+      // Run specific migrations based on checkboxes
+      if (!migrationStatuses.content && api.migrations.createContentTables) await api.migrations.createContentTables();
+      if (!migrationStatuses.events && api.migrations.createEventsTables) await api.migrations.createEventsTables();
+      if (!migrationStatuses.discussions && api.migrations.createDiscussionTables) await api.migrations.createDiscussionTables();
+      if (!migrationStatuses.points && api.migrations.createPointsTables) await api.migrations.createPointsTables();
+
+      await checkMigrationStatus();
+      setMigrationProgress(100);
+
+      toast({
+        title: "Selective Migration Complete",
+        description: "The selected tables have been successfully migrated."
+      });
+
+      setTimeout(() => {
+        setIsMigrating(false);
+        setMigrationProgress(0);
+      }, 1000);
+    } catch (error) {
+      console.error('Selective migration failed:', error);
+      setIsMigrating(false);
+      setMigrationProgress(0);
+      toast({
+        title: "Migration Failed",
+        description: "There was an error during the selective migration process.",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Database Migration</CardTitle>
-          <CardDescription>
-            Create and manage your database tables
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!initialized && (
-            <div className="mb-6">
-              <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
-                <AlertCircleIcon className="h-4 w-4" />
-                <AlertTitle>Initialization Required</AlertTitle>
-                <AlertDescription>
-                  You need to initialize the SQL functions before running migrations.
-                </AlertDescription>
-              </Alert>
-              <Button 
-                onClick={handleInitialize}
-                disabled={isLoading}
-                className="mb-4"
+    <Card>
+      <CardHeader>
+        <CardTitle>Database Migrations</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Run database migrations to update your schema to the latest version. This may be needed after updating the platform.
+        </p>
+        
+        {isMigrating && (
+          <div className="space-y-2 my-4">
+            <Progress value={migrationProgress} className="h-2" />
+            <p className="text-sm text-center">{migrationProgress}% Complete</p>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="content-tables" 
+                checked={migrationStatuses.content}
+                onCheckedChange={(checked) => 
+                  setMigrationStatuses(prev => ({ ...prev, content: !!checked }))
+                }
+              />
+              <label 
+                htmlFor="content-tables" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                {isLoading ? (
-                  <>
-                    <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
-                    Initializing...
-                  </>
-                ) : (
-                  'Initialize SQL Functions'
-                )}
-              </Button>
-            </div>
-          )}
-
-          <div className="mb-4">
-            <Button 
-              onClick={handleRunAllMigrations}
-              disabled={isLoading || (!initialized && !status)}
-              className="w-full mb-4"
-            >
-              {isLoading ? (
-                <>
-                  <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
-                  Running Migrations...
-                </>
-              ) : (
-                'Run All Migrations'
-              )}
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <h3 className="font-medium">Content Tables</h3>
-                <p className="text-sm text-gray-500">content_items, content_categories</p>
-              </div>
-              <div className="flex items-center">
-                {status?.content ? (
-                  <span className="flex items-center text-green-600">
-                    <CheckCircleIcon className="mr-1 h-5 w-5" />
-                    Installed
-                  </span>
-                ) : (
-                  <Button 
-                    onClick={() => handleMigrate('content')} 
-                    disabled={isLoading || (!initialized && !status)}
-                    size="sm"
-                  >
-                    {isLoading ? 'Installing...' : 'Install'}
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <h3 className="font-medium">Events Tables</h3>
-                <p className="text-sm text-gray-500">events, event_attendees</p>
-              </div>
-              <div className="flex items-center">
-                {status?.events ? (
-                  <span className="flex items-center text-green-600">
-                    <CheckCircleIcon className="mr-1 h-5 w-5" />
-                    Installed
-                  </span>
-                ) : (
-                  <Button 
-                    onClick={() => handleMigrate('events')} 
-                    disabled={isLoading || (!initialized && !status)}
-                    size="sm"
-                  >
-                    {isLoading ? 'Installing...' : 'Install'}
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <h3 className="font-medium">Discussions Tables</h3>
-                <p className="text-sm text-gray-500">discussion_topics, discussions, discussion_replies</p>
-              </div>
-              <div className="flex items-center">
-                {status?.discussions ? (
-                  <span className="flex items-center text-green-600">
-                    <CheckCircleIcon className="mr-1 h-5 w-5" />
-                    Installed
-                  </span>
-                ) : (
-                  <Button 
-                    onClick={() => handleMigrate('discussions')} 
-                    disabled={isLoading || (!initialized && !status)}
-                    size="sm"
-                  >
-                    {isLoading ? 'Installing...' : 'Install'}
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <h3 className="font-medium">Points Tables</h3>
-                <p className="text-sm text-gray-500">user_points, rewards, redemptions</p>
-              </div>
-              <div className="flex items-center">
-                {status?.points ? (
-                  <span className="flex items-center text-green-600">
-                    <CheckCircleIcon className="mr-1 h-5 w-5" />
-                    Installed
-                  </span>
-                ) : (
-                  <Button 
-                    onClick={() => handleMigrate('points')} 
-                    disabled={isLoading || (!initialized && !status)}
-                    size="sm"
-                  >
-                    {isLoading ? 'Installing...' : 'Install'}
-                  </Button>
-                )}
-              </div>
+                Content Tables {migrationStatuses.content && '✓'}
+              </label>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          
+          {/* Repeat for other tables */}
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="events-tables" 
+                checked={migrationStatuses.events}
+                onCheckedChange={(checked) => 
+                  setMigrationStatuses(prev => ({ ...prev, events: !!checked }))
+                }
+              />
+              <label 
+                htmlFor="events-tables" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Events Tables {migrationStatuses.events && '✓'}
+              </label>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="discussions-tables" 
+                checked={migrationStatuses.discussions}
+                onCheckedChange={(checked) => 
+                  setMigrationStatuses(prev => ({ ...prev, discussions: !!checked }))
+                }
+              />
+              <label 
+                htmlFor="discussions-tables" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Discussions Tables {migrationStatuses.discussions && '✓'}
+              </label>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="points-tables" 
+                checked={migrationStatuses.points}
+                onCheckedChange={(checked) => 
+                  setMigrationStatuses(prev => ({ ...prev, points: !!checked }))
+                }
+              />
+              <label 
+                htmlFor="points-tables" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Points & Rewards Tables {migrationStatuses.points && '✓'}
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-4 flex flex-col gap-2 sm:flex-row">
+          <Button 
+            onClick={handleMigrate} 
+            disabled={isMigrating}
+            className="flex-1"
+          >
+            Run All Migrations
+          </Button>
+          <Button 
+            onClick={runSpecificMigrations}
+            disabled={isMigrating}
+            variant="outline"
+            className="flex-1"
+          >
+            Run Selected Migrations
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

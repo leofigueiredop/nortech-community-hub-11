@@ -24,8 +24,8 @@ export interface ContentItem {
   category_id?: string;
   categoryId?: string;
   tags?: string[];
-  access_level?: string;
-  accessLevel?: string;
+  access_level?: 'free' | 'premium' | 'premium_plus';
+  accessLevel?: 'free' | 'premium' | 'premium_plus';
   is_featured?: boolean;
   featured?: boolean;
   views?: number;
@@ -44,6 +44,7 @@ export interface ContentItem {
   resourceUrl?: string;
   fileSize?: number;
   freeAccessesLeft?: number;
+  isExclusive?: boolean; // Add this property to fix mock data errors
 }
 
 export interface ContentInteraction {
@@ -93,11 +94,12 @@ export interface CourseModule {
 export interface CourseModuleItem {
   id: string;
   title: string;
-  type: 'video' | 'document' | 'quiz' | 'exercise' | 'text';
+  type: 'video' | 'document' | 'quiz' | 'exercise' | 'text' | 'assignment';
   duration?: number;
   completed?: boolean;
   url?: string;
   content?: string;
+  contentId?: string; // Add this to fix mockCourseData.ts errors
 }
 
 export interface Course extends ContentItem {

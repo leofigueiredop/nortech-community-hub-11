@@ -1,90 +1,103 @@
 
-import { Course } from '@/types/library';
+import { Course, CourseModule, CourseModuleItem } from '@/types/library';
 
-export const sampleCourse: Course = {
-  id: "react-mastery-2024",
-  title: "React Mastery 2024",
-  description: "Master modern React development with hands-on projects and advanced concepts. Learn hooks, state management, and best practices.",
-  thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop",
-  accessLevel: "free", // Changed from premium to free
+// Sample course data with modules and lessons
+export const MOCK_COURSE: Course = {
+  id: 'course-1',
+  title: 'Building Modern Web Applications',
+  description: 'Learn how to build scalable web applications using modern frameworks and best practices',
+  thumbnail: '/assets/course-thumbnail.jpg',
+  format: 'course',
+  access_level: 'premium',
+  community_id: 'community-1',
+  created_at: '2023-04-15T10:00:00Z',
+  updated_at: '2023-06-10T15:30:00Z',
   modules: [
     {
-      id: "m1",
-      title: "Getting Started with React",
+      id: 'module-1',
+      title: 'Getting Started',
       items: [
         {
-          id: "m1-l1",
-          title: "Introduction to React Development",
-          type: "video",
-          content: "intro-video",
+          id: 'item-1',
+          title: 'Introduction to the Course',
+          type: 'video',
+          content: 'https://example.com/videos/intro.mp4',
+          contentId: 'content-101',
           completed: false
         },
         {
-          id: "m1-l2",
-          title: "Setting Up Your Development Environment",
-          type: "video",
-          content: "setup-video",
+          id: 'item-2',
+          title: 'Setting Up Your Development Environment',
+          type: 'video',
+          content: 'https://example.com/videos/setup.mp4',
+          contentId: 'content-102',
           completed: false
         },
         {
-          id: "m1-l3",
-          title: "Your First React Component",
-          type: "video",
-          content: "component-video",
+          id: 'item-3',
+          title: 'Overview of Modern Web Technologies',
+          type: 'document',
+          content: 'https://example.com/docs/overview.pdf',
+          contentId: 'content-103',
           completed: false
         }
       ]
     },
     {
-      id: "m2",
-      title: "React Fundamentals",
+      id: 'module-2',
+      title: 'Frontend Development',
       items: [
         {
-          id: "m2-l1",
-          title: "Understanding JSX",
-          type: "video",
-          content: "jsx-video",
+          id: 'item-4',
+          title: 'Component-Based Architecture',
+          type: 'video',
+          content: 'https://example.com/videos/components.mp4',
+          contentId: 'content-201',
           completed: false
         },
         {
-          id: "m2-l2",
-          title: "Props and State",
-          type: "video",
-          content: "props-state-video",
+          id: 'item-5',
+          title: 'State Management Patterns',
+          type: 'video',
+          content: 'https://example.com/videos/state.mp4',
+          contentId: 'content-202',
           completed: false
         },
         {
-          id: "m2-l3",
-          title: "Fundamentals Quiz",
-          type: "quiz",
-          content: "fundamentals-quiz",
+          id: 'item-6',
+          title: 'Responsive Design Principles',
+          type: 'text',
+          content: 'This lesson covers the fundamental principles of responsive design...',
+          contentId: 'content-203',
           completed: false
         }
       ]
     },
     {
-      id: "m3",
-      title: "Advanced React Patterns",
+      id: 'module-3',
+      title: 'Backend Integration',
       items: [
         {
-          id: "m3-l1",
-          title: "React Hooks Deep Dive",
-          type: "video",
-          content: "hooks-video",
+          id: 'item-7',
+          title: 'API Design Best Practices',
+          type: 'video',
+          content: 'https://example.com/videos/api-design.mp4',
+          contentId: 'content-301',
           completed: false
         },
         {
-          id: "m3-l2",
-          title: "Context API and State Management",
-          type: "video",
-          content: "context-video",
+          id: 'item-8',
+          title: 'Authentication and Authorization',
+          type: 'video',
+          content: 'https://example.com/videos/auth.mp4',
+          contentId: 'content-302',
           completed: false
         },
         {
-          id: "m3-l3",
-          title: "Custom Hook Exercise",
-          type: "exercise",
-          content: "hook-assignment",
+          id: 'item-9',
+          title: 'Module Assignment - Build an API',
+          type: 'assignment',
+          content: 'Create a RESTful API with at least three endpoints that follow the principles discussed in this module.',
           completed: false
         }
       ]

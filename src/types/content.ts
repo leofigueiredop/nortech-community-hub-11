@@ -32,6 +32,7 @@ export interface ContentItem {
   pointsEnabled?: boolean;
   pointsValue?: number;
   freeAccessesLeft?: number;
+  isExclusive?: boolean; // Add this property to fix the errors in mockLibraryData.ts
   author?: {
     id: string;
     name: string;
