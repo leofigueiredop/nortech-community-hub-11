@@ -87,7 +87,7 @@ const RedemptionHistory: React.FC = () => {
             {redemptions.map((redemption) => (
               <TableRow key={redemption.id}>
                 <TableCell className="font-medium">
-                  {new Date(redemption.createdAt || redemption.redeemed_at).toLocaleDateString()}
+                  {new Date(redemption.createdAt || redemption.redeemed_at || redemption.created_at).toLocaleDateString()}
                 </TableCell>
                 <TableCell>{redemption.reward?.title || redemption.reward?.name}</TableCell>
                 <TableCell>{redemption.pointsSpent || redemption.points_spent}</TableCell>

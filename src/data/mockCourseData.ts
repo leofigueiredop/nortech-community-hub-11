@@ -16,21 +16,21 @@ export const sampleCourse: Course = {
           id: "m1-l1",
           title: "Introduction to React Development",
           type: "video",
-          contentId: "intro-video",
+          content: "intro-video",
           completed: false
         },
         {
           id: "m1-l2",
           title: "Setting Up Your Development Environment",
           type: "video",
-          contentId: "setup-video",
+          content: "setup-video",
           completed: false
         },
         {
           id: "m1-l3",
           title: "Your First React Component",
           type: "video",
-          contentId: "component-video",
+          content: "component-video",
           completed: false
         }
       ]
@@ -43,21 +43,21 @@ export const sampleCourse: Course = {
           id: "m2-l1",
           title: "Understanding JSX",
           type: "video",
-          contentId: "jsx-video",
+          content: "jsx-video",
           completed: false
         },
         {
           id: "m2-l2",
           title: "Props and State",
           type: "video",
-          contentId: "props-state-video",
+          content: "props-state-video",
           completed: false
         },
         {
           id: "m2-l3",
           title: "Fundamentals Quiz",
           type: "quiz",
-          contentId: "fundamentals-quiz",
+          content: "fundamentals-quiz",
           completed: false
         }
       ]
@@ -70,21 +70,21 @@ export const sampleCourse: Course = {
           id: "m3-l1",
           title: "React Hooks Deep Dive",
           type: "video",
-          contentId: "hooks-video",
+          content: "hooks-video",
           completed: false
         },
         {
           id: "m3-l2",
           title: "Context API and State Management",
           type: "video",
-          contentId: "context-video",
+          content: "context-video",
           completed: false
         },
         {
           id: "m3-l3",
-          title: "Assignment: Build a Custom Hook",
-          type: "assignment",
-          contentId: "hook-assignment",
+          title: "Custom Hook Exercise",
+          type: "exercise",
+          content: "hook-assignment",
           completed: false
         }
       ]

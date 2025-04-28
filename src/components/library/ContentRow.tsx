@@ -3,6 +3,7 @@ import React from 'react';
 import { ContentItem as ContentLibraryItem } from '@/types/library';
 import { ContentItem } from '@/types/content';
 import ContentSection from './ContentSection';
+import { adaptLibraryArrayToContentType } from '@/utils/contentTypeAdapter';
 
 interface ContentRowProps {
   items: ContentLibraryItem[];
@@ -17,19 +18,7 @@ const ContentRow: React.FC<ContentRowProps> = ({
   isTopTen = false,
   title 
 }) => {
-  // Create adapter function to convert ContentLibraryItem to ContentItem
-  const adaptItems = (items: ContentLibraryItem[]): ContentItem[] => {
-    return items.map(item => ({
-      ...item,
-      format: item.format as any, // Cast format to solve the type mismatch
-      description: item.description || "",
-      access_level: item.accessLevel || item.access_level || "free",
-      community_id: item.community_id || "default-community",
-      created_at: item.created_at || item.createdAt || new Date().toISOString(),
-      updated_at: item.updated_at || item.updatedAt || new Date().toISOString()
-    }));
-  };
-
+  // Handle item selection by finding the original library item
   const handleItemSelect = (item: ContentItem) => {
     // Find the original item to maintain type consistency
     const originalItem = items.find(i => i.id === item.id);
@@ -42,7 +31,7 @@ const ContentRow: React.FC<ContentRowProps> = ({
   return (
     <ContentSection
       title={title}
-      items={adaptItems(items)}
+      items={adaptLibraryArrayToContentType(items)}
       onItemSelect={handleItemSelect}
       isTopTen={isTopTen}
     />

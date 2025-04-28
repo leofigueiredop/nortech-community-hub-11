@@ -30,7 +30,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   isTopTen = false,
   viewAllUrl,
   showNewBadge = false,
-  layout,
+  layout = 'grid',
 }) => {
   if (items.length === 0) {
     return null;
@@ -140,7 +140,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
               </div>
 
               <div className="flex gap-1 ml-auto items-center">
-                {item.author && typeof item.author === 'object' && item.author !== null ? (
+                {typeof item.author === 'object' && item.author !== null ? (
                   <div className="flex items-center gap-1">
                     <Avatar className="w-4 h-4">
                       <AvatarImage src={item.author.avatar} />

@@ -70,6 +70,14 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
 
   // Use either imageUrl or image_url
   const imageUrl = reward.imageUrl || reward.image_url || '/placeholder.svg';
+  // Use either title or name
+  const title = reward.title || reward.name;
+  // Use either pointsCost or points_cost
+  const pointsCost = reward.pointsCost || reward.points_cost;
+  // Use either expiresAt or expires_at
+  const expiresAt = reward.expiresAt || reward.expires_at;
+  // Use either stock or quantity_available
+  const stock = reward.stock !== undefined ? reward.stock : reward.quantity_available;
 
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow">
@@ -79,7 +87,7 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
       />
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <h3 className="font-bold">{reward.title || reward.name}</h3>
+          <h3 className="font-bold">{title}</h3>
           {getVisibilityLabel()}
         </div>
         <div className="flex items-center space-x-2 text-xs text-muted-foreground">
@@ -97,7 +105,7 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
             </Tooltip>
           </TooltipProvider>
           
-          {(reward.expiresAt || reward.expires_at) && (
+          {expiresAt && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -107,7 +115,7 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Expires on {new Date(reward.expiresAt || reward.expires_at).toLocaleDateString()}</p>
+                  <p>Expires on {new Date(expiresAt).toLocaleDateString()}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -119,7 +127,7 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward }) => {
       </CardContent>
       <CardFooter className="border-t pt-4 flex justify-between items-center">
         <div className="font-bold text-purple-600 dark:text-purple-400">
-          {reward.pointsCost || reward.points_cost} Points
+          {pointsCost} Points
         </div>
         <Button 
           onClick={() => openRedeemDialog(reward)}

@@ -35,6 +35,9 @@ const RedeemDialog: React.FC<RedeemDialogProps> = ({ isOpen, onClose, reward, on
   const stockAvailable = reward.stock !== undefined ? reward.stock : reward.quantity_available;
   const isOutOfStock = stockAvailable !== null && stockAvailable !== undefined && stockAvailable <= 0;
   
+  // Get the reward title or name
+  const rewardTitle = reward.title || reward.name;
+  
   const handleConfirm = () => {
     if (!canAfford) {
       toast({
@@ -69,7 +72,7 @@ const RedeemDialog: React.FC<RedeemDialogProps> = ({ isOpen, onClose, reward, on
         
         <div className="py-4">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-medium">{reward.title || reward.name}</h4>
+            <h4 className="font-medium">{rewardTitle}</h4>
             <span className="font-bold text-purple-600 dark:text-purple-400">{rewardCost} Points</span>
           </div>
           

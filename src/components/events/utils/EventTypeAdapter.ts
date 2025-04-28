@@ -102,7 +102,8 @@ function getEventStatus(event: EventType): 'upcoming' | 'live' | 'ended' | 'happ
     if (event.status === 'cancelled') return 'ended';
     
     // If the status is already a valid type, use it
-    if (['upcoming', 'live', 'ended', 'happening_soon', 'in_progress'].includes(event.status)) {
+    const validStatuses = ['upcoming', 'live', 'ended', 'happening_soon', 'in_progress'];
+    if (validStatuses.includes(event.status)) {
       return event.status as 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress';
     }
   }

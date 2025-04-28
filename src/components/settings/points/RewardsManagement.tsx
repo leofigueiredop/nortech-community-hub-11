@@ -43,14 +43,14 @@ const RewardsManagement: React.FC = () => {
   const handleEditReward = (reward: Reward) => {
     setEditingReward({
       id: reward.id,
-      name: reward.title,
-      description: reward.description,
-      imageUrl: reward.imageUrl,
-      pointsCost: reward.pointsCost,
-      type: reward.type as RewardType,
+      name: reward.title || reward.name,
+      description: reward.description || '',
+      imageUrl: reward.imageUrl || reward.image_url,
+      pointsCost: reward.pointsCost || reward.points_cost,
+      type: (reward.type || reward.reward_type) as RewardType,
       visibility: reward.visibility as RewardVisibility,
-      stock: reward.stock,
-      expiresAt: reward.expiresAt,
+      stock: reward.stock || reward.quantity_available,
+      expiresAt: reward.expiresAt || reward.expires_at,
       actionUrl: reward.actionUrl,
       isActive: true
     });
@@ -59,14 +59,14 @@ const RewardsManagement: React.FC = () => {
 
   const handleDuplicateReward = (reward: Reward) => {
     setEditingReward({
-      name: `${reward.title} (Copy)`,
-      description: reward.description,
-      imageUrl: reward.imageUrl,
-      pointsCost: reward.pointsCost,
-      type: reward.type as RewardType,
+      name: `${reward.title || reward.name} (Copy)`,
+      description: reward.description || '',
+      imageUrl: reward.imageUrl || reward.image_url,
+      pointsCost: reward.pointsCost || reward.points_cost,
+      type: (reward.type || reward.reward_type) as RewardType,
       visibility: reward.visibility as RewardVisibility,
-      stock: reward.stock,
-      expiresAt: reward.expiresAt,
+      stock: reward.stock || reward.quantity_available,
+      expiresAt: reward.expiresAt || reward.expires_at,
       actionUrl: reward.actionUrl,
       isActive: true
     });
@@ -77,29 +77,41 @@ const RewardsManagement: React.FC = () => {
     if (formData.id) {
       updateReward(formData.id, {
         title: formData.name,
+        name: formData.name,
         description: formData.description,
         imageUrl: formData.imageUrl,
+        image_url: formData.imageUrl,
         pointsCost: formData.pointsCost,
+        points_cost: formData.pointsCost,
         type: formData.type as any,
+        reward_type: formData.type as any,
         visibility: formData.visibility as any,
         stock: formData.stock || null,
+        quantity_available: formData.stock || null,
         expiresAt: formData.expiresAt ? 
           (formData.expiresAt instanceof Date ? formData.expiresAt.toISOString() : formData.expiresAt) : null,
-        actionUrl: formData.actionUrl
+        expires_at: formData.expiresAt ? 
+          (formData.expiresAt instanceof Date ? formData.expiresAt.toISOString() : formData.expiresAt) : null,
       });
       toast.success('Reward updated successfully');
     } else {
       addReward({
         title: formData.name,
+        name: formData.name,
         description: formData.description,
         imageUrl: formData.imageUrl,
+        image_url: formData.imageUrl,
         pointsCost: formData.pointsCost,
+        points_cost: formData.pointsCost,
         type: formData.type as any,
+        reward_type: formData.type as any,
         visibility: formData.visibility as any,
         stock: formData.stock || null,
+        quantity_available: formData.stock || null,
         expiresAt: formData.expiresAt ? 
           (formData.expiresAt instanceof Date ? formData.expiresAt.toISOString() : formData.expiresAt) : null,
-        actionUrl: formData.actionUrl
+        expires_at: formData.expiresAt ? 
+          (formData.expiresAt instanceof Date ? formData.expiresAt.toISOString() : formData.expiresAt) : null,
       });
       toast.success('New reward created successfully');
     }

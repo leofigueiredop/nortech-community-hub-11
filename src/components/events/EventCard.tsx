@@ -37,7 +37,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
   };
 
   // Convert the event.id to string for the EventAttendanceManager
-  const eventIdString = String(event.id);
+  const eventIdString = typeof event.id === 'number' ? String(event.id) : event.id;
 
   return (
     <>

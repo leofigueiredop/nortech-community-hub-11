@@ -70,15 +70,7 @@ const LibraryContent: React.FC<LibraryContentProps> = ({
           >
             Explore by Category
           </motion.h2>
-          <motion.p
-            className="text-center text-muted-foreground mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
-            Choose a category to discover curated content just for you
-          </motion.p>
-          <LibraryCategories content={content} onItemSelect={onItemSelect} />
+          <LibraryCategories />
         </div>
       </div>
     </ScrollArea>

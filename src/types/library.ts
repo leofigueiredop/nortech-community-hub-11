@@ -1,13 +1,15 @@
+
 import { ContentFormat, ContentCategory as BaseContentCategory } from './content';
 
 export interface ContentCategory extends BaseContentCategory {
   itemCount?: number;
+  icon?: string;
 }
 
 export interface ContentItem {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   content?: string;
   format: ContentFormat | string;
   url?: string;
@@ -84,7 +86,7 @@ export interface CourseModule {
   id: string;
   title: string;
   description?: string;
-  order: number;
+  order?: number;
   items: CourseModuleItem[];
 }
 
@@ -117,4 +119,5 @@ export type ContentFormat =
   | 'link'
   | 'youtube'
   | 'vimeo'
-  | 'gdoc';
+  | 'gdoc'
+  | string;

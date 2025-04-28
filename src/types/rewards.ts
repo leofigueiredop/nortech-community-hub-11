@@ -1,4 +1,3 @@
-
 export interface Reward {
   id: string;
   community_id: string;
@@ -21,6 +20,7 @@ export interface Reward {
   type?: string; // Added for UI components 
   visibility?: string; // Added for UI components
   redeemCount?: number; // Added for UI components
+  actionUrl?: string; // Added for UI components
 }
 
 export interface Redemption {

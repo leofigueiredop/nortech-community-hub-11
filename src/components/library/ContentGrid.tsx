@@ -3,6 +3,7 @@ import React from 'react';
 import { ContentItem } from '@/types/library';
 import EnhancedContentCard from './EnhancedContentCard';
 import { motion } from 'framer-motion';
+import { adaptLibraryArrayToContentType } from '@/utils/contentTypeAdapter';
 
 interface ContentGridProps {
   items: ContentItem[];
@@ -35,6 +36,14 @@ const ContentGrid: React.FC<ContentGridProps> = ({ items, onItemSelect }) => {
     show: { y: 0, opacity: 1 }
   };
 
+  // Handle item selection by finding the original library item
+  const handleItemSelect = (item: any) => {
+    onItemSelect(items.find(i => i.id === item.id) || item);
+  };
+
+  // Convert library items to content items for EnhancedContentCard
+  const adaptedItems = adaptLibraryArrayToContentType(items);
+
   return (
     <motion.div 
       className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
@@ -42,11 +51,11 @@ const ContentGrid: React.FC<ContentGridProps> = ({ items, onItemSelect }) => {
       initial="hidden"
       animate="show"
     >
-      {items.map((contentItem, index) => (
+      {adaptedItems.map((contentItem, index) => (
         <motion.div key={contentItem.id} variants={item}>
           <EnhancedContentCard
             item={contentItem}
-            onSelect={() => onItemSelect(contentItem)}
+            onSelect={() => handleItemSelect(contentItem)}
           />
         </motion.div>
       ))}

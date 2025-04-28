@@ -3,6 +3,7 @@ import React from 'react';
 import { ContentItem } from '@/types/library';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import LibraryContent from './LibraryContent';
+import { adaptLibraryArrayToContentType } from '@/utils/contentTypeAdapter';
 
 interface LibraryContentAreaProps {
   isSearchActive: boolean;
