@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { usePoints } from '@/context/PointsContext';
 import { useContentProgress } from '@/hooks/useContentProgress';
@@ -7,7 +8,8 @@ import {
   DiscussionReply, 
   DiscussionFilter,
   DiscussionBadge,
-  DiscussionUser
+  DiscussionUser,
+  DiscussionComment
 } from '@/types/discussion';
 
 // Mock data for discussion topics
@@ -392,11 +394,11 @@ export const useDiscussions = () => {
   };
 
   // Create a new topic
-  const createTopic = useCallback((topic: Omit<DiscussionTopic, 'id' | 'discussionCount' | 'memberCount' | 'recentActivity' | 'createdAt' | 'slug'>>) => {
+  const createTopic = useCallback((topic: Omit<DiscussionTopic, 'id' | 'discussionCount' | 'memberCount' | 'recentActivity' | 'createdAt' | 'slug'>) => {
     const newTopic: DiscussionTopic = {
       ...topic,
       id: `topic-${Date.now()}`,
-      slug: topic.name.toLowerCase().replace(/\s+/g, '-'),
+      slug: topic.name!.toLowerCase().replace(/\s+/g, '-'),
       discussionCount: 0,
       memberCount: 1,
       recentActivity: 'agora mesmo',
@@ -553,18 +555,18 @@ export const useDiscussions = () => {
     
     // Count discussions created
     Object.values(discussions).flat().forEach(discussion => {
-      const userId = discussion.author.id;
+      const userId = discussion.author!.id;
       if (!userContributions[userId]) {
-        userContributions[userId] = { user: discussion.author, count: 0 };
+        userContributions[userId] = { user: discussion.author!, count: 0 };
       }
       userContributions[userId].count += 1;
     });
     
     // Count replies
     Object.values(replies).flat().forEach(reply => {
-      const userId = reply.author.id;
+      const userId = reply.author!.id;
       if (!userContributions[userId]) {
-        userContributions[userId] = { user: reply.author, count: 0 };
+        userContributions[userId] = { user: reply.author!, count: 0 };
       }
       userContributions[userId].count += 1;
     });
@@ -609,6 +611,7 @@ export const useDiscussions = () => {
     acceptAnswer,
     filterDiscussions,
     getActiveUsers,
-    getTrendingTags
+    getTrendingTags,
+    addToReplies
   };
 };
