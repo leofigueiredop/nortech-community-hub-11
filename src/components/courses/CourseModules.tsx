@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { 
@@ -38,7 +37,6 @@ const CourseModules: React.FC<CourseModulesProps> = ({
   const { courseId } = useParams();
   const { getProgress } = useContentProgress();
   
-  // Toggle module expansion
   const toggleModule = (moduleId: string) => {
     setExpandedModules(prev => 
       prev.includes(moduleId) 
@@ -47,7 +45,6 @@ const CourseModules: React.FC<CourseModulesProps> = ({
     );
   };
   
-  // Get lesson status icon by type and completion
   const getLessonIcon = (lesson: CourseModuleItem) => {
     const isCompleted = lesson.completed;
     
@@ -69,7 +66,6 @@ const CourseModules: React.FC<CourseModulesProps> = ({
     }
   };
   
-  // Check if module has a lesson that is completed
   const getModuleProgress = (module: CourseModule) => {
     const totalLessons = module.items.length;
     const completedLessons = module.items.filter(item => item.completed).length;
@@ -81,18 +77,14 @@ const CourseModules: React.FC<CourseModulesProps> = ({
     };
   };
   
-  // Check if module is new (released within 7 days)
   const isModuleNew = (module: CourseModule) => {
-    // This would use the module creation date in a real implementation
     return false; 
   };
   
   const isLessonNew = (lesson: CourseModuleItem) => {
-    // Check if lesson is less than 7 days old in a real implementation
     return false;
   };
   
-  // If not a course type, return empty
   if (course.format !== 'course') {
     return <div>Not a course</div>;
   }
@@ -117,7 +109,6 @@ const CourseModules: React.FC<CourseModulesProps> = ({
           
           return (
             <div key={module.id} className={`${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
-              {/* Module Header */}
               <div 
                 className={`p-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between`}
                 onClick={() => toggleModule(module.id)}
@@ -151,13 +142,12 @@ const CourseModules: React.FC<CourseModulesProps> = ({
                 </div>
               </div>
               
-              {/* Module Lessons */}
               {isExpanded && (
                 <div className={`pl-8 pr-4 pb-4 ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
                   <ul className="space-y-2">
                     {module.items.map((lesson, lessonIndex) => {
                       const isActive = lesson.id === currentLessonId;
-                      const isLocked = lesson.type === 'assignment' && !module.items[lessonIndex - 1]?.completed;
+                      const isLocked = lesson.type === 'exercise' && !module.items[lessonIndex - 1]?.completed;
                       
                       return (
                         <li key={lesson.id} className="relative">
@@ -192,7 +182,7 @@ const CourseModules: React.FC<CourseModulesProps> = ({
                               
                               {lesson.type === 'video' && (
                                 <span className="text-xs text-muted-foreground">
-                                  {formatDuration(360)} {/* This would be the actual video duration */}
+                                  {formatDuration(360)}
                                 </span>
                               )}
                             </div>

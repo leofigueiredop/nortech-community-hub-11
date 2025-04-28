@@ -24,14 +24,19 @@ export class SupabaseDiscussionsRepository implements IDiscussionsRepository {
 
       if (topicsError) throw topicsError;
 
-      // Get discussion counts per topic
-      const { data: countsData, error: countsError } = await this.supabase
+      // Get discussion counts per topic - modified to avoid using .group()
+      const { data: discussions, error: discussionsError } = await this.supabase
         .from('discussions')
-        .select('topic_id, count')
-        .eq('is_deleted', false)
-        .group('topic_id');
+        .select('topic_id')
+        .eq('is_deleted', false);
 
-      if (countsError) throw countsError;
+      if (discussionsError) throw discussionsError;
+      
+      // Calculate counts manually
+      const topicCounts: Record<string, number> = {};
+      discussions.forEach(disc => {
+        topicCounts[disc.topic_id] = (topicCounts[disc.topic_id] || 0) + 1;
+      });
 
       // Get most recent activity timestamps per topic
       const { data: activityData, error: activityError } = await this.supabase
@@ -40,11 +45,6 @@ export class SupabaseDiscussionsRepository implements IDiscussionsRepository {
         .order('updated_at', { ascending: false });
 
       if (activityError) throw activityError;
-
-      const topicCounts = countsData.reduce((acc: Record<string, number>, item: any) => {
-        acc[item.topic_id] = item.count;
-        return acc;
-      }, {});
 
       const topicActivity = activityData.reduce((acc: Record<string, string>, item: any) => {
         if (!acc[item.topic_id] || new Date(item.updated_at) > new Date(acc[item.topic_id])) {
@@ -80,7 +80,7 @@ export class SupabaseDiscussionsRepository implements IDiscussionsRepository {
       // Get discussion count for this topic
       const { data: countData, error: countError } = await this.supabase
         .from('discussions')
-        .select('count')
+        .select('*')
         .eq('topic_id', id)
         .eq('is_deleted', false);
 
@@ -252,18 +252,28 @@ export class SupabaseDiscussionsRepository implements IDiscussionsRepository {
 
   async getActiveUsers(): Promise<{ user: any; count: number; }[]> {
     try {
-      const { data, error } = await this.supabase
+      // Modified to avoid using .group()
+      const { data: discussions, error } = await this.supabase
         .from('discussions')
-        .select('user_id, count(*)')
-        .eq('is_deleted', false)
-        .group('user_id')
-        .order('count', { ascending: false })
-        .limit(5);
+        .select('user_id')
+        .eq('is_deleted', false);
 
       if (error) throw error;
 
+      // Count user posts manually
+      const userPostCounts: Record<string, number> = {};
+      discussions.forEach((item: any) => {
+        userPostCounts[item.user_id] = (userPostCounts[item.user_id] || 0) + 1;
+      });
+
+      // Convert to array and sort
+      const sortedUsers = Object.entries(userPostCounts)
+        .map(([userId, count]) => ({ userId, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
       // Get user details
-      const userIds = data.map((item: any) => item.user_id);
+      const userIds = sortedUsers.map((item) => item.userId);
       const { data: users, error: usersError } = await this.supabase
         .from('users')
         .select('id, name, avatar_url, level, xp')
@@ -276,13 +286,13 @@ export class SupabaseDiscussionsRepository implements IDiscussionsRepository {
         userMap[user.id] = user;
       });
 
-      return data.map((item: any) => ({
+      return sortedUsers.map((item) => ({
         user: {
-          id: item.user_id,
-          name: userMap[item.user_id]?.name || 'Unknown User',
-          avatar: userMap[item.user_id]?.avatar_url,
-          level: userMap[item.user_id]?.level || 1,
-          xp: userMap[item.user_id]?.xp || 0
+          id: item.userId,
+          name: userMap[item.userId]?.name || 'Unknown User',
+          avatar: userMap[item.userId]?.avatar_url,
+          level: userMap[item.userId]?.level || 1,
+          xp: userMap[item.userId]?.xp || 0
         },
         count: item.count
       }));

@@ -1,7 +1,7 @@
 
 import { ReactNode } from 'react';
 
-export type EventType = 'workshop' | 'webinar' | 'meetup' | 'conference' | 'course' | 'other';
+export type EventType = 'workshop' | 'webinar' | 'meetup' | 'conference' | 'course' | 'other' | 'live' | 'mentoria';
 
 export interface Event {
   id: number;
@@ -26,6 +26,16 @@ export interface Event {
   isPremium?: boolean;
   price?: number;
   ticketUrl?: string;
+  
+  // Additional properties needed by components
+  image?: string;
+  type?: EventType;
+  time?: string;
+  speaker?: string;
+  url?: string;
+  status?: 'upcoming' | 'live' | 'past' | 'cancelled' | 'happening_soon' | 'in_progress' | 'ended';
+  pointsValue?: number;
+  platform?: string;
 }
 
 export interface EventAttendee {
@@ -68,6 +78,16 @@ export const EVENT_TYPES: Record<EventType, { label: string; icon: ReactNode; co
     label: 'Course', 
     icon: <span>📚</span>, 
     color: 'bg-red-100 text-red-800' 
+  },
+  live: {
+    label: 'Live',
+    icon: <span>📡</span>,
+    color: 'bg-red-100 text-red-800'
+  },
+  mentoria: {
+    label: 'Mentoria',
+    icon: <span>👨‍🏫</span>,
+    color: 'bg-amber-100 text-amber-800'
   },
   other: { 
     label: 'Other', 

@@ -27,8 +27,8 @@ export interface Event {
   is_virtual: boolean;
   points_awarded: number;
   
-  // Campos adicionais necessários para compatibilidade com componentes existentes
-  date?: Date;  // Adicionado para compatibilidade
+  // Additional fields needed for compatibility with existing components
+  date?: Date;
   image?: string;
   url?: string;
   time?: string;

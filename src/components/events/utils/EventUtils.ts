@@ -5,6 +5,20 @@ import { Event } from '../types/EventTypes';
 export const getEventStatus = (event: Event): 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress' => {
   const now = new Date();
   const eventDate = new Date(event.date);
+  
+  if (!event.time) {
+    // If no time is provided, just compare dates
+    if (now.getDate() === eventDate.getDate() && 
+        now.getMonth() === eventDate.getMonth() && 
+        now.getFullYear() === eventDate.getFullYear()) {
+      return 'in_progress';
+    } else if (now > eventDate) {
+      return 'ended';
+    } else {
+      return 'upcoming';
+    }
+  }
+  
   const eventTime = event.time.split(' - ')[0]; // Get start time
   const [hourStr, minuteStr] = eventTime.split(':');
   const hour = parseInt(hourStr);
@@ -36,6 +50,6 @@ export const getEventStatus = (event: Event): 'upcoming' | 'live' | 'ended' | 'h
 
 // Check if user is registered for an event
 export const isUserRegistered = (event: Event, userId: string = 'current-user'): boolean => {
-  if (!event.registeredUsers) return event.isRegistered;
-  return event.registeredUsers.includes(userId) || event.isRegistered;
+  if (!event.registeredUsers) return event.isRegistered || false;
+  return event.registeredUsers.includes(userId) || !!event.isRegistered;
 };

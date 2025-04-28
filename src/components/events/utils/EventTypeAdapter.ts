@@ -14,11 +14,17 @@ export function adaptEventForComponent(event: EventType): ComponentEvent {
     date: event.date || new Date(event.start_date),
     time: event.time || `${new Date(event.start_date).getHours()}:00 - ${new Date(event.end_date).getHours()}:00`,
     type: mapEventType(event.event_type),
+    event_type: mapEventType(event.event_type),
     location: event.location || event.location_address || (event.is_virtual ? 'Online' : ''),
     speaker: event.speaker_name || (event.speaker ? event.speaker.name : ''),
     image: event.banner_url || event.image,
     attendees: event.attendees || 0,
     capacity: event.max_attendees || 100,
+    community_id: event.community_id,
+    is_virtual: event.is_virtual,
+    is_featured: event.is_featured,
+    points_awarded: event.points_awarded,
+    created_at: event.created_at,
     isRegistered: event.isRegistered || false,
     isPremium: event.isPremium || event.access_level === 'premium' || event.access_level === 'premium_plus',
     url: event.location_url || event.url,
@@ -74,7 +80,7 @@ function getEventStatus(event: EventType): 'upcoming' | 'live' | 'past' | 'cance
   const startDate = new Date(event.start_date);
   const endDate = new Date(event.end_date);
   
-  if (event.status) return event.status;
+  if (event.status) return event.status as 'upcoming' | 'live' | 'past' | 'cancelled';
   
   if (now < startDate) return 'upcoming';
   if (now >= startDate && now <= endDate) return 'live';
