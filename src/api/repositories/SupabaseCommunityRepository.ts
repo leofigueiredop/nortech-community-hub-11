@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { ICommunityRepository, Community, CommunityMember, CommunitySettings, SubscriptionPlan } from '../interfaces/ICommunityRepository';
 import { BaseRepository } from './BaseRepository';
@@ -16,13 +15,10 @@ export class SupabaseCommunityRepository extends BaseRepository implements IComm
     );
   }
 
-  // Set tenant context for all operations
-  private async setTenantContext(communityId: string): Promise<void> {
-    try {
-      await this.supabase.rpc('set_tenant_context', { community_uuid: communityId });
-    } catch (error) {
-      console.error('Error setting tenant context:', error);
-    }
+  // Sobrescrever setTenantContext para não aplicar no repositório de comunidade
+  public setCommunityContext(communityId: string | null) {
+    // Não aplicamos o contexto aqui pois este repositório gerencia todas as comunidades
+    return;
   }
 
   // Community management

@@ -1,16 +1,23 @@
 
-import { ApiResponse } from '@/types/api';
+export class BaseRepository {
+  protected currentCommunityId: string | null = null;
 
-export abstract class BaseRepository {
-  protected async handleResponse<T>(response: ApiResponse<T>): Promise<T> {
-    if (response.error) {
-      throw new Error(response.error);
-    }
-    return response.data as T;
+  public setCommunityContext(communityId: string | null) {
+    this.currentCommunityId = communityId;
   }
 
-  protected handleError(error: any): never {
-    console.error('API Error:', error);
-    throw error;
+  protected async setTenantContext() {
+    if (this.currentCommunityId) {
+      await this.supabase.rpc('set_tenant_context', {
+        community_uuid: this.currentCommunityId
+      });
+    }
+  }
+
+  protected async handleResponse<T>(response: any): Promise<T> {
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+    return response.data;
   }
 }

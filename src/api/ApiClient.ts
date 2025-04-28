@@ -1,4 +1,3 @@
-
 import { IAuthRepository } from './interfaces/IAuthRepository';
 import { IContentRepository } from './interfaces/IContentRepository';
 import { IEventsRepository } from './interfaces/IEventsRepository';
@@ -29,6 +28,7 @@ export class ApiClient {
   private _points: IPointsRepository;
   private _migration: IMigrationRepository;
   private _community: ICommunityRepository;
+  private _currentCommunityId: string | null = null;
 
   private constructor() {
     this._auth = new SupabaseAuthRepository();
@@ -45,6 +45,20 @@ export class ApiClient {
       ApiClient.instance = new ApiClient();
     }
     return ApiClient.instance;
+  }
+
+  public setCurrentCommunity(communityId: string | null) {
+    this._currentCommunityId = communityId;
+    // Atualiza o contexto em todos os repositórios
+    this._content.setCommunityContext?.(communityId);
+    this._events.setCommunityContext?.(communityId);
+    this._discussions.setCommunityContext?.(communityId);
+    this._points.setCommunityContext?.(communityId);
+    this._community.setCommunityContext?.(communityId);
+  }
+
+  public getCurrentCommunityId(): string | null {
+    return this._currentCommunityId;
   }
 
   get auth(): IAuthRepository {

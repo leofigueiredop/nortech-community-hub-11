@@ -1,4 +1,5 @@
 
 export interface IBaseRepository {
-  handleError(error: any): never;
+  setCommunityContext?(communityId: string | null): void;
+  handleResponse<T>(response: any): Promise<T>;
 }
