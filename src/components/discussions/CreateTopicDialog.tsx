@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -11,56 +10,79 @@ import { useDiscussions } from '@/hooks/useDiscussions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface CreateTopicDialogProps {
-  onSuccess?: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onTopicCreated?: () => void;
 }
 
-const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ onSuccess }) => {
+const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ open, onOpenChange, onTopicCreated }) => {
   const { toast } = useToast();
   const { createTopic } = useDiscussions();
-  const [name, setName] = useState('');
+  const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [icon, setIcon] = useState('MessageSquare');
-  const [open, setOpen] = useState(false);
+  const [selectedIcon, setSelectedIcon] = useState('MessageSquare');
+  const [selectedColor, setSelectedColor] = useState('blue');
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [selectedAccessLevel, setSelectedAccessLevel] = useState('free');
+  const [openState, setOpenState] = useState(open);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !description) {
+    if (!title) {
       toast({
-        title: "Campos incompletos",
-        description: "Por favor preencha todos os campos obrigatórios.",
+        title: "Missing title",
+        description: "Please provide a title for your topic",
         variant: "destructive",
-        duration: 3000,
       });
       return;
     }
     
-    createTopic({
-      name,
+    // Create topic object
+    const newTopic: Partial<DiscussionTopic> = {
+      title,
       description,
-      icon,
-      slug: name.toLowerCase().replace(/\s+/g, '-'),
-      createdBy: 'user1', // In a real app, this would be the current user's ID
-    });
+      icon: selectedIcon,
+      color: selectedColor,
+      is_featured: false,
+      is_private: isPrivate,
+      access_level: selectedAccessLevel as 'free' | 'premium' | 'premium_plus',
+      community_id: 'current-community-id' // This should be replaced with actual community ID
+    };
     
-    toast({
-      title: "Tópico criado",
-      description: `Seu tópico "${name}" foi criado com sucesso`,
-      duration: 3000,
-    });
-    
-    setOpen(false);
-    setName('');
+    // Mock API call
+    createTopic(newTopic)
+      .then(() => {
+        toast({
+          title: "Topic created",
+          description: "Your new discussion topic has been created successfully",
+        });
+        onTopicCreated?.();
+        onOpenChange(false);
+        resetForm();
+      })
+      .catch((error) => {
+        toast({
+          title: "Error creating topic",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
+  };
+
+  const resetForm = () => {
+    setTitle('');
     setDescription('');
     setIcon('MessageSquare');
-    
-    if (onSuccess) {
-      onSuccess();
-    }
+    setSelectedIcon('MessageSquare');
+    setSelectedColor('blue');
+    setIsPrivate(false);
+    setSelectedAccessLevel('free');
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={openState} onOpenChange={setOpenState}>
       <DialogTrigger asChild>
         <Button 
           className="flex items-center gap-2 bg-nortech-purple hover:bg-nortech-purple/90"
@@ -78,11 +100,11 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ onSuccess }) => {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nome do Tópico</Label>
+            <Label htmlFor="title">Nome do Tópico</Label>
             <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="Digite um nome para o tópico"
               required
             />

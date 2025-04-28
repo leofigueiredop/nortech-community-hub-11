@@ -1,151 +1,181 @@
-
-import React, { useState } from 'react';
-import { useToast } from '@/components/ui/use-toast';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import React from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import { useDiscussions } from '@/hooks/useDiscussions';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useToast } from '@/components/ui/use-toast';
+import { TagInput } from '@/components/ui/tag-input';
+import { useUser } from '@/hooks/use-user';
+import { Discussion, DiscussionTopic } from '@/types/discussion';
 
 interface CreateDiscussionDialogProps {
-  topicId: string;
-  topicName: string;
-  onSuccess?: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  topic: DiscussionTopic;
+  onDiscussionCreated?: () => void;
 }
 
-const CreateDiscussionDialog: React.FC<CreateDiscussionDialogProps> = ({ topicId, topicName, onSuccess }) => {
+const formats = [
+  { value: 'discussion', label: 'Discussion' },
+  { value: 'question', label: 'Question' },
+];
+
+const createDiscussion = async (discussion: Partial<Discussion>) => {
+  // Mock API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(discussion);
+    }, 500);
+  });
+};
+
+export default function CreateDiscussionDialog({
+  open,
+  onOpenChange,
+  topic,
+  onDiscussionCreated
+}: CreateDiscussionDialogProps) {
+  const [title, setTitle] = React.useState('');
+  const [description, setDescription] = React.useState('');
+  const [selectedFormat, setSelectedFormat] = React.useState('');
+  const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
   const { toast } = useToast();
-  const { createDiscussion } = useDiscussions();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [tags, setTags] = useState('');
-  const [format, setFormat] = useState<'discussion' | 'question'>('discussion');
-  const [open, setOpen] = useState(false);
+  const { user } = useUser();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!title || !description) {
+    if (!title || !description || !selectedFormat) {
       toast({
-        title: "Campos incompletos",
-        description: "Por favor preencha todos os campos obrigatórios.",
+        title: "Missing fields",
+        description: "Please fill out all required fields",
         variant: "destructive",
-        duration: 3000,
       });
       return;
     }
     
-    // Parse tags from comma-separated string
-    const tagsList = tags.split(',')
-      .map(tag => tag.trim())
-      .filter(tag => tag.length > 0);
-    
-    // Mock author data - in a real app, this would come from auth context
-    const author = {
-      id: 'user1',
-      name: 'Carlos Silva',
-      avatar: '/placeholder.svg',
-      level: 3,
-      xp: 250
+    // Create discussion object
+    const newDiscussion: Partial<Discussion> = {
+      title,
+      content: description,
+      topic_id: topic.id,
+      format: selectedFormat as 'question' | 'discussion',
+      tags: selectedTags,
+      community_id: topic.community_id,
+      is_locked: false,
+      is_featured: false,
+      is_anonymous: false,
+      votes: 0,
+      view_count: 0,
+      author: {
+        id: user.id,
+        name: user.display_name || user.email.split('@')[0],
+        avatar_url: user.avatar_url,
+        level: 1, // Default values for compatibility
+        xp: 0 // Default values for compatibility
+      }
     };
     
-    createDiscussion(topicId, {
-      title,
-      description,
-      author,
-      tags: tagsList,
-      format
-    });
-    
-    toast({
-      title: "Discussão criada",
-      description: `Sua discussão "${title}" foi criada no tópico ${topicName}`,
-      duration: 3000,
-    });
-    
-    setOpen(false);
+    // Mock API call
+    createDiscussion(newDiscussion)
+      .then(() => {
+        toast({
+          title: "Discussion created",
+          description: "Your discussion has been created successfully",
+        });
+        onDiscussionCreated?.();
+        onOpenChange(false);
+        resetForm();
+      })
+      .catch((error) => {
+        toast({
+          title: "Error creating discussion",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
+  };
+
+  const resetForm = () => {
     setTitle('');
     setDescription('');
-    setTags('');
-    setFormat('discussion');
-    
-    if (onSuccess) {
-      onSuccess();
-    }
+    setSelectedFormat('');
+    setSelectedTags([]);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button 
-          className="flex items-center gap-2 bg-nortech-purple hover:bg-nortech-purple/90"
-        >
-          <Plus size={16} />
-          <span>Iniciar Discussão</span>
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
-          <DialogTitle>Nova Discussão em {topicName}</DialogTitle>
+          <DialogTitle>Create New Discussion</DialogTitle>
           <DialogDescription>
-            Crie uma nova discussão para compartilhar com a comunidade.
+            Start a new discussion in <strong>{topic.title}</strong> topic.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Título</Label>
+        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="title">Title</Label>
             <Input
               id="title"
+              placeholder="What's this discussion about?"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Digite um título claro e conciso"
-              required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="format">Formato</Label>
-            <Select value={format} onValueChange={(value: 'discussion' | 'question') => setFormat(value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o formato" />
+          <div className="grid gap-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              placeholder="Elaborate more on your discussion..."
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="format">Format</Label>
+            <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+              <SelectTrigger id="format">
+                <SelectValue placeholder="Select a format" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="discussion">Discussão Geral</SelectItem>
-                <SelectItem value="question">Pergunta</SelectItem>
+                {formats.map((format) => (
+                  <SelectItem key={format.value} value={format.value}>
+                    {format.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Adicione mais detalhes sobre sua discussão"
-              required
-              rows={4}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
-            <Input
+          <div className="grid gap-2">
+            <Label htmlFor="tags">Tags</Label>
+            <TagInput
               id="tags"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="Ex: Carreira, Desenvolvimento, Iniciantes"
+              tags={selectedTags}
+              onTagsChange={setSelectedTags}
+              placeholder="Add some tags..."
             />
           </div>
           <DialogFooter>
-            <Button type="submit" className="bg-nortech-purple hover:bg-nortech-purple/90">
-              Publicar Discussão
-            </Button>
+            <Button type="submit">Create Discussion</Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
-};
-
-export default CreateDiscussionDialog;
+}

@@ -17,7 +17,7 @@ export function CommunityMenuItem({ community, onSelect }: CommunityMenuItemProp
       className="flex items-center"
     >
       <Avatar className="h-5 w-5 mr-2">
-        <AvatarImage src={community.logo} alt={community.name} />
+        <AvatarImage src={community.logo_url} alt={community.name} />
         <AvatarFallback>{community.name[0]}</AvatarFallback>
       </Avatar>
       {community.name}

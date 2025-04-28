@@ -100,3 +100,52 @@ export interface PaymentGateway {
   created_at: string;
   updated_at: string;
 }
+
+// Add mockCommunities data for development and testing
+export const mockCommunities: Community[] = [
+  {
+    id: 'comm-1',
+    name: 'Design Masters',
+    description: 'A community for UI/UX designers to share work and get feedback',
+    logo_url: 'https://via.placeholder.com/150',
+    banner_url: 'https://via.placeholder.com/800x200',
+    domain: 'design-masters.com',
+    creator_id: 'user-123',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    status: 'active',
+    theme_config: {
+      primaryColor: '#7E69AB',
+    }
+  },
+  {
+    id: 'comm-2',
+    name: 'Web3 Explorers',
+    description: 'Exploring the frontiers of blockchain and web3 technology',
+    logo_url: 'https://via.placeholder.com/150',
+    banner_url: 'https://via.placeholder.com/800x200',
+    domain: 'web3-explorers.com',
+    creator_id: 'user-456',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    status: 'active',
+    theme_config: {
+      primaryColor: '#3B82F6',
+    }
+  },
+  {
+    id: 'comm-3',
+    name: 'Creator Economy',
+    description: 'For content creators building their business online',
+    logo_url: 'https://via.placeholder.com/150',
+    banner_url: 'https://via.placeholder.com/800x200',
+    domain: 'creator-economy.com',
+    creator_id: 'user-789',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    status: 'active',
+    theme_config: {
+      primaryColor: '#F97316',
+    }
+  }
+];

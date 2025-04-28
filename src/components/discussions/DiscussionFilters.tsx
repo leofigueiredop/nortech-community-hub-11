@@ -1,222 +1,217 @@
-
-import React from 'react';
-import { Filter, Search, Tag, Clock, BarChart } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { useDiscussions } from '@/hooks/useDiscussions';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import {
+  SlidersHorizontal,
+  Search,
+  CheckCircle2,
+  LucideIcon
+} from "lucide-react"
+import { cn } from "@/lib/utils"
 import { DiscussionFilter } from '@/types/discussion';
 
 interface DiscussionFiltersProps {
   topicId: string;
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
   onFilterChange: (filters: DiscussionFilter[]) => void;
-  activeFilters: DiscussionFilter[];
 }
 
-const DiscussionFilters: React.FC<DiscussionFiltersProps> = ({ 
-  topicId, 
-  searchQuery, 
-  onSearchChange, 
-  onFilterChange,
-  activeFilters
-}) => {
-  const { getTrendingTags } = useDiscussions();
-  const trendingTags = getTrendingTags();
+export default function DiscussionFilters({
+  topicId,
+  onFilterChange
+}: DiscussionFiltersProps) {
+  const [activeFilters, setActiveFilters] = useState<DiscussionFilter[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleFilterToggle = (filter: DiscussionFilter) => {
-    const isActive = activeFilters.some(f => 
-      f.type === filter.type && f.value === filter.value
-    );
-    
-    let newFilters: DiscussionFilter[];
-    
-    if (isActive) {
-      // Remove the filter if it's already active
-      newFilters = activeFilters.filter(f => 
-        !(f.type === filter.type && f.value === filter.value)
-      );
+  // Mock data for filters
+  const discussionFormats = ['question', 'discussion', 'announcement'];
+  const discussionStatuses = ['open', 'closed', 'pending'];
+  const discussionTags = ['help', 'advice', 'feedback', 'general', 'ideas'];
+
+  useEffect(() => {
+    onFilterChange(activeFilters);
+  }, [activeFilters, onFilterChange]);
+
+  const handleFormatFilter = (format: string, active: boolean) => {
+    if (active) {
+      setActiveFilters(prev => [...prev, {
+        id: `format-${format}`,
+        type: 'format',
+        value: format,
+        label: format.charAt(0).toUpperCase() + format.slice(1)
+      }]);
     } else {
-      // Add the filter if it's not active
-      newFilters = [...activeFilters, filter];
+      setActiveFilters(prev => 
+        prev.filter(f => !(f.type === 'format' && f.value === format))
+      );
     }
-    
-    onFilterChange(newFilters);
   };
 
-  const removeFilter = (filter: DiscussionFilter) => {
-    const newFilters = activeFilters.filter(f => 
-      !(f.type === filter.type && f.value === filter.value)
-    );
-    onFilterChange(newFilters);
+  const handleStatusFilter = (status: string, active: boolean) => {
+    if (active) {
+      setActiveFilters(prev => [...prev, {
+        id: `status-${status}`,
+        type: 'status',
+        value: status,
+        label: status.charAt(0).toUpperCase() + status.slice(1)
+      }]);
+    } else {
+      setActiveFilters(prev => 
+        prev.filter(f => !(f.type === 'status' && f.value === status))
+      );
+    }
+  };
+
+  const handleTagFilter = (tag: string, active: boolean) => {
+    if (active) {
+      setActiveFilters(prev => [...prev, {
+        id: `tag-${tag}`,
+        type: 'tag',
+        value: tag,
+        label: tag
+      }]);
+    } else {
+      setActiveFilters(prev => 
+        prev.filter(f => !(f.type === 'tag' && f.value === tag))
+      );
+    }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Buscar discussões..." 
-              value={searchQuery} 
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-9"
-            />
+    <div className="w-full">
+      {/* Search Filter */}
+      <div className="mb-4">
+        <Label htmlFor="search">
+          <Search className="mr-2 h-4 w-4 inline-block" />
+          Search Discussions
+        </Label>
+        <Input
+          type="search"
+          id="search"
+          placeholder="Search by title or content..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mt-1"
+        />
+      </div>
+
+      <Separator className="mb-4" />
+
+      {/* Active Filters */}
+      {activeFilters.length > 0 && (
+        <div className="mb-4">
+          <Label>Active Filters:</Label>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {activeFilters.map(filter => (
+              <Badge
+                key={filter.id}
+                variant="secondary"
+                className="cursor-pointer"
+                onClick={() => {
+                  if (filter.type === 'format') {
+                    handleFormatFilter(filter.value, false);
+                  } else if (filter.type === 'status') {
+                    handleStatusFilter(filter.value, false);
+                  } else if (filter.type === 'tag') {
+                    handleTagFilter(filter.value, false);
+                  }
+                }}
+              >
+                {filter.label}
+              </Badge>
+            ))}
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Filter size={16} />
-              <span>Filtrar</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Filtros</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Formato</DropdownMenuLabel>
-              <DropdownMenuItem 
-                onClick={() => handleFilterToggle({ type: 'format', value: 'question', label: 'Perguntas' })}
-                className="flex items-center gap-2"
-              >
-                Perguntas
-                {activeFilters.some(f => f.type === 'format' && f.value === 'question') && (
-                  <span className="ml-auto h-2 w-2 rounded-full bg-purple-500" />
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => handleFilterToggle({ type: 'format', value: 'discussion', label: 'Discussões' })}
-                className="flex items-center gap-2"
-              >
-                Discussões
-                {activeFilters.some(f => f.type === 'format' && f.value === 'discussion') && (
-                  <span className="ml-auto h-2 w-2 rounded-full bg-purple-500" />
-                )}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            
-            <DropdownMenuSeparator />
-            
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Status</DropdownMenuLabel>
-              <DropdownMenuItem 
-                onClick={() => handleFilterToggle({ type: 'status', value: 'hot', label: 'Em alta' })}
-                className="flex items-center gap-2"
-              >
-                Em alta
-                {activeFilters.some(f => f.type === 'status' && f.value === 'hot') && (
-                  <span className="ml-auto h-2 w-2 rounded-full bg-purple-500" />
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => handleFilterToggle({ type: 'status', value: 'answered', label: 'Resolvidas' })}
-                className="flex items-center gap-2"
-              >
-                Resolvidas
-                {activeFilters.some(f => f.type === 'status' && f.value === 'answered') && (
-                  <span className="ml-auto h-2 w-2 rounded-full bg-purple-500" />
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => handleFilterToggle({ type: 'status', value: 'unanswered', label: 'Não resolvidas' })}
-                className="flex items-center gap-2"
-              >
-                Não resolvidas
-                {activeFilters.some(f => f.type === 'status' && f.value === 'unanswered') && (
-                  <span className="ml-auto h-2 w-2 rounded-full bg-purple-500" />
-                )}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            
-            <DropdownMenuSeparator />
-            
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Período</DropdownMenuLabel>
-              <DropdownMenuItem 
-                onClick={() => handleFilterToggle({ type: 'time', value: 'today', label: 'Hoje' })}
-                className="flex items-center gap-2"
-              >
-                Hoje
-                {activeFilters.some(f => f.type === 'time' && f.value === 'today') && (
-                  <span className="ml-auto h-2 w-2 rounded-full bg-purple-500" />
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => handleFilterToggle({ type: 'time', value: 'week', label: 'Esta semana' })}
-                className="flex items-center gap-2"
-              >
-                Esta semana
-                {activeFilters.some(f => f.type === 'time' && f.value === 'week') && (
-                  <span className="ml-auto h-2 w-2 rounded-full bg-purple-500" />
-                )}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      
-      {/* Active filters */}
-      {activeFilters.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {activeFilters.map((filter, index) => (
-            <Badge 
-              key={`${filter.type}-${filter.value}-${index}`}
-              variant="secondary"
-              className="flex items-center gap-1 cursor-pointer"
-              onClick={() => removeFilter(filter)}
-            >
-              {filter.label}
-              <span className="ml-1 text-xs">×</span>
-            </Badge>
-          ))}
-          {activeFilters.length > 0 && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-xs h-6 px-2"
-              onClick={() => onFilterChange([])}
-            >
-              Limpar filtros
-            </Button>
-          )}
-        </div>
       )}
-      
-      {/* Trending tags */}
-      <div className="flex flex-col space-y-1.5">
-        <div className="flex items-center">
-          <Tag size={14} className="mr-2 text-muted-foreground" />
-          <span className="text-sm font-medium">Tags populares</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {trendingTags.map(({ tag, count }) => (
-            <Badge 
-              key={tag}
-              variant="outline"
-              className="cursor-pointer hover:bg-secondary"
-              onClick={() => handleFilterToggle({ type: 'tag', value: tag, label: tag })}
+
+      {/* Accordion Filters */}
+      <Accordion type="multiple" collapsible className="w-full">
+        {/* Format Filter */}
+        <AccordionItem value="format">
+          <AccordionTrigger>
+            <SlidersHorizontal className="mr-2 h-4 w-4" />
+            Format
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid gap-2">
+              {discussionFormats.map(format => (
+                <div key={format} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`format-${format}`}
+                    checked={activeFilters.some(f => f.type === 'format' && f.value === format)}
+                    onCheckedChange={(checked) => handleFormatFilter(format, checked)}
+                  />
+                  <Label htmlFor={`format-${format}`} className="capitalize">{format}</Label>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Status Filter */}
+        <AccordionItem value="status">
+          <AccordionTrigger>
+            <CheckCircle2 className="mr-2 h-4 w-4" />
+            Status
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid gap-2">
+              {discussionStatuses.map(status => (
+                <div key={status} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`status-${status}`}
+                    checked={activeFilters.some(f => f.type === 'status' && f.value === status)}
+                    onCheckedChange={(checked) => handleStatusFilter(status, checked)}
+                  />
+                  <Label htmlFor={`status-${status}`} className="capitalize">{status}</Label>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Tags Filter */}
+        <AccordionItem value="tags">
+          <AccordionTrigger>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-4 h-4 mr-2"
             >
-              {tag}
-              <span className="ml-1 text-xs opacity-70">({count})</span>
-            </Badge>
-          ))}
-        </div>
-      </div>
+              <path
+                fillRule="evenodd"
+                d="M3 6a3 3 0 013-3h7.455a3 3 0 012.122.879l4.5 4.5A3 3 0 0119 15v1a2 2 0 01-2 2h-1v-1.586a3 3 0 00-3-3H5a3 3 0 00-3 3V19h-1a2 2 0 01-2-2v-1a3 3 0 013-3zm6.121-2.121a1.5 1.5 0 012.122 0l2.121 2.121a1.5 1.5 0 010 2.122L12.364 9.5A1.5 1.5 0 0110.243 7.379L12.364 5.258z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Tags
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid gap-2">
+              {discussionTags.map(tag => (
+                <div key={tag} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`tag-${tag}`}
+                    checked={activeFilters.some(f => f.type === 'tag' && f.value === tag)}
+                    onCheckedChange={(checked) => handleTagFilter(tag, checked)}
+                  />
+                  <Label htmlFor={`tag-${tag}`} className="capitalize">{tag}</Label>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
-};
-
-export default DiscussionFilters;
+}

@@ -8,7 +8,7 @@ const CommunitySwitcher: React.FC = () => {
   
   return (
     <Avatar className="h-8 w-8 rounded-full">
-      <AvatarImage src={activeCommunity.logo} alt={activeCommunity.name} />
+      <AvatarImage src={activeCommunity.logo_url} alt={activeCommunity.name} />
       <AvatarFallback className="bg-purple-600 text-white text-xs">
         {activeCommunity.name[0]}
       </AvatarFallback>
