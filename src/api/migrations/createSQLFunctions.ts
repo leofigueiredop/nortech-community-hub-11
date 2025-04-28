@@ -1,10 +1,11 @@
 
 import { createClient } from '@supabase/supabase-js';
+import { supabaseConfig } from '../ApiClient';
 
 export async function createSQLFunctions() {
   const supabase = createClient(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY
+    supabaseConfig.url,
+    supabaseConfig.anonKey
   );
   
   // Create function for content_items table
