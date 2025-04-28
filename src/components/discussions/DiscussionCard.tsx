@@ -16,9 +16,10 @@ import { Discussion } from '@/types/discussion';
 
 interface DiscussionCardProps {
   discussion: Discussion;
+  topicId?: string;
 }
 
-export function DiscussionCard({ discussion }: DiscussionCardProps) {
+const DiscussionCard = ({ discussion, topicId }: DiscussionCardProps) => {
   return (
     <div className={cn(
       "relative group border rounded-lg p-4 bg-card hover:border-primary/20 hover:bg-accent/50 transition-colors",
@@ -44,7 +45,7 @@ export function DiscussionCard({ discussion }: DiscussionCardProps) {
       </div>
 
       {/* Title and Content */}
-      <Link to={`/discussions/${discussion.topic_id}/${discussion.id}`} className="block">
+      <Link to={`/discussions/${topicId || discussion.topic_id}/${discussion.id}`} className="block">
         <h3 className="text-lg font-semibold mb-1 group-hover:text-primary transition-colors">
           {discussion.title}
         </h3>
@@ -78,4 +79,6 @@ export function DiscussionCard({ discussion }: DiscussionCardProps) {
       </div>
     </div>
   );
-}
+};
+
+export default DiscussionCard;
