@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Dialog,
@@ -85,7 +86,7 @@ export default function CreateDiscussionDialog({
       author: {
         id: user.id,
         name: user.display_name || user.email.split('@')[0],
-        avatar_url: user.avatar_url,
+        avatar: user.avatar_url, // Changed from avatar_url to avatar
         level: 1, // Default values for compatibility
         xp: 0 // Default values for compatibility
       }

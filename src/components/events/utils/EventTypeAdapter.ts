@@ -8,13 +8,13 @@ import { Event as ComponentEvent, EventType as ComponentEventType } from '@/comp
  */
 export function adaptEventForComponent(event: EventType): ComponentEvent {
   return {
-    id: typeof event.id === 'string' ? parseInt(event.id) : event.id as number,
+    id: event.id,
     title: event.title,
     description: event.description || '',
     date: event.date || new Date(event.start_date),
     location: event.location || event.location_address || (event.is_virtual ? 'Online' : ''),
     image_url: event.banner_url || event.image,
-    event_type: mapEventType(event.event_type),
+    event_type: event.event_type,
     capacity: event.max_attendees,
     is_virtual: event.is_virtual,
     meeting_link: event.location_url,
@@ -29,7 +29,7 @@ export function adaptEventForComponent(event: EventType): ComponentEvent {
     image: event.banner_url || event.image,
     type: mapEventType(event.event_type),
     time: event.time || `${new Date(event.start_date).getHours()}:00 - ${new Date(event.end_date).getHours()}:00`,
-    speaker: event.speaker_name || (event.speaker ? event.speaker.name : ''),
+    speaker: event.speaker_name || (typeof event.speaker === 'object' ? event.speaker.name : event.speaker),
     url: event.location_url,
     isRegistered: event.isRegistered || false,
     isPremium: event.isPremium || event.access_level === 'premium' || event.access_level === 'premium_plus',
@@ -39,7 +39,14 @@ export function adaptEventForComponent(event: EventType): ComponentEvent {
     registeredUsers: event.registeredUsers || [],
     price: undefined,
     ticketUrl: undefined,
-    organizer_id: undefined
+    organizer_id: undefined,
+    
+    // Required fields from event type
+    start_date: event.start_date,
+    end_date: event.end_date,
+    location_type: event.location_type || 'online',
+    access_level: event.access_level || 'free',
+    updated_at: event.updated_at
   };
 }
 
@@ -61,10 +68,10 @@ function mapEventType(eventType: string | undefined): ComponentEventType {
       return 'course';
     case 'live':
     case 'livestream':
-      return 'live'; // Updated to return 'live' now that it's added to the type
+      return 'live' as ComponentEventType; // Type assertion to ComponentEventType
     case 'mentoria':
     case 'mentorship':
-      return 'mentoria'; // Updated to return 'mentoria' now that it's added to the type
+      return 'mentoria' as ComponentEventType; // Type assertion to ComponentEventType
     default:
       return 'other';
   }
@@ -83,18 +90,18 @@ function getPlatformFromUrl(url: string): string | undefined {
 }
 
 // Get event status based on date/time
-function getEventStatus(event: EventType): 'upcoming' | 'live' | 'past' | 'ended' | 'happening_soon' | 'in_progress' | 'cancelled' {
+function getEventStatus(event: EventType): 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress' {
   const now = new Date();
   const startDate = new Date(event.start_date);
   const endDate = new Date(event.end_date);
   
-  if (event.status === 'cancelled') return 'cancelled';
-  if (event.status === 'past') return 'ended'; // Map 'past' to 'ended'
+  if (event.status === 'past' || event.status === 'ended') return 'ended';
+  if (event.status === 'cancelled') return 'ended';
   if (event.status) return event.status as 'upcoming' | 'live' | 'happening_soon' | 'in_progress' | 'ended';
   
   if (now < startDate) return 'upcoming';
   if (now >= startDate && now <= endDate) return 'live';
-  if (now > endDate) return 'ended'; // Use 'ended' instead of 'past'
+  if (now > endDate) return 'ended';
   
   return 'upcoming';
 }

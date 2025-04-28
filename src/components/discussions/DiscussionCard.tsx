@@ -29,7 +29,7 @@ const DiscussionCard = ({ discussion, topicId }: DiscussionCardProps) => {
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
-            <AvatarImage src={discussion.author?.avatar_url} alt={discussion.author?.name} />
+            <AvatarImage src={discussion.author?.avatar || discussion.author?.avatar_url} alt={discussion.author?.name} />
             <AvatarFallback>{discussion.author?.name?.[0] || '?'}</AvatarFallback>
           </Avatar>
           <span className="text-sm font-medium">{discussion.author?.name}</span>
@@ -51,7 +51,7 @@ const DiscussionCard = ({ discussion, topicId }: DiscussionCardProps) => {
         </h3>
         
         <p className="text-muted-foreground line-clamp-2 mb-3">
-          {discussion.content}
+          {discussion.content || discussion.description}
         </p>
       </Link>
 
@@ -59,17 +59,17 @@ const DiscussionCard = ({ discussion, topicId }: DiscussionCardProps) => {
       <div className="flex items-center text-sm text-muted-foreground gap-4">
         <div className="flex items-center gap-1">
           <ThumbsUp className="h-4 w-4" />
-          <span>{discussion.votes || 0}</span>
+          <span>{discussion.votes || discussion.upvotes || 0}</span>
         </div>
         
         <div className="flex items-center gap-1">
           <MessageCircle className="h-4 w-4" />
-          <span>{discussion.replies?.length || 0}</span>
+          <span>{discussion.replies ? (typeof discussion.replies === 'number' ? discussion.replies : discussion.replies.length) : 0}</span>
         </div>
         
         <div className="flex items-center gap-1">
           <Eye className="h-4 w-4" />
-          <span>{discussion.view_count}</span>
+          <span>{discussion.view_count || discussion.views || 0}</span>
         </div>
         
         <div className="flex items-center gap-1 ml-auto">

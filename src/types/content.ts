@@ -14,6 +14,7 @@ export interface ContentItem {
   url?: string;
   format: ContentFormat;
   thumbnail?: string;
+  thumbnailUrl?: string;
   community_id: string;
   created_at: string;
   updated_at: string;
@@ -23,9 +24,13 @@ export interface ContentItem {
   likes?: number;
   duration?: number;
   access_level?: 'free' | 'premium' | 'premium_plus';
+  resourceUrl?: string;
   
   // Additional properties needed by components
   isNew?: boolean;
+  pointsEnabled?: boolean;
+  pointsValue?: number;
+  freeAccessesLeft?: number;
   author?: {
     id: string;
     name: string;

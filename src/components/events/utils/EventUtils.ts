@@ -2,7 +2,7 @@
 import { Event } from '@/types/events';
 
 // Helper functions for event status
-export const getEventStatus = (event: Event): 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress' | 'past' => {
+export const getEventStatus = (event: Event): 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress' => {
   const now = new Date();
   const eventDate = new Date(event.date || event.start_date);
   

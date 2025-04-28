@@ -1,6 +1,6 @@
 
 export interface Event {
-  id: string;
+  id: string | number; // Support both string and number for ID
   community_id: string;
   title: string;
   description?: string;
@@ -39,8 +39,8 @@ export interface Event {
     name: string;
     avatar?: string;
     bio?: string;
-  };
-  status?: 'upcoming' | 'live' | 'past' | 'cancelled';
+  } | string;
+  status?: 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress';
   attendees?: number;
   capacity?: number;
   isRegistered?: boolean;

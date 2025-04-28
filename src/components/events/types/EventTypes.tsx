@@ -4,21 +4,21 @@ import { ReactNode } from 'react';
 export type EventType = 'workshop' | 'webinar' | 'meetup' | 'conference' | 'course' | 'other' | 'live' | 'mentoria';
 
 export interface Event {
-  id: number;
+  id: number | string;
   community_id: string;
   title: string;
   description: string;
   date: Date;
   location: string;
   image_url?: string;
-  event_type: EventType;
+  event_type?: string;
   capacity?: number;
-  is_virtual: boolean;
+  is_virtual?: boolean;
   meeting_link?: string;
   organizer_id?: string;
-  is_featured: boolean;
-  points_awarded: number;
-  created_at: string;
+  is_featured?: boolean;
+  points_awarded?: number;
+  created_at?: string;
   space_id?: string;
   attendees: number;
   isRegistered?: boolean;
@@ -33,7 +33,7 @@ export interface Event {
   time?: string;
   speaker?: string;
   url?: string;
-  status?: 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress'; // Removed 'past' and 'cancelled'
+  status?: 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress';
   pointsValue?: number;
   platform?: string;
 

@@ -4,31 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Check, Clock } from 'lucide-react';
 import { Event, EVENT_TYPES } from './types/EventTypes';
-import { getEventStatus, isUserRegistered } from './utils/EventUtils';
 
 interface WeeklyEventCardProps {
   event: Event;
-  onRSVP: (eventId: number) => void;
+  onRSVP: (eventId: number | string) => void;
 }
 
 const WeeklyEventCard: React.FC<WeeklyEventCardProps> = ({ event, onRSVP }) => {
-  const eventType = EVENT_TYPES[event.type];
+  const eventType = EVENT_TYPES[event.type as keyof typeof EVENT_TYPES];
   
   // Get the event status directly from the event or use the utility
-  const status = event.status || getEventStatus({
-    ...event,
-    start_date: event.start_date || event.date.toISOString(),
-    end_date: event.end_date || new Date(event.date.getTime() + 2 * 60 * 60 * 1000).toISOString(),
-    date: undefined // Ensure we're using the correct date field
-  });
+  const status = event.status || 'upcoming';
   
   // Check if current user is registered
-  const isRegistered = isUserRegistered({
-    ...event,
-    start_date: event.start_date || event.date.toISOString(),
-    end_date: event.end_date || new Date(event.date.getTime() + 2 * 60 * 60 * 1000).toISOString(),
-    date: undefined // Ensure we're using the correct date field
-  });
+  const isRegistered = event.isRegistered || false;
   
   return (
     <div 
@@ -66,9 +55,9 @@ const WeeklyEventCard: React.FC<WeeklyEventCardProps> = ({ event, onRSVP }) => {
           size="sm" 
           className="w-full text-xs mt-1 h-6"
           onClick={() => onRSVP(event.id)}
-          disabled={event.attendees >= event.capacity}
+          disabled={event.attendees >= (event.capacity || 0)}
         >
-          {event.attendees >= event.capacity ? "Full" : "Register"}
+          {event.attendees >= (event.capacity || 0) ? "Full" : "Register"}
         </Button>
       ) : isRegistered ? (
         <Button 
@@ -78,8 +67,8 @@ const WeeklyEventCard: React.FC<WeeklyEventCardProps> = ({ event, onRSVP }) => {
           onClick={() => {
             // Generate Google Calendar link and open it
             const startDateTime = new Date(event.date);
-            const [startHour, startMinute] = event.time.split(' - ')[0].split(':');
-            startDateTime.setHours(parseInt(startHour), parseInt(startMinute));
+            const [startHour, startMinute] = (event.time || "").split(' - ')[0].split(':');
+            startDateTime.setHours(parseInt(startHour || "0"), parseInt(startMinute || "0"));
             
             const endDateTime = new Date(startDateTime);
             endDateTime.setHours(endDateTime.getHours() + 2);

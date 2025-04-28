@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { EVENT_TYPES, Event } from './types/EventTypes'; 
-import { getEventStatus, isUserRegistered } from './utils/EventUtils';
 import { useNotifications } from '@/context/NotificationsContext';
 import EventAttendanceManager from './attendance/EventAttendanceManager';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -17,7 +16,7 @@ import EventCalendarButtons from './card/EventCalendarButtons';
 
 interface EventCardProps {
   event: Event;
-  onRSVP: (eventId: number) => void;
+  onRSVP: (eventId: number | string) => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
@@ -27,10 +26,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   
   // Get the event status
-  const status = event.status || getEventStatus(event);
+  const status = event.status || 'upcoming';
   
-  // Check if current user is registered (for demo, always using 'current-user')
-  const isRegistered = isUserRegistered(event);
+  // Check if current user is registered
+  const isRegistered = event.isRegistered || false;
   
   const handleRSVP = () => {
     // RSVP for the event
@@ -46,8 +45,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
         <EventCardHeader 
           title={event.title}
           date={event.date}
-          time={event.time}
-          type={event.type}
+          time={event.time || ''}
+          type={event.type || 'other'}
           status={status}
           isRegistered={isRegistered}
           isPremium={event.isPremium}
@@ -56,11 +55,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
         <CardContent>
           <EventCardDetails 
             description={event.description}
-            image={event.image}
-            speaker={event.speaker}
+            image={event.image || ''}
+            speaker={event.speaker || ''}
             location={event.location}
             attendees={event.attendees}
-            capacity={event.capacity}
+            capacity={event.capacity || 0}
           />
           
           <div onClick={(e) => e.stopPropagation()}>
@@ -68,7 +67,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
               status={status}
               isRegistered={isRegistered}
               attendees={event.attendees}
-              capacity={event.capacity}
+              capacity={event.capacity || 0}
               onRSVP={handleRSVP}
               onOpenAttendanceModal={() => setShowAttendanceModal(true)}
               isPremium={event.isPremium}
@@ -77,7 +76,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
             <EventCalendarButtons 
               title={event.title}
               date={event.date}
-              time={event.time}
+              time={event.time || ''}
               description={event.description}
               location={event.location}
               isRegistered={isRegistered}
