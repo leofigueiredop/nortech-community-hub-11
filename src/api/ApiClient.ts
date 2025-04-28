@@ -4,11 +4,13 @@ import { IContentRepository } from './interfaces/IContentRepository';
 import { IEventsRepository } from './interfaces/IEventsRepository';
 import { IDiscussionRepository } from './interfaces/IDiscussionRepository';
 import { IPointsRepository } from './interfaces/IPointsRepository';
+import { IMigrationRepository } from './interfaces/IMigrationRepository';
 import { SupabaseAuthRepository } from './repositories/SupabaseAuthRepository';
 import { SupabaseContentRepository } from './repositories/SupabaseContentRepository';
 import { SupabaseEventsRepository } from './repositories/SupabaseEventsRepository';
 import { SupabaseDiscussionRepository } from './repositories/SupabaseDiscussionRepository';
 import { SupabasePointsRepository } from './repositories/SupabasePointsRepository';
+import { SupabaseMigrationRepository } from './repositories/SupabaseMigrationRepository';
 
 export class ApiClient {
   private static instance: ApiClient;
@@ -17,6 +19,7 @@ export class ApiClient {
   private _events: IEventsRepository;
   private _discussions: IDiscussionRepository;
   private _points: IPointsRepository;
+  private _migration: IMigrationRepository;
 
   private constructor() {
     this._auth = new SupabaseAuthRepository();
@@ -24,6 +27,7 @@ export class ApiClient {
     this._events = new SupabaseEventsRepository();
     this._discussions = new SupabaseDiscussionRepository();
     this._points = new SupabasePointsRepository();
+    this._migration = new SupabaseMigrationRepository();
   }
 
   public static getInstance(): ApiClient {
@@ -51,6 +55,10 @@ export class ApiClient {
 
   get points(): IPointsRepository {
     return this._points;
+  }
+
+  get migration(): IMigrationRepository {
+    return this._migration;
   }
 }
 

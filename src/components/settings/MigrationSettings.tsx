@@ -1,151 +1,276 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Upload, FileType, HelpCircle } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/components/ui/use-toast';
-import { Label } from '@/components/ui/label';
-import MigrationHistory from './migration/MigrationHistory';
-import CSVImport from './migration/CSVImport';
-import SupportCTA from './migration/SupportCTA';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ReloadIcon, CheckCircleIcon, AlertCircleIcon } from 'lucide-react';
+import { api } from '@/api/ApiClient';
+import { createSQLFunctions } from '@/api/migrations/createSQLFunctions';
+import { useToast } from '@/hooks/use-toast';
 
 const MigrationSettings: React.FC = () => {
   const { toast } = useToast();
-  const [selectedExportOptions, setSelectedExportOptions] = useState({
-    members: true,
-  });
-  const [isExporting, setIsExporting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<{
+    content: boolean;
+    events: boolean;
+    discussions: boolean;
+    points: boolean;
+  } | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
-  const handleExport = () => {
-    const selectedOptions = Object.entries(selectedExportOptions)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([option]) => option);
-      
-    if (selectedOptions.length === 0) {
+  const fetchMigrationStatus = async () => {
+    try {
+      const status = await api.migration.getMigrationStatus();
+      setStatus(status);
+    } catch (error) {
+      console.error('Error fetching migration status:', error);
       toast({
-        title: "No options selected",
-        description: "Please select at least one data type to export",
-        variant: "destructive"
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to fetch migration status',
       });
-      return;
     }
-    
-    setIsExporting(true);
-    
-    // Simulate export process
-    setTimeout(() => {
-      setIsExporting(false);
-      toast({
-        title: "Export generated successfully",
-        description: "Your export is ready to download. Link will be available for 24 hours.",
-      });
-    }, 2000);
   };
-  
+
+  useEffect(() => {
+    fetchMigrationStatus();
+  }, []);
+
+  const handleInitialize = async () => {
+    setIsLoading(true);
+    try {
+      await createSQLFunctions();
+      setInitialized(true);
+      toast({
+        title: 'SQL Functions Created',
+        description: 'Database functions have been created successfully.',
+      });
+    } catch (error) {
+      console.error('Error initializing:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Initialization Error',
+        description: 'Failed to create SQL functions',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMigrate = async (type: 'content' | 'events' | 'discussions' | 'points') => {
+    setIsLoading(true);
+    try {
+      switch (type) {
+        case 'content':
+          await api.migration.createContentTables();
+          break;
+        case 'events':
+          await api.migration.createEventsTables();
+          break;
+        case 'discussions':
+          await api.migration.createDiscussionTables();
+          break;
+        case 'points':
+          await api.migration.createPointsTables();
+          break;
+      }
+      
+      await fetchMigrationStatus();
+      
+      toast({
+        title: 'Migration Successful',
+        description: `${type.charAt(0).toUpperCase() + type.slice(1)} tables created successfully.`,
+      });
+    } catch (error) {
+      console.error(`Error migrating ${type}:`, error);
+      toast({
+        variant: 'destructive',
+        title: 'Migration Error',
+        description: `Failed to create ${type} tables`,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRunAllMigrations = async () => {
+    setIsLoading(true);
+    try {
+      if (!initialized) {
+        await createSQLFunctions();
+        setInitialized(true);
+      }
+      
+      await api.migration.createContentTables();
+      await api.migration.createEventsTables();
+      await api.migration.createDiscussionTables();
+      await api.migration.createPointsTables();
+      
+      await fetchMigrationStatus();
+      
+      toast({
+        title: 'All Migrations Complete',
+        description: 'All database tables have been created successfully.',
+      });
+    } catch (error) {
+      console.error('Error running migrations:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Migration Error',
+        description: 'Failed to run all migrations',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">Data Migration</h2>
-        <p className="text-gray-500 dark:text-gray-400">
-          Import data from other platforms or export your community data.
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Upload size={18} />
-              Import Data
-            </CardTitle>
-            <CardDescription>
-              Bring your existing community data into Nortech from other platforms.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-6">
-            <CSVImport />
-            
-            <div className="bg-slate-50 dark:bg-slate-900 p-4 mt-6 rounded-lg">
-              <SupportCTA />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Download size={18} />
-              Export Data
-            </CardTitle>
-            <CardDescription>
-              Export your community data for backup or migration purposes.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <h3 className="font-medium">Export Options</h3>
-                <Button 
-                  variant="link" 
-                  className="text-xs p-0 h-auto" 
-                  onClick={() => setSelectedExportOptions({
-                    members: true
-                  })}
-                >
-                  Select all
-                </Button>
-              </div>
-              
-              <div className="grid gap-3">
-                <div className="flex items-start space-x-2">
-                  <Checkbox 
-                    id="members" 
-                    checked={selectedExportOptions.members}
-                    onCheckedChange={(checked) => 
-                      setSelectedExportOptions(prev => ({ ...prev, members: !!checked }))
-                    }
-                  />
-                  <div className="grid gap-1.5 leading-none">
-                    <Label htmlFor="members" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      Member profiles
-                    </Label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <Button 
-              onClick={handleExport} 
-              className="w-full"
-              disabled={isExporting}
-            >
-              {isExporting ? "Generating Export..." : "Generate Export"}
-            </Button>
-            
-            <p className="text-xs text-muted-foreground">
-              Export files are available for download for 24 hours.
-            </p>
-            
-            <div className="bg-slate-50 dark:bg-slate-900 p-4 mt-4 rounded-lg">
-              <SupportCTA />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileType size={18} />
-            Migration History
-          </CardTitle>
+          <CardTitle>Database Migration</CardTitle>
           <CardDescription>
-            View your past data import and export operations.
+            Create and manage your database tables
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <MigrationHistory />
+          {!initialized && (
+            <div className="mb-6">
+              <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                <AlertCircleIcon className="h-4 w-4" />
+                <AlertTitle>Initialization Required</AlertTitle>
+                <AlertDescription>
+                  You need to initialize the SQL functions before running migrations.
+                </AlertDescription>
+              </Alert>
+              <Button 
+                onClick={handleInitialize}
+                disabled={isLoading}
+                className="mb-4"
+              >
+                {isLoading ? (
+                  <>
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                    Initializing...
+                  </>
+                ) : (
+                  'Initialize SQL Functions'
+                )}
+              </Button>
+            </div>
+          )}
+
+          <div className="mb-4">
+            <Button 
+              onClick={handleRunAllMigrations}
+              disabled={isLoading || (!initialized && !status)}
+              className="w-full mb-4"
+            >
+              {isLoading ? (
+                <>
+                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                  Running Migrations...
+                </>
+              ) : (
+                'Run All Migrations'
+              )}
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <h3 className="font-medium">Content Tables</h3>
+                <p className="text-sm text-gray-500">content_items, content_categories</p>
+              </div>
+              <div className="flex items-center">
+                {status?.content ? (
+                  <span className="flex items-center text-green-600">
+                    <CheckCircleIcon className="mr-1 h-5 w-5" />
+                    Installed
+                  </span>
+                ) : (
+                  <Button 
+                    onClick={() => handleMigrate('content')} 
+                    disabled={isLoading || (!initialized && !status)}
+                    size="sm"
+                  >
+                    {isLoading ? 'Installing...' : 'Install'}
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <h3 className="font-medium">Events Tables</h3>
+                <p className="text-sm text-gray-500">events, event_attendees</p>
+              </div>
+              <div className="flex items-center">
+                {status?.events ? (
+                  <span className="flex items-center text-green-600">
+                    <CheckCircleIcon className="mr-1 h-5 w-5" />
+                    Installed
+                  </span>
+                ) : (
+                  <Button 
+                    onClick={() => handleMigrate('events')} 
+                    disabled={isLoading || (!initialized && !status)}
+                    size="sm"
+                  >
+                    {isLoading ? 'Installing...' : 'Install'}
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <h3 className="font-medium">Discussions Tables</h3>
+                <p className="text-sm text-gray-500">discussion_topics, discussions, discussion_replies</p>
+              </div>
+              <div className="flex items-center">
+                {status?.discussions ? (
+                  <span className="flex items-center text-green-600">
+                    <CheckCircleIcon className="mr-1 h-5 w-5" />
+                    Installed
+                  </span>
+                ) : (
+                  <Button 
+                    onClick={() => handleMigrate('discussions')} 
+                    disabled={isLoading || (!initialized && !status)}
+                    size="sm"
+                  >
+                    {isLoading ? 'Installing...' : 'Install'}
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <h3 className="font-medium">Points Tables</h3>
+                <p className="text-sm text-gray-500">user_points, rewards, redemptions</p>
+              </div>
+              <div className="flex items-center">
+                {status?.points ? (
+                  <span className="flex items-center text-green-600">
+                    <CheckCircleIcon className="mr-1 h-5 w-5" />
+                    Installed
+                  </span>
+                ) : (
+                  <Button 
+                    onClick={() => handleMigrate('points')} 
+                    disabled={isLoading || (!initialized && !status)}
+                    size="sm"
+                  >
+                    {isLoading ? 'Installing...' : 'Install'}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

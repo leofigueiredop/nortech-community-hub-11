@@ -5,7 +5,7 @@ import MigrationSettings from '@/components/settings/MigrationSettings';
 
 const Migration: React.FC = () => {
   return (
-    <SettingsLayout activeSection="migration" title="Migration">
+    <SettingsLayout activeSection="migration" title="Migration & Database">
       <MigrationSettings />
     </SettingsLayout>
   );
