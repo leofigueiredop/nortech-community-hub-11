@@ -2,6 +2,7 @@
 import React from 'react';
 import { ContentItem } from '@/types/library';
 import ContentRow from './ContentRow';
+import { adaptLibraryArrayToContentType } from '@/utils/contentTypeAdapter';
 
 interface LibraryContentRowsProps {
   featuredContent: ContentItem[];
@@ -22,13 +23,18 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
   premiumContent,
   onItemSelect
 }) => {
+  // Helper function to convert ContentItem[] to ContentTypeItem[]
+  const convertContentItems = (items: ContentItem[]) => {
+    return adaptLibraryArrayToContentType(items);
+  };
+
   return (
     <div className="space-y-8 pb-12">
       {/* Featured Content */}
       {featuredContent.length > 0 && (
         <ContentRow 
           title="Featured Content" 
-          items={featuredContent}
+          items={convertContentItems(featuredContent)}
           onItemSelect={onItemSelect}
         />
       )}
@@ -37,7 +43,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {newContent.length > 0 && (
         <ContentRow 
           title="New Content" 
-          items={newContent}
+          items={convertContentItems(newContent)}
           onItemSelect={onItemSelect}
         />
       )}
@@ -46,7 +52,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {popularContent.length > 0 && (
         <ContentRow 
           title="Popular Content" 
-          items={popularContent}
+          items={convertContentItems(popularContent)}
           onItemSelect={onItemSelect}
         />
       )}
@@ -55,7 +61,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {recommendedContent.length > 0 && (
         <ContentRow 
           title="Recommended For You" 
-          items={recommendedContent}
+          items={convertContentItems(recommendedContent)}
           onItemSelect={onItemSelect}
         />
       )}
@@ -64,7 +70,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {trendingContent.length > 0 && (
         <ContentRow 
           title="Trending Now" 
-          items={trendingContent}
+          items={convertContentItems(trendingContent)}
           onItemSelect={onItemSelect}
           isTopTen={true}
         />
@@ -74,7 +80,7 @@ const LibraryContentRows: React.FC<LibraryContentRowsProps> = ({
       {premiumContent.length > 0 && (
         <ContentRow 
           title="Premium Content" 
-          items={premiumContent}
+          items={convertContentItems(premiumContent)}
           onItemSelect={onItemSelect}
         />
       )}

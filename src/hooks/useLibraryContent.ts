@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { ContentItem, ContentCategory } from '@/types/library';
 import { CONTENT_ITEMS } from '@/data/mockLibraryData';
@@ -11,10 +10,46 @@ export const useLibraryContent = () => {
   
   // Mock categories for components that expect them
   const [categories] = useState<ContentCategory[]>([
-    { id: 'cat-1', name: 'Development', description: 'Programming and development content', itemCount: 15, icon: '💻' },
-    { id: 'cat-2', name: 'Design', description: 'UI/UX and graphic design', itemCount: 8, icon: '🎨' },
-    { id: 'cat-3', name: 'Business', description: 'Business and entrepreneurship', itemCount: 12, icon: '💼' },
-    { id: 'cat-4', name: 'Marketing', description: 'Digital marketing and SEO', itemCount: 9, icon: '📈' }
+    { 
+      id: 'cat-1',
+      name: 'Development',
+      description: 'Programming and development content',
+      itemCount: 15,
+      icon: '💻',
+      slug: 'development',
+      created_at: '2023-01-01T00:00:00Z',
+      updated_at: '2023-01-01T00:00:00Z'
+    },
+    { 
+      id: 'cat-2',
+      name: 'Design',
+      description: 'UI/UX and graphic design',
+      itemCount: 8,
+      icon: '🎨',
+      slug: 'design',
+      created_at: '2023-01-01T00:00:00Z',
+      updated_at: '2023-01-01T00:00:00Z'
+    },
+    { 
+      id: 'cat-3',
+      name: 'Business',
+      description: 'Business and entrepreneurship',
+      itemCount: 12,
+      icon: '💼',
+      slug: 'business',
+      created_at: '2023-01-01T00:00:00Z',
+      updated_at: '2023-01-01T00:00:00Z'
+    },
+    { 
+      id: 'cat-4',
+      name: 'Marketing',
+      description: 'Digital marketing and SEO',
+      itemCount: 9,
+      icon: '📈',
+      slug: 'marketing',
+      created_at: '2023-01-01T00:00:00Z',
+      updated_at: '2023-01-01T00:00:00Z'
+    }
   ]);
   
   const [content] = useState<ContentItem[]>([
@@ -43,7 +78,6 @@ export const useLibraryContent = () => {
     ...CONTENT_ITEMS
   ]);
 
-  // Add category management functions
   const addCategory = (category: ContentCategory) => {
     console.log('Adding category:', category);
   };
@@ -56,7 +90,6 @@ export const useLibraryContent = () => {
     console.log('Deleting category:', id);
   };
 
-  // Return both the local content state and all the filtering functionality from useContentItems
   return {
     ...contentItemsHook,
     content,

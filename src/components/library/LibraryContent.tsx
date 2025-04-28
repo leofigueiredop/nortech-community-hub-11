@@ -10,6 +10,11 @@ interface LibraryContentProps {
   onItemSelect: (item: ContentItem) => void;
 }
 
+interface LibraryCategoriesProps {
+  content: ContentItem[];
+  onItemSelect: (item: ContentItem) => void;
+}
+
 const LibraryContent: React.FC<LibraryContentProps> = ({ content, onItemSelect }) => {
   // Filter content by different criteria
   const featuredContent = content.filter(item => item.is_featured || item.featured);

@@ -56,6 +56,7 @@ export interface Discussion {
   participants?: number;
   created_at: string;
   updated_at: string;
+  createdAt?: string; // Added for UI compatibility
   
   // UI-specific properties
   isHot?: boolean;
@@ -101,6 +102,7 @@ export interface DiscussionReply {
   is_solution?: boolean;
   upvotes: number;
   created_at: string;
+  createdAt?: string; // Adding for UI compatibility
   author?: {
     id: string;
     name: string;

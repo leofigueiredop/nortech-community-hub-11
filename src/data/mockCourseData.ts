@@ -23,6 +23,7 @@ export const MOCK_COURSE: Course = {
           type: 'video',
           content: 'https://example.com/videos/intro.mp4',
           completed: false
+          // Removing contentId property that was causing errors
         },
         {
           id: 'item-2',
@@ -30,6 +31,7 @@ export const MOCK_COURSE: Course = {
           type: 'video',
           content: 'https://example.com/videos/setup.mp4',
           completed: false
+          // Removing contentId property that was causing errors
         },
         {
           id: 'item-3',
@@ -37,6 +39,7 @@ export const MOCK_COURSE: Course = {
           type: 'document',
           content: 'https://example.com/docs/overview.pdf',
           completed: false
+          // Removing contentId property that was causing errors
         }
       ]
     },
@@ -50,6 +53,7 @@ export const MOCK_COURSE: Course = {
           type: 'video',
           content: 'https://example.com/videos/components.mp4',
           completed: false
+          // Removing contentId property that was causing errors
         },
         {
           id: 'item-5',
@@ -57,6 +61,7 @@ export const MOCK_COURSE: Course = {
           type: 'video',
           content: 'https://example.com/videos/state.mp4',
           completed: false
+          // Removing contentId property that was causing errors
         },
         {
           id: 'item-6',
@@ -64,6 +69,7 @@ export const MOCK_COURSE: Course = {
           type: 'text',
           content: 'This lesson covers the fundamental principles of responsive design...',
           completed: false
+          // Removing contentId property that was causing errors
         }
       ]
     },
@@ -77,6 +83,7 @@ export const MOCK_COURSE: Course = {
           type: 'video',
           content: 'https://example.com/videos/api-design.mp4',
           completed: false
+          // Removing contentId property that was causing errors
         },
         {
           id: 'item-8',
@@ -84,13 +91,15 @@ export const MOCK_COURSE: Course = {
           type: 'video',
           content: 'https://example.com/videos/auth.mp4',
           completed: false
+          // Removing contentId property that was causing errors
         },
         {
           id: 'item-9',
           title: 'Module Assignment - Build an API',
-          type: 'text',
+          type: 'assignment',
           content: 'Create a RESTful API with at least three endpoints that follow the principles discussed in this module.',
           completed: false
+          // Removing contentId property that was causing errors
         }
       ]
     }

@@ -45,9 +45,9 @@ export const useUser = () => {
             id: currentUser.id,
             email: currentUser.email,
             display_name: currentUser.name,
-            avatar_url: currentUser.avatar_url,
+            avatar_url: currentUser.avatar_url, // Using avatar_url from the interface
             role: currentUser.role || 'member',
-            access_level: currentUser.access_level || 'free'
+            access_level: currentUser.access_level || 'free' // Using access_level from the interface
           });
         }
       } catch (err) {

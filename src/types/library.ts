@@ -1,4 +1,3 @@
-
 import { ContentFormat, ContentCategory as BaseContentCategory } from './content';
 
 export interface ContentCategory extends BaseContentCategory {
@@ -44,7 +43,7 @@ export interface ContentItem {
   resourceUrl?: string;
   fileSize?: number;
   freeAccessesLeft?: number;
-  isExclusive?: boolean; // Add this property to fix mock data errors
+  isExclusive?: boolean;
 }
 
 export interface ContentInteraction {
@@ -99,7 +98,7 @@ export interface CourseModuleItem {
   completed?: boolean;
   url?: string;
   content?: string;
-  contentId?: string; // Add this to fix mockCourseData.ts errors
+  contentId?: string;
 }
 
 export interface Course extends ContentItem {
