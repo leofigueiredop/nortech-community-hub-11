@@ -17,9 +17,10 @@ interface AuthUser {
   id: string;
   email: string;
   name?: string;
-  avatar_url?: string; // Added for API compatibility
+  avatar_url?: string; // Add this property
+  avatar?: string;
   role?: string;
-  access_level?: 'free' | 'premium' | 'premium_plus'; // Added for API compatibility
+  access_level?: 'free' | 'premium' | 'premium_plus'; // Add this property
 }
 
 export const useUser = () => {

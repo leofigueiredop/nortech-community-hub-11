@@ -31,6 +31,9 @@ export function adaptLibraryToContentType(item: ContentLibraryItem): ContentType
     }
   }
 
+  // Get author_id from author object if possible
+  const author_id = typeof item.author === 'object' && item.author ? item.author.id : undefined;
+
   // Create properly typed ContentTypeItem
   return {
     id: item.id,
@@ -43,7 +46,7 @@ export function adaptLibraryToContentType(item: ContentLibraryItem): ContentType
     community_id: item.community_id || 'default-community',
     created_at: item.created_at || item.createdAt || new Date().toISOString(),
     updated_at: item.updated_at || item.updatedAt || new Date().toISOString(),
-    author_id: typeof item.author === 'object' && item.author ? item.author.id : undefined,
+    author_id: author_id,
     is_featured: item.is_featured || item.featured || false,
     views: item.views || 0,
     likes: item.likes || 0,
@@ -65,7 +68,8 @@ export function adaptLibraryToContentType(item: ContentLibraryItem): ContentType
     featured: item.featured || item.is_featured || false,
     createdAt: item.createdAt || item.created_at || new Date().toISOString(),
     updatedAt: item.updatedAt || item.updated_at || new Date().toISOString(),
-    allowComments: item.allowComments
+    allowComments: item.allowComments,
+    isExclusive: item.isExclusive
   };
 }
 

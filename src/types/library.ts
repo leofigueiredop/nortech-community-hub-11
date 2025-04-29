@@ -48,6 +48,7 @@ export interface ContentItem {
   completionThreshold?: number;
   isNew?: boolean;
   freeAccessesLeft?: number;
+  isExclusive?: boolean; // Add isExclusive property to match mockLibraryData.ts
 }
 
 // Course-related types
@@ -57,6 +58,7 @@ export interface CourseModuleItem {
   description?: string;
   type: string;
   content?: string;
+  contentId?: string; // Add contentId for Course components
   duration?: number;
   completed?: boolean;
   url?: string;
@@ -74,7 +76,7 @@ export interface Course extends ContentItem {
   modules?: CourseModule[];
 }
 
-// Content progress tracking types
+// Content progress tracking types - update to match how it's used
 export interface ContentProgress {
   id: string;
   user_id: string;
@@ -83,6 +85,13 @@ export interface ContentProgress {
   completed_at?: string | null;
   last_accessed_at: string;
   points_awarded: boolean;
+  // Add aliases for consistent access
+  userId?: string;
+  contentId?: string;
+  progress?: number;
+  completed?: boolean;
+  lastAccessedAt?: string;
+  pointsAwarded?: boolean;
 }
 
 // Content interaction types

@@ -7,8 +7,15 @@ export const useContentProgress = () => {
   const [progress, setProgress] = useState<ContentProgress[]>([
     {
       id: 'progress1',
+      user_id: 'user1',
+      content_id: 'content1', 
+      progress_percent: 100,
+      completed_at: new Date().toISOString(),
+      last_accessed_at: new Date().toISOString(),
+      points_awarded: true,
+      // Add aliases for component compatibility
       userId: 'user1',
-      contentId: 'content1', 
+      contentId: 'content1',
       progress: 100,
       completed: true,
       lastAccessedAt: new Date().toISOString(),
@@ -16,6 +23,13 @@ export const useContentProgress = () => {
     },
     {
       id: 'progress2',
+      user_id: 'user1',
+      content_id: 'content2',
+      progress_percent: 50,
+      completed_at: null,
+      last_accessed_at: new Date().toISOString(),
+      points_awarded: false,
+      // Add aliases for component compatibility
       userId: 'user1',
       contentId: 'content2',
       progress: 50,
@@ -28,18 +42,27 @@ export const useContentProgress = () => {
   const addProgress = useCallback((contentId: string) => {
     setProgress(prev => {
       // Skip if content already has progress
-      if (prev.some(p => p.contentId === contentId)) {
+      if (prev.some(p => (p.contentId || p.content_id) === contentId)) {
         return prev;
       }
+      
+      const now = new Date().toISOString();
       
       // Add new progress entry
       return [...prev, {
         id: `progress-${Date.now()}`,
-        userId: 'user1', // In a real app, this would come from an auth context
+        user_id: 'user1', // In a real app, this would come from an auth context
+        content_id: contentId,
+        progress_percent: 0,
+        completed_at: null,
+        last_accessed_at: now,
+        points_awarded: false,
+        // Add aliases for component compatibility
+        userId: 'user1',
         contentId,
         progress: 0,
         completed: false,
-        lastAccessedAt: new Date().toISOString(),
+        lastAccessedAt: now,
         pointsAwarded: false
       }];
     });
@@ -48,12 +71,17 @@ export const useContentProgress = () => {
   const updateProgress = useCallback((contentId: string, newProgress: number) => {
     setProgress(prev => {
       return prev.map(p => {
-        if (p.contentId === contentId) {
+        if ((p.contentId || p.content_id) === contentId) {
+          const isCompleted = newProgress >= 100;
+          const now = new Date().toISOString();
           return {
             ...p,
+            progress_percent: newProgress,
+            completed_at: isCompleted ? now : p.completed_at,
+            last_accessed_at: now,
             progress: newProgress,
-            completed: newProgress >= 100,
-            lastAccessedAt: new Date().toISOString()
+            completed: isCompleted,
+            lastAccessedAt: now
           };
         }
         return p;
@@ -62,16 +90,24 @@ export const useContentProgress = () => {
   }, []);
 
   const getProgress = useCallback((contentId: string) => {
-    const item = progress.find(p => p.contentId === contentId);
+    const item = progress.find(p => (p.contentId || p.content_id) === contentId);
     if (!item) {
       // Return default values if no progress found
+      const now = new Date().toISOString();
       return {
         id: '',
+        user_id: 'user1',
+        content_id: contentId,
+        progress_percent: 0,
+        completed_at: null,
+        last_accessed_at: now,
+        points_awarded: false,
+        // Add aliases for component compatibility
         userId: 'user1',
         contentId,
         progress: 0,
         completed: false,
-        lastAccessedAt: new Date().toISOString(),
+        lastAccessedAt: now,
         pointsAwarded: false
       };
     }
@@ -81,9 +117,10 @@ export const useContentProgress = () => {
   const awardPoints = useCallback((contentId: string) => {
     setProgress(prev => {
       return prev.map(p => {
-        if (p.contentId === contentId) {
+        if ((p.contentId || p.content_id) === contentId) {
           return {
             ...p,
+            points_awarded: true,
             pointsAwarded: true
           };
         }
@@ -101,15 +138,15 @@ export const useContentProgress = () => {
     const formatItems = contentList.filter(item => item.format === format);
     const formatItemIds = formatItems.map(item => item.id);
     
-    return progress.filter(p => formatItemIds.includes(p.contentId));
+    return progress.filter(p => formatItemIds.includes(p.contentId || p.content_id));
   }, [progress]);
   
   // Get stats about content consumption
   const getContentStats = useCallback(() => {
     const total = progress.length;
-    const completed = progress.filter(p => p.completed).length;
-    const inProgress = progress.filter(p => p.progress > 0 && !p.completed).length;
-    const notStarted = progress.filter(p => p.progress === 0).length;
+    const completed = progress.filter(p => p.completed || p.completed_at !== null).length;
+    const inProgress = progress.filter(p => (p.progress || p.progress_percent) > 0 && !(p.completed || p.completed_at !== null)).length;
+    const notStarted = progress.filter(p => (p.progress || p.progress_percent) === 0).length;
     
     return {
       total,

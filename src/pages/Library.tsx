@@ -45,7 +45,7 @@ const Library: React.FC = () => {
 
   // Calculate total progress
   const totalItems = content.length;
-  const completedItems = contentProgress.filter(item => item.completed).length;
+  const completedItems = contentProgress.filter(item => item.completed || item.completed_at !== null).length;
   const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   useEffect(() => {
@@ -76,10 +76,10 @@ const Library: React.FC = () => {
     startOfWeek.setHours(0, 0, 0, 0);
     
     const completedThisWeek = contentProgress.filter(progress => {
-      const lastAccessed = new Date(progress.lastAccessedAt);
-      return progress.completed && 
+      const lastAccessed = new Date(progress.lastAccessedAt || progress.last_accessed_at);
+      return (progress.completed || progress.completed_at !== null) && 
              lastAccessed >= startOfWeek && 
-             content.find(item => item.id === progress.contentId)?.format === 'video';
+             content.find(item => item.id === (progress.contentId || progress.content_id))?.format === 'video';
     });
     
     return completedThisWeek.length;
@@ -165,10 +165,12 @@ const Library: React.FC = () => {
         />
       </div>
 
-      <ContentViewer 
-        item={selectedItem} 
-        onClose={() => setSelectedItem(null)} 
-      />
+      {selectedItem && (
+        <ContentViewer 
+          item={selectedItem} 
+          onClose={() => setSelectedItem(null)} 
+        />
+      )}
 
       <CreateContentModal 
         isOpen={isCreateContentOpen} 
