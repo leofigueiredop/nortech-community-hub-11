@@ -1,336 +1,521 @@
-
-import { createClient } from '@/api/supabase';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { Event, EventAttendee } from '@/types/events';
-import { IEventsRepository } from '@/api/interfaces/IEventsRepository';
-
-export interface EventFilters {
-  isPremium?: boolean;
-  isUpcoming?: boolean;
-  timeframe?: 'today' | 'week' | 'month' | 'all';
-  accessLevel?: 'free' | 'premium' | 'premium_plus';
-}
+import { IEventsRepository, EventFilters } from '@/api/interfaces/IEventsRepository';
+import { Result } from '@/types/result';
+import { AppError } from '@/types/error';
 
 export class SupabaseEventsRepository implements IEventsRepository {
-  private supabase = createClient();
-  private communityId: string;
+  private communityId: string | null = null;
+  
+  constructor(private supabase: SupabaseClient) {}
 
-  constructor(communityId: string = 'default') {
+  setCommunityContext(communityId: string) {
     this.communityId = communityId;
   }
 
-  async getAll(): Promise<Event[]> {
+  private ensureCommunityContext(): AppError | null {
+    if (!this.communityId) {
+      return {
+        message: 'Community context not set',
+        code: 'COMMUNITY_CONTEXT_MISSING'
+      };
+    }
+    return null;
+  }
+
+  private transformEventData(data: any): Event {
+    return {
+      id: data.id,
+      title: data.title,
+      description: data.description,
+      date: new Date(data.date),
+      location: data.location,
+      image_url: data.image_url,
+      event_type: data.event_type,
+      capacity: data.capacity,
+      is_virtual: data.is_virtual,
+      meeting_link: data.meeting_link,
+      organizer_id: data.organizer_id,
+      is_featured: data.is_featured,
+      points_awarded: data.points_awarded,
+      space_id: data.space_id,
+      start_date: data.start_date,
+      end_date: data.end_date,
+      timezone: data.timezone,
+      location_type: data.location_type,
+      location_url: data.location_url,
+      location_address: data.location_address,
+      location_details: data.location_details,
+      max_attendees: data.max_attendees,
+      access_level: data.access_level,
+      speaker_id: data.speaker_id,
+      speaker_name: data.speaker_name,
+      speaker_bio: data.speaker_bio,
+      speaker_avatar: data.speaker_avatar,
+      banner_url: data.banner_url,
+      points_value: data.points_value,
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+      community_id: data.community_id,
+      url: data.url,
+      time: data.time,
+      type: data.type,
+      speaker: data.speaker,
+      status: data.status,
+      attendees: data.attendees,
+      isRegistered: data.isRegistered,
+      isPremium: data.isPremium,
+      pointsValue: data.pointsValue,
+      registeredUsers: data.registeredUsers,
+      platform: data.platform
+    };
+  }
+
+  async getUpcomingEvents(param?: number | EventFilters): Promise<Result<Event[], AppError>> {
+    const contextError = this.ensureCommunityContext();
+    if (contextError) {
+      return { error: contextError };
+    }
+
     try {
-      const { data, error } = await this.supabase
+      let query = this.supabase
         .from('events')
         .select('*')
         .eq('community_id', this.communityId)
+        .gte('start_date', new Date().toISOString())
         .order('start_date', { ascending: true });
 
-      if (error) throw error;
-
-      // Transform data for compatibility with UI components
-      return data.map(event => this.transformEventData(event));
-    } catch (error) {
-      console.error('Error fetching events:', error);
-      return [];
-    }
-  }
-
-  async getById(id: number): Promise<Event> {
-    try {
-      const { data, error } = await this.supabase
-        .from('events')
-        .select('*')
-        .eq('id', id.toString())
-        .single();
-
-      if (error) throw error;
-      if (!data) throw new Error(`Event with ID ${id} not found`);
-
-      // Get attendees count
-      const { count, error: countError } = await this.supabase
-        .from('event_attendees')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_id', id.toString());
-
-      if (countError) throw countError;
-
-      const transformedEvent = this.transformEventData(data);
-      transformedEvent.attendees = count || 0;
-
-      return transformedEvent;
-    } catch (error) {
-      console.error(`Error fetching event with ID ${id}:`, error);
-      throw error;
-    }
-  }
-
-  async create(event: Partial<Event>): Promise<Event> {
-    try {
-      const newEvent = {
-        community_id: this.communityId,
-        title: event.title,
-        description: event.description || '',
-        content: event.content || '',
-        start_date: event.start_date || new Date().toISOString(),
-        end_date: event.end_date || new Date().toISOString(),
-        timezone: event.timezone,
-        location_type: event.location_type || 'online',
-        location_url: event.location_url,
-        location_address: event.location_address,
-        location_details: event.location_details,
-        max_attendees: event.max_attendees,
-        access_level: event.access_level || 'free',
-        is_featured: event.is_featured || false,
-        speaker_id: event.speaker_id,
-        speaker_name: event.speaker_name,
-        speaker_bio: event.speaker_bio,
-        speaker_avatar: event.speaker_avatar,
-        banner_url: event.banner_url,
-        points_value: event.points_value,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      const { data, error } = await this.supabase
-        .from('events')
-        .insert(newEvent)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      return this.transformEventData(data);
-    } catch (error) {
-      console.error('Error creating event:', error);
-      throw error;
-    }
-  }
-
-  async update(id: number, event: Partial<Event>): Promise<Event> {
-    try {
-      const updateData = {
-        ...event,
-        updated_at: new Date().toISOString()
-      };
-
-      const { data, error } = await this.supabase
-        .from('events')
-        .update(updateData)
-        .eq('id', id.toString())
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      return this.transformEventData(data);
-    } catch (error) {
-      console.error(`Error updating event with ID ${id}:`, error);
-      throw error;
-    }
-  }
-
-  async delete(id: number): Promise<void> {
-    try {
-      const { error } = await this.supabase
-        .from('events')
-        .delete()
-        .eq('id', id.toString());
-
-      if (error) throw error;
-    } catch (error) {
-      console.error(`Error deleting event with ID ${id}:`, error);
-      throw error;
-    }
-  }
-
-  async registerAttendee(eventId: number, userId: string): Promise<void> {
-    try {
-      // Check if already registered
-      const { data: existing, error: checkError } = await this.supabase
-        .from('event_attendees')
-        .select('id')
-        .eq('event_id', eventId.toString())
-        .eq('user_id', userId)
-        .single();
-
-      if (checkError && checkError.code !== 'PGRST116') {
-        throw checkError;
-      }
-
-      if (existing) {
-        // Already registered
-        return;
-      }
-
-      // Register for the event
-      const { error } = await this.supabase
-        .from('event_attendees')
-        .insert({
-          event_id: eventId.toString(),
-          user_id: userId,
-          status: 'registered',
-          registration_date: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error registering for event:', error);
-      throw error;
-    }
-  }
-
-  async unregisterAttendee(eventId: number, userId: string): Promise<void> {
-    try {
-      const { error } = await this.supabase
-        .from('event_attendees')
-        .delete()
-        .eq('event_id', eventId.toString())
-        .eq('user_id', userId);
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error unregistering from event:', error);
-      throw error;
-    }
-  }
-
-  async getAttendees(eventId: number): Promise<EventAttendee[]> {
-    try {
-      const { data, error } = await this.supabase
-        .from('event_attendees')
-        .select(`
-          *,
-          profile:user_id (
-            id,
-            name,
-            avatar_url,
-            email
-          )
-        `)
-        .eq('event_id', eventId.toString());
-
-      if (error) throw error;
-
-      return data.map(attendee => ({
-        ...attendee,
-        profile: attendee.profile || {
-          id: attendee.user_id,
-          name: 'Unknown User',
-          avatar_url: null,
-          email: null
+      if (typeof param === 'number') {
+        query = query.limit(param);
+      } else if (param) {
+        if (param.isPremium !== undefined) {
+          query = query.eq('is_premium', param.isPremium);
         }
-      }));
+        if (param.accessLevel) {
+          query = query.eq('access_level', param.accessLevel);
+        }
+        if (param.timeframe) {
+          const now = new Date();
+          let endDate = new Date();
+          
+          switch (param.timeframe) {
+            case 'today':
+              endDate.setHours(23, 59, 59);
+              break;
+            case 'week':
+              endDate.setDate(now.getDate() + 7);
+              break;
+            case 'month':
+              endDate.setMonth(now.getMonth() + 1);
+              break;
+          }
+
+          if (param.timeframe !== 'all') {
+            query = query.lte('start_date', endDate.toISOString());
+          }
+        }
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        return {
+          error: {
+            message: 'Failed to fetch upcoming events',
+            code: 'FETCH_EVENTS_ERROR',
+            cause: error
+          }
+        };
+      }
+
+      return { data: data.map(this.transformEventData) };
     } catch (error) {
-      console.error('Error fetching event attendees:', error);
-      return [];
+      return {
+        error: {
+          message: 'An unexpected error occurred while fetching events',
+          code: 'UNEXPECTED_ERROR',
+          cause: error
+        }
+      };
     }
   }
 
-  async markAttendance(eventId: number, userId: string, attended: boolean): Promise<void> {
+  async getAll(): Promise<Result<Event[], AppError>> {
+    const contextError = this.ensureCommunityContext();
+    if (contextError) {
+      return { error: contextError };
+    }
+
+    try {
+      const { data, error } = await this.supabase
+        .from('events')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        return {
+          error: {
+            message: 'Failed to fetch events',
+            code: 'FETCH_EVENTS_ERROR',
+            cause: error
+          }
+        };
+      }
+
+      return { data };
+    } catch (error) {
+      return {
+        error: {
+          message: 'An unexpected error occurred while fetching events',
+          code: 'UNEXPECTED_ERROR',
+          cause: error
+        }
+      };
+    }
+  }
+
+  async getById(id: number): Promise<Result<Event, AppError>> {
+    const contextError = this.ensureCommunityContext();
+    if (contextError) {
+      return { error: contextError };
+    }
+
+    try {
+      const { data, error } = await this.supabase
+        .from('events')
+        .select('*')
+        .eq('id', id)
+        .eq('community_id', this.communityId)
+        .single();
+
+      if (error) {
+        return {
+          error: {
+            message: 'Failed to fetch event',
+            code: 'FETCH_EVENT_ERROR',
+            cause: error
+          }
+        };
+      }
+
+      return { data: this.transformEventData(data) };
+    } catch (error) {
+      return {
+        error: {
+          message: 'An unexpected error occurred while fetching the event',
+          code: 'UNEXPECTED_ERROR',
+          cause: error
+        }
+      };
+    }
+  }
+
+  async create(event: Partial<Event>): Promise<Result<Event, AppError>> {
+    const contextError = this.ensureCommunityContext();
+    if (contextError) {
+      return { error: contextError };
+    }
+
+    try {
+      const { data, error } = await this.supabase
+        .from('events')
+        .insert([{ ...event, community_id: this.communityId }])
+        .select()
+        .single();
+
+      if (error) {
+        return {
+          error: {
+            message: 'Failed to create event',
+            code: 'CREATE_EVENT_ERROR',
+            cause: error
+          }
+        };
+      }
+
+      return { data: this.transformEventData(data) };
+    } catch (error) {
+      return {
+        error: {
+          message: 'An unexpected error occurred while creating the event',
+          code: 'UNEXPECTED_ERROR',
+          cause: error
+        }
+      };
+    }
+  }
+
+  async update(id: number, event: Partial<Event>): Promise<Result<Event, AppError>> {
+    const contextError = this.ensureCommunityContext();
+    if (contextError) {
+      return { error: contextError };
+    }
+
+    try {
+      const { data, error } = await this.supabase
+        .from('events')
+        .update(event)
+        .eq('id', id)
+        .eq('community_id', this.communityId)
+        .select()
+        .single();
+
+      if (error) {
+        return {
+          error: {
+            message: 'Failed to update event',
+            code: 'UPDATE_EVENT_ERROR',
+            cause: error
+          }
+        };
+      }
+
+      return { data: this.transformEventData(data) };
+    } catch (error) {
+      return {
+        error: {
+          message: 'An unexpected error occurred while updating the event',
+          code: 'UNEXPECTED_ERROR',
+          cause: error
+        }
+      };
+    }
+  }
+
+  async delete(id: number): Promise<Result<void, AppError>> {
+    const contextError = this.ensureCommunityContext();
+    if (contextError) {
+      return { error: contextError };
+    }
+
+    try {
+      const { error } = await this.supabase
+        .from('events')
+        .delete()
+        .eq('id', id)
+        .eq('community_id', this.communityId);
+
+      if (error) {
+        return {
+          error: {
+            message: 'Failed to delete event',
+            code: 'DELETE_EVENT_ERROR',
+            cause: error
+          }
+        };
+      }
+
+      return { error: null };
+    } catch (error) {
+      return {
+        error: {
+          message: 'An unexpected error occurred while deleting the event',
+          code: 'UNEXPECTED_ERROR',
+          cause: error
+        }
+      };
+    }
+  }
+
+  async registerAttendee(eventId: number, userId: string): Promise<Result<void, AppError>> {
+    const contextError = this.ensureCommunityContext();
+    if (contextError) {
+      return { error: contextError };
+    }
+
     try {
       const { error } = await this.supabase
         .from('event_attendees')
-        .update({
-          status: attended ? 'attended' : 'no_show',
-          checkin_date: attended ? new Date().toISOString() : null,
-          updated_at: new Date().toISOString()
-        })
-        .eq('event_id', eventId.toString())
+        .insert([{ event_id: eventId, user_id: userId }]);
+
+      if (error) {
+        return {
+          error: {
+            message: 'Failed to register attendee',
+            code: 'REGISTER_ATTENDEE_ERROR',
+            cause: error
+          }
+        };
+      }
+
+      return { error: null };
+    } catch (error) {
+      return {
+        error: {
+          message: 'An unexpected error occurred while registering the attendee',
+          code: 'UNEXPECTED_ERROR',
+          cause: error
+        }
+      };
+    }
+  }
+
+  async unregisterAttendee(eventId: number, userId: string): Promise<Result<void, AppError>> {
+    const contextError = this.ensureCommunityContext();
+    if (contextError) {
+      return { error: contextError };
+    }
+
+    try {
+      const { error } = await this.supabase
+        .from('event_attendees')
+        .delete()
+        .eq('event_id', eventId)
         .eq('user_id', userId);
 
-      if (error) throw error;
+      if (error) {
+        return { error: { message: error.message } };
+      }
+
+      return {};
     } catch (error) {
-      console.error('Error marking attendance:', error);
-      throw error;
+      return { error: { message: 'Failed to unregister attendee' } };
     }
   }
 
-  async getUpcomingEvents(limit: number = 5): Promise<Event[]> {
+  async getAttendees(eventId: number): Promise<Result<EventAttendee[], AppError>> {
     try {
-      const now = new Date().toISOString();
       const { data, error } = await this.supabase
-        .from('events')
-        .select('*')
-        .eq('community_id', this.communityId)
-        .gt('start_date', now)
-        .order('start_date', { ascending: true })
-        .limit(limit);
+        .from('event_attendees')
+        .select('*, users(*)')
+        .eq('event_id', eventId);
 
-      if (error) throw error;
+      if (error) {
+        return { error: { message: error.message } };
+      }
 
-      return data.map(event => this.transformEventData(event));
+      return { data };
     } catch (error) {
-      console.error('Error fetching upcoming events:', error);
-      return [];
+      return { error: { message: 'Failed to fetch attendees' } };
     }
   }
 
-  async getFeaturedEvents(): Promise<Event[]> {
+  async markAttendance(eventId: number, userId: string, attended: boolean): Promise<Result<void, AppError>> {
+    try {
+      const { error } = await this.supabase
+        .from('event_attendees')
+        .update({ attended })
+        .eq('event_id', eventId)
+        .eq('user_id', userId);
+
+      if (error) {
+        return { error: { message: error.message } };
+      }
+
+      return {};
+    } catch (error) {
+      return { error: { message: 'Failed to mark attendance' } };
+    }
+  }
+
+  async getFeaturedEvents(): Promise<Result<Event[], AppError>> {
     try {
       const { data, error } = await this.supabase
         .from('events')
         .select('*')
-        .eq('community_id', this.communityId)
         .eq('is_featured', true)
         .order('start_date', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        return { error: { message: error.message } };
+      }
 
-      return data.map(event => this.transformEventData(event));
+      return { data };
     } catch (error) {
-      console.error('Error fetching featured events:', error);
-      return [];
+      return { error: { message: 'Failed to fetch featured events' } };
     }
   }
 
-  async getEventsByDate(startDate: Date, endDate: Date): Promise<Event[]> {
+  async getEventsByDate(startDate: Date, endDate: Date): Promise<Result<Event[], AppError>> {
     try {
       const { data, error } = await this.supabase
         .from('events')
         .select('*')
-        .eq('community_id', this.communityId)
         .gte('start_date', startDate.toISOString())
         .lte('end_date', endDate.toISOString())
         .order('start_date', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        return { error: { message: error.message } };
+      }
 
-      return data.map(event => this.transformEventData(event));
+      return { data };
     } catch (error) {
-      console.error('Error fetching events by date:', error);
-      return [];
+      return { error: { message: 'Failed to fetch events by date' } };
     }
   }
 
-  // Helper methods
-  private transformEventData(event: any): Event {
-    // Converte start_date para um objeto Date para compatibilidade
-    const startDate = new Date(event.start_date);
-    
-    return {
-      ...event,
-      date: startDate, // Garantindo compatibilidade com interfaces existentes
-      image: event.banner_url,
-      url: event.location_url,
-      time: this.formatEventTime(event.start_date, event.end_date, event.timezone),
-      type: this.getEventType(event),
-      location: event.location_address || event.location_details || 'Online',
-      speaker: event.speaker_name ? {
-        id: event.speaker_id || 'unknown',
-        name: event.speaker_name,
-        avatar: event.speaker_avatar,
-        bio: event.speaker_bio
-      } : undefined,
-      status: this.getEventStatus(event),
-      attendees: event.attendees || 0,
-      capacity: event.max_attendees || 100,
-      isRegistered: false, // Will be checked separately
-      isPremium: event.access_level === 'premium' || event.access_level === 'premium_plus',
-      pointsValue: event.points_value
-    };
+  async checkInAttendee(eventId: number, userId: string): Promise<Result<boolean, AppError>> {
+    try {
+      const { data, error } = await this.supabase
+        .from('event_attendees')
+        .update({ checked_in: true, checked_in_at: new Date().toISOString() })
+        .eq('event_id', eventId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+
+      if (error) {
+        return { error: { message: error.message } };
+      }
+
+      return { data: true };
+    } catch (error) {
+      return { error: { message: 'Failed to check in attendee' } };
+    }
+  }
+
+  async getEventAttendees(eventId: number): Promise<Result<EventAttendee[], AppError>> {
+    try {
+      const { data, error } = await this.supabase
+        .from('event_attendees')
+        .select('*, users(*)')
+        .eq('event_id', eventId);
+
+      if (error) {
+        return { error: { message: error.message } };
+      }
+
+      return { data };
+    } catch (error) {
+      return { error: { message: 'Failed to fetch event attendees' } };
+    }
+  }
+
+  async searchAttendees(eventId: number, query: string): Promise<Result<EventAttendee[], AppError>> {
+    try {
+      const { data, error } = await this.supabase
+        .from('event_attendees')
+        .select('*, users(*)')
+        .eq('event_id', eventId)
+        .textSearch('users.name', query);
+
+      if (error) {
+        return { error: { message: error.message } };
+      }
+
+      return { data };
+    } catch (error) {
+      return { error: { message: 'Failed to search attendees' } };
+    }
+  }
+
+  async scheduleEventReminder(eventId: number, userId: string): Promise<Result<boolean, AppError>> {
+    try {
+      const { data, error } = await this.supabase
+        .from('event_reminders')
+        .insert([{ event_id: eventId, user_id: userId }])
+        .select()
+        .single();
+
+      if (error) {
+        return { error: { message: error.message } };
+      }
+
+      return { data: true };
+    } catch (error) {
+      return { error: { message: 'Failed to schedule event reminder' } };
+    }
   }
 
   private formatEventTime(startDate: string, endDate: string, timezone?: string): string {

@@ -1,6 +1,5 @@
-
 import { IContentRepository } from '@/api/interfaces/IContentRepository';
-import { createClient } from '@/api/supabase';
+import { IBaseRepository } from '../interfaces/IBaseRepository';
 import { 
   ContentItem, 
   ContentCategory,
@@ -9,15 +8,21 @@ import {
   ContentComment,
   Course
 } from '@/types/library';
-import { IBaseRepository } from '../interfaces/IBaseRepository';
+import { Result } from '@/types/result';
+import { AppError } from '@/types/error';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 // Class implementation
 export class SupabaseContentRepository implements IContentRepository, IBaseRepository {
-  private supabase = createClient();
-  private communityId: string | null = null;
+  private supabase: SupabaseClient;
+  private currentCommunityId: string | null = null;
   
+  constructor(supabaseClient: SupabaseClient) {
+    this.supabase = supabaseClient;
+  }
+
   setCommunityContext(communityId: string | null): void {
-    this.communityId = communityId;
+    this.currentCommunityId = communityId;
   }
 
   async getAll(): Promise<ContentItem[]> {
@@ -35,41 +40,43 @@ export class SupabaseContentRepository implements IContentRepository, IBaseRepos
     }
   }
 
-  async getById(id: string): Promise<ContentItem> {
+  async getById(id: string): Promise<Result<ContentItem, AppError>> {
     try {
       const { data, error } = await this.supabase
         .from('content_items')
-        .select('*')
+        .select('*, author:profiles(*)')
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        return { error: { message: error.message, code: 'CONTENT_FETCH_ERROR' } };
+      }
 
-      return data;
+      return { data };
     } catch (error) {
-      console.error(`Error fetching content item with id ${id}:`, error);
-      throw error;
+      return { error: { message: 'Failed to fetch content', code: 'CONTENT_FETCH_ERROR' } };
     }
   }
 
-  async create(content: Partial<ContentItem>): Promise<ContentItem> {
+  async create(content: Partial<ContentItem>): Promise<Result<ContentItem, AppError>> {
     try {
       const { data, error } = await this.supabase
         .from('content_items')
-        .insert(content)
+        .insert([content])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        return { error: { message: error.message, code: 'CONTENT_CREATE_ERROR' } };
+      }
 
-      return data;
+      return { data };
     } catch (error) {
-      console.error('Error creating content item:', error);
-      throw error;
+      return { error: { message: 'Failed to create content', code: 'CONTENT_CREATE_ERROR' } };
     }
   }
 
-  async update(id: string, content: Partial<ContentItem>): Promise<ContentItem> {
+  async update(id: string, content: Partial<ContentItem>): Promise<Result<ContentItem, AppError>> {
     try {
       const { data, error } = await this.supabase
         .from('content_items')
@@ -78,26 +85,30 @@ export class SupabaseContentRepository implements IContentRepository, IBaseRepos
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        return { error: { message: error.message, code: 'CONTENT_UPDATE_ERROR' } };
+      }
 
-      return data;
+      return { data };
     } catch (error) {
-      console.error(`Error updating content item with id ${id}:`, error);
-      throw error;
+      return { error: { message: 'Failed to update content', code: 'CONTENT_UPDATE_ERROR' } };
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string): Promise<Result<boolean, AppError>> {
     try {
       const { error } = await this.supabase
         .from('content_items')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        return { error: { message: error.message, code: 'CONTENT_DELETE_ERROR' } };
+      }
+
+      return { data: true };
     } catch (error) {
-      console.error(`Error deleting content item with id ${id}:`, error);
-      throw error;
+      return { error: { message: 'Failed to delete content', code: 'CONTENT_DELETE_ERROR' } };
     }
   }
 
@@ -214,6 +225,68 @@ export class SupabaseContentRepository implements IContentRepository, IBaseRepos
     } catch (error) {
       console.error('Error tracking content completion:', error);
       throw error;
+    }
+  }
+
+  async list(filters?: {
+    communityId?: string;
+    categoryId?: string;
+    format?: string;
+    accessLevel?: string;
+    featured?: boolean;
+    limit?: number;
+    offset?: number;
+  }): Promise<Result<{ items: ContentItem[]; total: number }, AppError>> {
+    try {
+      let query = this.supabase
+        .from('content_items')
+        .select('*, author:profiles(*)', { count: 'exact' });
+
+      if (filters?.communityId) {
+        query = query.eq('community_id', filters.communityId);
+      }
+      if (filters?.categoryId) {
+        query = query.eq('category_id', filters.categoryId);
+      }
+      if (filters?.format) {
+        query = query.eq('format', filters.format);
+      }
+      if (filters?.accessLevel) {
+        query = query.eq('access_level', filters.accessLevel);
+      }
+      if (filters?.featured !== undefined) {
+        query = query.eq('is_featured', filters.featured);
+      }
+      if (filters?.limit) {
+        query = query.limit(filters.limit);
+      }
+      if (filters?.offset) {
+        query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1);
+      }
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        return { error: { message: error.message, code: 'CONTENT_LIST_ERROR' } };
+      }
+
+      return { data: { items: data, total: count || 0 } };
+    } catch (error) {
+      return { error: { message: 'Failed to list content', code: 'CONTENT_LIST_ERROR' } };
+    }
+  }
+
+  async incrementViews(id: string): Promise<Result<void, AppError>> {
+    try {
+      const { error } = await this.supabase.rpc('increment_content_views', { content_id_param: id });
+
+      if (error) {
+        return { error: { message: error.message, code: 'CONTENT_VIEW_ERROR' } };
+      }
+
+      return { data: undefined };
+    } catch (error) {
+      return { error: { message: 'Failed to increment views', code: 'CONTENT_VIEW_ERROR' } };
     }
   }
 }

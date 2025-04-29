@@ -1,14 +1,26 @@
-
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { usePointsSubscription } from '@/hooks/usePointsSubscription';
+import { ApiClient } from '@/api/ApiClient';
+import { useAuth } from '@/context/AuthContext';
+import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'react-hot-toast';
+import { supabase } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
+import { Result } from '@/types/result';
+import { AppError } from '@/types/error';
 
 // Define the types for points transactions
-export interface PointsActivity {
-  id: string;
-  type: string;
+interface PointsActivity {
+  id?: string;
+  user_id: string;
   points: number;
   description: string;
-  timestamp: string;
+  type: string;
+  created_at: string;
 }
+
+// Define the type for new points activity data
+type NewPointsActivity = Omit<PointsActivity, 'id'>;
 
 // Points values for different activities
 export const POINTS_VALUES = {
@@ -27,72 +39,130 @@ export const POINTS_VALUES = {
   referral: 25
 };
 
-// Define the structure of the Points context
-export interface PointsContextType {
+// Points context interface
+interface PointsContextType {
   totalPoints: number;
-  awardPoints: (pointsData: { type: string; description: string; points: number }) => void;
+  pointsHistory: PointsActivity[];
+  awardPoints: (points: number, description: string) => Promise<void>;
+  redeemPoints: (points: number, description: string) => Promise<void>;
   addPoints: (pointsData: { type: string; description: string; points: number }) => void;
   deductPoints: (points: number, description?: string) => void;
   getUserLevel: () => { level: number; nextLevel: number; progress: number };
-  pointsHistory: PointsActivity[];
   awardBadge: (badge: { name: string; description: string; category: string }) => void;
 }
 
 // Create the context
-const PointsContext = createContext<PointsContextType | undefined>(undefined);
+const PointsContext = createContext<PointsContextType>({
+  totalPoints: 0,
+  pointsHistory: [],
+  awardPoints: async () => {},
+  redeemPoints: async () => {},
+  addPoints: () => {},
+  deductPoints: () => {},
+  getUserLevel: () => ({ level: 1, nextLevel: 2, progress: 0 }),
+  awardBadge: () => {}
+});
 
 // Points provider component
 export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [pointsHistory, setPointsHistory] = useState<PointsActivity[]>([
-    {
-      id: '1',
-      type: 'login_bonus',
-      points: 2,
-      description: 'Daily login bonus',
-      timestamp: new Date(Date.now() - 86400000).toISOString(),
-    },
-    {
-      id: '2',
-      type: 'content_completion',
-      points: 10,
-      description: 'Completed "Getting Started with Our Platform"',
-      timestamp: new Date(Date.now() - 172800000).toISOString(),
-    },
-  ]);
+  const { user } = useAuth();
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [pointsHistory, setPointsHistory] = useState<PointsActivity[]>([]);
+  const api = ApiClient.getInstance();
 
-  // Calculate total points
-  const totalPoints = pointsHistory.reduce((sum, activity) => sum + activity.points, 0);
+  // Use the real-time subscription hook
+  usePointsSubscription();
 
-  // Award points to the user (new version using object parameter)
-  const awardPoints = useCallback((pointsData: { type: string; description: string; points: number }) => {
-    const newActivity: PointsActivity = {
-      id: Date.now().toString(),
-      type: pointsData.type,
-      points: pointsData.points,
-      description: pointsData.description,
-      timestamp: new Date().toISOString(),
+  useEffect(() => {
+    // Load initial points data
+    const loadPointsData = async () => {
+      if (!user) return;
+      
+      // Fetch points history
+      const { data: history, error } = await supabase
+        .from('points_history')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching points history:', error);
+        toast.error('Failed to load points data');
+        return;
+      }
+
+      if (history) {
+        setPointsHistory(history);
+        // Calculate total points
+        const total = history.reduce((sum, activity) => sum + activity.points, 0);
+        setTotalPoints(total);
+      }
     };
-    
-    setPointsHistory(prev => [newActivity, ...prev]);
-  }, []);
+
+    loadPointsData();
+  }, [user]);
+
+  const awardPoints = useCallback(async (points: number, description: string) => {
+    if (!user) return;
+
+    try {
+      const activity: NewPointsActivity = {
+        user_id: user.id,
+        points,
+        description,
+        type: 'points_earned',
+        created_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase
+        .from('points_history')
+        .insert([activity]);
+
+      if (error) {
+        console.error('Error awarding points:', error);
+        toast.error('Failed to award points');
+        return;
+      }
+
+      // Update local state
+      setTotalPoints(prev => prev + points);
+      setPointsHistory(prev => [activity as PointsActivity, ...prev]);
+      toast.success(`Awarded ${points} points!`);
+    } catch (error) {
+      console.error('Error in awardPoints:', error);
+      toast.error('Failed to award points');
+    }
+  }, [user]);
 
   // Legacy support for the original addPoints method
   const addPoints = useCallback((pointsData: { type: string; description: string; points: number }) => {
-    awardPoints(pointsData);
+    awardPoints(pointsData.points, pointsData.description);
   }, [awardPoints]);
 
   // Deduct points from the user
-  const deductPoints = useCallback((points: number, description = '') => {
+  const deductPoints = useCallback(async (points: number, description = '') => {
+    if (!user) return;
+
     const newActivity: PointsActivity = {
       id: Date.now().toString(),
       type: 'reward_redemption',
       points: -Math.abs(points), // Ensure it's negative
       description,
-      timestamp: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      user_id: user.id
     };
     
     setPointsHistory(prev => [newActivity, ...prev]);
-  }, []);
+    setTotalPoints(prev => prev - Math.abs(points));
+
+    // Sync with backend
+    await api.points.addPoints(
+      user.id,
+      -Math.abs(points),
+      'reward_redemption',
+      description
+    );
+  }, [user]);
 
   // Award badge (simplified implementation)
   const awardBadge = useCallback((badge: { name: string; description: string; category: string }) => {
@@ -111,14 +181,89 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return { level, nextLevel, progress };
   }, [totalPoints]);
 
+  const redeemPoints = useCallback(async (points: number, description: string) => {
+    if (!user || points > totalPoints) return;
+
+    try {
+      const newActivity: PointsActivity = {
+        id: uuidv4(),
+        type: 'reward_redemption',
+        points: -points,
+        description,
+        created_at: new Date().toISOString(),
+        user_id: user.id
+      };
+
+      // Update local state
+      setTotalPoints(prev => prev - points);
+      setPointsHistory(prev => [newActivity, ...prev]);
+
+      // Save to database
+      await api.points.addPoints(
+        user.id,
+        -points,
+        'reward_redemption',
+        description
+      );
+    } catch (error) {
+      console.error('Error redeeming points:', error);
+    }
+  }, [user, totalPoints]);
+
+  const addPointsActivity = async (activity: NewPointsActivity) => {
+    if (!user) return;
+    
+    const newActivity: PointsActivity = {
+      id: uuidv4(),
+      user_id: user.id,
+      created_at: new Date().toISOString(),
+      ...activity
+    };
+
+    setPointsHistory(prev => [...prev, newActivity]);
+    
+    try {
+      await supabase
+        .from('points_history')
+        .insert([newActivity]);
+    } catch (error) {
+      console.error('Error saving points activity:', error);
+      toast.error('Failed to save points activity');
+    }
+  };
+
+  const loadPointsHistory = async () => {
+    if (!user) return;
+    
+    try {
+      const { data: history, error } = await supabase
+        .from('points_history')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading points history:', error);
+        toast.error('Failed to load points history');
+        return;
+      }
+
+      setPointsHistory(history);
+    } catch (error) {
+      console.error('Error in loadPointsHistory:', error);
+      toast.error('Failed to load points history');
+    }
+  };
+
   return (
     <PointsContext.Provider value={{
       totalPoints,
+      pointsHistory,
       awardPoints,
+      redeemPoints,
       addPoints,
       deductPoints,
       getUserLevel,
-      pointsHistory,
       awardBadge
     }}>
       {children}
@@ -126,13 +271,5 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   );
 };
 
-// Hook to use the points context
-export const usePoints = () => {
-  const context = useContext(PointsContext);
-  
-  if (context === undefined) {
-    throw new Error('usePoints must be used within a PointsProvider');
-  }
-  
-  return context;
-};
+// Export the hook for using points context
+export const usePoints = () => useContext(PointsContext);

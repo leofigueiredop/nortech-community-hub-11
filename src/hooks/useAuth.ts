@@ -1,138 +1,118 @@
-
 import { useState, useEffect } from 'react';
-import { api } from '@/api/ApiClient';
-import { AuthUser } from '@/types/api';
-import { toast } from '@/components/ui/use-toast';
+import { supabase, handleAuthError } from '../lib/supabase';
+import { User, Session } from '@supabase/supabase-js';
 
-// Extend the IAuthRepository interface to add the updateProfile method
-interface ExtendedAuthRepository {
-  getCurrentUser(): Promise<AuthUser | null>;
-  login(credentials: { email: string; password: string }): Promise<{ user: AuthUser; token: string }>;
-  register(userData: { email: string; password: string; name: string }): Promise<{ user: AuthUser; token: string }>;
-  logout(): Promise<void>;
-  updateProfile(userData: Partial<AuthUser>): Promise<AuthUser>;
+export interface AuthHook {
+  user: User | null;
+  session: Session | null;
+  loading: boolean;
+  signIn: {
+    withEmail: (email: string, password: string) => Promise<{ data: any; error: any }>;
+    withGoogle: () => Promise<{ data: any; error: any }>;
+    withApple: () => Promise<{ data: any; error: any }>;
+  };
+  signUp: (email: string, password: string, options?: any) => Promise<{ data: any; error: any }>;
+  signOut: () => Promise<{ error: any }>;
+  resetPassword: (email: string) => Promise<{ data: any; error: any }>;
+  emailConfirmation: {
+    sendConfirmation: (email: string) => Promise<{ data: any; error: any }>;
+    verifyToken: (token: string) => Promise<{ data: any; error: any }>;
+  };
 }
 
-export const useAuth = () => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+export function useAuth(): AuthHook {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkUser();
+    // Get current session
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    // Initial session check
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Cleanup subscription
+    return () => subscription.unsubscribe();
   }, []);
 
-  const checkUser = async () => {
-    try {
-      setLoading(true);
-      const user = await api.auth.getCurrentUser();
-      setUser(user);
-    } catch (error) {
-      console.error('Error checking user:', error);
-    } finally {
-      setLoading(false);
-    }
+  const signIn = {
+    withEmail: (email: string, password: string) => 
+      supabase.auth.signInWithPassword({ email, password })
+        .then(result => result)
+        .catch(handleAuthError),
+    
+    withGoogle: () => 
+      supabase.auth.signInWithOAuth({ provider: 'google' })
+        .then(result => result)
+        .catch(handleAuthError),
+    
+    withApple: () => 
+      supabase.auth.signInWithOAuth({ provider: 'apple' })
+        .then(result => result)
+        .catch(handleAuthError)
   };
 
-  const login = async (email: string, password: string) => {
-    try {
-      const response = await api.auth.login({ email, password });
-      setUser(response.user);
-      
-      // Check if the user has a community associated
-      if (response.user) {
-        const communityId = localStorage.getItem('nortechCommunityContext') 
-          ? JSON.parse(localStorage.getItem('nortechCommunityContext') || '{}').communityId
-          : null;
-          
-        if (communityId) {
-          api.setCurrentCommunity(communityId);
+  const signUp = (email: string, password: string, options?: any) => 
+    supabase.auth.signUp({ 
+      email, 
+      password, 
+      options: {
+        ...options,
+        emailRedirectTo: import.meta.env.VITE_EMAIL_REDIRECT_URL
+      }
+    })
+      .then(result => result)
+      .catch(handleAuthError);
+
+  const signOut = () => 
+    supabase.auth.signOut()
+      .then(result => result)
+      .catch(handleAuthError);
+
+  const resetPassword = (email: string) => 
+    supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: import.meta.env.VITE_PASSWORD_RESET_REDIRECT_URL
+    })
+      .then(result => result)
+      .catch(handleAuthError);
+
+  const emailConfirmation = {
+    sendConfirmation: (email: string) => 
+      supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: import.meta.env.VITE_EMAIL_REDIRECT_URL
         }
-      }
-      
-      return response;
-    } catch (error) {
-      console.error('Login error:', error);
-      toast({
-        title: "Login failed",
-        description: error instanceof Error ? error.message : "An error occurred during login",
-        variant: "destructive"
-      });
-      throw error;
-    }
-  };
-
-  const register = async (email: string, password: string, name: string) => {
-    try {
-      const response = await api.auth.register({ email, password, name });
-      setUser(response.user);
-      
-      // Check if there's community context from registration
-      const communityId = localStorage.getItem('nortechCommunityContext') 
-        ? JSON.parse(localStorage.getItem('nortechCommunityContext') || '{}').communityId
-        : null;
-        
-      if (communityId) {
-        api.setCurrentCommunity(communityId);
-      }
-      
-      return response;
-    } catch (error) {
-      console.error('Registration error:', error);
-      toast({
-        title: "Registration failed",
-        description: error instanceof Error ? error.message : "An error occurred during registration",
-        variant: "destructive"
-      });
-      throw error;
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await api.auth.logout();
-      setUser(null);
-      // Clear community context when logging out
-      api.setCurrentCommunity(null);
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast({
-        title: "Logout failed",
-        description: error instanceof Error ? error.message : "An error occurred during logout",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const updateProfile = async (userdata: Partial<AuthUser>) => {
-    try {
-      if (!user?.id) throw new Error("User not logged in");
-      
-      const extendedAuthRepository = api.auth as unknown as ExtendedAuthRepository;
-      if (!extendedAuthRepository.updateProfile) {
-        throw new Error("Update profile method not available");
-      }
-      
-      const updated = await extendedAuthRepository.updateProfile(userdata);
-      setUser(prev => prev ? { ...prev, ...updated } : updated);
-      return updated;
-    } catch (error) {
-      console.error('Profile update error:', error);
-      toast({
-        title: "Profile update failed",
-        description: error instanceof Error ? error.message : "An error occurred while updating your profile",
-        variant: "destructive"
-      });
-      throw error;
-    }
+      })
+        .then(result => result)
+        .catch(handleAuthError),
+    
+    verifyToken: (token: string) => 
+      supabase.auth.exchangeCodeForSession(token)
+        .then(result => result)
+        .catch(handleAuthError)
   };
 
   return {
     user,
+    session,
     loading,
-    login,
-    register,
-    logout,
-    updateProfile,
-    checkUser
+    signIn,
+    signUp,
+    signOut,
+    resetPassword,
+    emailConfirmation
   };
-};
+}

@@ -1,6 +1,10 @@
+// Import the main settings page
+import SettingsPage from './index.page';
+
+// Export the main settings page as default
+export default SettingsPage;
 
 // Export all settings components
-export { default as Index } from './Index';
 export { default as General } from './General';
 export { default as Branding } from './Branding';
 export { default as Integration } from './Integration';

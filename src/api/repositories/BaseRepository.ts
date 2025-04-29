@@ -1,6 +1,4 @@
-
-import { createClient, PostgrestError, SupabaseClient } from '@supabase/supabase-js';
-import { supabaseConfig } from '../config';
+import { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 import { ApiResponse } from '@/types/api';
 import { IBaseRepository } from '../interfaces/IBaseRepository';
 
@@ -8,11 +6,8 @@ export class BaseRepository implements IBaseRepository {
   protected supabase: SupabaseClient;
   protected currentCommunityId: string | null = null;
 
-  constructor() {
-    this.supabase = createClient(
-      supabaseConfig.url,
-      supabaseConfig.anonKey
-    );
+  constructor(supabaseClient: SupabaseClient) {
+    this.supabase = supabaseClient;
   }
 
   setCommunityContext(communityId: string | null): void {

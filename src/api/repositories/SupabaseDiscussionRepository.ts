@@ -1,13 +1,11 @@
-
-import { createClient } from '@supabase/supabase-js';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { IDiscussionRepository } from '../interfaces/IDiscussionRepository';
 import { BaseRepository } from './BaseRepository';
-import { supabaseConfig } from '../config';
 import { DiscussionTopic, Discussion, DiscussionReply } from '@/types/discussion';
 
 export class SupabaseDiscussionRepository extends BaseRepository implements IDiscussionRepository {
-  constructor() {
-    super();
+  constructor(supabaseClient: SupabaseClient) {
+    super(supabaseClient);
   }
 
   async getAllTopics(): Promise<DiscussionTopic[]> {

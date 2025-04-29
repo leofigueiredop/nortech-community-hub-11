@@ -1,7 +1,7 @@
-
 import { createClient } from '@/api/supabase';
 import { IPointsRepository } from '@/api/interfaces/IPointsRepository';
 import { PointsActivity, PointsRedemption } from '@/types/points';
+import { LeaderboardUser } from '@/types/leaderboard';
 
 export class SupabasePointsRepository implements IPointsRepository {
   private supabase = createClient();
@@ -156,6 +156,36 @@ export class SupabasePointsRepository implements IPointsRepository {
       return data as PointsRedemption[];
     } catch (error) {
       console.error("Error getting redemption history:", error);
+      return [];
+    }
+  }
+
+  async getLeaderboard(limit: number = 10): Promise<LeaderboardUser[]> {
+    try {
+      const { data, error } = await this.supabase
+        .from('user_profiles')
+        .select(`
+          id,
+          user_id,
+          name,
+          avatar_url,
+          points,
+          level
+        `)
+        .order('points', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+
+      return data.map(user => ({
+        id: user.user_id,
+        name: user.name,
+        avatar: user.avatar_url,
+        points: user.points || 0,
+        level: user.level || 1
+      }));
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
       return [];
     }
   }

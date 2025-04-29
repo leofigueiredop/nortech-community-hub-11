@@ -1,13 +1,12 @@
-
-import { createClient } from '@supabase/supabase-js';
 import { IMigrationRepository } from '../interfaces/IMigrationRepository';
-import { BaseRepository } from './BaseRepository';
-import { supabaseConfig } from '../config';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { createSQLFunctions } from '../migrations/createSQLFunctions';
 
-export class SupabaseMigrationRepository extends BaseRepository implements IMigrationRepository {
-  constructor() {
-    super();
+export class SupabaseMigrationRepository implements IMigrationRepository {
+  private supabase: SupabaseClient;
+
+  constructor(supabaseClient: SupabaseClient) {
+    this.supabase = supabaseClient;
   }
 
   async runMigrations(): Promise<boolean> {

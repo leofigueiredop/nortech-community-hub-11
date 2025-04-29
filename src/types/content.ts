@@ -1,56 +1,45 @@
-
 /**
  * Content format types
  */
-export type ContentFormat = 'video' | 'text' | 'document' | 'audio' | 'course' | 'image' | 'link' | 'youtube' | 'vimeo' | 'gdoc' | 'pdf' | string;
+export type ContentFormat = 'video' | 'article' | 'pdf' | 'course' | 'audio' | 'image' | 'link';
 
 /**
  * Content item interface
  */
 export interface ContentItem {
   id: string;
-  title: string;
-  description: string;
-  url?: string;
-  format: ContentFormat;
-  thumbnail?: string;
-  thumbnailUrl?: string; // Added for compatibility with existing components
   community_id: string;
+  title: string;
+  description?: string;
+  format: string;
+  thumbnail?: string;
+  thumbnail_url?: string;
+  resource_url?: string;
+  author?: Profile;
+  author_id?: string;
+  duration?: number;
+  tags?: string[];
+  access_level: 'free' | 'premium' | 'unlockable';
   created_at: string;
   updated_at: string;
-  author_id?: string;
-  is_featured?: boolean;
-  views?: number;
-  likes?: number;
-  duration?: number;
-  access_level: 'free' | 'premium' | 'premium_plus';
+  views: number;
   category_id?: string;
-  tags?: string[];
-  
-  // Additional properties needed by components
-  isNew?: boolean;
-  pointsEnabled?: boolean;
-  pointsValue?: number;
-  freeAccessesLeft?: number;
-  isExclusive?: boolean; // Added to fix errors in mockLibraryData.ts
-  author?: {
-    id: string;
-    name: string;
-    avatar?: string;
-  } | string | null;
-  
-  // Properties used in various components
-  resourceUrl?: string;
-  categoryId?: string;
-  visibility?: 'public' | 'premium' | 'points' | 'hidden' | 'vip-only' | 'limited-time';
-  completionCriteria?: 'view' | 'scroll_end' | 'watch_percent' | 'time_spent';
-  completionThreshold?: number;
-  fileSize?: number | string; // Accept both number and string to match library.ts
-  accessLevel?: 'free' | 'premium' | 'premium_plus';
-  featured?: boolean;
-  createdAt?: string; // Alias for created_at
-  updatedAt?: string; // Alias for updated_at
-  allowComments?: boolean;
+  visibility: 'public' | 'private';
+  featured: boolean;
+  points_enabled: boolean;
+  points_value: number;
+  completion_criteria: string;
+  completion_threshold: number;
+  file_size?: number;
+  space_id?: string;
+  url?: string;
+  likes: number;
+  is_featured: boolean;
+  content?: string;
+  is_new: boolean;
+  freeAccessesLeft: number;
+  isExclusive: boolean;
+  allow_comments: boolean;
 }
 
 /**
@@ -58,11 +47,15 @@ export interface ContentItem {
  */
 export interface ContentFormData {
   title: string;
-  description: string;
-  url?: string;
+  description?: string;
   format: ContentFormat;
-  community_id: string;
-  thumbnail_url?: string;
+  url?: string;
+  file?: File;
+  thumbnail?: File;
+  category_id?: string;
+  tags?: string[];
+  access_level?: string;
+  community_id?: string;
 }
 
 /**
@@ -93,4 +86,109 @@ export interface ContentCategory {
   created_at: string;
   updated_at: string;
   itemCount?: number; // Added for UI convenience
+}
+
+// Content Types
+export type ContentType = 'text' | 'image' | 'video' | 'audio' | 'document' | 'course' | 'link';
+
+export interface ContentMetadata {
+  title: string;
+  description?: string;
+  content?: string;
+  format: ContentType;
+  thumbnail?: string;
+  resourceUrl?: string;
+  duration?: number;
+  fileSize?: number;
+  mimeType?: string;
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+  encoding?: string;
+  bitrate?: number;
+  author?: string;
+  tags?: string[];
+  customFields?: Record<string, any>;
+}
+
+export interface ContentItem {
+  id: string;
+  communityId: string;
+  metadata: ContentMetadata;
+  url?: string;
+  resourceUrl?: string;
+  readonly accessLevel: 'free' | 'premium' | 'premium_plus';
+  status: 'draft' | 'published' | 'archived' | 'scheduled';
+  publishedAt?: string;
+  scheduledAt?: string;
+  version: number;
+  seoTitle?: string;
+  seoDescription?: string;
+  slug?: string;
+  previewUrl?: string;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+// Content Type Adapter Interface
+export interface ContentTypeAdapter<T extends ContentMetadata = ContentMetadata> {
+  type: ContentType;
+  validate(content: Partial<ContentItem>): Promise<boolean>;
+  transform(content: Partial<ContentItem>): Promise<ContentItem>;
+  extractMetadata(file: File | string): Promise<T>;
+  generatePreview(content: ContentItem): Promise<string>;
+  getStorageConfig(): {
+    allowedMimeTypes: string[];
+    maxFileSize: number;
+    storagePrefix: string;
+  };
+}
+
+// Base Content Adapter
+export abstract class BaseContentAdapter<T extends ContentMetadata = ContentMetadata> implements ContentTypeAdapter<T> {
+  abstract type: ContentType;
+  
+  async validate(content: Partial<ContentItem>): Promise<boolean> {
+    if (!content.metadata?.title) {
+      throw new Error('Title is required');
+    }
+    if (!content.metadata?.format) {
+      throw new Error('Content format is required');
+    }
+    if (content.metadata.format !== this.type) {
+      throw new Error(`Invalid content type. Expected ${this.type}`);
+    }
+    return true;
+  }
+
+  abstract transform(content: Partial<ContentItem>): Promise<ContentItem>;
+  abstract extractMetadata(file: File | string): Promise<T>;
+  abstract generatePreview(content: ContentItem): Promise<string>;
+  abstract getStorageConfig(): {
+    allowedMimeTypes: string[];
+    maxFileSize: number;
+    storagePrefix: string;
+  };
+
+  protected generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  }
+
+  protected async validateFileType(file: File, allowedTypes: string[]): Promise<boolean> {
+    if (!allowedTypes.includes(file.type)) {
+      throw new Error(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`);
+    }
+    return true;
+  }
+
+  protected async validateFileSize(file: File, maxSize: number): Promise<boolean> {
+    if (file.size > maxSize) {
+      throw new Error(`File too large. Maximum size: ${maxSize / 1024 / 1024}MB`);
+    }
+    return true;
+  }
 }

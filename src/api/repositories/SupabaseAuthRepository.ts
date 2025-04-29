@@ -1,17 +1,11 @@
-
-import { createClient } from '@supabase/supabase-js';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { IAuthRepository } from '../interfaces/IAuthRepository';
 import { AuthUser, LoginCredentials, AuthResponse } from '@/types/api';
 import { BaseRepository } from './BaseRepository';
-import { supabaseConfig } from '../config';
 
 export class SupabaseAuthRepository extends BaseRepository implements IAuthRepository {
-  constructor() {
-    super();
-    this.supabase = createClient(
-      supabaseConfig.url,
-      supabaseConfig.anonKey
-    );
+  constructor(supabaseClient: SupabaseClient) {
+    super(supabaseClient);
   }
 
   async login({ email, password }: LoginCredentials): Promise<AuthResponse> {
@@ -21,22 +15,35 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Login error:', error);
+        throw new Error(error.message || 'Erro no login');
+      }
+
+      if (!data.user) {
+        throw new Error('Usuário não autenticado');
+      }
 
       return {
         user: {
           id: data.user.id,
           email: data.user.email!,
-          name: data.user.user_metadata?.name,
+          name: data.user.user_metadata?.name || email.split('@')[0],
         },
-        session: {
+        session: data.session ? {
           access_token: data.session.access_token,
           refresh_token: data.session.refresh_token,
           expires_at: data.session.expires_at,
-        },
+        } : null
       };
     } catch (error) {
-      return this.handleError(error);
+      console.error('Login completo error:', error);
+      
+      if (error instanceof Error) {
+        throw new Error(`Falha no login: ${error.message}`);
+      }
+      
+      throw new Error('Erro desconhecido durante o login');
     }
   }
 
@@ -48,52 +55,95 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         options: {
           data: {
             name,
-          },
-        },
+            display_name: name,
+            role: 'member'
+          }
+        }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Signup error:', error);
+        throw new Error(error.message || 'Erro no registro');
+      }
 
+      if (!data.user) {
+        throw new Error('Usuário não criado');
+      }
+
+      const session = data.session;
+      
       return {
         user: {
-          id: data.user!.id,
-          email: data.user!.email!,
-          name: data.user!.user_metadata?.name,
+          id: data.user.id,
+          email: data.user.email!,
+          name: data.user.user_metadata?.name || name,
         },
-        session: {
-          access_token: data.session!.access_token,
-          refresh_token: data.session!.refresh_token,
-          expires_at: data.session!.expires_at,
-        },
+        session: session ? {
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+          expires_at: session.expires_at,
+        } : null
       };
     } catch (error) {
-      return this.handleError(error);
+      console.error('Registro completo error:', error);
+      
+      if (error instanceof Error) {
+        throw new Error(`Falha no registro: ${error.message}`);
+      }
+      
+      throw new Error('Erro desconhecido durante o registro');
     }
   }
 
   async logout(): Promise<void> {
     try {
       const { error } = await this.supabase.auth.signOut();
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Logout error:', error);
+        throw new Error(error.message || 'Erro no logout');
+      }
     } catch (error) {
-      this.handleError(error);
+      console.error('Logout completo error:', error);
+      throw new Error('Não foi possível fazer logout');
     }
   }
 
   async getCurrentUser(): Promise<AuthUser | null> {
     try {
+      // Primeiro tenta recuperar a sessão
+      const { data: sessionData } = await this.supabase.auth.getSession();
+      
+      // Se não há sessão, retorna null
+      if (!sessionData.session) {
+        console.warn('No active session found');
+        return null;
+      }
+
+      // Com a sessão ativa, busca os dados do usuário
       const { data: { user }, error } = await this.supabase.auth.getUser();
       
-      if (error) throw error;
-      if (!user) return null;
+      if (error) {
+        console.error('Get current user error:', error);
+        return null;
+      }
+
+      if (!user) {
+        console.warn('No user data found');
+        return null;
+      }
 
       return {
         id: user.id,
         email: user.email!,
-        name: user.user_metadata?.name,
+        name: user.user_metadata?.name || user.email?.split('@')[0] || 'Usuário',
+        accessLevel: user.user_metadata?.accessLevel || 'free',
+        interests: user.user_metadata?.interests || [],
+        isOnboarded: user.user_metadata?.isOnboarded || false
       };
     } catch (error) {
-      return this.handleError(error);
+      console.error('Erro ao buscar usuário atual:', error);
+      return null;
     }
   }
 
@@ -118,6 +168,21 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
       };
     } catch (error) {
       return this.handleError(error);
+    }
+  }
+
+  async sendEmailVerification(email: string): Promise<void> {
+    try {
+      const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/verify-email`
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error('Erro no envio de verificação de email:', error);
+      throw new Error('Não foi possível enviar o email de verificação');
     }
   }
 }

@@ -1,12 +1,20 @@
-
 export interface Event {
-  id: string | number; // Support both string and number for ID
-  community_id: string;
+  id: number;
   title: string;
-  description?: string;
-  content?: string;
-  start_date: string;
-  end_date: string;
+  description: string;
+  date: Date;
+  location: string;
+  image_url?: string;
+  event_type: string;
+  capacity?: number;
+  is_virtual: boolean;
+  meeting_link?: string;
+  organizer_id?: string;
+  is_featured: boolean;
+  points_awarded: number;
+  space_id?: string;
+  start_date?: string;
+  end_date?: string;
   timezone?: string;
   location_type: 'online' | 'in_person' | 'hybrid';
   location_url?: string;
@@ -14,7 +22,6 @@ export interface Event {
   location_details?: string;
   max_attendees?: number;
   access_level: 'free' | 'premium' | 'premium_plus';
-  is_featured: boolean;
   speaker_id?: string;
   speaker_name?: string;
   speaker_bio?: string;
@@ -23,17 +30,10 @@ export interface Event {
   points_value?: number;
   created_at: string;
   updated_at: string;
-  event_type: string;
-  is_virtual: boolean;
-  points_awarded: number;
-  
-  // Additional fields needed for compatibility with existing components
-  date?: Date;
-  image?: string;
+  community_id: string;
   url?: string;
   time?: string;
   type?: string;
-  location?: string;
   speaker?: {
     id: string;
     name: string;
@@ -42,7 +42,6 @@ export interface Event {
   } | string;
   status?: 'upcoming' | 'live' | 'ended' | 'happening_soon' | 'in_progress';
   attendees?: number;
-  capacity?: number;
   isRegistered?: boolean;
   isPremium?: boolean;
   pointsValue?: number;
@@ -51,22 +50,20 @@ export interface Event {
 }
 
 export interface EventAttendee {
-  id: string;
-  event_id: string;
+  id: number;
+  event_id: number;
   user_id: string;
+  registered_at: Date;
+  attended: boolean;
+  feedback?: string;
   status: 'registered' | 'confirmed' | 'attended' | 'cancelled' | 'no_show';
   notes?: string;
-  registration_date: string;
-  checkin_date?: string;
-  created_at: string;
-  updated_at: string;
-  registered_at?: string; // Adicionado para compatibilidade
-  attended?: boolean; // Adicionado para compatibilidade
-  profile?: {
+  registration_date?: Date;
+  checkin_date?: Date;
+  user?: {
     id: string;
     name: string;
     avatar_url?: string;
-    email?: string;
   };
 }
 

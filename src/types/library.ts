@@ -1,5 +1,4 @@
-
-import { ContentFormat as BaseContentFormat, ContentCategory as BaseContentCategory } from './content';
+import { ContentFormat as BaseContentFormat, ContentCategory as BaseContentCategory, ContentItem } from './content';
 
 // Re-export ContentFormat to avoid conflicts
 export type ContentFormat = BaseContentFormat;
@@ -9,46 +8,43 @@ export interface ContentCategory extends BaseContentCategory {
   icon?: string;
 }
 
-export interface ContentItem {
-  id: string;
-  title: string;
-  description?: string;
-  content?: string;
-  format: ContentFormat | string;
-  url?: string;
-  thumbnail?: string;
-  thumbnailUrl?: string;
+export interface LibraryContentItem extends ContentItem {
+  // Required fields from base interface
+  createdAt: string;
+  updatedAt: string;
+  
+  // Optional fields specific to library content
+  created_at?: string; // Legacy field
+  updated_at?: string; // Legacy field
+  author_id?: string;
+  is_featured?: boolean;
+  views?: number;
+  likes?: number;
   duration?: number;
-  author?: string | {
+  access_level: 'free' | 'premium' | 'premium_plus';
+  category_id?: string;
+  tags?: string[];
+  
+  // Additional properties needed by components
+  isNew?: boolean;
+  pointsEnabled?: boolean;
+  pointsValue?: number;
+  freeAccessesLeft?: number;
+  isExclusive?: boolean;
+  author?: {
     id: string;
     name: string;
     avatar?: string;
-  } | null;
-  category_id?: string;
-  categoryId?: string;
-  tags?: string[];
-  access_level?: 'free' | 'premium' | 'premium_plus';
-  accessLevel?: 'free' | 'premium' | 'premium_plus';
-  is_featured?: boolean;
-  featured?: boolean;
-  views?: number;
-  likes?: number;
-  created_at?: string;
-  updated_at?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  pointsEnabled?: boolean;
-  pointsValue?: number;
-  allowComments?: boolean;
-  community_id?: string;
-  fileSize?: string | number; // Make fileSize accept both string and number
+  } | string | null;
+  
+  // Properties used in various components
   resourceUrl?: string;
-  visibility?: string;
-  completionCriteria?: string;
+  visibility?: 'public' | 'premium' | 'points' | 'hidden' | 'vip-only' | 'limited-time';
+  completionCriteria?: 'view' | 'scroll_end' | 'watch_percent' | 'time_spent';
   completionThreshold?: number;
-  isNew?: boolean;
-  freeAccessesLeft?: number;
-  isExclusive?: boolean; // Add isExclusive property to match mockLibraryData.ts
+  fileSize?: number | string;
+  featured?: boolean;
+  allowComments?: boolean;
 }
 
 // Course-related types

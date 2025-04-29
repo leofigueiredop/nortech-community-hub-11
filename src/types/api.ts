@@ -1,4 +1,3 @@
-
 // API Response types
 export interface ApiResponse<T = any> {
   data?: T;
@@ -12,13 +11,14 @@ export interface BaseRepository {
 }
 
 // Auth types
-export interface AuthUser {
+export type AuthUser = {
   id: string;
   email: string;
-  name?: string;
-  avatar?: string;
-  role?: string;
-}
+  name: string;
+  accessLevel?: 'free' | 'pro' | 'admin';
+  interests?: string[];
+  isOnboarded?: boolean;
+};
 
 export interface LoginCredentials {
   email: string;

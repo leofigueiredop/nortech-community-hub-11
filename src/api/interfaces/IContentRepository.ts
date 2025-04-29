@@ -1,17 +1,20 @@
-
-import { ContentItem, ContentCategory } from '@/types/library';
+import { ContentItem } from '@/types/content';
+import { Result } from '@/types/result';
+import { AppError } from '@/types/error';
 
 export interface IContentRepository {
-  getAll(): Promise<ContentItem[]>;
-  getById(id: string): Promise<ContentItem>;
-  create(content: Partial<ContentItem>): Promise<ContentItem>;
-  update(id: string, content: Partial<ContentItem>): Promise<ContentItem>;
-  delete(id: string): Promise<void>;
-  getAllCategories(): Promise<ContentCategory[]>;
-  getCategoryById(id: string): Promise<ContentCategory>;
-  createCategory(category: Partial<ContentCategory>): Promise<ContentCategory>;
-  updateCategory(id: string, category: Partial<ContentCategory>): Promise<ContentCategory>;
-  deleteCategory(id: string): Promise<void>;
-  trackContentView(contentId: string, userId: string): Promise<void>;
-  trackContentCompletion(contentId: string, userId: string, percentComplete: number): Promise<void>;
+  create(content: Partial<ContentItem>): Promise<Result<ContentItem, AppError>>;
+  update(id: string, content: Partial<ContentItem>): Promise<Result<ContentItem, AppError>>;
+  delete(id: string): Promise<Result<boolean, AppError>>;
+  getById(id: string): Promise<Result<ContentItem, AppError>>;
+  list(filters?: {
+    communityId?: string;
+    categoryId?: string;
+    format?: string;
+    accessLevel?: string;
+    featured?: boolean;
+    limit?: number;
+    offset?: number;
+  }): Promise<Result<{ items: ContentItem[]; total: number }, AppError>>;
+  incrementViews(id: string): Promise<Result<void, AppError>>;
 }

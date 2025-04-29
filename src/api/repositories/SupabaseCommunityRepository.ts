@@ -1,6 +1,6 @@
-
-import { createClient } from '@supabase/supabase-js';
-import { ICommunityRepository, Community } from '../interfaces/ICommunityRepository';
+import { ICommunityRepository } from '../interfaces/ICommunityRepository';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { Community } from '@/types/community';
 import { BaseRepository } from './BaseRepository';
 import { supabaseConfig } from '../config';
 
@@ -24,8 +24,11 @@ export interface CommunityMember {
 }
 
 export class SupabaseCommunityRepository extends BaseRepository implements ICommunityRepository {
-  constructor() {
+  private supabase: SupabaseClient;
+
+  constructor(supabaseClient: SupabaseClient) {
     super();
+    this.supabase = supabaseClient;
   }
 
   async getCommunityById(id: string): Promise<Community> {

@@ -16,6 +16,7 @@ import { SupabaseMigrationRepository } from './repositories/SupabaseMigrationRep
 import { SupabaseCommunityRepository } from './repositories/SupabaseCommunityRepository';
 import { SupabasePostRepository } from './repositories/SupabasePostRepository';
 import { supabaseConfig } from './config';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 export class ApiClient {
   private static instance: ApiClient;
@@ -28,16 +29,24 @@ export class ApiClient {
   private _community: ICommunityRepository;
   private _posts: IPostRepository;
   private _currentCommunityId: string | null = null;
+  public supabase: SupabaseClient;
 
   private constructor() {
-    this._auth = new SupabaseAuthRepository();
-    this._content = new SupabaseContentRepository();
-    this._events = new SupabaseEventsRepository();
-    this._discussions = new SupabaseDiscussionRepository();
-    this._points = new SupabasePointsRepository();
-    this._migration = new SupabaseMigrationRepository();
-    this._community = new SupabaseCommunityRepository();
-    this._posts = new SupabasePostRepository();
+    this.supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    });
+    this._auth = new SupabaseAuthRepository(this.supabase);
+    this._content = new SupabaseContentRepository(this.supabase);
+    this._events = new SupabaseEventsRepository(this.supabase);
+    this._discussions = new SupabaseDiscussionRepository(this.supabase);
+    this._points = new SupabasePointsRepository(this.supabase);
+    this._migration = new SupabaseMigrationRepository(this.supabase);
+    this._community = new SupabaseCommunityRepository(this.supabase);
+    this._posts = new SupabasePostRepository(this.supabase);
   }
 
   public static getInstance(): ApiClient {
