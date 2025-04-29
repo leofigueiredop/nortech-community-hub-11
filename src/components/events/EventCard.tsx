@@ -1,128 +1,195 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import { EVENT_TYPES, Event } from './types/EventTypes'; 
-import { useNotifications } from '@/context/NotificationsContext';
-import EventAttendanceManager from './attendance/EventAttendanceManager';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import EventDetailModal from './EventDetailModal';
-
-// Import the new smaller components
-import EventCardHeader from './card/EventCardHeader';
-import EventCardDetails from './card/EventCardDetails';
-import EventCardActions from './card/EventCardActions';
-import EventCalendarButtons from './card/EventCalendarButtons';
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, Clock, MapPin, Users, Star } from 'lucide-react';
+import { format } from 'date-fns';
+import { Event } from './types/EventTypes';
 
 interface EventCardProps {
   event: Event;
-  onRSVP: (eventId: string | number) => void;
+  viewType?: 'grid' | 'list';
+  onRSVP: (eventId: number) => void;
+  onOpenAttendanceModal?: (eventId: number) => void;
 }
 
-const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
-  const { toast } = useToast();
-  const { addNotification } = useNotifications();
-  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
-  const [showDetailModal, setShowDetailModal] = useState(false);
+const EventCard: React.FC<EventCardProps> = ({
+  event,
+  viewType = 'grid',
+  onRSVP,
+  onOpenAttendanceModal,
+}) => {
+  const isGrid = viewType === 'grid';
+  const isPast = new Date(event.date) < new Date();
+  const isRegistered = event.isRegistered;
   
-  // Get the event status
-  const status = event.status || 'upcoming';
-  
-  // Check if current user is registered
-  const isRegistered = event.isRegistered || false;
-  
+  // Convert string to number if needed
   const handleRSVP = () => {
-    // RSVP for the event
-    onRSVP(event.id);
+    const eventId = typeof event.id === 'string' ? parseInt(event.id, 10) : event.id;
+    onRSVP(eventId);
+  };
+  
+  // Convert string to number if needed
+  const handleOpenAttendance = () => {
+    if (!onOpenAttendanceModal) return;
+    const eventId = typeof event.id === 'string' ? parseInt(event.id, 10) : event.id;
+    onOpenAttendanceModal(eventId);
   };
 
-  // Convert the event.id to string for the EventAttendanceManager
-  const eventIdString = typeof event.id === 'number' ? String(event.id) : event.id;
+  const renderEventDate = () => {
+    return (
+      <div className={`flex items-center gap-1 text-sm text-gray-500`}>
+        <Calendar size={16} />
+        <span>{format(new Date(event.date), 'MMM d, yyyy')}</span>
+      </div>
+    );
+  };
 
-  // Calculate attendees as number
-  const attendeesCount = typeof event.attendees === 'string' 
-    ? parseInt(event.attendees, 10) 
-    : (event.attendees || 0);
-    
-  // Calculate capacity as number
-  const capacityCount = event.capacity ? Number(event.capacity) : 0;
+  const renderEventTime = () => {
+    return (
+      <div className={`flex items-center gap-1 text-sm text-gray-500`}>
+        <Clock size={16} />
+        <span>{format(new Date(event.date), 'h:mm a')}</span>
+      </div>
+    );
+  };
+
+  const renderEventLocation = () => {
+    return (
+      <div className={`flex items-center gap-1 text-sm text-gray-500`}>
+        <MapPin size={16} />
+        <span className="truncate">{event.location || 'Online'}</span>
+      </div>
+    );
+  };
+
+  const renderAttendees = () => {
+    return (
+      <div className={`flex items-center gap-1 text-sm text-gray-500`}>
+        <Users size={16} />
+        <span>{event.attendees || 0} registered</span>
+      </div>
+    );
+  };
+
+  const renderPoints = () => {
+    if (!event.pointsValue) return null;
+    return (
+      <div className={`flex items-center gap-1 text-sm text-amber-600`}>
+        <Star size={16} />
+        <span>{event.pointsValue} points</span>
+      </div>
+    );
+  };
+
+  if (isGrid) {
+    return (
+      <Card className="overflow-hidden h-full flex flex-col">
+        <div className="relative">
+          <img
+            src={event.imageUrl || 'https://via.placeholder.com/300x150?text=Event'}
+            alt={event.title}
+            className="w-full h-48 object-cover"
+          />
+          {event.isPremium && (
+            <Badge className="absolute top-2 right-2 bg-gradient-to-r from-amber-500 to-amber-600">
+              Premium
+            </Badge>
+          )}
+        </div>
+
+        <div className="p-4 flex flex-col flex-grow">
+          <h3 className="font-bold text-lg mb-2 line-clamp-2">{event.title}</h3>
+          
+          <p className="text-sm text-gray-600 mb-4 line-clamp-2">{event.description}</p>
+          
+          <div className="grid grid-cols-2 gap-2 mb-4 mt-auto">
+            {renderEventDate()}
+            {renderEventTime()}
+            {renderEventLocation()}
+            {renderAttendees()}
+            {renderPoints()}
+          </div>
+          
+          <div className="mt-auto">
+            {isPast ? (
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                disabled={!isRegistered} 
+                onClick={handleOpenAttendance}
+              >
+                {isRegistered ? 'View Attendance' : 'Event Ended'}
+              </Button>
+            ) : (
+              <Button 
+                className="w-full" 
+                variant={isRegistered ? "outline" : "default"} 
+                onClick={handleRSVP} 
+                disabled={isRegistered}
+              >
+                {isRegistered ? 'Registered' : 'Register Now'}
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
-    <>
-      <Card 
-        className="mb-4 cursor-pointer hover:shadow-md transition-shadow group"
-        onClick={() => setShowDetailModal(true)}
-      >
-        <EventCardHeader 
-          title={event.title}
-          date={event.date}
-          time={event.time || ''}
-          type={event.type || 'other'}
-          status={status}
-          isRegistered={isRegistered}
-          isPremium={event.isPremium}
-        />
-        
-        <CardContent>
-          <EventCardDetails 
-            description={event.description}
-            image={event.image || ''}
-            speaker={event.speaker || ''}
-            location={event.location}
-            attendees={attendeesCount}
-            capacity={capacityCount}
+    <Card className="mb-4 overflow-hidden">
+      <div className="flex flex-col md:flex-row">
+        <div className="relative md:w-64">
+          <img
+            src={event.imageUrl || 'https://via.placeholder.com/300x150?text=Event'}
+            alt={event.title}
+            className="w-full h-48 md:h-full object-cover"
           />
-          
-          <div onClick={(e) => e.stopPropagation()}>
-            <EventCardActions 
-              status={status}
-              isRegistered={isRegistered}
-              attendees={attendeesCount}
-              capacity={capacityCount}
-              onRSVP={handleRSVP}
-              onOpenAttendanceModal={() => setShowAttendanceModal(true)}
-              isPremium={event.isPremium}
-            />
-            
-            <EventCalendarButtons 
-              title={event.title}
-              date={event.date}
-              time={event.time || ''}
-              description={event.description}
-              location={event.location}
-              isRegistered={isRegistered}
-              status={status}
-            />
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Attendance management dialog */}
-      <Dialog open={showAttendanceModal} onOpenChange={setShowAttendanceModal}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Attendance Management - {event.title}</DialogTitle>
-          </DialogHeader>
-          <EventAttendanceManager eventId={eventIdString} eventTitle={event.title} />
-        </DialogContent>
-      </Dialog>
+          {event.isPremium && (
+            <Badge className="absolute top-2 right-2 bg-gradient-to-r from-amber-500 to-amber-600">
+              Premium
+            </Badge>
+          )}
+        </div>
 
-      {/* Event detail modal */}
-      <EventDetailModal 
-        event={event}
-        isOpen={showDetailModal}
-        onClose={() => setShowDetailModal(false)}
-        onRSVP={onRSVP}
-      />
-    </>
+        <div className="p-4 flex-grow">
+          <h3 className="font-bold text-lg mb-2">{event.title}</h3>
+          
+          <p className="text-sm text-gray-600 mb-4">{event.description}</p>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 mb-4">
+            {renderEventDate()}
+            {renderEventTime()}
+            {renderEventLocation()}
+            {renderAttendees()}
+            {renderPoints()}
+          </div>
+          
+          <div className="flex justify-end mt-4">
+            {isPast ? (
+              <Button 
+                variant="outline" 
+                disabled={!isRegistered} 
+                onClick={handleOpenAttendance}
+              >
+                {isRegistered ? 'View Attendance' : 'Event Ended'}
+              </Button>
+            ) : (
+              <Button 
+                variant={isRegistered ? "outline" : "default"} 
+                onClick={handleRSVP} 
+                disabled={isRegistered}
+              >
+                {isRegistered ? 'Registered' : 'Register Now'}
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
   );
 };
 
 export default EventCard;
-
-export const parseAttendeeCount = (count: string | number): number => {
-  if (typeof count === 'string') {
-    return parseInt(count, 10) || 0;
-  }
-  return count || 0;
-};

@@ -2,46 +2,53 @@
 import React from 'react';
 import { ContentItem } from '@/types/library';
 import { Button } from '@/components/ui/button';
-import { PlayCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { adaptLibraryToContentType } from '@/utils/contentTypeAdapter';
+import { ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { adaptLibraryItemToContentType } from '@/utils/contentTypeAdapter';
+import ContentCard from './card/ContentCard';
 
 interface FeaturedContentProps {
+  title: string;
   items: ContentItem[];
-  onItemSelect: (item: ContentItem) => void;
+  viewAllUrl?: string;
+  onItemSelect?: (item: ContentItem) => void;
+  className?: string;
 }
 
-const FeaturedContent: React.FC<FeaturedContentProps> = ({ items, onItemSelect }) => {
-  if (!items.length) return null;
-  
-  const featured = items[0];
-  
+const FeaturedContent: React.FC<FeaturedContentProps> = ({
+  title,
+  items,
+  viewAllUrl,
+  onItemSelect,
+  className
+}) => {
+  if (items.length === 0) {
+    return null;
+  }
+
   return (
-    <motion.div 
-      className="relative w-full rounded-xl overflow-hidden aspect-[21/9]"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div 
-        className="absolute inset-0 bg-cover bg-center" 
-        style={{ backgroundImage: `url(${featured.thumbnail || featured.thumbnailUrl || '/placeholder.svg'})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
-      
-      <div className="absolute inset-0 p-6 md:p-10 flex flex-col justify-end">
-        <h3 className="text-white text-2xl md:text-3xl font-bold">{featured.title}</h3>
-        <p className="text-gray-300 mt-2 mb-4 max-w-2xl line-clamp-2">{featured.description}</p>
-        
-        <Button 
-          className="gap-2 w-fit"
-          onClick={() => onItemSelect(featured)}
-        >
-          <PlayCircle className="h-5 w-5" />
-          Watch Now
-        </Button>
+    <div className={className}>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">{title}</h2>
+        {viewAllUrl && (
+          <Link to={viewAllUrl}>
+            <Button variant="ghost" size="sm" className="gap-1">
+              View all <ChevronRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        )}
       </div>
-    </motion.div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {items.map((item) => (
+          <ContentCard
+            key={item.id}
+            item={item}
+            onClick={() => onItemSelect?.(item)}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 

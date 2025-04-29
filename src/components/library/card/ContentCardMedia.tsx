@@ -1,82 +1,76 @@
 
 import React from 'react';
 import { ContentItem } from '@/types/library';
+import { useContentProgress } from '@/hooks/useContentProgress';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Star, Crown } from 'lucide-react';
-import { useContentProgress } from '@/hooks/useContentProgress';
+import { PlayCircle, FileText, Headphones, BookOpen } from 'lucide-react';
 
-export interface ContentCardMediaProps {
+interface ContentCardMediaProps {
   item: ContentItem;
-  isTopPick?: boolean;
-  rank?: number;
-  showProgress?: boolean;
+  onClick?: () => void;
 }
 
-const ContentCardMedia = ({ item, isTopPick, rank, showProgress = false }: ContentCardMediaProps) => {
+const ContentCardMedia: React.FC<ContentCardMediaProps> = ({ item, onClick }) => {
   const { getProgress } = useContentProgress();
-  const progress = getProgress(item.id)?.progress || 0;
-
+  const itemProgress = getProgress(item.id);
+  const progress = itemProgress?.progress_percent || 0;
+  
+  const getFormatIcon = () => {
+    switch (item.format) {
+      case 'video':
+        return <PlayCircle className="w-10 h-10 text-white opacity-80" />;
+      case 'document':
+      case 'pdf':
+        return <FileText className="w-10 h-10 text-white opacity-80" />;
+      case 'audio':
+        return <Headphones className="w-10 h-10 text-white opacity-80" />;
+      case 'course':
+        return <BookOpen className="w-10 h-10 text-white opacity-80" />;
+      default:
+        return null;
+    }
+  };
+  
+  // Premium badge (premium or premium_plus)
+  const isPremium = item.access_level === 'premium' || item.access_level === 'premium_plus';
+  
   return (
-    <div className="relative aspect-video w-full overflow-hidden">
+    <div 
+      className="relative aspect-video overflow-hidden rounded-t-md cursor-pointer group"
+      onClick={onClick}
+    >
+      {/* Thumbnail Image */}
       <img 
-        src={item.thumbnail} 
+        src={item.thumbnail || item.thumbnailUrl || `https://via.placeholder.com/320x180?text=${item.title}`} 
         alt={item.title} 
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
       
       {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-      
-      {/* Premium Overlay */}
-      {item.accessLevel === 'premium' && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-black/40 backdrop-blur-sm p-2 rounded-full">
-            <Crown className="h-8 w-8 text-amber-500" />
-          </div>
-        </div>
-      )}
-      
-      {/* Top Pick Badge */}
-      {isTopPick && (
-        <div className="absolute top-2 left-2 bg-amber-500 text-white text-xs px-2 py-1 rounded-md font-medium">
-          Top Pick
-        </div>
-      )}
-      
-      {/* Rank Badge */}
-      {rank !== undefined && (
-        <div className="absolute top-2 left-2 bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">
-          {rank}
-        </div>
-      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex items-center justify-center">
+        {getFormatIcon()}
+      </div>
       
       {/* Format Badge */}
       <Badge 
-        variant="outline" 
-        className="absolute top-2 right-2 bg-black/50 text-white border-none text-xs"
+        variant="outline"
+        className="absolute top-2 right-2 bg-black/60 text-white border-none text-xs"
       >
         {item.format}
       </Badge>
       
       {/* Premium Badge */}
-      {item.accessLevel === 'premium' && (
-        <div className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-          <Crown className="h-3 w-3" />
-          <span>Premium</span>
-        </div>
-      )}
-      
-      {/* Points Badge */}
-      {item.pointsEnabled && item.pointsValue && (
-        <div className="absolute bottom-2 right-2 bg-amber-500/90 text-white text-xs px-2 py-0.5 rounded-md flex items-center">
-          <Star className="h-3 w-3 mr-1" />
-          <span>{item.pointsValue} XP</span>
-        </div>
+      {isPremium && (
+        <Badge 
+          className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white border-none"
+        >
+          Premium
+        </Badge>
       )}
       
       {/* Progress Bar */}
-      {showProgress && progress > 0 && (
+      {progress > 0 && (
         <div className="absolute bottom-0 left-0 right-0">
           <Progress value={progress} className="h-1 rounded-none" />
         </div>

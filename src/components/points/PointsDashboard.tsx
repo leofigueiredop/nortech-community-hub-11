@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -7,35 +6,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
 import { usePoints } from '@/context/PointsContext';
 import PointsHistory from './PointsHistory';
-import ContentProgressList, { ContentProgressItem } from './ContentProgressList';
+import ContentProgressList from './ContentProgressList';
 import { Award, Gift, ChevronRight, Trophy, BookOpen, Star } from 'lucide-react';
+import { ContentProgress } from '@/types/library';
 
 const PointsDashboard: React.FC = () => {
   const { totalPoints, getUserLevel } = usePoints();
   const { level, nextLevel, progress } = getUserLevel();
 
   // Mock progress items for demonstration
-  const mockProgressItems: ContentProgressItem[] = [
+  const mockProgressItems: ContentProgress[] = [
     {
       id: 'p1',
-      contentId: 'c1',
-      progress: 100,
-      completed: true,
-      lastAccessedAt: new Date().toISOString(),
+      user_id: 'user1',
+      content_id: 'c1',
+      progress_percent: 100,
+      completed_at: new Date().toISOString(),
+      last_accessed_at: new Date().toISOString(),
+      points_awarded: true
     },
     {
       id: 'p2',
-      contentId: 'c2',
-      progress: 45,
-      completed: false,
-      lastAccessedAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+      user_id: 'user1',
+      content_id: 'c2',
+      progress_percent: 45,
+      completed_at: null,
+      last_accessed_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+      points_awarded: false
     },
     {
       id: 'p3',
-      contentId: 'c3',
-      progress: 75,
-      completed: false,
-      lastAccessedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+      user_id: 'user1',
+      content_id: 'c3',
+      progress_percent: 75,
+      completed_at: null,
+      last_accessed_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+      points_awarded: false
     }
   ];
 

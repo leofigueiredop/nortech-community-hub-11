@@ -2,85 +2,58 @@
 import React from 'react';
 import { ContentItem } from '@/types/library';
 import { useContentProgress } from '@/hooks/useContentProgress';
-import { Badge } from '@/components/ui/badge';
-import { Star, Clock, Eye, CheckCircle } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { CheckCircle, Clock, Eye, Star } from 'lucide-react';
 
-export interface ContentCardInfoProps {
+interface ContentCardInfoProps {
   item: ContentItem;
-  showAuthor?: boolean;
-  showPoints?: boolean;
-  isCompact?: boolean;
 }
 
-// Helper function to format duration in seconds to minutes/hours
-const formatDuration = (seconds: number): string => {
-  if (seconds < 60) return `${seconds}s`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
-};
-
-const ContentCardInfo = ({ item, showAuthor, showPoints, isCompact }: ContentCardInfoProps) => {
+const ContentCardInfo: React.FC<ContentCardInfoProps> = ({ item }) => {
   const { getProgress } = useContentProgress();
   const progress = getProgress(item.id);
-  const isCompleted = progress?.completed || false;
+  const isCompleted = progress?.completed_at !== null;
   
   return (
-    <div className="p-4 bg-card space-y-2">
-      <h3 className="font-medium text-sm line-clamp-2 min-h-[2.5rem] leading-tight">{item.title}</h3>
-      
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <div className="flex items-center gap-2">
-          {item.views > 0 && (
-            <span className="flex items-center">
-              <Eye size={12} className="mr-1 flex-shrink-0" />
-              <span className="truncate max-w-[40px]">{item.views.toLocaleString()}</span>
-            </span>
-          )}
-        </div>
-        
-        {item.duration > 0 && (
-          <span className="flex items-center">
-            <Clock size={12} className="mr-1 flex-shrink-0" />
-            <span className="truncate max-w-[70px]">{formatDuration(item.duration)}</span>
-          </span>
+    <div className="p-4">
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="font-semibold line-clamp-2 flex-1 text-foreground">{item.title}</h3>
+        {isCompleted && (
+          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 ml-2" />
         )}
       </div>
       
-      <div className="flex justify-between items-center">
-        {/* Tags - limited to 1 */}
-        {item.tags && item.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            <Badge 
-              key={item.tags[0]} 
-              variant="secondary" 
-              className="text-xs px-2 py-0.5 h-5 opacity-70 truncate max-w-[90px]"
-            >
-              {item.tags[0]}
-            </Badge>
-            {item.tags.length > 1 && (
-              <span className="text-xs text-muted-foreground">+{item.tags.length - 1}</span>
-            )}
+      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+        {item.description || 'No description available'}
+      </p>
+      
+      <div className="flex items-center text-xs text-muted-foreground gap-4">
+        {item.updated_at && (
+          <span>
+            {formatDistanceToNow(new Date(item.updated_at), { addSuffix: true })}
+          </span>
+        )}
+        
+        {item.duration && (
+          <div className="flex items-center">
+            <Clock className="w-3 h-3 mr-1" />
+            <span>{Math.round(item.duration / 60)} min</span>
           </div>
         )}
         
-        {/* Gamification indicators */}
-        <div className="flex items-center gap-1.5">
-          {item.pointsEnabled && item.pointsValue > 0 && (
-            <span className="flex items-center text-xs font-medium text-amber-500">
-              <Star size={12} className="mr-0.5 flex-shrink-0" />
-              {item.pointsValue}
-            </span>
-          )}
-          
-          {isCompleted && (
-            <span className="flex items-center text-xs font-medium text-green-500">
-              <CheckCircle size={12} className="flex-shrink-0" />
-            </span>
-          )}
-        </div>
+        {item.views !== undefined && (
+          <div className="flex items-center">
+            <Eye className="w-3 h-3 mr-1" />
+            <span>{item.views}</span>
+          </div>
+        )}
+        
+        {item.points_value && item.points_enabled && (
+          <div className="flex items-center text-amber-500">
+            <Star className="w-3 h-3 mr-1" />
+            <span>{item.points_value} XP</span>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -27,15 +27,15 @@ export interface ContentItem {
   views?: number;
   likes?: number;
   duration?: number;
-  access_level: 'free' | 'premium' | 'premium_plus';
+  access_level: 'free' | 'premium' | 'premium_plus' | 'unlockable';
   category_id?: string;
   tags?: string[];
   content?: string;
   
   // Additional properties needed by components
   isNew?: boolean;
-  pointsEnabled?: boolean;
-  pointsValue?: number;
+  points_enabled?: boolean;
+  points_value?: number;
   freeAccessesLeft?: number;
   isExclusive?: boolean;
   
@@ -49,7 +49,7 @@ export interface ContentItem {
   featured?: boolean;
   createdAt?: string;
   updatedAt?: string;
-  allowComments?: boolean;
+  allow_comments?: boolean;
 }
 
 /**

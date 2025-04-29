@@ -35,7 +35,7 @@ export interface ContentItem {
   category_id?: string;
   categoryId?: string;
   tags?: string[];
-  access_level?: 'free' | 'premium' | 'premium_plus';
+  access_level?: 'free' | 'premium' | 'premium_plus' | 'unlockable';
   is_featured?: boolean;
   featured?: boolean;
   views?: number;
@@ -44,8 +44,11 @@ export interface ContentItem {
   updated_at?: string;
   createdAt?: string;
   updatedAt?: string;
+  points_enabled?: boolean;
   pointsEnabled?: boolean;
+  points_value?: number;
   pointsValue?: number;
+  allow_comments?: boolean;
   allowComments?: boolean;
   community_id?: string;
   fileSize?: string | number;
@@ -58,32 +61,7 @@ export interface ContentItem {
   isExclusive?: boolean;
 }
 
-// Course-related types
-export interface CourseModuleItem {
-  id: string;
-  title: string;
-  description?: string;
-  type: string;
-  content?: string;
-  contentId?: string;
-  duration?: number;
-  completed?: boolean;
-  url?: string;
-  resourceUrl?: string;
-}
-
-export interface CourseModule {
-  id: string;
-  title: string;
-  description?: string;
-  items: CourseModuleItem[];
-}
-
-export interface Course extends ContentItem {
-  modules?: CourseModule[];
-}
-
-// Content progress tracking types - update to match how it's used
+// Content progress tracking types
 export interface ContentProgress {
   id: string;
   user_id: string;
@@ -117,4 +95,29 @@ export interface ContentComment {
     name: string;
     avatar?: string;
   };
+}
+
+// Course-related types
+export interface CourseModuleItem {
+  id: string;
+  title: string;
+  description?: string;
+  type: string;
+  content?: string;
+  content_id?: string;
+  duration?: number;
+  completed?: boolean;
+  url?: string;
+  resourceUrl?: string;
+}
+
+export interface CourseModule {
+  id: string;
+  title: string;
+  description?: string;
+  items: CourseModuleItem[];
+}
+
+export interface Course extends ContentItem {
+  modules?: CourseModule[];
 }

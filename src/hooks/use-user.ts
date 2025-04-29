@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/api/ApiClient';
+import { AuthUser } from '@/types/api';
 
 interface User {
   id: string;
@@ -10,17 +11,6 @@ interface User {
   role?: string;
   created_at?: string;
   access_level?: 'free' | 'premium' | 'premium_plus';
-}
-
-// Extended AuthUser interface to match what's used in the code
-interface AuthUser {
-  id: string;
-  email: string;
-  name?: string;
-  avatar?: string;
-  role?: string;
-  access_level?: 'free' | 'premium' | 'premium_plus';
-  avatar_url?: string;
 }
 
 export const useUser = () => {
@@ -45,7 +35,7 @@ export const useUser = () => {
           setUser({
             id: currentUser.id,
             email: currentUser.email,
-            display_name: currentUser.name,
+            display_name: currentUser.name || currentUser.display_name,
             avatar_url: currentUser.avatar_url || currentUser.avatar,
             role: currentUser.role || 'member',
             access_level: currentUser.access_level || 'free'

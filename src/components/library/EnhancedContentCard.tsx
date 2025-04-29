@@ -32,7 +32,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
   onClick
 }) => {
   const { getProgress } = useContentProgress();
-  const progress = getProgress(item.id)?.progress || 0;
+  const progress = getProgress(item.id)?.progress_percent || 0;
   
   const handleClick = (e: React.MouseEvent) => {
     if (onClick) {
@@ -78,7 +78,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
           
           {/* Premium Overlay */}
-          {(item.access_level === 'premium' || item.accessLevel === 'premium') && (
+          {(item.access_level === 'premium' || item.access_level === 'premium_plus') && (
             <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
           )}
           
@@ -100,7 +100,7 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
           )}
           
           {/* Premium badge */}
-          {(item.access_level === 'premium' || item.accessLevel === 'premium') && (
+          {(item.access_level === 'premium' || item.access_level === 'premium_plus') && (
             <Badge 
               className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white border-none text-xs px-2 py-1 flex items-center gap-1"
             >
@@ -126,10 +126,10 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
             
             {/* Stats row */}
             <div className="flex items-center gap-3 mt-2">
-              {item.pointsEnabled && item.pointsValue && (
+              {item.points_enabled && item.points_value && (
                 <div className="flex items-center text-xs text-amber-300">
                   <Star className="h-3 w-3 mr-1" />
-                  <span>{item.pointsValue} XP</span>
+                  <span>{item.points_value} XP</span>
                 </div>
               )}
               

@@ -1,123 +1,55 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { ContentItem } from '@/types/library';
-import { formatDuration } from '../viewer/contentViewerUtils';
-import { Play, FileText, Book, Play as PlayIcon, Bookmark, CheckCircle, Clock } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { useContentProgress } from '@/hooks/useContentProgress';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, Lock } from 'lucide-react';
 
 interface ContentFreeOverlayProps {
   item: ContentItem;
+  onUnlock?: () => void;
 }
 
-const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item }) => {
+const ContentFreeOverlay: React.FC<ContentFreeOverlayProps> = ({ item, onUnlock }) => {
   const { getProgress } = useContentProgress();
   const progress = getProgress(item.id);
-  const isCompleted = progress?.completed || false;
-  const progressPercentage = progress ? progress.progress : 0;
-
-  const getActionIcon = () => {
-    switch (item.format) {
-      case 'video':
-      case 'youtube':
-      case 'vimeo':
-        return <Play className="h-4 w-4" fill="currentColor" />;
-      case 'pdf':
-      case 'text':
-        return <FileText className="h-4 w-4" />;
-      case 'course':
-        return <Book className="h-4 w-4" />;
-      default:
-        return <PlayIcon className="h-4 w-4" />;
-    }
-  };
-
-  const getActionText = () => {
-    switch (item.format) {
-      case 'video':
-      case 'youtube':
-      case 'vimeo':
-        return 'Watch Now';
-      case 'pdf':
-      case 'text':
-        return 'Read Now';
-      case 'audio':
-        return 'Listen Now';
-      case 'course':
-        return 'Start Course';
-      case 'link':
-        return 'Visit Link';
-      default:
-        return 'View Now';
-    }
-  };
-
+  const isCompleted = progress?.completed_at !== null;
+  const hasProgress = progress?.progress_percent > 0;
+  
+  // Free content doesn't need an overlay
+  if (item.access_level === 'free') return null;
+  
   return (
-    <div className="absolute inset-0 bg-card/95 flex flex-col p-4 z-10 animate-fade-in overflow-y-auto">
-      <div className="flex-1 flex flex-col space-y-2">
-        {/* Title */}
-        <h3 className="text-sm font-semibold line-clamp-1">{item.title}</h3>
-        
-        {/* Description */}
-        <p className="text-xs text-muted-foreground line-clamp-3">{item.description}</p>
-        
-        {/* Duration info if available */}
-        {item.duration > 0 && (
-          <div className="flex items-center text-xs text-muted-foreground">
-            <Clock className="h-3 w-3 mr-1" />
-            <span>{formatDuration(item.duration)}</span>
-          </div>
-        )}
-        
-        {/* Tags */}
-        {item.tags && item.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-auto">
-            {item.tags.slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="outline" className="text-xs text-foreground/70">
-                {tag}
-              </Badge>
-            ))}
-            {item.tags.length > 3 && (
-              <span className="text-xs text-muted-foreground">+{item.tags.length - 3}</span>
-            )}
-          </div>
-        )}
-      </div>
-      
-      {/* Progress bar */}
-      {progress && progressPercentage > 0 && !isCompleted && (
-        <div className="w-full h-1 bg-muted rounded-full mt-4">
-          <div 
-            className="h-full bg-primary rounded-full" 
-            style={{ width: `${progressPercentage}%` }} 
-          />
-          <div className="text-xs text-muted-foreground mt-1">
-            {progressPercentage}% {item.format === 'video' ? 'watched' : 'completed'}
-          </div>
-        </div>
-      )}
-      
-      {/* Completed indicator */}
-      {isCompleted && (
-        <div className="text-xs text-green-500 flex items-center mt-4">
-          <CheckCircle className="h-3 w-3 mr-1" />
-          <span>Completed</span>
-        </div>
-      )}
-      
-      {/* Actions */}
-      <div className="flex gap-2 mt-4">
-        <Button size="sm" className="w-full flex items-center gap-2 bg-primary hover:bg-primary/90">
-          {getActionIcon()}
-          <span>{getActionText()}</span>
-        </Button>
-        
-        <Button size="icon" variant="outline">
-          <Bookmark className="h-4 w-4" />
-          <span className="sr-only">Save</span>
-        </Button>
-      </div>
+    <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent/25 flex flex-col items-center justify-center p-4 text-center">
+      {item.access_level === 'premium' || item.access_level === 'premium_plus' ? (
+        <>
+          <Lock className="w-12 h-12 text-white mb-3" />
+          <h3 className="text-white font-bold mb-1">Premium Content</h3>
+          <p className="text-white/80 text-sm mb-4">Upgrade to access this content</p>
+          <Button variant="outline" className="bg-white text-black hover:bg-white/90">
+            Upgrade Now
+          </Button>
+        </>
+      ) : item.access_level === 'unlockable' ? (
+        <>
+          {isCompleted ? (
+            <div className="flex flex-col items-center">
+              <CheckCircle className="w-12 h-12 text-green-500 mb-3" />
+              <h3 className="text-white font-bold">Completed</h3>
+              {hasProgress && <p className="text-white/80 text-sm">{progress.progress_percent}% complete</p>}
+            </div>
+          ) : (
+            <>
+              <Lock className="w-12 h-12 text-white mb-3" />
+              <h3 className="text-white font-bold mb-1">Unlock with Points</h3>
+              <p className="text-white/80 text-sm mb-4">Use {item.points_value || 0} points to access</p>
+              <Button onClick={onUnlock}>
+                Unlock Now
+              </Button>
+            </>
+          )}
+        </>
+      ) : null}
     </div>
   );
 };
