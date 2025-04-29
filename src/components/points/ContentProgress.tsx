@@ -14,11 +14,11 @@ export const ContentProgressItem: React.FC<ContentProgressItemProps> = ({
   progress,
   contentTitle,
 }) => {
-  // Use consistent property names with fallbacks
-  const isCompleted = progress.completed || progress.completed_at !== null;
-  const progressPercent = progress.progress || progress.progress_percent || 0;
-  const lastAccessed = progress.lastAccessedAt || progress.last_accessed_at;
-  const pointsAwarded = progress.pointsAwarded || progress.points_awarded;
+  // Use correct property names from ContentProgress interface
+  const isCompleted = progress.completed_at !== null;
+  const progressPercent = progress.progress_percent || 0;
+  const lastAccessed = progress.last_accessed_at;
+  const pointsAwarded = progress.points_awarded;
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 border rounded-md bg-card hover:bg-accent/50 transition-colors">
@@ -68,8 +68,8 @@ export const ContentProgressList: React.FC<ContentProgressListProps> = ({
   }
 
   const sortedItems = [...progressItems].sort(
-    (a, b) => new Date(b.lastAccessedAt || b.last_accessed_at).getTime() - 
-              new Date(a.lastAccessedAt || a.last_accessed_at).getTime()
+    (a, b) => new Date(b.last_accessed_at).getTime() - 
+              new Date(a.last_accessed_at).getTime()
   );
 
   return (
@@ -78,7 +78,7 @@ export const ContentProgressList: React.FC<ContentProgressListProps> = ({
         <ContentProgressItem 
           key={item.id} 
           progress={item} 
-          contentTitle={getContentTitle(item.contentId || item.content_id)}
+          contentTitle={getContentTitle(item.content_id)}
         />
       ))}
     </div>

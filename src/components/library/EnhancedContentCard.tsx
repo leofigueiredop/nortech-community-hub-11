@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ContentItem } from '@/types/content';
+import { ContentItem } from '@/types/library';
 import { useContentProgress } from '@/hooks/useContentProgress';
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
@@ -167,16 +167,16 @@ const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
                     )}
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {item.author.name || 'Anonymous'} • {formatDistanceToNow(new Date(item.updated_at || item.updatedAt || ''), { addSuffix: true })}
+                    {item.author.name || 'Anonymous'} • {formatDistanceToNow(new Date(item.updated_at || item.updated_at || ''), { addSuffix: true })}
                   </span>
                 </>
               ) : item.author && typeof item.author === 'string' ? (
                 <span className="text-xs text-muted-foreground">
-                  {item.author} • {formatDistanceToNow(new Date(item.updated_at || item.updatedAt || ''), { addSuffix: true })}
+                  {item.author} • {formatDistanceToNow(new Date(item.updated_at || item.updated_at || ''), { addSuffix: true })}
                 </span>
               ) : (
                 <span className="text-xs text-muted-foreground">
-                  Anonymous • {formatDistanceToNow(new Date(item.updated_at || item.updatedAt || ''), { addSuffix: true })}
+                  Anonymous • {formatDistanceToNow(new Date(item.updated_at || item.updated_at || ''), { addSuffix: true })}
                 </span>
               )}
             </div>

@@ -1,123 +1,111 @@
+export interface ContentItem {
+  id: string;
+  title: string;
+  description?: string;
+  format: ContentFormat;
+  thumbnail?: string;
+  thumbnailUrl?: string;
+  url?: string;
+  resourceUrl?: string;
+  author?: string | ContentAuthor;
+  duration?: number;
+  views?: number;
+  tags?: string[];
+  category_id?: string;
+  created_at?: string;
+  updated_at?: string;
+  is_featured?: boolean;
+  featured?: boolean;
+  access_level: 'free' | 'premium' | 'premium_plus' | 'unlockable';
+  visibility?: 'public' | 'premium' | 'points' | 'hidden';
+  points_value?: number;
+  points_enabled?: boolean;
+  completionCriteria?: 'view' | 'scroll_end' | 'watch_percent' | 'time_spent';
+  completionThreshold?: number;
+  fileSize?: number;
+  isNew?: boolean;
+  community_id?: string;
+  
+  // Legacy fields - keeping for compatibility
+  // These should be accessed through their snake_case versions
+  categoryId?: string;
+  accessLevel?: 'free' | 'premium' | 'premium_plus' | 'unlockable';
+}
 
-// Re-export ContentFormat to avoid conflicts
-export type ContentFormat = 'video' | 'text' | 'document' | 'audio' | 'course' | 'image' | 'link' | 'youtube' | 'vimeo' | 'gdoc' | 'pdf' | string;
+export type ContentFormat = 'video' | 'document' | 'pdf' | 'audio' | 'image' | 'course' | 'link' | 'embed';
+
+export interface ContentAuthor {
+  id: string;
+  name: string;
+  avatar?: string;
+}
 
 export interface ContentCategory {
   id: string;
   name: string;
   description?: string;
-  slug: string;
-  parent_id?: string;
-  icon?: string;
-  created_at: string;
-  updated_at: string;
-  item_count?: number;
   color?: string;
-  sort_order?: number;
+  icon?: string;
+  parent_id?: string;
   community_id?: string;
+  item_count?: number;
 }
 
-export interface ContentItem {
-  id: string;
-  title: string;
-  description?: string;
-  content?: string;
-  format: ContentFormat | string;
-  url?: string;
-  thumbnail?: string;
-  thumbnailUrl?: string;
-  duration?: number;
-  author?: string | {
-    id: string;
-    name: string;
-    avatar?: string;
-  } | null;
-  category_id?: string;
-  categoryId?: string;
-  tags?: string[];
-  access_level?: 'free' | 'premium' | 'premium_plus' | 'unlockable';
-  is_featured?: boolean;
-  featured?: boolean;
-  views?: number;
-  likes?: number;
-  created_at?: string;
-  updated_at?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  points_enabled?: boolean;
-  pointsEnabled?: boolean;
-  points_value?: number;
-  pointsValue?: number;
-  allow_comments?: boolean;
-  allowComments?: boolean;
-  community_id?: string;
-  fileSize?: string | number;
-  resourceUrl?: string;
-  visibility?: string;
-  completionCriteria?: string;
-  completionThreshold?: number;
-  isNew?: boolean;
-  freeAccessesLeft?: number;
-  isExclusive?: boolean;
-}
-
-// Content progress tracking types
 export interface ContentProgress {
   id: string;
   user_id: string;
   content_id: string;
   progress_percent: number;
-  completed_at?: string | null;
+  completed_at: string | null;
   last_accessed_at: string;
   points_awarded: boolean;
-}
-
-// Content interaction types
-export interface ContentInteraction {
-  id: string;
-  user_id: string;
-  content_id: string;
-  interaction_type: 'view' | 'like' | 'share' | 'download';
-  created_at: string;
-}
-
-// Content comment types
-export interface ContentComment {
-  id: string;
-  user_id: string;
-  content_id: string;
-  comment: string;
-  created_at: string;
-  updated_at?: string;
-  parent_id?: string;
-  author?: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-}
-
-// Course-related types
-export interface CourseModuleItem {
-  id: string;
-  title: string;
-  description?: string;
-  type: string;
-  content?: string;
-  content_id?: string;
-  duration?: number;
-  completed?: boolean;
-  url?: string;
-  resourceUrl?: string;
 }
 
 export interface CourseModule {
   id: string;
   title: string;
   description?: string;
+  order: number;
   items: CourseModuleItem[];
 }
 
-export interface Course extends ContentItem {
-  modules?: CourseModule[];
+export interface CourseModuleItem {
+  id: string;
+  title: string;
+  description?: string;
+  type: 'video' | 'document' | 'quiz' | 'text';
+  duration?: number;
+  order: number;
+  content_id?: string;
+  module_id: string;
+  is_required: boolean;
+  content?: ContentItem;
 }
+
+// Helper adapter functions to maintain compatibility
+export const adaptContentProgressForLegacy = (progress: ContentProgress) => {
+  return {
+    ...progress,
+    contentId: progress.content_id,
+    userId: progress.user_id,
+    progress: progress.progress_percent,
+    completed: progress.completed_at !== null,
+    lastAccessedAt: progress.last_accessed_at,
+    pointsAwarded: progress.points_awarded
+  };
+};
+
+export const adaptContentItemForLegacy = (item: ContentItem) => {
+  return {
+    ...item,
+    accessLevel: item.access_level,
+    categoryId: item.category_id
+  };
+};
+
+export const adaptContentCategoryForLegacy = (category: ContentCategory) => {
+  return {
+    ...category,
+    itemCount: category.item_count
+  };
+};

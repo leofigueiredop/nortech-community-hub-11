@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, MapPin, Users, Star } from 'lucide-react';
 import { format } from 'date-fns';
-import { Event } from './types/EventTypes';
+import { Event, EVENT_TYPES } from './types/EventTypes';
 
 interface EventCardProps {
   event: Event;
@@ -26,14 +26,16 @@ const EventCard: React.FC<EventCardProps> = ({
   
   // Convert string to number if needed
   const handleRSVP = () => {
-    const eventId = typeof event.id === 'string' ? parseInt(event.id, 10) : event.id;
+    // Ensure eventId is a number
+    const eventId = typeof event.id === 'string' ? parseInt(event.id, 10) : event.id as number;
     onRSVP(eventId);
   };
   
   // Convert string to number if needed
   const handleOpenAttendance = () => {
     if (!onOpenAttendanceModal) return;
-    const eventId = typeof event.id === 'string' ? parseInt(event.id, 10) : event.id;
+    // Ensure eventId is a number
+    const eventId = typeof event.id === 'string' ? parseInt(event.id, 10) : event.id as number;
     onOpenAttendanceModal(eventId);
   };
 
@@ -88,7 +90,7 @@ const EventCard: React.FC<EventCardProps> = ({
       <Card className="overflow-hidden h-full flex flex-col">
         <div className="relative">
           <img
-            src={event.imageUrl || 'https://via.placeholder.com/300x150?text=Event'}
+            src={event.imageUrl || event.image_url || 'https://via.placeholder.com/300x150?text=Event'}
             alt={event.title}
             className="w-full h-48 object-cover"
           />

@@ -14,12 +14,37 @@ export interface AuthUser {
 }
 
 /**
+ * Login credentials interface
+ */
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+/**
  * API Error interface
  */
 export interface ApiError {
   code: string;
   message: string;
   details?: any;
+}
+
+/**
+ * Auth response interface
+ */
+export interface AuthResponse {
+  user: AuthUser | null;
+  session: any | null;
+  error?: ApiError;
+}
+
+/**
+ * Generic API response
+ */
+export interface ApiResponse<T> {
+  data?: T;
+  error?: ApiError;
 }
 
 /**

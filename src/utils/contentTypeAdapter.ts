@@ -1,100 +1,46 @@
-
 import { ContentItem as LibraryContentItem } from '@/types/library';
 import { ContentItem as ContentTypeItem } from '@/types/content';
 
 /**
- * Adapts a library content item to a content type item
+ * Adapts a library content item to the content type format
  */
-export function adaptLibraryItemToContentType(item: LibraryContentItem): ContentTypeItem {
+export const adaptLibraryItemToContentType = (item: LibraryContentItem): ContentTypeItem => {
   return {
-    id: item.id,
-    title: item.title,
+    ...item,
     description: item.description || '',
-    format: item.format,
-    thumbnail: item.thumbnail,
-    thumbnailUrl: item.thumbnailUrl,
-    community_id: item.community_id || '',
-    created_at: item.created_at || item.createdAt || new Date().toISOString(),
-    updated_at: item.updated_at || item.updatedAt || new Date().toISOString(),
-    access_level: item.access_level || 'free',
-    url: item.url,
-    is_featured: item.is_featured || item.featured || false,
+    accessLevel: item.access_level,
+    categoryId: item.category_id,
+    thumbnailUrl: item.thumbnail || item.thumbnailUrl,
+    featured: item.is_featured || item.featured,
+    pointsEnabled: item.points_enabled || false,
+    pointsValue: item.points_value || 0,
     views: item.views || 0,
-    likes: item.likes || 0,
-    duration: item.duration,
-    category_id: item.category_id || item.categoryId,
-    tags: item.tags,
-    points_enabled: item.points_enabled || item.pointsEnabled,
-    points_value: item.points_value || item.pointsValue,
-    isNew: item.isNew,
-    freeAccessesLeft: item.freeAccessesLeft,
-    isExclusive: item.isExclusive,
-    author: item.author,
-    resourceUrl: item.resourceUrl,
-    visibility: item.visibility as any,
-    completionCriteria: item.completionCriteria as any,
-    completionThreshold: item.completionThreshold,
-    fileSize: item.fileSize,
-    featured: item.featured || item.is_featured,
-    createdAt: item.createdAt || item.created_at,
-    updatedAt: item.updatedAt || item.updated_at,
-    allow_comments: item.allow_comments || item.allowComments,
-    content: item.content,
-    categoryId: item.categoryId || item.category_id,
-  };
-}
+    duration: item.duration || 0,
+    updatedAt: item.updated_at,
+    createdAt: item.created_at
+  } as ContentTypeItem;
+};
 
 /**
- * Adapts an array of library content items to content type items
+ * Adapts an array of library items to content type format
  */
-export function adaptLibraryArrayToContentType(items: LibraryContentItem[]): ContentTypeItem[] {
+export const adaptLibraryArrayToContentType = (items: LibraryContentItem[]): ContentTypeItem[] => {
   return items.map(item => adaptLibraryItemToContentType(item));
-}
+};
 
 /**
- * Adapts a content type item to a library content item
+ * Adapts a content type item to the library content format
  */
-export function adaptContentTypeToLibraryItem(item: ContentTypeItem): LibraryContentItem {
+export const adaptContentTypeToLibrary = (item: ContentTypeItem): LibraryContentItem => {
   return {
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    format: item.format,
-    thumbnail: item.thumbnail,
-    thumbnailUrl: item.thumbnailUrl,
-    community_id: item.community_id,
-    created_at: item.created_at,
-    updated_at: item.updated_at,
-    author: item.author,
-    is_featured: item.is_featured,
-    views: item.views,
-    likes: item.likes,
-    duration: item.duration,
-    access_level: item.access_level,
-    category_id: item.category_id,
-    tags: item.tags,
-    points_enabled: item.points_enabled,
-    points_value: item.points_value,
-    isNew: item.isNew,
-    freeAccessesLeft: item.freeAccessesLeft,
-    isExclusive: item.isExclusive,
-    resourceUrl: item.resourceUrl,
-    categoryId: item.categoryId,
-    visibility: item.visibility,
-    completionCriteria: item.completionCriteria,
-    completionThreshold: item.completionThreshold,
-    fileSize: item.fileSize,
-    featured: item.featured,
-    createdAt: item.createdAt,
-    updatedAt: item.updatedAt,
-    allow_comments: item.allow_comments,
-    content: item.content,
-  };
-}
-
-/**
- * Adapts an array of content type items to library content items
- */
-export function adaptContentArrayToLibraryType(items: ContentTypeItem[]): LibraryContentItem[] {
-  return items.map(item => adaptContentTypeToLibraryItem(item));
-}
+    ...item,
+    access_level: item.accessLevel || item.access_level || 'free',
+    category_id: item.categoryId || item.category_id,
+    thumbnail: item.thumbnailUrl || item.thumbnail,
+    is_featured: item.featured || item.is_featured || false,
+    points_enabled: item.pointsEnabled || item.points_enabled || false,
+    points_value: item.pointsValue || item.points_value || 0,
+    updated_at: item.updatedAt || item.updated_at,
+    created_at: item.createdAt || item.created_at
+  } as LibraryContentItem;
+};

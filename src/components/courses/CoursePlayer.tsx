@@ -30,7 +30,7 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
   const { user } = useAuth();
   
   useEffect(() => {
-    if (course.accessLevel === 'premium' && user?.accessLevel !== 'premium') {
+    if (course.access_level === 'premium' && user?.access_level !== 'premium') {
       setHasAccess(false);
     } else {
       setHasAccess(true);
@@ -272,7 +272,7 @@ const CoursePlayer: React.FC<CoursePlayerProps> = ({
   };
   
   return (
-    <div className={`rounded-lg overflow-hidden border ${isDarkMode ? 'border-slate-700' : 'border-slate-200'} shadow-lg`}>
+    <div>
       {renderContentByType()}
     </div>
   );
