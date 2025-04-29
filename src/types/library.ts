@@ -41,9 +41,71 @@ export interface ContentItem {
   pointsValue?: number;
   allowComments?: boolean;
   community_id?: string;
-  fileSize?: string;
+  fileSize?: string | number; // Make fileSize accept both string and number
   resourceUrl?: string;
   visibility?: string;
   completionCriteria?: string;
   completionThreshold?: number;
+  isNew?: boolean;
+  freeAccessesLeft?: number;
+}
+
+// Course-related types
+export interface CourseModuleItem {
+  id: string;
+  title: string;
+  description?: string;
+  type: string;
+  content?: string;
+  duration?: number;
+  completed?: boolean;
+  url?: string;
+  resourceUrl?: string;
+}
+
+export interface CourseModule {
+  id: string;
+  title: string;
+  description?: string;
+  items: CourseModuleItem[];
+}
+
+export interface Course extends ContentItem {
+  modules?: CourseModule[];
+}
+
+// Content progress tracking types
+export interface ContentProgress {
+  id: string;
+  user_id: string;
+  content_id: string;
+  progress_percent: number;
+  completed_at?: string | null;
+  last_accessed_at: string;
+  points_awarded: boolean;
+}
+
+// Content interaction types
+export interface ContentInteraction {
+  id: string;
+  user_id: string;
+  content_id: string;
+  interaction_type: 'view' | 'like' | 'share' | 'download';
+  created_at: string;
+}
+
+// Content comment types
+export interface ContentComment {
+  id: string;
+  user_id: string;
+  content_id: string;
+  comment: string;
+  created_at: string;
+  updated_at?: string;
+  parent_id?: string;
+  author?: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
 }

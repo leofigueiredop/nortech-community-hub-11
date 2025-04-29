@@ -45,7 +45,7 @@ export interface ContentItem {
   visibility?: 'public' | 'premium' | 'points' | 'hidden' | 'vip-only' | 'limited-time';
   completionCriteria?: 'view' | 'scroll_end' | 'watch_percent' | 'time_spent';
   completionThreshold?: number;
-  fileSize?: number;
+  fileSize?: number | string; // Accept both number and string to match library.ts
   accessLevel?: 'free' | 'premium' | 'premium_plus';
   featured?: boolean;
   createdAt?: string; // Alias for created_at

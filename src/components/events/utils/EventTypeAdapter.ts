@@ -29,7 +29,7 @@ export const adaptEventForComponent = (event: any): Event => {
     location: event.location || 'Online',
     image_url: event.image_url || event.image || '/placeholder.svg',
     event_type: event.event_type || event.type || 'other',
-    capacity: event.capacity ? Number(event.capacity) : undefined,
+    capacity: event.capacity ? Number(event.capacity) : undefined, // Convert string to number
     is_virtual: event.is_virtual || event.location_type === 'online' || false,
     meeting_link: event.meeting_link || event.url || undefined,
     organizer_id: event.organizer_id || undefined,

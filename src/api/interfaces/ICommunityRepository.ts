@@ -32,13 +32,15 @@ export interface Community {
 }
 
 export interface ICommunityRepository {
-  getCommunity(id: string): Promise<Community>;
-  getCommunityBySlug(slug: string): Promise<Community>;
-  createCommunity(data: Partial<Community>): Promise<Community>;
-  updateCommunity(id: string, data: Partial<Community>): Promise<Community>;
-  deleteCommunity(id: string): Promise<void>;
-  listCommunities(userId?: string): Promise<Community[]>;
-  joinCommunity(communityId: string, userId: string): Promise<void>;
-  leaveCommunity(communityId: string, userId: string): Promise<void>;
-  isMember(communityId: string, userId: string): Promise<boolean>;
+  getCommunityById(id: string): Promise<Community>;
+  getCommunityByDomain(domain: string): Promise<Community | null>;
+  createCommunity(community: Partial<Community>): Promise<Community>;
+  updateCommunity(id: string, community: Partial<Community>): Promise<Community>;
+  getSettings(type: string): Promise<any>;
+  updateSettings(type: string, settings: any): Promise<any>;
+  getMemberById(userId: string): Promise<any | null>;
+  addMember(member: any): Promise<any>;
+  updateMember(userId: string, member: any): Promise<any>;
+  removeMember(userId: string): Promise<void>;
+  getAllMembers(page?: number, limit?: number): Promise<{ members: any[], total: number }>;
 }

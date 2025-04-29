@@ -1,9 +1,27 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { ICommunityRepository } from '../interfaces/ICommunityRepository';
+import { ICommunityRepository, Community } from '../interfaces/ICommunityRepository';
 import { BaseRepository } from './BaseRepository';
 import { supabaseConfig } from '../config';
-import { Community, CommunitySettings, CommunityMember } from '@/types/community';
+
+export interface CommunitySettings {
+  id: string;
+  community_id: string;
+  settings_type: string;
+  settings_data: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommunityMember {
+  id: string;
+  user_id: string;
+  community_id: string;
+  role: string;
+  joined_at: string;
+  status: string;
+  permissions?: string[];
+}
 
 export class SupabaseCommunityRepository extends BaseRepository implements ICommunityRepository {
   constructor() {

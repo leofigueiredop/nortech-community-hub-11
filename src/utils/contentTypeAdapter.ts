@@ -21,6 +21,16 @@ export function adaptLibraryToContentType(item: ContentLibraryItem): ContentType
   // Ensure access_level is valid
   const accessLevel = (item.access_level || item.accessLevel || 'free') as 'free' | 'premium' | 'premium_plus';
 
+  // Convert fileSize if needed
+  let fileSize: number | string | undefined = item.fileSize;
+  if (typeof fileSize === 'string' && fileSize) {
+    // Try to convert string to number if possible
+    const parsedSize = parseFloat(fileSize);
+    if (!isNaN(parsedSize)) {
+      fileSize = parsedSize;
+    }
+  }
+
   // Create properly typed ContentTypeItem
   return {
     id: item.id,
@@ -50,7 +60,7 @@ export function adaptLibraryToContentType(item: ContentLibraryItem): ContentType
     visibility: item.visibility as any,
     completionCriteria: item.completionCriteria as any,
     completionThreshold: item.completionThreshold,
-    fileSize: item.fileSize,
+    fileSize: fileSize,
     accessLevel: accessLevel,
     featured: item.featured || item.is_featured || false,
     createdAt: item.createdAt || item.created_at || new Date().toISOString(),
