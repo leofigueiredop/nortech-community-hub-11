@@ -10,7 +10,7 @@ import CategoriesManagement from '@/components/library/management/CategoriesMana
 import { ContentItem } from '@/types/library';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { useToast } from '@/hooks/use-toast';
-import { adaptLibraryArrayToContentType } from '@/utils/contentTypeAdapter';
+import { adaptLibraryArrayToContentType, adaptContentTypeToLibraryItem } from '@/utils/contentTypeAdapter';
 
 const ContentManagement: React.FC = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -113,12 +113,15 @@ const ContentManagement: React.FC = () => {
 
       <ContentUploadForm 
         isOpen={isUploadOpen}
-        editItem={editingContent}
+        editItem={editingContent ? adaptLibraryItemToContentType(editingContent) : null}
         onClose={() => {
           setIsUploadOpen(false);
           setEditingContent(null);
         }}
-        onSave={handleSaveContent}
+        onSave={(newContent) => {
+          // Convert ContentItem from content.ts to library.ts format
+          handleSaveContent(adaptContentTypeToLibraryItem(newContent));
+        }}
       />
     </MainLayout>
   );

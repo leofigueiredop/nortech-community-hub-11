@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { usePoints } from '@/context/PointsContext';
 import { Link } from 'react-router-dom';
+import { ContentProgress } from '@/types/library';
 
 const PointsDashboard: React.FC = () => {
   const { 
@@ -20,28 +21,52 @@ const PointsDashboard: React.FC = () => {
   
   const { level, nextLevel, progress } = getUserLevel();
   
-  // Mock content progress items
-  const contentProgress = [
+  // Mock content progress items with both standard and alias properties
+  const contentProgress: ContentProgress[] = [
     {
       id: 'p1',
+      user_id: 'user1',
+      content_id: 'c1',
+      progress_percent: 100,
+      completed_at: new Date().toISOString(),
+      last_accessed_at: new Date().toISOString(),
+      points_awarded: true,
+      // Aliases
       contentId: 'c1',
       progress: 100,
       completed: true,
       lastAccessedAt: new Date().toISOString(),
+      pointsAwarded: true
     },
     {
       id: 'p2',
+      user_id: 'user1',
+      content_id: 'c2',
+      progress_percent: 45,
+      completed_at: null,
+      last_accessed_at: new Date(Date.now() - 86400000).toISOString(),
+      points_awarded: false,
+      // Aliases
       contentId: 'c2',
       progress: 45,
       completed: false,
-      lastAccessedAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+      lastAccessedAt: new Date(Date.now() - 86400000).toISOString(),
+      pointsAwarded: false
     },
     {
       id: 'p3',
+      user_id: 'user1',
+      content_id: 'c3',
+      progress_percent: 75,
+      completed_at: null,
+      last_accessed_at: new Date(Date.now() - 172800000).toISOString(),
+      points_awarded: false,
+      // Aliases
       contentId: 'c3',
       progress: 75,
       completed: false,
-      lastAccessedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+      lastAccessedAt: new Date(Date.now() - 172800000).toISOString(),
+      pointsAwarded: false
     }
   ];
   

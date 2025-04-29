@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { ContentProgress } from '@/types/library';
 
@@ -13,7 +12,7 @@ export const useContentProgress = () => {
       completed_at: new Date().toISOString(),
       last_accessed_at: new Date().toISOString(),
       points_awarded: true,
-      // Add aliases for component compatibility
+      // Aliases for component compatibility
       userId: 'user1',
       contentId: 'content1',
       progress: 100,
@@ -29,7 +28,7 @@ export const useContentProgress = () => {
       completed_at: null,
       last_accessed_at: new Date().toISOString(),
       points_awarded: false,
-      // Add aliases for component compatibility
+      // Aliases for component compatibility
       userId: 'user1',
       contentId: 'content2',
       progress: 50,
@@ -48,8 +47,8 @@ export const useContentProgress = () => {
       
       const now = new Date().toISOString();
       
-      // Add new progress entry
-      return [...prev, {
+      // Create new progress with both standard and alias properties
+      const newProgress: ContentProgress = {
         id: `progress-${Date.now()}`,
         user_id: 'user1', // In a real app, this would come from an auth context
         content_id: contentId,
@@ -57,14 +56,16 @@ export const useContentProgress = () => {
         completed_at: null,
         last_accessed_at: now,
         points_awarded: false,
-        // Add aliases for component compatibility
+        // Aliases for component compatibility
         userId: 'user1',
         contentId,
         progress: 0,
         completed: false,
         lastAccessedAt: now,
         pointsAwarded: false
-      }];
+      };
+      
+      return [...prev, newProgress];
     });
   }, []);
 
@@ -79,6 +80,7 @@ export const useContentProgress = () => {
             progress_percent: newProgress,
             completed_at: isCompleted ? now : p.completed_at,
             last_accessed_at: now,
+            // Update aliases too
             progress: newProgress,
             completed: isCompleted,
             lastAccessedAt: now
@@ -92,9 +94,9 @@ export const useContentProgress = () => {
   const getProgress = useCallback((contentId: string) => {
     const item = progress.find(p => (p.contentId || p.content_id) === contentId);
     if (!item) {
-      // Return default values if no progress found
+      // Return default values with both standard and alias properties
       const now = new Date().toISOString();
-      return {
+      const defaultProgress: ContentProgress = {
         id: '',
         user_id: 'user1',
         content_id: contentId,
@@ -102,7 +104,7 @@ export const useContentProgress = () => {
         completed_at: null,
         last_accessed_at: now,
         points_awarded: false,
-        // Add aliases for component compatibility
+        // Aliases for component compatibility
         userId: 'user1',
         contentId,
         progress: 0,
@@ -110,6 +112,7 @@ export const useContentProgress = () => {
         lastAccessedAt: now,
         pointsAwarded: false
       };
+      return defaultProgress;
     }
     return item;
   }, [progress]);

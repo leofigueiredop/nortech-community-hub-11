@@ -165,6 +165,7 @@ const Library: React.FC = () => {
         />
       </div>
 
+      {/* Content Viewer Modal */}
       {selectedItem && (
         <ContentViewer 
           item={selectedItem} 

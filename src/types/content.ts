@@ -32,7 +32,7 @@ export interface ContentItem {
   pointsEnabled?: boolean;
   pointsValue?: number;
   freeAccessesLeft?: number;
-  isExclusive?: boolean; // Added to fix errors in mockLibraryData.ts
+  isExclusive?: boolean;
   author?: {
     id: string;
     name: string;
@@ -45,12 +45,13 @@ export interface ContentItem {
   visibility?: 'public' | 'premium' | 'points' | 'hidden' | 'vip-only' | 'limited-time';
   completionCriteria?: 'view' | 'scroll_end' | 'watch_percent' | 'time_spent';
   completionThreshold?: number;
-  fileSize?: number | string; // Accept both number and string to match library.ts
+  fileSize?: number | string;
   accessLevel?: 'free' | 'premium' | 'premium_plus';
   featured?: boolean;
   createdAt?: string; // Alias for created_at
   updatedAt?: string; // Alias for updated_at
   allowComments?: boolean;
+  content?: string; // Add content field which was missing
 }
 
 /**

@@ -61,7 +61,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
             image={event.image || ''}
             speaker={event.speaker || ''}
             location={event.location}
-            attendees={typeof event.attendees === 'string' ? parseInt(event.attendees) : event.attendees}
+            attendees={typeof event.attendees === 'string' ? parseInt(event.attendees, 10) : (event.attendees || 0)}
             capacity={event.capacity ? Number(event.capacity) : 0}
           />
           
@@ -69,7 +69,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
             <EventCardActions 
               status={status}
               isRegistered={isRegistered}
-              attendees={typeof event.attendees === 'string' ? parseInt(event.attendees) : event.attendees}
+              attendees={typeof event.attendees === 'string' ? parseInt(event.attendees, 10) : (event.attendees || 0)}
               capacity={event.capacity ? Number(event.capacity) : 0}
               onRSVP={handleRSVP}
               onOpenAttendanceModal={() => setShowAttendanceModal(true)}

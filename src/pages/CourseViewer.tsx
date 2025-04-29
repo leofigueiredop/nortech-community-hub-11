@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
@@ -52,7 +51,7 @@ const CourseViewer: React.FC = () => {
         // Calculate course progress
         if (foundCourse.id) {
           const progress = getProgress(foundCourse.id);
-          setCourseProgress(progress?.progress || 0);
+          setCourseProgress(progress?.progress || progress?.progress_percent || 0);
         }
         
         // Set first lesson if none specified
@@ -92,9 +91,9 @@ const CourseViewer: React.FC = () => {
   
   // Update progress when lesson changes
   useEffect(() => {
-    if (currentLesson && currentLesson.contentId) {
+    if (currentLesson && (currentLesson.contentId || currentLesson.content_id)) {
       // Mark the current lesson as started
-      updateProgress(currentLesson.contentId, 10);
+      updateProgress(currentLesson.contentId || currentLesson.content_id, 10);
     }
   }, [currentLesson, updateProgress]);
   
@@ -175,8 +174,8 @@ const CourseViewer: React.FC = () => {
               lesson={currentLesson}
               course={currentCourse}
               onProgress={(progress) => {
-                if (currentLesson?.contentId) {
-                  updateProgress(currentLesson.contentId, progress);
+                if (currentLesson && (currentLesson.contentId || currentLesson.content_id)) {
+                  updateProgress(currentLesson.contentId || currentLesson.content_id, progress);
                 }
               }}
               isDarkMode={isDarkMode}
