@@ -39,6 +39,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
   // Convert the event.id to string for the EventAttendanceManager
   const eventIdString = typeof event.id === 'number' ? String(event.id) : event.id;
 
+  // Calculate attendees as number
+  const attendeesCount = typeof event.attendees === 'string' 
+    ? parseInt(event.attendees, 10) 
+    : (event.attendees || 0);
+    
+  // Calculate capacity as number
+  const capacityCount = event.capacity ? Number(event.capacity) : 0;
+
   return (
     <>
       <Card 
@@ -61,16 +69,16 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRSVP }) => {
             image={event.image || ''}
             speaker={event.speaker || ''}
             location={event.location}
-            attendees={typeof event.attendees === 'string' ? parseInt(event.attendees, 10) : (event.attendees || 0)}
-            capacity={event.capacity ? Number(event.capacity) : 0}
+            attendees={attendeesCount}
+            capacity={capacityCount}
           />
           
           <div onClick={(e) => e.stopPropagation()}>
             <EventCardActions 
               status={status}
               isRegistered={isRegistered}
-              attendees={typeof event.attendees === 'string' ? parseInt(event.attendees, 10) : (event.attendees || 0)}
-              capacity={event.capacity ? Number(event.capacity) : 0}
+              attendees={attendeesCount}
+              capacity={capacityCount}
               onRSVP={handleRSVP}
               onOpenAttendanceModal={() => setShowAttendanceModal(true)}
               isPremium={event.isPremium}

@@ -7,7 +7,7 @@ import CourseViewerModal from './CourseViewerModal';
 import MainContentViewer from './MainContentViewer';
 
 interface ContentViewerProps {
-  item: ContentItem | null;
+  item: ContentItem;
   onClose: () => void;
 }
 
@@ -19,15 +19,16 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ item, onClose }) => {
 
   useEffect(() => {
     if (item) {
-      setHasAccess(item.accessLevel === 'free');
+      setHasAccess(item.access_level === 'free');
       addProgress(item.id);
     }
   }, [item, addProgress]);
 
   if (!item) return null;
 
-  const progress = getProgress(item.id)?.progress || 0;
-  const isCompleted = progress >= 100;
+  const itemProgress = getProgress(item.id);
+  const progress = itemProgress?.progress_percent || 0;
+  const isCompleted = itemProgress?.completed_at !== null;
 
   // Render different viewer based on content format
   if (item.format === 'course') {

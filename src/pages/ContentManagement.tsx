@@ -10,7 +10,7 @@ import CategoriesManagement from '@/components/library/management/CategoriesMana
 import { ContentItem } from '@/types/library';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { useToast } from '@/hooks/use-toast';
-import { adaptLibraryArrayToContentType, adaptContentTypeToLibraryItem } from '@/utils/contentTypeAdapter';
+import { adaptLibraryItemToContentType, adaptContentTypeToLibraryItem } from '@/utils/contentTypeAdapter';
 
 const ContentManagement: React.FC = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -49,8 +49,6 @@ const ContentManagement: React.FC = () => {
       description: "The content has been removed from your library."
     });
   };
-
-  const adaptedContent = adaptLibraryArrayToContentType(content);
 
   return (
     <MainLayout title="Content Management">

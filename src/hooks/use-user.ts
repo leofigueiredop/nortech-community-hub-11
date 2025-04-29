@@ -17,10 +17,10 @@ interface AuthUser {
   id: string;
   email: string;
   name?: string;
-  avatar_url?: string; // Add this property
   avatar?: string;
   role?: string;
-  access_level?: 'free' | 'premium' | 'premium_plus'; // Add this property
+  access_level?: 'free' | 'premium' | 'premium_plus';
+  avatar_url?: string;
 }
 
 export const useUser = () => {
@@ -46,9 +46,9 @@ export const useUser = () => {
             id: currentUser.id,
             email: currentUser.email,
             display_name: currentUser.name,
-            avatar_url: currentUser.avatar_url, // Using avatar_url which is now in the interface
+            avatar_url: currentUser.avatar_url || currentUser.avatar,
             role: currentUser.role || 'member',
-            access_level: currentUser.access_level || 'free' // Using access_level which is now in the interface
+            access_level: currentUser.access_level || 'free'
           });
         }
       } catch (err) {

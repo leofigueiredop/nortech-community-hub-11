@@ -1,12 +1,20 @@
 
-import { ContentFormat as BaseContentFormat, ContentCategory as BaseContentCategory } from './content';
-
 // Re-export ContentFormat to avoid conflicts
-export type ContentFormat = BaseContentFormat;
+export type ContentFormat = 'video' | 'text' | 'document' | 'audio' | 'course' | 'image' | 'link' | 'youtube' | 'vimeo' | 'gdoc' | 'pdf' | string;
 
-export interface ContentCategory extends BaseContentCategory {
-  itemCount?: number;
+export interface ContentCategory {
+  id: string;
+  name: string;
+  description?: string;
+  slug: string;
+  parent_id?: string;
   icon?: string;
+  created_at: string;
+  updated_at: string;
+  item_count?: number;
+  color?: string;
+  sort_order?: number;
+  community_id?: string;
 }
 
 export interface ContentItem {
@@ -28,7 +36,6 @@ export interface ContentItem {
   categoryId?: string;
   tags?: string[];
   access_level?: 'free' | 'premium' | 'premium_plus';
-  accessLevel?: 'free' | 'premium' | 'premium_plus';
   is_featured?: boolean;
   featured?: boolean;
   views?: number;
@@ -41,7 +48,7 @@ export interface ContentItem {
   pointsValue?: number;
   allowComments?: boolean;
   community_id?: string;
-  fileSize?: string | number; // Make fileSize accept both string and number
+  fileSize?: string | number;
   resourceUrl?: string;
   visibility?: string;
   completionCriteria?: string;
@@ -85,14 +92,6 @@ export interface ContentProgress {
   completed_at?: string | null;
   last_accessed_at: string;
   points_awarded: boolean;
-  
-  // Add alias properties to match component usage
-  userId?: string;
-  contentId?: string;
-  progress?: number;
-  completed?: boolean;
-  lastAccessedAt?: string;
-  pointsAwarded?: boolean;
 }
 
 // Content interaction types

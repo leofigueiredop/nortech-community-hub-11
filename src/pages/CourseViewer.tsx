@@ -51,7 +51,7 @@ const CourseViewer: React.FC = () => {
         // Calculate course progress
         if (foundCourse.id) {
           const progress = getProgress(foundCourse.id);
-          setCourseProgress(progress?.progress || progress?.progress_percent || 0);
+          setCourseProgress(progress?.progress_percent || 0);
         }
         
         // Set first lesson if none specified
@@ -91,9 +91,9 @@ const CourseViewer: React.FC = () => {
   
   // Update progress when lesson changes
   useEffect(() => {
-    if (currentLesson && (currentLesson.contentId || currentLesson.content_id)) {
+    if (currentLesson && currentLesson.contentId) {
       // Mark the current lesson as started
-      updateProgress(currentLesson.contentId || currentLesson.content_id, 10);
+      updateProgress(currentLesson.contentId, 10);
     }
   }, [currentLesson, updateProgress]);
   
@@ -174,8 +174,8 @@ const CourseViewer: React.FC = () => {
               lesson={currentLesson}
               course={currentCourse}
               onProgress={(progress) => {
-                if (currentLesson && (currentLesson.contentId || currentLesson.content_id)) {
-                  updateProgress(currentLesson.contentId || currentLesson.content_id, progress);
+                if (currentLesson && currentLesson.contentId) {
+                  updateProgress(currentLesson.contentId, progress);
                 }
               }}
               isDarkMode={isDarkMode}

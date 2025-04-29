@@ -14,11 +14,15 @@ export interface ContentItem {
   url?: string;
   format: ContentFormat;
   thumbnail?: string;
-  thumbnailUrl?: string; // Added for compatibility with existing components
+  thumbnailUrl?: string;
   community_id: string;
   created_at: string;
   updated_at: string;
-  author_id?: string;
+  author?: string | {
+    id: string;
+    name: string;
+    avatar?: string;
+  } | null;
   is_featured?: boolean;
   views?: number;
   likes?: number;
@@ -26,6 +30,7 @@ export interface ContentItem {
   access_level: 'free' | 'premium' | 'premium_plus';
   category_id?: string;
   tags?: string[];
+  content?: string;
   
   // Additional properties needed by components
   isNew?: boolean;
@@ -33,11 +38,6 @@ export interface ContentItem {
   pointsValue?: number;
   freeAccessesLeft?: number;
   isExclusive?: boolean;
-  author?: {
-    id: string;
-    name: string;
-    avatar?: string;
-  } | string | null;
   
   // Properties used in various components
   resourceUrl?: string;
@@ -46,12 +46,10 @@ export interface ContentItem {
   completionCriteria?: 'view' | 'scroll_end' | 'watch_percent' | 'time_spent';
   completionThreshold?: number;
   fileSize?: number | string;
-  accessLevel?: 'free' | 'premium' | 'premium_plus';
   featured?: boolean;
-  createdAt?: string; // Alias for created_at
-  updatedAt?: string; // Alias for updated_at
+  createdAt?: string;
+  updatedAt?: string;
   allowComments?: boolean;
-  content?: string; // Add content field which was missing
 }
 
 /**
@@ -73,12 +71,12 @@ export interface ContentSectionProps {
   title: string;
   items: ContentItem[];
   isTopTen?: boolean;
-  onItemSelect?: (item: ContentItem) => void; // Added to fix property error
+  onItemSelect?: (item: ContentItem) => void;
   viewAllUrl?: string;
   showNewBadge?: boolean;
   description?: string;
   viewAll?: string;
-  layout?: string; // Added for components that use this prop
+  layout?: string;
 }
 
 /**
@@ -93,5 +91,5 @@ export interface ContentCategory {
   icon?: string;
   created_at: string;
   updated_at: string;
-  itemCount?: number; // Added for UI convenience
+  item_count?: number;
 }

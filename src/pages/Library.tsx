@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { useLibraryState } from '@/hooks/useLibraryState';
-import ContentViewer from '@/components/library/ContentViewer';
+import ContentViewer from '@/components/library/viewer/ContentViewer'; // Updated path to correct component
 import CreateContentModal from '@/components/library/CreateContentModal';
 import LibraryTopBar from '@/components/library/LibraryTopBar';
 import LibraryContentArea from '@/components/library/LibraryContentArea';
@@ -10,6 +11,7 @@ import ContentFilters from '@/components/library/ContentFilters';
 import { Button } from '@/components/ui/button';
 import { Trophy, Star, Award } from 'lucide-react';
 import { useContentProgress } from '@/hooks/useContentProgress';
+import { ContentItem } from '@/types/library';
 
 const Library: React.FC = () => {
   const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('all');
@@ -45,7 +47,7 @@ const Library: React.FC = () => {
 
   // Calculate total progress
   const totalItems = content.length;
-  const completedItems = contentProgress.filter(item => item.completed || item.completed_at !== null).length;
+  const completedItems = contentProgress.filter(item => item.completed_at !== null).length;
   const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   useEffect(() => {
@@ -76,10 +78,10 @@ const Library: React.FC = () => {
     startOfWeek.setHours(0, 0, 0, 0);
     
     const completedThisWeek = contentProgress.filter(progress => {
-      const lastAccessed = new Date(progress.lastAccessedAt || progress.last_accessed_at);
-      return (progress.completed || progress.completed_at !== null) && 
+      const lastAccessed = new Date(progress.last_accessed_at);
+      return (progress.completed_at !== null) && 
              lastAccessed >= startOfWeek && 
-             content.find(item => item.id === (progress.contentId || progress.content_id))?.format === 'video';
+             content.find(item => item.id === progress.content_id)?.format === 'video';
     });
     
     return completedThisWeek.length;
