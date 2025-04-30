@@ -1,0 +1,60 @@
+-- Enable UUID extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Set UUID default for all relevant tables
+ALTER TABLE communities ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE analytics_events ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE badges ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE community_members ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE community_settings ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE content_categories ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE conversations ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE level_configs ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE messages ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE notification_settings ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE notifications ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE payment_gateways ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE permissions ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE points_activities ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE posts ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE rewards ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE spaces ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE subscription_plans ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE content_items ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE conversation_members ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE discussion_topics ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE discussions ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE discussion_replies ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE message_attachments ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE post_comments ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE post_reactions ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+ALTER TABLE redemptions ALTER COLUMN id SET DEFAULT uuid_generate_v4();
+
+-- Add comments for documentation
+COMMENT ON COLUMN communities.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN analytics_events.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN badges.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN community_members.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN community_settings.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN content_categories.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN conversations.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN level_configs.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN messages.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN notification_settings.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN notifications.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN payment_gateways.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN permissions.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN points_activities.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN posts.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN rewards.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN spaces.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN subscription_plans.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN content_items.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN conversation_members.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN discussion_topics.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN discussions.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN discussion_replies.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN message_attachments.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN post_comments.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN post_reactions.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN redemptions.id IS 'Unique identifier - automatically generated UUID v4'; 

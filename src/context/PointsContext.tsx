@@ -70,17 +70,25 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [pointsHistory, setPointsHistory] = useState<PointsActivity[]>([]);
   const api = ApiClient.getInstance();
 
-  // Use the real-time subscription hook
-  usePointsSubscription();
+  // Skip subscription during onboarding
+  useEffect(() => {
+    if (!user || !user.isOnboarded) return;
+    usePointsSubscription();
+  }, [user]);
 
   useEffect(() => {
     // Load initial points data
     const loadPointsData = async () => {
-      if (!user) return;
+      // Skip if no user or if user is in onboarding
+      if (!user || !user.isOnboarded) {
+        setTotalPoints(0);
+        setPointsHistory([]);
+        return;
+      }
       
-      // Fetch points history
+      // Fetch points history from points_transactions table
       const { data: history, error } = await supabase
-        .from('points_history')
+        .from('points_transactions')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
@@ -224,7 +232,7 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     
     try {
       await supabase
-        .from('points_history')
+        .from('points_transactions')
         .insert([newActivity]);
     } catch (error) {
       console.error('Error saving points activity:', error);
@@ -233,11 +241,11 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const loadPointsHistory = async () => {
-    if (!user) return;
+    if (!user || !user.isOnboarded) return;
     
     try {
       const { data: history, error } = await supabase
-        .from('points_history')
+        .from('points_transactions')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });

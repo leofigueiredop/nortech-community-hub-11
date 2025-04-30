@@ -18,6 +18,7 @@ export interface AuthHook {
     sendConfirmation: (email: string) => Promise<{ data: any; error: any }>;
     verifyToken: (token: string) => Promise<{ data: any; error: any }>;
   };
+  handleAuthCallback: () => Promise<{ data: any; error: any }>;
 }
 
 export function useAuth(): AuthHook {
@@ -53,12 +54,27 @@ export function useAuth(): AuthHook {
         .catch(handleAuthError),
     
     withGoogle: () => 
-      supabase.auth.signInWithOAuth({ provider: 'google' })
+      supabase.auth.signInWithOAuth({ 
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        }
+      })
         .then(result => result)
         .catch(handleAuthError),
     
     withApple: () => 
-      supabase.auth.signInWithOAuth({ provider: 'apple' })
+      supabase.auth.signInWithOAuth({ 
+        provider: 'apple',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          scopes: 'name email',
+        }
+      })
         .then(result => result)
         .catch(handleAuthError)
   };
@@ -105,6 +121,24 @@ export function useAuth(): AuthHook {
         .catch(handleAuthError)
   };
 
+  const handleAuthCallback = async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error) throw error;
+      if (!session) throw new Error('No session found');
+
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!user) throw new Error('No user found');
+
+      return { data: { session, user }, error: null };
+    } catch (error) {
+      console.error('Auth callback error:', error);
+      return { data: null, error };
+    }
+  };
+
   return {
     user,
     session,
@@ -113,6 +147,7 @@ export function useAuth(): AuthHook {
     signUp,
     signOut,
     resetPassword,
-    emailConfirmation
+    emailConfirmation,
+    handleAuthCallback
   };
 }

@@ -1,259 +1,379 @@
-import { ICommunityRepository } from '../interfaces/ICommunityRepository';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Community } from '@/types/community';
-import { BaseRepository } from './BaseRepository';
-import { supabaseConfig } from '../config';
+import { ICommunityRepository, Community } from '../interfaces/ICommunityRepository';
+import { Result } from '@/types/api';
 
-export interface CommunitySettings {
-  id: string;
-  community_id: string;
-  settings_type: string;
-  settings_data: any;
-  created_at: string;
-  updated_at: string;
-}
+export class SupabaseCommunityRepository implements ICommunityRepository {
+  private readonly client: SupabaseClient;
 
-export interface CommunityMember {
-  id: string;
-  user_id: string;
-  community_id: string;
-  role: string;
-  joined_at: string;
-  status: string;
-  permissions?: string[];
-}
-
-export class SupabaseCommunityRepository extends BaseRepository implements ICommunityRepository {
-  private supabase: SupabaseClient;
-
-  constructor(supabaseClient: SupabaseClient) {
-    super();
-    this.supabase = supabaseClient;
+  constructor(client: SupabaseClient) {
+    this.client = client;
   }
 
-  async getCommunityById(id: string): Promise<Community> {
+  async searchCommunities(query: string, filters?: { 
+    isPrivate?: boolean;
+    status?: string;
+    category?: string;
+  }): Promise<Result<Community[]>> {
     try {
-      const { data, error } = await this.supabase
+      let queryBuilder = this.client
         .from('communities')
-        .select('*')
-        .eq('id', id)
-        .single();
-      
-      if (error) throw error;
-      return data as Community;
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
+        .select(`
+          *,
+          profiles!communities_creator_id_fkey (
+            full_name
+          )
+        `)
+        .textSearch('name', query);
 
-  async getCommunityByDomain(domain: string): Promise<Community | null> {
-    try {
-      const { data, error } = await this.supabase
-        .from('communities')
-        .select('*')
-        .eq('domain', domain)
-        .single();
-      
-      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "no rows returned"
-      return data as Community || null;
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
-
-  async createCommunity(community: Partial<Community>): Promise<Community> {
-    try {
-      const { data, error } = await this.supabase
-        .from('communities')
-        .insert([community])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data as Community;
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
-
-  async updateCommunity(id: string, community: Partial<Community>): Promise<Community> {
-    try {
-      await this.setTenantContext();
-      const { data, error } = await this.supabase
-        .from('communities')
-        .update(community)
-        .eq('id', id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data as Community;
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
-
-  async getSettings(type: string): Promise<CommunitySettings> {
-    try {
-      await this.setTenantContext();
-      const { data, error } = await this.supabase
-        .from('community_settings')
-        .select('*')
-        .eq('community_id', this.currentCommunityId)
-        .eq('settings_type', type)
-        .single();
-      
-      if (error) throw error;
-      return data as CommunitySettings;
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
-
-  async updateSettings(type: string, settings: any): Promise<CommunitySettings> {
-    try {
-      await this.setTenantContext();
-      // Check if settings exist
-      const { data: existingData } = await this.supabase
-        .from('community_settings')
-        .select('id')
-        .eq('community_id', this.currentCommunityId)
-        .eq('settings_type', type)
-        .single();
-      
-      let result;
-      if (existingData) {
-        // Update existing settings
-        const { data, error } = await this.supabase
-          .from('community_settings')
-          .update({ settings_data: settings })
-          .eq('id', existingData.id)
-          .select()
-          .single();
-        
-        if (error) throw error;
-        result = data;
-      } else {
-        // Create new settings
-        const { data, error } = await this.supabase
-          .from('community_settings')
-          .insert([{
-            community_id: this.currentCommunityId,
-            settings_type: type,
-            settings_data: settings
-          }])
-          .select()
-          .single();
-        
-        if (error) throw error;
-        result = data;
+      if (filters?.isPrivate !== undefined) {
+        queryBuilder = queryBuilder.eq('is_private', filters.isPrivate);
       }
-      
-      return result as CommunitySettings;
+      if (filters?.status) {
+        queryBuilder = queryBuilder.eq('status', filters.status);
+      }
+      if (filters?.category) {
+        queryBuilder = queryBuilder.eq('category', filters.category);
+      }
+
+      const { data, error } = await queryBuilder;
+
+      if (error) throw error;
+
+      const communities = data.map(community => ({
+        id: community.id,
+        name: community.name,
+        description: community.description,
+        slug: community.slug,
+        isPrivate: community.is_private,
+        status: community.status,
+        category: community.category,
+        creatorId: community.creator_id,
+        creatorName: community.profiles?.full_name || 'Unknown',
+        logo_url: community.logo_url,
+        banner_url: community.banner_url,
+        memberCount: community.member_count,
+        createdAt: new Date(community.created_at),
+        updatedAt: new Date(community.updated_at)
+      }));
+
+      return { ok: true, data: communities };
     } catch (error) {
-      return this.handleError(error);
+      console.error('Error searching communities:', error);
+      return { ok: false, error: 'Failed to search communities' };
     }
   }
 
-  async getMemberById(userId: string): Promise<CommunityMember | null> {
+  async getFeaturedCommunities(): Promise<Result<Community[]>> {
     try {
-      await this.setTenantContext();
-      const { data, error } = await this.supabase
-        .from('community_members')
-        .select('*')
-        .eq('community_id', this.currentCommunityId)
-        .eq('user_id', userId)
+      const { data, error } = await this.client
+        .from('communities')
+        .select(`
+          *,
+          profiles!communities_creator_id_fkey (
+            full_name
+          )
+        `)
+        .eq('status', 'active')
+        .order('member_count', { ascending: false })
+        .limit(6);
+
+      if (error) throw error;
+
+      const communities = data.map(community => ({
+        id: community.id,
+        name: community.name,
+        description: community.description,
+        slug: community.slug,
+        isPrivate: community.is_private,
+        status: community.status,
+        category: community.category,
+        creatorId: community.creator_id,
+        creatorName: community.profiles?.full_name || 'Unknown',
+        logo_url: community.logo_url,
+        banner_url: community.banner_url,
+        memberCount: community.member_count,
+        createdAt: new Date(community.created_at),
+        updatedAt: new Date(community.updated_at)
+      }));
+
+      return { ok: true, data: communities };
+    } catch (error) {
+      console.error('Error getting featured communities:', error);
+      return { ok: false, error: 'Failed to get featured communities' };
+    }
+  }
+
+  async getCommunityById(id: string): Promise<Result<Community>> {
+    try {
+      const { data, error } = await this.client
+        .from('communities')
+        .select(`
+          *,
+          profiles!communities_creator_id_fkey (
+            full_name
+          )
+        `)
+        .eq('id', id)
         .single();
-      
-      if (error && error.code !== 'PGRST116') throw error;
-      return data as CommunityMember || null;
+
+      if (error) throw error;
+      if (!data) throw new Error('Community not found');
+
+      const community: Community = {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        slug: data.slug,
+        isPrivate: data.is_private,
+        status: data.status,
+        category: data.category,
+        creatorId: data.creator_id,
+        creatorName: data.profiles?.full_name || 'Unknown',
+        logo_url: data.logo_url,
+        banner_url: data.banner_url,
+        memberCount: data.member_count,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at)
+      };
+
+      return { ok: true, data: community };
     } catch (error) {
-      return this.handleError(error);
+      console.error('Error getting community by ID:', error);
+      return { ok: false, error: 'Failed to get community' };
     }
   }
 
-  async addMember(member: Partial<CommunityMember>): Promise<CommunityMember> {
+  async getCommunityBySlug(slug: string): Promise<Result<Community>> {
     try {
-      await this.setTenantContext();
-      const { data, error } = await this.supabase
-        .from('community_members')
+      const { data, error } = await this.client
+        .from('communities')
+        .select(`
+          *,
+          profiles!communities_creator_id_fkey (
+            full_name
+          )
+        `)
+        .eq('slug', slug)
+        .single();
+
+      if (error) throw error;
+      if (!data) throw new Error('Community not found');
+
+      const community: Community = {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        slug: data.slug,
+        isPrivate: data.is_private,
+        status: data.status,
+        category: data.category,
+        creatorId: data.creator_id,
+        creatorName: data.profiles?.full_name || 'Unknown',
+        logo_url: data.logo_url,
+        banner_url: data.banner_url,
+        memberCount: data.member_count,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at)
+      };
+
+      return { ok: true, data: community };
+    } catch (error) {
+      console.error('Error getting community by slug:', error);
+      return { ok: false, error: 'Failed to get community' };
+    }
+  }
+
+  async createCommunity(data: Partial<Community>): Promise<Result<Community>> {
+    try {
+      const { data: community, error } = await this.client
+        .from('communities')
         .insert([{
-          community_id: this.currentCommunityId,
-          ...member
+          name: data.name,
+          description: data.description,
+          slug: data.slug,
+          is_private: data.isPrivate,
+          status: data.status || 'active',
+          category: data.category,
+          creator_id: data.creatorId,
+          logo_url: data.logo_url,
+          banner_url: data.banner_url
         }])
-        .select()
+        .select(`
+          *,
+          profiles!communities_creator_id_fkey (
+            full_name
+          )
+        `)
         .single();
-      
-      if (error) throw error;
-      return data as CommunityMember;
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
 
-  async updateMember(userId: string, member: Partial<CommunityMember>): Promise<CommunityMember> {
-    try {
-      await this.setTenantContext();
-      const { data, error } = await this.supabase
-        .from('community_members')
-        .update(member)
-        .eq('community_id', this.currentCommunityId)
-        .eq('user_id', userId)
-        .select()
-        .single();
-      
       if (error) throw error;
-      return data as CommunityMember;
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
+      if (!community) throw new Error('Failed to create community');
 
-  async removeMember(userId: string): Promise<void> {
-    try {
-      await this.setTenantContext();
-      const { error } = await this.supabase
-        .from('community_members')
-        .delete()
-        .eq('community_id', this.currentCommunityId)
-        .eq('user_id', userId);
-      
-      if (error) throw error;
-    } catch (error) {
-      this.handleError(error);
-    }
-  }
-
-  async getAllMembers(page: number = 1, limit: number = 20): Promise<{ members: CommunityMember[], total: number }> {
-    try {
-      await this.setTenantContext();
-      
-      // Get total count
-      const { count, error: countError } = await this.supabase
-        .from('community_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('community_id', this.currentCommunityId);
-      
-      if (countError) throw countError;
-      
-      // Get members with pagination
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
-      
-      const { data, error } = await this.supabase
-        .from('community_members')
-        .select('*')
-        .eq('community_id', this.currentCommunityId)
-        .range(from, to);
-      
-      if (error) throw error;
-      
       return {
-        members: data as CommunityMember[],
-        total: count || 0
+        ok: true,
+        data: {
+          id: community.id,
+          name: community.name,
+          description: community.description,
+          slug: community.slug,
+          isPrivate: community.is_private,
+          status: community.status,
+          category: community.category,
+          creatorId: community.creator_id,
+          creatorName: community.profiles?.full_name || 'Unknown',
+          logo_url: community.logo_url,
+          banner_url: community.banner_url,
+          memberCount: community.member_count,
+          createdAt: new Date(community.created_at),
+          updatedAt: new Date(community.updated_at)
+        }
       };
     } catch (error) {
-      return this.handleError(error);
+      console.error('Error creating community:', error);
+      return { ok: false, error: 'Failed to create community' };
+    }
+  }
+
+  async updateCommunity(id: string, data: Partial<Community>): Promise<Result<Community>> {
+    try {
+      const { data: community, error } = await this.client
+        .from('communities')
+        .update({
+          name: data.name,
+          description: data.description,
+          slug: data.slug,
+          is_private: data.isPrivate,
+          status: data.status,
+          category: data.category,
+          logo_url: data.logo_url,
+          banner_url: data.banner_url
+        })
+        .eq('id', id)
+        .select(`
+          *,
+          profiles!communities_creator_id_fkey (
+            full_name
+          )
+        `)
+        .single();
+
+      if (error) throw error;
+      if (!community) throw new Error('Community not found');
+
+      return {
+        ok: true,
+        data: {
+          id: community.id,
+          name: community.name,
+          description: community.description,
+          slug: community.slug,
+          isPrivate: community.is_private,
+          status: community.status,
+          category: community.category,
+          creatorId: community.creator_id,
+          creatorName: community.profiles?.full_name || 'Unknown',
+          logo_url: community.logo_url,
+          banner_url: community.banner_url,
+          memberCount: community.member_count,
+          createdAt: new Date(community.created_at),
+          updatedAt: new Date(community.updated_at)
+        }
+      };
+    } catch (error) {
+      console.error('Error updating community:', error);
+      return { ok: false, error: 'Failed to update community' };
+    }
+  }
+
+  async deleteCommunity(id: string): Promise<Result<void>> {
+    try {
+      const { error } = await this.client
+        .from('communities')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      return { ok: true };
+    } catch (error) {
+      console.error('Error deleting community:', error);
+      return { ok: false, error: 'Failed to delete community' };
+    }
+  }
+
+  async joinCommunity(communityId: string, userId: string): Promise<Result<void>> {
+    try {
+      const { error } = await this.client
+        .from('community_members')
+        .insert([{
+          community_id: communityId,
+          user_id: userId,
+          role: 'member'
+        }]);
+
+      if (error) throw error;
+
+      // Update member count
+      await this.client.rpc('increment_member_count', { community_id: communityId });
+
+      return { ok: true };
+    } catch (error) {
+      console.error('Error joining community:', error);
+      return { ok: false, error: 'Failed to join community' };
+    }
+  }
+
+  async leaveCommunity(communityId: string, userId: string): Promise<Result<void>> {
+    try {
+      const { error } = await this.client
+        .from('community_members')
+        .delete()
+        .eq('community_id', communityId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      // Update member count
+      await this.client.rpc('decrement_member_count', { community_id: communityId });
+
+      return { ok: true };
+    } catch (error) {
+      console.error('Error leaving community:', error);
+      return { ok: false, error: 'Failed to leave community' };
+    }
+  }
+
+  async getAllMembers(communityId: string): Promise<Result<string[]>> {
+    try {
+      const { data, error } = await this.client
+        .from('community_members')
+        .select('user_id')
+        .eq('community_id', communityId);
+
+      if (error) throw error;
+
+      return { ok: true, data: data.map(member => member.user_id) };
+    } catch (error) {
+      console.error('Error getting community members:', error);
+      return { ok: false, error: 'Failed to get community members' };
+    }
+  }
+
+  async isMember(communityId: string, userId: string): Promise<Result<boolean>> {
+    try {
+      const { data, error } = await this.client
+        .from('community_members')
+        .select('id')
+        .eq('community_id', communityId)
+        .eq('user_id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "not found"
+
+      return { ok: true, data: !!data };
+    } catch (error) {
+      console.error('Error checking community membership:', error);
+      return { ok: false, error: 'Failed to check membership' };
     }
   }
 }

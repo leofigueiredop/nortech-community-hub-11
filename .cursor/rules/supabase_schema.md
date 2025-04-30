@@ -1,681 +1,964 @@
-Esquema do Banco de Dados
-Tabelas Principais
-communities
+-- public.communities definição
 
-CREATE TABLE communities (
-  id UUID PRIMARY KEY,
-  name TEXT NOT NULL,
-  description TEXT,
-  logo_url TEXT,
-  banner_url TEXT,
-  domain TEXT,
-  creator_id TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  status TEXT DEFAULT 'active',
-  theme_config JSONB,
-  api_keys JSONB,
-  slug TEXT NOT NULL,
-  primary_color TEXT,
-  secondary_color TEXT,
-  is_public BOOLEAN DEFAULT true,
-  owner_id TEXT NOT NULL,
-  is_private BOOLEAN DEFAULT false
+-- Drop table
+
+-- DROP TABLE public.communities;
+
+CREATE TABLE public.communities (
+	id uuid NOT NULL,
+	"name" text NOT NULL,
+	description text NULL,
+	logo_url text NULL,
+	banner_url text NULL,
+	"domain" text NULL,
+	creator_id text NOT NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	status text DEFAULT 'active'::text NULL,
+	theme_config jsonb NULL,
+	api_keys jsonb NULL,
+	is_private bool DEFAULT false NULL,
+	CONSTRAINT communities_pkey PRIMARY KEY (id)
 );
 
-CREATE INDEX communities_slug_idx ON communities(slug);
-community_settings
+-- Permissions
 
-CREATE TABLE community_settings (
-  id UUID PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  settings_type TEXT NOT NULL,
-  settings_data JSONB NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(community_id, settings_type)
+ALTER TABLE public.communities OWNER TO postgres;
+GRANT ALL ON TABLE public.communities TO postgres;
+GRANT ALL ON TABLE public.communities TO anon;
+GRANT ALL ON TABLE public.communities TO authenticated;
+GRANT ALL ON TABLE public.communities TO service_role;
+
+
+-- public.analytics_events definição
+
+-- Drop table
+
+-- DROP TABLE public.analytics_events;
+
+CREATE TABLE public.analytics_events (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	event_type text NOT NULL,
+	user_id text NULL,
+	metadata jsonb NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT analytics_events_pkey PRIMARY KEY (id),
+	CONSTRAINT analytics_events_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
-community_members
+CREATE INDEX analytics_events_community_idx ON public.analytics_events USING btree (community_id);
 
-CREATE TABLE community_members (
-  id UUID PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  user_id TEXT NOT NULL,
-  role TEXT DEFAULT 'member',
-  status TEXT DEFAULT 'active',
-  subscription_plan_id UUID,
-  joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  subscription_start_date TIMESTAMP WITH TIME ZONE,
-  subscription_end_date TIMESTAMP WITH TIME ZONE,
-  custom_fields JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  points NUMBER DEFAULT 0,
-  UNIQUE(community_id, user_id)
+-- Permissions
+
+ALTER TABLE public.analytics_events OWNER TO postgres;
+GRANT ALL ON TABLE public.analytics_events TO postgres;
+GRANT ALL ON TABLE public.analytics_events TO anon;
+GRANT ALL ON TABLE public.analytics_events TO authenticated;
+GRANT ALL ON TABLE public.analytics_events TO service_role;
+
+
+-- public.badges definição
+
+-- Drop table
+
+-- DROP TABLE public.badges;
+
+CREATE TABLE public.badges (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	"name" text NOT NULL,
+	description text NULL,
+	icon_url text NULL,
+	points_value int4 DEFAULT 0 NULL,
+	category text NULL,
+	requirements jsonb NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT badges_pkey PRIMARY KEY (id),
+	CONSTRAINT badges_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
+CREATE INDEX badges_community_id_idx ON public.badges USING btree (community_id);
 
-CREATE INDEX community_members_community_id_idx ON community_members(community_id);
-CREATE INDEX community_members_user_id_idx ON community_members(user_id);
-subscription_plans
+-- Permissions
 
-CREATE TABLE subscription_plans (
-  id UUID PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  name TEXT NOT NULL,
-  description TEXT,
-  price DECIMAL(10,2),
-  interval TEXT DEFAULT 'month',
-  features JSONB,
-  is_active BOOLEAN DEFAULT true,
-  trial_days INTEGER,
-  max_members INTEGER,
-  visibility TEXT DEFAULT 'public',
-  progressive_content BOOLEAN DEFAULT false,
-  retention_days INTEGER,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+ALTER TABLE public.badges OWNER TO postgres;
+GRANT ALL ON TABLE public.badges TO postgres;
+GRANT ALL ON TABLE public.badges TO anon;
+GRANT ALL ON TABLE public.badges TO authenticated;
+GRANT ALL ON TABLE public.badges TO service_role;
+
+
+-- public.community_members definição
+
+-- Drop table
+
+-- DROP TABLE public.community_members;
+
+CREATE TABLE public.community_members (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	user_id text NOT NULL,
+	"role" text DEFAULT 'member'::text NULL,
+	status text DEFAULT 'active'::text NULL,
+	subscription_plan_id uuid NULL,
+	joined_at timestamptz DEFAULT now() NULL,
+	subscription_start_date timestamptz NULL,
+	subscription_end_date timestamptz NULL,
+	custom_fields jsonb NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT community_members_community_id_user_id_key UNIQUE (community_id, user_id),
+	CONSTRAINT community_members_pkey PRIMARY KEY (id),
+	CONSTRAINT community_members_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
+CREATE INDEX community_members_community_id_idx ON public.community_members USING btree (community_id);
+CREATE INDEX community_members_user_id_idx ON public.community_members USING btree (user_id);
 
-CREATE INDEX subscription_plans_community_id_idx ON subscription_plans(community_id);
-spaces
+-- Permissions
 
-CREATE TABLE spaces (
-  id UUID PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  name TEXT NOT NULL,
-  description TEXT,
-  type TEXT NOT NULL,
-  icon TEXT,
-  banner_url TEXT,
-  config JSONB,
-  visibility TEXT DEFAULT 'public',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+ALTER TABLE public.community_members OWNER TO postgres;
+GRANT ALL ON TABLE public.community_members TO postgres;
+GRANT ALL ON TABLE public.community_members TO anon;
+GRANT ALL ON TABLE public.community_members TO authenticated;
+GRANT ALL ON TABLE public.community_members TO service_role;
 
-CREATE INDEX spaces_community_id_idx ON spaces(community_id);
-payment_gateways
 
-CREATE TABLE payment_gateways (
-  id UUID PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  gateway_type TEXT NOT NULL,
-  is_active BOOLEAN DEFAULT false,
-  config JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(community_id, gateway_type)
-);
-permissions
+-- public.community_settings definição
 
-CREATE TABLE permissions (
-  id UUID PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  role TEXT NOT NULL,
-  resource TEXT NOT NULL,
-  action TEXT NOT NULL,
-  conditions JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(community_id, role, resource, action)
-);
-Conteúdo e Biblioteca
-content_items
+-- Drop table
 
-CREATE TABLE content_items (
-  id UUID PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  title TEXT NOT NULL,
-  description TEXT,
-  format TEXT NOT NULL,
-  thumbnail TEXT,
-  thumbnail_url TEXT,
-  resource_url TEXT,
-  author TEXT,
-  duration INTEGER,
-  tags TEXT[],
-  access_level TEXT DEFAULT 'free',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  views INTEGER DEFAULT 0,
-  category_id TEXT,
-  visibility TEXT DEFAULT 'public',
-  featured BOOLEAN DEFAULT false,
-  points_enabled BOOLEAN DEFAULT false,
-  points_value INTEGER DEFAULT 0,
-  completion_criteria TEXT DEFAULT 'view',
-  completion_threshold INTEGER DEFAULT 80,
-  file_size INTEGER,
-  space_id UUID REFERENCES spaces(id),
-  url TEXT,
-  likes INTEGER DEFAULT 0,
-  author_id TEXT,
-  is_featured BOOLEAN DEFAULT false,
-  content TEXT,
-  is_new BOOLEAN DEFAULT false,
-  freeAccessesLeft INTEGER DEFAULT 0,
-  isExclusive BOOLEAN DEFAULT false,
-  allow_comments BOOLEAN DEFAULT true
+-- DROP TABLE public.community_settings;
+
+CREATE TABLE public.community_settings (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	settings_type text NOT NULL,
+	settings_data jsonb NOT NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT community_settings_community_id_settings_type_key UNIQUE (community_id, settings_type),
+	CONSTRAINT community_settings_pkey PRIMARY KEY (id),
+	CONSTRAINT community_settings_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 
-CREATE INDEX content_items_community_id_idx ON content_items(community_id);
-CREATE INDEX content_items_space_id_idx ON content_items(space_id);
-CREATE INDEX content_items_author_id_idx ON content_items(author_id);
-CREATE INDEX content_items_format_idx ON content_items(format);
-CREATE INDEX content_items_category_id_idx ON content_items(category_id);
-content_categories
+-- Permissions
 
-CREATE TABLE content_categories (
-  id UUID PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  name TEXT NOT NULL,
-  description TEXT,
-  parent_id UUID REFERENCES content_categories(id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  sort_order INTEGER DEFAULT 0,
-  slug TEXT,
-  icon TEXT,
-  color TEXT,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  item_count INTEGER DEFAULT 0
+ALTER TABLE public.community_settings OWNER TO postgres;
+GRANT ALL ON TABLE public.community_settings TO postgres;
+GRANT ALL ON TABLE public.community_settings TO anon;
+GRANT ALL ON TABLE public.community_settings TO authenticated;
+GRANT ALL ON TABLE public.community_settings TO service_role;
+
+
+-- public.content_categories definição
+
+-- Drop table
+
+-- DROP TABLE public.content_categories;
+
+CREATE TABLE public.content_categories (
+	id uuid NOT NULL,
+	"name" text NOT NULL,
+	description text NULL,
+	parent_id uuid NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	community_id uuid NULL,
+	CONSTRAINT content_categories_pkey PRIMARY KEY (id),
+	CONSTRAINT content_categories_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id),
+	CONSTRAINT content_categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.content_categories(id)
+);
+CREATE INDEX content_categories_community_id_idx ON public.content_categories USING btree (community_id);
+
+-- Permissions
+
+ALTER TABLE public.content_categories OWNER TO postgres;
+GRANT ALL ON TABLE public.content_categories TO postgres;
+GRANT ALL ON TABLE public.content_categories TO anon;
+GRANT ALL ON TABLE public.content_categories TO authenticated;
+GRANT ALL ON TABLE public.content_categories TO service_role;
+
+
+-- public.conversations definição
+
+-- Drop table
+
+-- DROP TABLE public.conversations;
+
+CREATE TABLE public.conversations (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	"type" text DEFAULT 'private'::text NULL,
+	title text NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT conversations_pkey PRIMARY KEY (id),
+	CONSTRAINT conversations_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 
-CREATE INDEX content_categories_community_id_idx ON content_categories(community_id);
-CREATE INDEX content_categories_parent_id_idx ON content_categories(parent_id);
-content_progress
+-- Permissions
 
-CREATE TABLE content_progress (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id TEXT NOT NULL,
-  content_id UUID NOT NULL REFERENCES content_items(id),
-  progress_percent INTEGER DEFAULT 0,
-  completed_at TIMESTAMP WITH TIME ZONE,
-  last_accessed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  points_awarded BOOLEAN DEFAULT false,
-  UNIQUE(user_id, content_id)
+ALTER TABLE public.conversations OWNER TO postgres;
+GRANT ALL ON TABLE public.conversations TO postgres;
+GRANT ALL ON TABLE public.conversations TO anon;
+GRANT ALL ON TABLE public.conversations TO authenticated;
+GRANT ALL ON TABLE public.conversations TO service_role;
+
+
+-- public.level_configs definição
+
+-- Drop table
+
+-- DROP TABLE public.level_configs;
+
+CREATE TABLE public.level_configs (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	"level" int4 NOT NULL,
+	points_required int4 NOT NULL,
+	"name" text NULL,
+	benefits jsonb NULL,
+	badge_id uuid NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT level_configs_community_id_level_key UNIQUE (community_id, level),
+	CONSTRAINT level_configs_pkey PRIMARY KEY (id),
+	CONSTRAINT level_configs_badge_id_fkey FOREIGN KEY (badge_id) REFERENCES public.badges(id),
+	CONSTRAINT level_configs_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
+);
+CREATE INDEX level_configs_community_idx ON public.level_configs USING btree (community_id);
+
+-- Permissions
+
+ALTER TABLE public.level_configs OWNER TO postgres;
+GRANT ALL ON TABLE public.level_configs TO postgres;
+GRANT ALL ON TABLE public.level_configs TO anon;
+GRANT ALL ON TABLE public.level_configs TO authenticated;
+GRANT ALL ON TABLE public.level_configs TO service_role;
+
+
+-- public.messages definição
+
+-- Drop table
+
+-- DROP TABLE public.messages;
+
+CREATE TABLE public.messages (
+	id uuid NOT NULL,
+	conversation_id uuid NULL,
+	sender_id text NOT NULL,
+	"content" text NOT NULL,
+	"type" text DEFAULT 'text'::text NULL,
+	metadata jsonb NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT messages_pkey PRIMARY KEY (id),
+	CONSTRAINT messages_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.conversations(id)
+);
+CREATE INDEX messages_conversation_idx ON public.messages USING btree (conversation_id);
+
+-- Permissions
+
+ALTER TABLE public.messages OWNER TO postgres;
+GRANT ALL ON TABLE public.messages TO postgres;
+GRANT ALL ON TABLE public.messages TO anon;
+GRANT ALL ON TABLE public.messages TO authenticated;
+GRANT ALL ON TABLE public.messages TO service_role;
+
+
+-- public.notification_settings definição
+
+-- Drop table
+
+-- DROP TABLE public.notification_settings;
+
+CREATE TABLE public.notification_settings (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	user_id text NOT NULL,
+	settings_data jsonb NOT NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT notification_settings_community_id_user_id_key UNIQUE (community_id, user_id),
+	CONSTRAINT notification_settings_pkey PRIMARY KEY (id),
+	CONSTRAINT notification_settings_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 
-CREATE INDEX content_progress_user_id_idx ON content_progress(user_id);
-CREATE INDEX content_progress_content_id_idx ON content_progress(content_id);
-content_interactions
+-- Permissions
 
-CREATE TABLE content_interactions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  content_id UUID NOT NULL REFERENCES content_items(id),
-  user_id TEXT NOT NULL,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  interaction_type TEXT NOT NULL,
-  interaction_data JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(content_id, user_id, interaction_type)
+ALTER TABLE public.notification_settings OWNER TO postgres;
+GRANT ALL ON TABLE public.notification_settings TO postgres;
+GRANT ALL ON TABLE public.notification_settings TO anon;
+GRANT ALL ON TABLE public.notification_settings TO authenticated;
+GRANT ALL ON TABLE public.notification_settings TO service_role;
+
+
+-- public.notifications definição
+
+-- Drop table
+
+-- DROP TABLE public.notifications;
+
+CREATE TABLE public.notifications (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	user_id text NOT NULL,
+	"type" text NOT NULL,
+	title text NOT NULL,
+	"content" text NULL,
+	link text NULL,
+	"read" bool DEFAULT false NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT notifications_pkey PRIMARY KEY (id),
+	CONSTRAINT notifications_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
+);
+CREATE INDEX notifications_user_community_idx ON public.notifications USING btree (user_id, community_id);
+
+-- Permissions
+
+ALTER TABLE public.notifications OWNER TO postgres;
+GRANT ALL ON TABLE public.notifications TO postgres;
+GRANT ALL ON TABLE public.notifications TO anon;
+GRANT ALL ON TABLE public.notifications TO authenticated;
+GRANT ALL ON TABLE public.notifications TO service_role;
+
+
+-- public.payment_gateways definição
+
+-- Drop table
+
+-- DROP TABLE public.payment_gateways;
+
+CREATE TABLE public.payment_gateways (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	gateway_type text NOT NULL,
+	is_active bool DEFAULT false NULL,
+	config jsonb NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT payment_gateways_community_id_gateway_type_key UNIQUE (community_id, gateway_type),
+	CONSTRAINT payment_gateways_pkey PRIMARY KEY (id),
+	CONSTRAINT payment_gateways_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 
-CREATE INDEX content_interactions_content_idx ON content_interactions(content_id);
-CREATE INDEX content_interactions_user_idx ON content_interactions(user_id);
-CREATE INDEX content_interactions_community_idx ON content_interactions(community_id);
-content_comments
+-- Permissions
 
-CREATE TABLE content_comments (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  content_id UUID NOT NULL REFERENCES content_items(id),
-  user_id TEXT NOT NULL,
-  comment TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  parent_id UUID REFERENCES content_comments(id)
+ALTER TABLE public.payment_gateways OWNER TO postgres;
+GRANT ALL ON TABLE public.payment_gateways TO postgres;
+GRANT ALL ON TABLE public.payment_gateways TO anon;
+GRANT ALL ON TABLE public.payment_gateways TO authenticated;
+GRANT ALL ON TABLE public.payment_gateways TO service_role;
+
+
+-- public.permissions definição
+
+-- Drop table
+
+-- DROP TABLE public.permissions;
+
+CREATE TABLE public.permissions (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	"role" text NOT NULL,
+	resource text NOT NULL,
+	"action" text NOT NULL,
+	conditions jsonb NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT permissions_community_id_role_resource_action_key UNIQUE (community_id, role, resource, action),
+	CONSTRAINT permissions_pkey PRIMARY KEY (id),
+	CONSTRAINT permissions_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 
-CREATE INDEX content_comments_content_id_idx ON content_comments(content_id);
-CREATE INDEX content_comments_user_id_idx ON content_comments(user_id);
-Cursos
-courses
+-- Permissions
 
-CREATE TABLE courses (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  content_id UUID NOT NULL REFERENCES content_items(id),
-  description TEXT,
-  curriculum JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+ALTER TABLE public.permissions OWNER TO postgres;
+GRANT ALL ON TABLE public.permissions TO postgres;
+GRANT ALL ON TABLE public.permissions TO anon;
+GRANT ALL ON TABLE public.permissions TO authenticated;
+GRANT ALL ON TABLE public.permissions TO service_role;
+
+
+-- public.points_activities definição
+
+-- Drop table
+
+-- DROP TABLE public.points_activities;
+
+CREATE TABLE public.points_activities (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	user_id text NOT NULL,
+	activity_type text NOT NULL,
+	points int4 NOT NULL,
+	description text NULL,
+	reference_id text NULL,
+	reference_type text NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT points_activities_pkey PRIMARY KEY (id),
+	CONSTRAINT points_activities_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
+);
+CREATE INDEX points_activities_created_idx ON public.points_activities USING btree (created_at);
+CREATE INDEX points_activities_type_idx ON public.points_activities USING btree (activity_type);
+CREATE INDEX points_activities_user_community_idx ON public.points_activities USING btree (user_id, community_id);
+
+-- Permissions
+
+ALTER TABLE public.points_activities OWNER TO postgres;
+GRANT ALL ON TABLE public.points_activities TO postgres;
+GRANT ALL ON TABLE public.points_activities TO anon;
+GRANT ALL ON TABLE public.points_activities TO authenticated;
+GRANT ALL ON TABLE public.points_activities TO service_role;
+
+
+-- public.posts definição
+
+-- Drop table
+
+-- DROP TABLE public.posts;
+
+CREATE TABLE public.posts (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	author_id text NOT NULL,
+	"content" text NOT NULL,
+	media_urls _text NULL,
+	visibility text DEFAULT 'public'::text NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT posts_pkey PRIMARY KEY (id),
+	CONSTRAINT posts_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
+);
+CREATE INDEX posts_author_id_idx ON public.posts USING btree (author_id);
+CREATE INDEX posts_community_id_idx ON public.posts USING btree (community_id);
+
+-- Permissions
+
+ALTER TABLE public.posts OWNER TO postgres;
+GRANT ALL ON TABLE public.posts TO postgres;
+GRANT ALL ON TABLE public.posts TO anon;
+GRANT ALL ON TABLE public.posts TO authenticated;
+GRANT ALL ON TABLE public.posts TO service_role;
+
+
+-- public.rewards definição
+
+-- Drop table
+
+-- DROP TABLE public.rewards;
+
+CREATE TABLE public.rewards (
+	id uuid NOT NULL,
+	"name" text NOT NULL,
+	description text NULL,
+	image_url text NULL,
+	points_cost int4 NOT NULL,
+	is_active bool DEFAULT true NULL,
+	quantity_available int4 NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	expires_at timestamptz NULL,
+	community_id uuid NULL,
+	CONSTRAINT rewards_pkey PRIMARY KEY (id),
+	CONSTRAINT rewards_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
+);
+CREATE INDEX rewards_community_id_idx ON public.rewards USING btree (community_id);
+
+-- Permissions
+
+ALTER TABLE public.rewards OWNER TO postgres;
+GRANT ALL ON TABLE public.rewards TO postgres;
+GRANT ALL ON TABLE public.rewards TO anon;
+GRANT ALL ON TABLE public.rewards TO authenticated;
+GRANT ALL ON TABLE public.rewards TO service_role;
+
+
+-- public.spaces definição
+
+-- Drop table
+
+-- DROP TABLE public.spaces;
+
+CREATE TABLE public.spaces (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	"name" text NOT NULL,
+	description text NULL,
+	"type" text NOT NULL,
+	icon text NULL,
+	banner_url text NULL,
+	config jsonb NULL,
+	visibility text DEFAULT 'public'::text NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT spaces_pkey PRIMARY KEY (id),
+	CONSTRAINT spaces_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
+);
+CREATE INDEX spaces_community_id_idx ON public.spaces USING btree (community_id);
+
+-- Permissions
+
+ALTER TABLE public.spaces OWNER TO postgres;
+GRANT ALL ON TABLE public.spaces TO postgres;
+GRANT ALL ON TABLE public.spaces TO anon;
+GRANT ALL ON TABLE public.spaces TO authenticated;
+GRANT ALL ON TABLE public.spaces TO service_role;
+
+
+-- public.subscription_plans definição
+
+-- Drop table
+
+-- DROP TABLE public.subscription_plans;
+
+CREATE TABLE public.subscription_plans (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	"name" text NOT NULL,
+	description text NULL,
+	price numeric(10, 2) NULL,
+	"interval" text DEFAULT 'month'::text NULL,
+	features jsonb NULL,
+	is_active bool DEFAULT true NULL,
+	trial_days int4 NULL,
+	max_members int4 NULL,
+	visibility text DEFAULT 'public'::text NULL,
+	progressive_content bool DEFAULT false NULL,
+	retention_days int4 NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT subscription_plans_pkey PRIMARY KEY (id),
+	CONSTRAINT subscription_plans_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
+);
+CREATE INDEX subscription_plans_community_id_idx ON public.subscription_plans USING btree (community_id);
+
+-- Permissions
+
+ALTER TABLE public.subscription_plans OWNER TO postgres;
+GRANT ALL ON TABLE public.subscription_plans TO postgres;
+GRANT ALL ON TABLE public.subscription_plans TO anon;
+GRANT ALL ON TABLE public.subscription_plans TO authenticated;
+GRANT ALL ON TABLE public.subscription_plans TO service_role;
+
+
+-- public.user_activity definição
+
+-- Drop table
+
+-- DROP TABLE public.user_activity;
+
+CREATE TABLE public.user_activity (
+	id uuid NOT NULL,
+	community_id uuid NOT NULL,
+	user_id text NOT NULL,
+	activity_type text NOT NULL,
+	metadata jsonb NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT user_activity_pkey PRIMARY KEY (id),
+	CONSTRAINT user_activity_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
+);
+CREATE INDEX user_activity_user_community_idx ON public.user_activity USING btree (user_id, community_id);
+
+-- Permissions
+
+ALTER TABLE public.user_activity OWNER TO postgres;
+GRANT ALL ON TABLE public.user_activity TO postgres;
+GRANT ALL ON TABLE public.user_activity TO anon;
+GRANT ALL ON TABLE public.user_activity TO authenticated;
+GRANT ALL ON TABLE public.user_activity TO service_role;
+
+
+-- public.user_badges definição
+
+-- Drop table
+
+-- DROP TABLE public.user_badges;
+
+CREATE TABLE public.user_badges (
+	id uuid NOT NULL,
+	badge_id uuid NULL,
+	user_id text NOT NULL,
+	community_id uuid NOT NULL,
+	awarded_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT user_badges_pkey PRIMARY KEY (id),
+	CONSTRAINT user_badges_user_id_badge_id_community_id_key UNIQUE (user_id, badge_id, community_id),
+	CONSTRAINT user_badges_badge_id_fkey FOREIGN KEY (badge_id) REFERENCES public.badges(id),
+	CONSTRAINT user_badges_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
+);
+CREATE INDEX user_badges_user_community_idx ON public.user_badges USING btree (user_id, community_id);
+
+-- Permissions
+
+ALTER TABLE public.user_badges OWNER TO postgres;
+GRANT ALL ON TABLE public.user_badges TO postgres;
+GRANT ALL ON TABLE public.user_badges TO anon;
+GRANT ALL ON TABLE public.user_badges TO authenticated;
+GRANT ALL ON TABLE public.user_badges TO service_role;
+
+
+-- public.user_points definição
+
+-- Drop table
+
+-- DROP TABLE public.user_points;
+
+CREATE TABLE public.user_points (
+	id serial4 NOT NULL,
+	user_id text NOT NULL,
+	points int4 DEFAULT 0 NULL,
+	last_updated timestamptz DEFAULT now() NULL,
+	community_id uuid NULL,
+	CONSTRAINT user_points_pkey PRIMARY KEY (id),
+	CONSTRAINT user_points_user_community_unique UNIQUE (user_id, community_id),
+	CONSTRAINT user_points_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
+);
+CREATE INDEX user_points_user_community_idx ON public.user_points USING btree (user_id, community_id);
+
+-- Permissions
+
+ALTER TABLE public.user_points OWNER TO postgres;
+GRANT ALL ON TABLE public.user_points TO postgres;
+GRANT ALL ON TABLE public.user_points TO anon;
+GRANT ALL ON TABLE public.user_points TO authenticated;
+GRANT ALL ON TABLE public.user_points TO service_role;
+
+
+-- public.content_items definição
+
+-- Drop table
+
+-- DROP TABLE public.content_items;
+
+CREATE TABLE public.content_items (
+	id uuid NOT NULL,
+	title text NOT NULL,
+	description text NULL,
+	format text NOT NULL,
+	thumbnail text NULL,
+	thumbnail_url text NULL,
+	resource_url text NULL,
+	author text NULL,
+	duration int4 NULL,
+	tags _text NULL,
+	access_level text DEFAULT 'free'::text NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	"views" int4 DEFAULT 0 NULL,
+	category_id text NULL,
+	visibility text DEFAULT 'public'::text NULL,
+	featured bool DEFAULT false NULL,
+	points_enabled bool DEFAULT false NULL,
+	points_value int4 DEFAULT 0 NULL,
+	completion_criteria text DEFAULT 'view'::text NULL,
+	completion_threshold int4 DEFAULT 80 NULL,
+	file_size int4 NULL,
+	community_id uuid NULL,
+	space_id uuid NULL,
+	CONSTRAINT content_items_pkey PRIMARY KEY (id),
+	CONSTRAINT content_items_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id),
+	CONSTRAINT content_items_space_id_fkey FOREIGN KEY (space_id) REFERENCES public.spaces(id)
+);
+CREATE INDEX content_items_community_id_idx ON public.content_items USING btree (community_id);
+CREATE INDEX content_items_space_id_idx ON public.content_items USING btree (space_id);
+
+-- Permissions
+
+ALTER TABLE public.content_items OWNER TO postgres;
+GRANT ALL ON TABLE public.content_items TO postgres;
+GRANT ALL ON TABLE public.content_items TO anon;
+GRANT ALL ON TABLE public.content_items TO authenticated;
+GRANT ALL ON TABLE public.content_items TO service_role;
+
+
+-- public.conversation_members definição
+
+-- Drop table
+
+-- DROP TABLE public.conversation_members;
+
+CREATE TABLE public.conversation_members (
+	id uuid NOT NULL,
+	conversation_id uuid NULL,
+	user_id text NOT NULL,
+	"role" text DEFAULT 'member'::text NULL,
+	joined_at timestamptz DEFAULT now() NULL,
+	last_read_at timestamptz NULL,
+	CONSTRAINT conversation_members_conversation_id_user_id_key UNIQUE (conversation_id, user_id),
+	CONSTRAINT conversation_members_pkey PRIMARY KEY (id),
+	CONSTRAINT conversation_members_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.conversations(id)
+);
+CREATE INDEX conversation_members_user_idx ON public.conversation_members USING btree (user_id);
+
+-- Permissions
+
+ALTER TABLE public.conversation_members OWNER TO postgres;
+GRANT ALL ON TABLE public.conversation_members TO postgres;
+GRANT ALL ON TABLE public.conversation_members TO anon;
+GRANT ALL ON TABLE public.conversation_members TO authenticated;
+GRANT ALL ON TABLE public.conversation_members TO service_role;
+
+
+-- public.discussion_topics definição
+
+-- Drop table
+
+-- DROP TABLE public.discussion_topics;
+
+CREATE TABLE public.discussion_topics (
+	id uuid NOT NULL,
+	"name" text NOT NULL,
+	description text NULL,
+	icon text NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	community_id uuid NULL,
+	space_id uuid NULL,
+	CONSTRAINT discussion_topics_pkey PRIMARY KEY (id),
+	CONSTRAINT discussion_topics_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id),
+	CONSTRAINT discussion_topics_space_id_fkey FOREIGN KEY (space_id) REFERENCES public.spaces(id)
+);
+CREATE INDEX discussion_topics_community_id_idx ON public.discussion_topics USING btree (community_id);
+
+-- Permissions
+
+ALTER TABLE public.discussion_topics OWNER TO postgres;
+GRANT ALL ON TABLE public.discussion_topics TO postgres;
+GRANT ALL ON TABLE public.discussion_topics TO anon;
+GRANT ALL ON TABLE public.discussion_topics TO authenticated;
+GRANT ALL ON TABLE public.discussion_topics TO service_role;
+
+
+-- public.discussions definição
+
+-- Drop table
+
+-- DROP TABLE public.discussions;
+
+CREATE TABLE public.discussions (
+	id uuid NOT NULL,
+	title text NOT NULL,
+	"content" text NOT NULL,
+	topic_id uuid NULL,
+	author_id text NOT NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	is_pinned bool DEFAULT false NULL,
+	view_count int4 DEFAULT 0 NULL,
+	is_closed bool DEFAULT false NULL,
+	community_id uuid NULL,
+	CONSTRAINT discussions_pkey PRIMARY KEY (id),
+	CONSTRAINT discussions_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id),
+	CONSTRAINT discussions_topic_id_fkey FOREIGN KEY (topic_id) REFERENCES public.discussion_topics(id)
+);
+CREATE INDEX discussions_author_id_idx ON public.discussions USING btree (author_id);
+CREATE INDEX discussions_community_id_idx ON public.discussions USING btree (community_id);
+CREATE INDEX discussions_topic_id_idx ON public.discussions USING btree (topic_id);
+
+-- Permissions
+
+ALTER TABLE public.discussions OWNER TO postgres;
+GRANT ALL ON TABLE public.discussions TO postgres;
+GRANT ALL ON TABLE public.discussions TO anon;
+GRANT ALL ON TABLE public.discussions TO authenticated;
+GRANT ALL ON TABLE public.discussions TO service_role;
+
+
+-- public.events definição
+
+-- Drop table
+
+-- DROP TABLE public.events;
+
+CREATE TABLE public.events (
+	id serial4 NOT NULL,
+	title text NOT NULL,
+	description text NULL,
+	"date" timestamptz NOT NULL,
+	"location" text NULL,
+	image_url text NULL,
+	event_type text NOT NULL,
+	capacity int4 NULL,
+	is_virtual bool DEFAULT false NULL,
+	meeting_link text NULL,
+	organizer_id text NULL,
+	is_featured bool DEFAULT false NULL,
+	points_awarded int4 DEFAULT 0 NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	community_id uuid NULL,
+	space_id uuid NULL,
+	CONSTRAINT events_pkey PRIMARY KEY (id),
+	CONSTRAINT events_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id),
+	CONSTRAINT events_space_id_fkey FOREIGN KEY (space_id) REFERENCES public.spaces(id)
+);
+CREATE INDEX events_community_id_idx ON public.events USING btree (community_id);
+CREATE INDEX events_date_idx ON public.events USING btree (date);
+
+-- Permissions
+
+ALTER TABLE public.events OWNER TO postgres;
+GRANT ALL ON TABLE public.events TO postgres;
+GRANT ALL ON TABLE public.events TO anon;
+GRANT ALL ON TABLE public.events TO authenticated;
+GRANT ALL ON TABLE public.events TO service_role;
+
+
+-- public.message_attachments definição
+
+-- Drop table
+
+-- DROP TABLE public.message_attachments;
+
+CREATE TABLE public.message_attachments (
+	id uuid NOT NULL,
+	message_id uuid NULL,
+	file_url text NOT NULL,
+	file_type text NOT NULL,
+	file_size int4 NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT message_attachments_pkey PRIMARY KEY (id),
+	CONSTRAINT message_attachments_message_id_fkey FOREIGN KEY (message_id) REFERENCES public.messages(id)
 );
 
-CREATE INDEX courses_content_id_idx ON courses(content_id);
-course_modules
+-- Permissions
 
-CREATE TABLE course_modules (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  course_id UUID NOT NULL REFERENCES courses(id),
-  title TEXT NOT NULL,
-  description TEXT,
-  sort_order INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+ALTER TABLE public.message_attachments OWNER TO postgres;
+GRANT ALL ON TABLE public.message_attachments TO postgres;
+GRANT ALL ON TABLE public.message_attachments TO anon;
+GRANT ALL ON TABLE public.message_attachments TO authenticated;
+GRANT ALL ON TABLE public.message_attachments TO service_role;
+
+
+-- public.post_comments definição
+
+-- Drop table
+
+-- DROP TABLE public.post_comments;
+
+CREATE TABLE public.post_comments (
+	id uuid NOT NULL,
+	post_id uuid NULL,
+	author_id text NOT NULL,
+	"content" text NOT NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT post_comments_pkey PRIMARY KEY (id),
+	CONSTRAINT post_comments_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.posts(id)
+);
+CREATE INDEX post_comments_post_id_idx ON public.post_comments USING btree (post_id);
+
+-- Permissions
+
+ALTER TABLE public.post_comments OWNER TO postgres;
+GRANT ALL ON TABLE public.post_comments TO postgres;
+GRANT ALL ON TABLE public.post_comments TO anon;
+GRANT ALL ON TABLE public.post_comments TO authenticated;
+GRANT ALL ON TABLE public.post_comments TO service_role;
+
+
+-- public.post_reactions definição
+
+-- Drop table
+
+-- DROP TABLE public.post_reactions;
+
+CREATE TABLE public.post_reactions (
+	id uuid NOT NULL,
+	post_id uuid NULL,
+	user_id text NOT NULL,
+	reaction_type text NOT NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT post_reactions_pkey PRIMARY KEY (id),
+	CONSTRAINT post_reactions_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.posts(id)
+);
+CREATE INDEX post_reactions_post_id_idx ON public.post_reactions USING btree (post_id);
+
+-- Permissions
+
+ALTER TABLE public.post_reactions OWNER TO postgres;
+GRANT ALL ON TABLE public.post_reactions TO postgres;
+GRANT ALL ON TABLE public.post_reactions TO anon;
+GRANT ALL ON TABLE public.post_reactions TO authenticated;
+GRANT ALL ON TABLE public.post_reactions TO service_role;
+
+
+-- public.redemptions definição
+
+-- Drop table
+
+-- DROP TABLE public.redemptions;
+
+CREATE TABLE public.redemptions (
+	id uuid NOT NULL,
+	user_id text NOT NULL,
+	reward_id uuid NULL,
+	redeemed_at timestamptz DEFAULT now() NULL,
+	status text DEFAULT 'pending'::text NULL,
+	fulfillment_details jsonb NULL,
+	community_id uuid NULL,
+	CONSTRAINT redemptions_pkey PRIMARY KEY (id),
+	CONSTRAINT redemptions_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id),
+	CONSTRAINT redemptions_reward_id_fkey FOREIGN KEY (reward_id) REFERENCES public.rewards(id)
+);
+CREATE INDEX redemptions_community_id_idx ON public.redemptions USING btree (community_id);
+CREATE INDEX redemptions_user_id_idx ON public.redemptions USING btree (user_id);
+
+-- Permissions
+
+ALTER TABLE public.redemptions OWNER TO postgres;
+GRANT ALL ON TABLE public.redemptions TO postgres;
+GRANT ALL ON TABLE public.redemptions TO anon;
+GRANT ALL ON TABLE public.redemptions TO authenticated;
+GRANT ALL ON TABLE public.redemptions TO service_role;
+
+
+-- public.discussion_replies definição
+
+-- Drop table
+
+-- DROP TABLE public.discussion_replies;
+
+CREATE TABLE public.discussion_replies (
+	id uuid NOT NULL,
+	"content" text NOT NULL,
+	discussion_id uuid NULL,
+	author_id text NOT NULL,
+	created_at timestamptz DEFAULT now() NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	is_solution bool DEFAULT false NULL,
+	CONSTRAINT discussion_replies_pkey PRIMARY KEY (id),
+	CONSTRAINT discussion_replies_discussion_id_fkey FOREIGN KEY (discussion_id) REFERENCES public.discussions(id)
 );
 
-CREATE INDEX course_modules_course_id_idx ON course_modules(course_id);
-course_module_items
+-- Permissions
 
-CREATE TABLE course_module_items (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  module_id UUID NOT NULL REFERENCES course_modules(id),
-  title TEXT NOT NULL,
-  type TEXT NOT NULL,
-  content TEXT,
-  content_id UUID REFERENCES content_items(id),
-  duration INTEGER,
-  sort_order INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  url TEXT,
-  resource_url TEXT
+ALTER TABLE public.discussion_replies OWNER TO postgres;
+GRANT ALL ON TABLE public.discussion_replies TO postgres;
+GRANT ALL ON TABLE public.discussion_replies TO anon;
+GRANT ALL ON TABLE public.discussion_replies TO authenticated;
+GRANT ALL ON TABLE public.discussion_replies TO service_role;
+
+
+-- public.event_attendees definição
+
+-- Drop table
+
+-- DROP TABLE public.event_attendees;
+
+CREATE TABLE public.event_attendees (
+	id serial4 NOT NULL,
+	event_id int4 NULL,
+	user_id text NOT NULL,
+	registered_at timestamptz DEFAULT now() NULL,
+	attended bool DEFAULT false NULL,
+	feedback text NULL,
+	CONSTRAINT event_attendees_event_id_user_id_key UNIQUE (event_id, user_id),
+	CONSTRAINT event_attendees_pkey PRIMARY KEY (id),
+	CONSTRAINT event_attendees_event_id_fkey FOREIGN KEY (event_id) REFERENCES public.events(id)
 );
 
-CREATE INDEX course_module_items_module_id_idx ON course_module_items(module_id);
-CREATE INDEX course_module_items_content_id_idx ON course_module_items(content_id);
-Eventos
-events
+-- Permissions
 
-CREATE TABLE events (
-  id SERIAL PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  title TEXT NOT NULL,
-  description TEXT,
-  date TIMESTAMP WITH TIME ZONE NOT NULL,
-  location TEXT,
-  image_url TEXT,
-  event_type TEXT NOT NULL,
-  capacity INTEGER,
-  is_virtual BOOLEAN DEFAULT false,
-  meeting_link TEXT,
-  organizer_id TEXT,
-  is_featured BOOLEAN DEFAULT false,
-  points_awarded INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  space_id UUID REFERENCES spaces(id),
-  start_date TIMESTAMP WITH TIME ZONE,
-  end_date TIMESTAMP WITH TIME ZONE,
-  timezone TEXT,
-  location_type TEXT CHECK (location_type IN ('online', 'in_person', 'hybrid')),
-  location_url TEXT,
-  location_address TEXT,
-  location_details TEXT,
-  max_attendees INTEGER,
-  access_level TEXT CHECK (access_level IN ('free', 'premium', 'premium_plus')),
-  speaker_id TEXT,
-  speaker_name TEXT,
-  speaker_bio TEXT,
-  speaker_avatar TEXT,
-  banner_url TEXT,
-  points_value INTEGER,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE INDEX events_community_id_idx ON events(community_id);
-CREATE INDEX events_date_idx ON events(date);
-CREATE INDEX events_space_id_idx ON events(space_id);
-event_attendees
-
-CREATE TABLE event_attendees (
-  id SERIAL PRIMARY KEY,
-  event_id INTEGER REFERENCES events(id),
-  user_id TEXT NOT NULL,
-  registered_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  attended BOOLEAN DEFAULT false,
-  feedback TEXT,
-  status TEXT CHECK (status IN ('registered', 'confirmed', 'attended', 'cancelled', 'no_show')),
-  notes TEXT,
-  registration_date TIMESTAMP WITH TIME ZONE,
-  checkin_date TIMESTAMP WITH TIME ZONE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(event_id, user_id)
-);
-
-CREATE INDEX event_attendees_event_id_idx ON event_attendees(event_id);
-CREATE INDEX event_attendees_user_id_idx ON event_attendees(user_id);
-event_series
-
-CREATE TABLE event_series (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  community_id UUID NOT NULL REFERENCES communities(id),
-  title TEXT NOT NULL,
-  description TEXT,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE INDEX event_series_community_id_idx ON event_series(community_id);
-Discussões e Posts
-discussion_topics
-
-CREATE TABLE discussion_topics (
-  id UUID PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  name TEXT NOT NULL,
-  description TEXT,
-  icon TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  space_id UUID REFERENCES spaces(id),
-  title TEXT,
-  color TEXT,
-  slug TEXT,
-  is_featured BOOLEAN DEFAULT false,
-  is_private BOOLEAN DEFAULT false,
-  access_level TEXT CHECK (access_level IN ('free', 'premium', 'premium_plus')),
-  discussion_count INTEGER DEFAULT 0,
-  member_count INTEGER DEFAULT 0,
-  recent_activity TIMESTAMP WITH TIME ZONE,
-  created_by TEXT
-);
-
-CREATE INDEX discussion_topics_community_id_idx ON discussion_topics(community_id);
-CREATE INDEX discussion_topics_space_id_idx ON discussion_topics(space_id);
-discussions
-
-CREATE TABLE discussions (
-  id UUID PRIMARY KEY,
-  title TEXT NOT NULL,
-  content TEXT NOT NULL,
-  topic_id UUID REFERENCES discussion_topics(id),
-  author_id TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  is_pinned BOOLEAN DEFAULT false,
-  view_count INTEGER DEFAULT 0,
-  is_closed BOOLEAN DEFAULT false,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  description TEXT,
-  tags TEXT[],
-  format TEXT CHECK (format IN ('question', 'discussion', 'announcement')),
-  is_locked BOOLEAN DEFAULT false,
-  is_featured BOOLEAN DEFAULT false,
-  is_anonymous BOOLEAN DEFAULT false,
-  votes INTEGER DEFAULT 0,
-  upvotes INTEGER DEFAULT 0,
-  downvotes INTEGER DEFAULT 0,
-  likes INTEGER DEFAULT 0,
-  comments INTEGER DEFAULT 0,
-  replies INTEGER DEFAULT 0,
-  participants INTEGER DEFAULT 0,
-  is_hot BOOLEAN DEFAULT false,
-  is_answered BOOLEAN DEFAULT false,
-  last_activity TIMESTAMP WITH TIME ZONE
-);
-
-CREATE INDEX discussions_topic_id_idx ON discussions(topic_id);
-CREATE INDEX discussions_community_id_idx ON discussions(community_id);
-CREATE INDEX discussions_author_id_idx ON discussions(author_id);
-discussion_replies
-
-CREATE TABLE discussion_replies (
-  id UUID PRIMARY KEY,
-  content TEXT NOT NULL,
-  discussion_id UUID REFERENCES discussions(id),
-  author_id TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  is_solution BOOLEAN DEFAULT false,
-  parent_id UUID REFERENCES discussion_replies(id),
-  is_answer BOOLEAN DEFAULT false,
-  upvotes INTEGER DEFAULT 0,
-  is_accepted_answer BOOLEAN DEFAULT false
-);
-
-CREATE INDEX discussion_replies_discussion_id_idx ON discussion_replies(discussion_id);
-CREATE INDEX discussion_replies_author_id_idx ON discussion_replies(author_id);
-CREATE INDEX discussion_replies_parent_id_idx ON discussion_replies(parent_id);
-discussion_votes
-
-CREATE TABLE discussion_votes (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  discussion_id UUID REFERENCES discussions(id),
-  user_id TEXT NOT NULL,
-  is_upvote BOOLEAN NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(discussion_id, user_id)
-);
-
-CREATE INDEX discussion_votes_discussion_id_idx ON discussion_votes(discussion_id);
-CREATE INDEX discussion_votes_user_id_idx ON discussion_votes(user_id);
-posts
-
-CREATE TABLE posts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  title TEXT NOT NULL,
-  content TEXT NOT NULL,
-  author_id TEXT NOT NULL,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  media_urls TEXT[],
-  is_featured BOOLEAN DEFAULT false,
-  tags TEXT[],
-  type TEXT NOT NULL,
-  status TEXT DEFAULT 'published',
-  view_count INTEGER DEFAULT 0,
-  comment_count INTEGER DEFAULT 0,
-  space_id UUID REFERENCES spaces(id),
-  pinned BOOLEAN DEFAULT false,
-  expires_at TIMESTAMP WITH TIME ZONE,
-  visibility TEXT DEFAULT 'public',
-  location JSONB
-);
-
-CREATE INDEX posts_community_id_idx ON posts(community_id);
-CREATE INDEX posts_author_id_idx ON posts(author_id);
-CREATE INDEX posts_space_id_idx ON posts(space_id);
-post_comments
-
-CREATE TABLE post_comments (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  content TEXT NOT NULL,
-  author_id TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  parent_id UUID REFERENCES post_comments(id) ON DELETE CASCADE
-);
-
-CREATE INDEX post_comments_post_id_idx ON post_comments(post_id);
-CREATE INDEX post_comments_author_id_idx ON post_comments(author_id);
-CREATE INDEX post_comments_parent_id_idx ON post_comments(parent_id);
-post_reactions
-
-CREATE TABLE post_reactions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  user_id TEXT NOT NULL,
-  reaction_type TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(post_id, user_id)
-);
-
-CREATE INDEX post_reactions_post_id_idx ON post_reactions(post_id);
-CREATE INDEX post_reactions_user_id_idx ON post_reactions(user_id);
-Sistema de Pontos
-user_points
-
-CREATE TABLE user_points (
-  id SERIAL PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  points INTEGER DEFAULT 0,
-  last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(user_id, community_id)
-);
-
-CREATE INDEX user_points_user_community_idx ON user_points(user_id, community_id);
-points_transactions
-
-CREATE TABLE points_transactions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id TEXT NOT NULL,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  points INTEGER NOT NULL,
-  source TEXT NOT NULL,
-  description TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  reference_id TEXT,
-  reference_type TEXT,
-  activity_type TEXT,
-  entity_id TEXT,
-  entity_type TEXT,
-  metadata JSONB
-);
-
-CREATE INDEX points_transactions_user_id_idx ON points_transactions(user_id);
-CREATE INDEX points_transactions_community_id_idx ON points_transactions(community_id);
-CREATE INDEX points_transactions_user_community_idx ON points_transactions(user_id, community_id);
-rewards
-
-CREATE TABLE rewards (
-  id UUID PRIMARY KEY,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  name TEXT NOT NULL,
-  description TEXT,
-  image_url TEXT,
-  points_cost INTEGER NOT NULL,
-  is_active BOOLEAN DEFAULT true,
-  quantity_available INTEGER,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  expires_at TIMESTAMP WITH TIME ZONE,
-  redemption_instructions TEXT,
-  reward_type TEXT,
-  title TEXT,
-  stock INTEGER,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  redeem_count INTEGER DEFAULT 0,
-  action_url TEXT,
-  visibility TEXT,
-  category_id TEXT
-);
-
-CREATE INDEX rewards_community_id_idx ON rewards(community_id);
-redemptions
-
-CREATE TABLE redemptions (
-  id UUID PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  reward_id UUID REFERENCES rewards(id),
-  redeemed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  status TEXT DEFAULT 'pending',
-  fulfillment_details JSONB,
-  community_id UUID NOT NULL REFERENCES communities(id),
-  points_spent INTEGER,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE INDEX redemptions_user_id_idx ON redemptions(user_id);
-CREATE INDEX redemptions_community_id_idx ON redemptions(community_id);
-CREATE INDEX redemptions_reward_id_idx ON redemptions(reward_id);
-points_settings
-
-CREATE TABLE points_settings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  community_id UUID NOT NULL REFERENCES communities(id) UNIQUE,
-  activity_rewards JSONB NOT NULL,
-  redemption_enabled BOOLEAN DEFAULT true,
-  welcome_bonus INTEGER DEFAULT 0,
-  referral_bonus INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE INDEX points_settings_community_id_idx ON points_settings(community_id);
-Usuários e Perfis
-profiles
-
-CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id),
-  name TEXT,
-  email TEXT UNIQUE,
-  avatar_url TEXT,
-  bio TEXT,
-  website TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  display_name TEXT,
-  role TEXT,
-  access_level TEXT CHECK (access_level IN ('free', 'premium', 'premium_plus'))
-);
-
-CREATE INDEX profiles_email_idx ON profiles(email);
-Funções SQL Importantes
-
--- Incrementar visualizações de conteúdo
-CREATE OR REPLACE FUNCTION increment_content_views(content_id_param UUID)
-RETURNS void AS $$
-BEGIN
-  UPDATE content_items
-  SET views = views + 1
-  WHERE id = content_id_param;
-END;
-$$ LANGUAGE plpgsql;
-
--- Incrementar visualizações de discussão
-CREATE OR REPLACE FUNCTION increment_discussion_views(discussion_id_param UUID)
-RETURNS void AS $$
-BEGIN
-  UPDATE discussions
-  SET view_count = view_count + 1
-  WHERE id = discussion_id_param;
-END;
-$$ LANGUAGE plpgsql;
-
--- Incrementar comentários de post
-CREATE OR REPLACE FUNCTION increment_post_comments(post_id_param UUID)
-RETURNS void AS $$
-BEGIN
-  UPDATE posts
-  SET comment_count = comment_count + 1
-  WHERE id = post_id_param;
-END;
-$$ LANGUAGE plpgsql;
-
--- Decrementar comentários de post
-CREATE OR REPLACE FUNCTION decrement_post_comments(post_id_param UUID)
-RETURNS void AS $$
-BEGIN
-  UPDATE posts
-  SET comment_count = GREATEST(comment_count - 1, 0)
-  WHERE id = post_id_param;
-END;
-$$ LANGUAGE plpgsql;
-
--- Adicionar pontos a um usuário
-CREATE OR REPLACE FUNCTION add_points(user_id TEXT, community_id UUID, points_to_add INTEGER)
-RETURNS INTEGER AS $$
-DECLARE
-  current_points INTEGER;
-BEGIN
-  INSERT INTO user_points (user_id, community_id, points)
-  VALUES (user_id, community_id, points_to_add)
-  ON CONFLICT (user_id, community_id) DO UPDATE
-  SET points = user_points.points + points_to_add,
-      last_updated = NOW()
-  RETURNING points INTO current_points;
-  
-  RETURN current_points;
-END;
-$$ LANGUAGE plpgsql;
-
--- Funções para contexto de tenant
-CREATE OR REPLACE FUNCTION set_tenant_context(community_uuid UUID)
-RETURNS void AS $$
-BEGIN
-  PERFORM set_config('app.current_tenant', community_uuid::text, false);
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION get_tenant_context()
-RETURNS UUID AS $$
-BEGIN
-  RETURN current_setting('app.current_tenant', true)::UUID;
-EXCEPTION
-  WHEN OTHERS THEN
-    RETURN NULL::UUID;
-END;
-$$ LANGUAGE plpgsql;
+ALTER TABLE public.event_attendees OWNER TO postgres;
+GRANT ALL ON TABLE public.event_attendees TO postgres;
+GRANT ALL ON TABLE public.event_attendees TO anon;
+GRANT ALL ON TABLE public.event_attendees TO authenticated;
+GRANT ALL ON TABLE public.event_attendees TO service_role;

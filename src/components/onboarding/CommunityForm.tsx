@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,7 +6,9 @@ import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { toast } from '@/components/ui/use-toast';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { api } from '../../api';
 
 interface FormData {
   communityName: string;
@@ -19,33 +20,88 @@ const CommunityForm: React.FC = () => {
     communityName: '',
     communityUrl: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showBadge, setShowBadge] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Salvar dados da comunidade
-    localStorage.setItem('communityData', JSON.stringify(formData));
-    localStorage.setItem('onboardingStep', '4');
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create a community",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     
-    // Mostrar feedback
-    toast({
-      title: "🎖️ Achievement Unlocked!",
-      description: "Community details saved (+15 XP)",
-      duration: 3000,
-    });
-    
-    // Navegar para próxima etapa
-    navigate('/onboarding/creator');
+    try {
+      // Create the community in Supabase
+      const { error: communityError } = await api.supabase
+        .from('communities')
+        .insert([{
+          name: formData.communityName,
+          description: 'A new learning community',
+          creator_id: user.id,
+          domain: formData.communityUrl.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+          status: 'active',
+          theme_config: {}, // Initialize empty theme config
+          api_keys: {}, // Initialize empty API keys
+          is_private: false // Default to public community
+        }]);
+
+      if (communityError) {
+        console.error('Community creation error:', communityError);
+        throw communityError;
+      }
+
+      // Show achievement badge
+      setShowBadge(true);
+      
+      // Show success toast
+      toast({
+        title: "🎖️ Achievement Unlocked!",
+        description: "Community created successfully (+15 XP)",
+        duration: 3000,
+      });
+      
+      // Save step progress
+      localStorage.setItem('onboardingStep', '4');
+      
+      // Navigate to next step after a brief delay
+      setTimeout(() => {
+        navigate('/onboarding/templates');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error creating community:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create community",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto relative">
+      {showBadge && (
+        <div className="absolute -top-5 -right-5 bg-nortech-purple text-white p-2 rounded-full animate-bounce shadow-lg">
+          <Sparkles className="h-6 w-6" />
+        </div>
+      )}
+      
       <CardContent className="pt-6">
         <div className="flex flex-col items-center mb-6">
           <div className="w-20 h-20 bg-nortech-purple rounded-lg flex items-center justify-center mb-4">
@@ -73,6 +129,7 @@ const CommunityForm: React.FC = () => {
               onChange={handleChange}
               placeholder="Your Community Name"
               required
+              disabled={isSubmitting}
             />
           </div>
           
@@ -86,6 +143,7 @@ const CommunityForm: React.FC = () => {
                 onChange={handleChange}
                 placeholder="your-community"
                 required
+                disabled={isSubmitting}
                 className="rounded-r-none"
               />
               <div className="inline-flex items-center justify-center rounded-r-md border border-l-0 border-input bg-background px-3 text-sm text-muted-foreground">
@@ -98,8 +156,9 @@ const CommunityForm: React.FC = () => {
             <Button 
               type="submit" 
               className="w-full bg-nortech-purple hover:bg-nortech-purple/90"
+              disabled={isSubmitting}
             >
-              Continue <ArrowRight className="ml-2 h-4 w-4" />
+              {isSubmitting ? "Creating..." : "Continue"} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </form>

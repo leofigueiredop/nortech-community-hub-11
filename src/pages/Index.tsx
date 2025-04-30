@@ -134,7 +134,7 @@ const Index: React.FC = () => {
               </Link>
             </Button>
             <Button asChild className="bg-nortech-purple hover:bg-nortech-purple/90">
-              <Link to="/onboarding/community">
+              <Link to="/onboarding">
                 <Plus size={16} className="mr-1" />
                 Create Community
               </Link>

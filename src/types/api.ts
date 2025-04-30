@@ -1,8 +1,10 @@
 // API Response types
 export interface ApiResponse<T = any> {
   data?: T;
-  error?: string;
-  status: number;
+  error?: {
+    message: string;
+    code?: string;
+  };
 }
 
 // Base Repository interface
@@ -11,25 +13,42 @@ export interface BaseRepository {
 }
 
 // Auth types
-export type AuthUser = {
+export interface Result<T> {
+  ok: boolean;
+  data?: T;
+  error?: {
+    message: string;
+    code?: string;
+  };
+}
+
+export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  accessLevel?: 'free' | 'pro' | 'admin';
-  interests?: string[];
-  isOnboarded?: boolean;
-};
+  role: string;
+  accessLevel: 'free' | 'premium' | 'creator';
+  interests: string[];
+  isOnboarded: boolean;
+  communityId?: string;
+  communityRole?: 'admin' | 'moderator' | 'member';
+}
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
+export interface AuthSession {
+  access_token: string;
+  refresh_token: string;
+  expires_at: number;
 }
 
 export interface AuthResponse {
   user: AuthUser;
-  session: {
-    access_token: string;
-    refresh_token: string;
-    expires_at: number;
-  };
+  session: AuthSession | null;
 }
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+  role?: string;
+}
+
+export type SignupType = 'member' | 'community_creator' | 'content_creator';

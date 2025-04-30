@@ -34,3 +34,6 @@ node_modules/
 # Task files
 tasks.json
 tasks/ 
+.cursor/mcp.json
+scripts/task-complexity-report.json
+supabase/.temp/cli-latest
