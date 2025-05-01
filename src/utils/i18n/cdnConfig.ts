@@ -19,8 +19,8 @@ interface CDNConfig {
  * Default CDN configuration
  */
 const defaultConfig: CDNConfig = {
-  baseUrl: process.env.NEXT_PUBLIC_TRANSLATIONS_CDN_URL || '/locales',
-  version: process.env.NEXT_PUBLIC_TRANSLATIONS_VERSION || '1.0.0',
+  baseUrl: import.meta.env.VITE_TRANSLATIONS_CDN_URL || '/locales',
+  version: import.meta.env.VITE_TRANSLATIONS_VERSION || '1.0.0',
   cacheDuration: 24 * 60 * 60, // 24 hours
   fallbackUrl: '/locales'
 };

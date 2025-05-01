@@ -1,5 +1,7 @@
 {
-  "welcome": "Welcome to Nortech Community",
+  "welcome": {
+    "title": "Welcome to Nortech Community"
+  },
   "language": {
     "select": "Select Language",
     "en-US": "English",

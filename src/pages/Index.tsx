@@ -144,11 +144,6 @@ const Index: React.FC = () => {
         </div>
       </header>
       
-      {/* Language Test */}
-      <div className="container mx-auto px-4 py-8">
-        <LanguageTest />
-      </div>
-      
       {/* Hero section */}
       <section className="py-10 md:py-16">
         <div className="container mx-auto px-4">

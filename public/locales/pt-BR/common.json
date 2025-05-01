@@ -1,5 +1,7 @@
 {
-  "welcome": "Bem-vindo à Comunidade Nortech",
+  "welcome": {
+    "title": "Bem-vindo à Comunidade Nortech"
+  },
   "language": {
     "select": "Selecionar Idioma",
     "en-US": "Inglês",
