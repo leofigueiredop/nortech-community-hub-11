@@ -1,0 +1,74 @@
+{
+  "items": {
+    "zero": "No items",
+    "one": "One item",
+    "other": "{{count}} items"
+  },
+  "messages": {
+    "zero": "No messages",
+    "one": "You have one message",
+    "other": "You have {{count}} messages"
+  },
+  "points": {
+    "zero": "No points earned",
+    "one": "{{count}} point earned",
+    "other": "{{count}} points earned"
+  },
+  "events": {
+    "attending": {
+      "zero": "Not attending any events",
+      "one": "Attending {{count}} event",
+      "other": "Attending {{count}} events"
+    },
+    "registered": {
+      "zero": "No registered events",
+      "one": "{{count}} registered event",
+      "other": "{{count}} registered events"
+    }
+  },
+  "discussions": {
+    "comments": {
+      "zero": "No comments yet",
+      "one": "{{count}} comment",
+      "other": "{{count}} comments"
+    },
+    "replies": {
+      "zero": "No replies yet",
+      "one": "{{count}} reply",
+      "other": "{{count}} replies"
+    }
+  },
+  "context": {
+    "user": {
+      "role": {
+        "admin": "Administrator",
+        "moderator": "Moderator",
+        "member": "Member"
+      },
+      "status": {
+        "online": "Online",
+        "offline": "Offline",
+        "away": "Away"
+      }
+    },
+    "post": {
+      "status": {
+        "draft": "Draft",
+        "published": "Published",
+        "archived": "Archived"
+      },
+      "visibility": {
+        "public": "Public",
+        "private": "Private",
+        "members": "Members Only"
+      }
+    }
+  },
+  "complex": {
+    "eventAttendance": "{{count, plural, =0 {No one is attending} =1 {One person is attending} other {# people are attending}}} this event",
+    "commentThread": "{{count, plural, =0 {Be the first to comment} =1 {One comment} other {# comments}}} on this thread",
+    "pointsEarned": "{{count, plural, =0 {No points earned today} =1 {Earned one point today} other {Earned # points today}}}",
+    "taskCompletion": "{{count, plural, =0 {No tasks completed} =1 {Completed one task} other {Completed # tasks}}} {{period, select, today {today} week {this week} month {this month} other {in total}}}",
+    "membershipDuration": "Member for {{count, plural, =0 {less than a day} =1 {one day} other {# days}}}"
+  }
+} 

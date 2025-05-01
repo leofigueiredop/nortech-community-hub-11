@@ -1,0 +1,53 @@
+{
+  "events": {
+    "create": {
+      "title": "Criar Evento",
+      "description": "Descrição do Evento",
+      "date": "Data do Evento",
+      "time": "Horário do Evento",
+      "location": "Localização",
+      "capacity": "Capacidade",
+      "type": {
+        "label": "Tipo de Evento",
+        "online": "Online",
+        "inPerson": "Presencial",
+        "hybrid": "Híbrido"
+      }
+    },
+    "filters": {
+      "upcoming": "Próximos",
+      "past": "Anteriores",
+      "myEvents": "Meus Eventos",
+      "registered": "Inscritos"
+    }
+  },
+  "discussions": {
+    "create": {
+      "title": "Criar Discussão",
+      "topic": "Tópico",
+      "content": "Conteúdo",
+      "tags": "Tags"
+    },
+    "actions": {
+      "reply": "Responder",
+      "share": "Compartilhar",
+      "report": "Denunciar",
+      "pin": "Fixar"
+    }
+  },
+  "points": {
+    "earn": {
+      "title": "Ganhar Pontos",
+      "description": "Complete ações para ganhar pontos",
+      "daily": "Login Diário",
+      "post": "Criar Publicação",
+      "comment": "Comentar",
+      "attend": "Participar de Evento"
+    },
+    "redeem": {
+      "title": "Resgatar Pontos",
+      "description": "Use seus pontos para obter recompensas",
+      "available": "Pontos Disponíveis"
+    }
+  }
+} 

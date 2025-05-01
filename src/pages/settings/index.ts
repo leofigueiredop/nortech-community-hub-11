@@ -3,24 +3,24 @@ import SettingsPage from './index.page';
 
 // Export the main settings page as default
 export default SettingsPage;
-
 // Export all settings components
-export { default as General } from './General';
-export { default as Branding } from './Branding';
-export { default as Integration } from './Integration';
-export { default as Domain } from './Domain';
-export { default as PointsConfiguration } from './PointsConfiguration';
-export { default as Migration } from './Migration';
-export { default as AIAgents } from './AIAgents';
-export { default as Notifications } from './Notifications';
-export { default as Plans } from './Plans';
-export { default as Paywall } from './Paywall';
-export { default as Subscriptions } from './Subscriptions';
-export { default as Legal } from './Legal';
-export { default as Marketing } from './Marketing';
-export { default as Posts } from './Posts';
-export { default as Spaces } from './Spaces';
-export { default as Moderation } from './Moderation';
-export { default as Workflows } from './Workflows';
-export { default as Analytics } from './Analytics';
-export { default as Affiliates } from './Affiliates';
+
+export { default as General } from './General.tsx';
+export { default as Branding } from './Branding.tsx';
+export { default as Integration } from './Integration.tsx';
+export { default as Domain } from './Domain.tsx';
+export { default as PointsConfiguration } from './PointsConfiguration.tsx';
+export { default as Migration } from './Migration.tsx';
+export { default as AIAgents } from './AIAgents.tsx';
+export { default as Notifications } from './Notifications.tsx';
+export { default as Plans } from './Plans.tsx';
+export { default as Paywall } from './Paywall.tsx';
+export { default as Subscriptions } from './Subscriptions.tsx';
+export { default as Legal } from './Legal.tsx';
+export { default as Marketing } from './Marketing.tsx';
+export { default as Posts } from './Posts.tsx';
+export { default as Spaces } from './Spaces.tsx';
+export { default as Moderation } from './Moderation.tsx';
+export { default as Workflows } from './Workflows.tsx';
+export { default as Analytics } from './Analytics.tsx';
+export { default as Affiliates } from './Affiliates.tsx';

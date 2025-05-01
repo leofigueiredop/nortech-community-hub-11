@@ -1,0 +1,26 @@
+{
+  "main": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "library": "Library",
+    "events": "Events",
+    "feed": "Feed",
+    "discussions": "Discussions",
+    "members": "Members"
+  },
+  "user": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log Out"
+  },
+  "events": {
+    "calendar": "Calendar View",
+    "weekly": "Weekly View",
+    "create": "Create Event"
+  },
+  "points": {
+    "dashboard": "Points Dashboard",
+    "store": "Points Store",
+    "leaderboard": "Leaderboard"
+  }
+} 

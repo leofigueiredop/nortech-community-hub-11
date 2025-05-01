@@ -1,0 +1,53 @@
+{
+  "events": {
+    "create": {
+      "title": "Create Event",
+      "description": "Event Description",
+      "date": "Event Date",
+      "time": "Event Time",
+      "location": "Location",
+      "capacity": "Capacity",
+      "type": {
+        "label": "Event Type",
+        "online": "Online",
+        "inPerson": "In Person",
+        "hybrid": "Hybrid"
+      }
+    },
+    "filters": {
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "myEvents": "My Events",
+      "registered": "Registered"
+    }
+  },
+  "discussions": {
+    "create": {
+      "title": "Create Discussion",
+      "topic": "Topic",
+      "content": "Content",
+      "tags": "Tags"
+    },
+    "actions": {
+      "reply": "Reply",
+      "share": "Share",
+      "report": "Report",
+      "pin": "Pin"
+    }
+  },
+  "points": {
+    "earn": {
+      "title": "Earn Points",
+      "description": "Complete actions to earn points",
+      "daily": "Daily Login",
+      "post": "Create Post",
+      "comment": "Comment",
+      "attend": "Attend Event"
+    },
+    "redeem": {
+      "title": "Redeem Points",
+      "description": "Use your points to get rewards",
+      "available": "Available Points"
+    }
+  }
+} 

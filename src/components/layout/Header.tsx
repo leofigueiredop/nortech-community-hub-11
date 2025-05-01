@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import LanguageSwitcher from '@/components/language/LanguageSwitcher';
 
 const Header: React.FC<{
   title?: string;
@@ -75,6 +76,8 @@ const Header: React.FC<{
           <NotificationBell />
           
           <PointsBadge size="sm" />
+          
+          <LanguageSwitcher />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
