@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import PricingPlans from '@/components/settings/PricingPlans';
+import { LanguageTest } from '@/components/LanguageTest';
 
 // Sample community data
 const communities = [
@@ -142,6 +143,11 @@ const Index: React.FC = () => {
           </div>
         </div>
       </header>
+      
+      {/* Language Test */}
+      <div className="container mx-auto px-4 py-8">
+        <LanguageTest />
+      </div>
       
       {/* Hero section */}
       <section className="py-10 md:py-16">

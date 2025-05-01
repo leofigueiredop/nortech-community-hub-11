@@ -1,0 +1,74 @@
+{
+  "items": {
+    "zero": "Nenhum item",
+    "one": "Um item",
+    "other": "{{count}} itens"
+  },
+  "messages": {
+    "zero": "Nenhuma mensagem",
+    "one": "Você tem uma mensagem",
+    "other": "Você tem {{count}} mensagens"
+  },
+  "points": {
+    "zero": "Nenhum ponto ganho",
+    "one": "{{count}} ponto ganho",
+    "other": "{{count}} pontos ganhos"
+  },
+  "events": {
+    "attending": {
+      "zero": "Não está participando de nenhum evento",
+      "one": "Participando de {{count}} evento",
+      "other": "Participando de {{count}} eventos"
+    },
+    "registered": {
+      "zero": "Nenhum evento registrado",
+      "one": "{{count}} evento registrado",
+      "other": "{{count}} eventos registrados"
+    }
+  },
+  "discussions": {
+    "comments": {
+      "zero": "Nenhum comentário ainda",
+      "one": "{{count}} comentário",
+      "other": "{{count}} comentários"
+    },
+    "replies": {
+      "zero": "Nenhuma resposta ainda",
+      "one": "{{count}} resposta",
+      "other": "{{count}} respostas"
+    }
+  },
+  "context": {
+    "user": {
+      "role": {
+        "admin": "Administrador",
+        "moderator": "Moderador",
+        "member": "Membro"
+      },
+      "status": {
+        "online": "Online",
+        "offline": "Offline",
+        "away": "Ausente"
+      }
+    },
+    "post": {
+      "status": {
+        "draft": "Rascunho",
+        "published": "Publicado",
+        "archived": "Arquivado"
+      },
+      "visibility": {
+        "public": "Público",
+        "private": "Privado",
+        "members": "Apenas Membros"
+      }
+    }
+  },
+  "complex": {
+    "eventAttendance": "{{count, plural, =0 {Ninguém está participando} =1 {Uma pessoa está participando} other {# pessoas estão participando}}} deste evento",
+    "commentThread": "{{count, plural, =0 {Seja o primeiro a comentar} =1 {Um comentário} other {# comentários}}} neste tópico",
+    "pointsEarned": "{{count, plural, =0 {Nenhum ponto ganho hoje} =1 {Ganhou um ponto hoje} other {Ganhou # pontos hoje}}}",
+    "taskCompletion": "{{count, plural, =0 {Nenhuma tarefa concluída} =1 {Concluiu uma tarefa} other {Concluiu # tarefas}}} {{period, select, today {hoje} week {esta semana} month {este mês} other {no total}}}",
+    "membershipDuration": "Membro por {{count, plural, =0 {menos de um dia} =1 {um dia} other {# dias}}}"
+  }
+} 
