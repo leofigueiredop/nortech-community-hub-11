@@ -1,0 +1,173 @@
+{
+  "fields": {
+    "username": {
+      "label": "Username",
+      "placeholder": "Enter your username",
+      "help": "Choose a unique username for your account",
+      "validation": {
+        "required": "Username is required",
+        "minLength": "Username must be at least {{count}} characters",
+        "maxLength": "Username cannot exceed {{count}} characters",
+        "pattern": "Username can only contain letters, numbers, and underscores",
+        "unique": "This username is already taken"
+      }
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Enter your password",
+      "help": "Password must be at least 8 characters long",
+      "validation": {
+        "required": "Password is required",
+        "minLength": "Password must be at least {{count}} characters",
+        "pattern": "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+        "match": "Passwords do not match"
+      }
+    },
+    "email": {
+      "label": "Email Address",
+      "placeholder": "Enter your email address",
+      "help": "We'll never share your email with anyone else",
+      "validation": {
+        "required": "Email address is required",
+        "format": "Please enter a valid email address",
+        "unique": "This email address is already registered"
+      }
+    },
+    "name": {
+      "label": "",
+      "placeholder": "",
+      "help": ""
+    },
+    "phone": {
+      "label": "Phone Number",
+      "placeholder": "Enter your phone number",
+      "help": "Format: +1 (555) 555-5555",
+      "validation": {
+        "required": "Phone number is required",
+        "format": "Please enter a valid phone number"
+      }
+    },
+    "address": {
+      "street": {
+        "label": "Street Address",
+        "placeholder": "Enter street address",
+        "validation": {
+          "required": "Street address is required"
+        }
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "Enter city",
+        "validation": {
+          "required": "City is required"
+        }
+      },
+      "state": {
+        "label": "State/Province",
+        "placeholder": "Select state/province",
+        "validation": {
+          "required": "State/Province is required"
+        }
+      },
+      "zip": {
+        "label": "ZIP/Postal Code",
+        "placeholder": "Enter ZIP/postal code",
+        "validation": {
+          "required": "ZIP/postal code is required",
+          "format": "Please enter a valid ZIP/postal code"
+        }
+      },
+      "country": {
+        "label": "Country",
+        "placeholder": "Select country",
+        "validation": {
+          "required": "Country is required"
+        }
+      }
+    },
+    "dateTime": {
+      "date": {
+        "label": "Date",
+        "placeholder": "Select date",
+        "validation": {
+          "required": "Date is required",
+          "future": "Date must be in the future",
+          "past": "Date must be in the past",
+          "range": "Date must be between {{start}} and {{end}}"
+        }
+      },
+      "time": {
+        "label": "Time",
+        "placeholder": "Select time",
+        "validation": {
+          "required": "Time is required",
+          "range": "Time must be between {{start}} and {{end}}"
+        }
+      }
+    },
+    "file": {
+      "label": "File Upload",
+      "placeholder": "Choose file(s)",
+      "help": "Maximum file size: {{size}}MB",
+      "validation": {
+        "required": "Please select a file",
+        "size": "File size cannot exceed {{size}}MB",
+        "type": "File type must be {{types}}",
+        "count": "You can upload up to {{count}} files"
+      }
+    }
+  },
+  "validation": {
+    "required": "",
+    "email": "",
+    "minLength": "",
+    "maxLength": "",
+    "pattern": "",
+    "match": "",
+    "unique": "",
+    "numeric": "",
+    "url": "",
+    "date": ""
+  },
+  "errors": {
+    "submission": "",
+    "network": "",
+    "validation": "",
+    "server": "",
+    "unknown": ""
+  },
+  "success": {
+    "saved": "",
+    "updated": "",
+    "deleted": "",
+    "submitted": ""
+  },
+  "buttons": {
+    "submit": "Submit Form",
+    "reset": "Reset Form",
+    "clear": "",
+    "cancel": "Cancel",
+    "back": "",
+    "next": "Next Step",
+    "save": {
+      "default": "Save",
+      "saving": "Saving...",
+      "saved": "Saved!",
+      "error": "Save Failed"
+    }
+  },
+  "messages": {
+    "success": "Form submitted successfully",
+    "error": "There was an error submitting the form",
+    "validation": "Please correct the errors before submitting",
+    "required": "Required fields are marked with {{marker}}",
+    "unsaved": "You have unsaved changes. Are you sure you want to leave?",
+    "loading": "Loading form data...",
+    "saving": "Saving form data..."
+  },
+  "progress": {
+    "step": "Step {{current}} of {{total}}",
+    "completion": "{{percent}}% complete",
+    "saved": "Last saved: {{time}}"
+  }
+} 

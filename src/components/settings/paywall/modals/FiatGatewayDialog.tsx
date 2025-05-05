@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -42,9 +41,7 @@ const FiatGatewayDialog: React.FC<FiatGatewayDialogProps> = ({
           <form className="space-y-6">
             <Alert>
               <Info className="h-4 w-4" />
-              <AlertDescription>
-                Your API keys are securely stored and encrypted. Never share them with anyone.
-              </AlertDescription>
+              <AlertDescription translationKey="settings.paywall.fiat.info" />
             </Alert>
 
             <FormField

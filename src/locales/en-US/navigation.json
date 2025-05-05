@@ -1,0 +1,52 @@
+{
+  "main": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "createSpace": "Create Space",
+    "posts": "Posts",
+    "discussions": "Discussions",
+    "courses": "Courses",
+    "events": "Events",
+    "liveStreams": "Live Streams",
+    "members": "Members",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "contentLibrary": "Content Library",
+    "matchmaker": "Matchmaker",
+    "points": "Points",
+    "createPost": "Create Post",
+    "createEvent": "Create Event"
+  },
+  "section": {
+    "getStarted": "Get Started",
+    "spaces": "Spaces",
+    "content": "Content",
+    "community": "Community",
+    "links": "Links",
+    "manage": "Manage"
+  },
+  "download": {
+    "android": "Download Android app",
+    "ios": "Download iOS app"
+  },
+  "user": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log Out"
+  },
+  "events": {
+    "calendar": "Calendar View",
+    "weekly": "Weekly View",
+    "create": "Create Event"
+  },
+  "points": {
+    "dashboard": "Points Dashboard",
+    "store": "Points Store",
+    "leaderboard": "Leaderboard"
+  },
+  "label": {
+    "members": "Members",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  }
+} 

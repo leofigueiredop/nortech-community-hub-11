@@ -1,0 +1,108 @@
+{
+  "fields": {
+    "required": "Required",
+    "optional": "Optional",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone Number",
+    "address": "Address",
+    "city": "City",
+    "state": "State",
+    "country": "Country",
+    "zipCode": "ZIP Code"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Must be at least {{count}} characters",
+    "maxLength": "Must be no more than {{count}} characters",
+    "passwordMatch": "Passwords must match",
+    "invalidFormat": "Invalid format",
+    "numeric": "Must be a number",
+    "url": "Please enter a valid URL",
+    "date": "Please enter a valid date",
+    "phone": "Please enter a valid phone number",
+    "unique": "This value must be unique",
+    "alreadyAdded": "This {{field}} is already added",
+    "pattern": "Invalid format for {{field}}",
+    "min": "Value must be at least {{min}}",
+    "max": "Value must be at most {{max}}",
+    "between": "Value must be between {{min}} and {{max}}",
+    "oneOf": "Value must be one of: {{values}}",
+    "notOneOf": "Value must not be one of: {{values}}",
+    "matches": "Value must match the required pattern",
+    "emailArray": "All emails must be valid",
+    "arrayMin": "At least {{count}} item(s) required",
+    "arrayMax": "No more than {{count}} item(s) allowed",
+    "boolean": "Must be true or false",
+    "accepted": "You must accept the {{field}}",
+    "custom": "{{message}}"
+  },
+  "placeholders": {
+    "email": "Enter your email address",
+    "password": "Enter your password",
+    "search": "Search...",
+    "phone": "Enter your phone number",
+    "address": "Enter your address"
+  },
+  "label": {
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "username": "Username",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone Number",
+    "address": "Address",
+    "city": "City",
+    "state": "State",
+    "country": "Country",
+    "zipCode": "ZIP Code"
+  },
+  "placeholder": {
+    "email": "Enter your email address",
+    "password": "Enter your password",
+    "confirmPassword": "Confirm your password",
+    "username": "Choose a username",
+    "search": "Search...",
+    "select": "Select an option"
+  },
+  "helper": {
+    "password": "Must contain at least 8 characters, including uppercase, lowercase, and numbers",
+    "optional": "Optional",
+    "maxLength": "Maximum {{count}} characters"
+  },
+  "error": {
+    "submission": "There was an error submitting the form",
+    "required": "Please fill in all required fields",
+    "invalid": "Please correct the errors before submitting",
+    "network": "Network error, please try again later",
+    "server": "Server error, please contact support",
+    "notFound": "Resource not found",
+    "forbidden": "You do not have permission to perform this action"
+  },
+  "success": {
+    "submission": "Form submitted successfully",
+    "saved": "Changes saved successfully"
+  },
+  "button": {
+    "submit": "Submit",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "reset": "Reset Form",
+    "edit": "Edit"
+  }
+} 

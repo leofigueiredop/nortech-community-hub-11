@@ -1,0 +1,74 @@
+{
+  "items": {
+    "zero": "No items",
+    "one": "1 item",
+    "other": "{{count}} items",
+    "withOwner": {
+      "zero": "{{owner}} has no items",
+      "one": "{{owner}} has 1 item",
+      "other": "{{owner}} has {{count}} items"
+    }
+  },
+  "messages": {
+    "zero": "No messages",
+    "one": "1 unread message",
+    "other": "{{count}} unread messages",
+    "withTime": {
+      "zero": "No messages received today",
+      "one": "1 message received {{time}} ago",
+      "other": "{{count}} messages received {{time}} ago"
+    }
+  },
+  "notifications": {
+    "zero": "No new notifications",
+    "one": "1 new notification",
+    "other": "{{count}} new notifications",
+    "withType": {
+      "zero": "No {{type}} notifications",
+      "one": "1 {{type}} notification",
+      "other": "{{count}} {{type}} notifications"
+    }
+  },
+  "files": {
+    "zero": "No files selected",
+    "one": "1 file selected",
+    "other": "{{count}} files selected",
+    "withSize": {
+      "zero": "No files (0 B)",
+      "one": "1 file ({{size}})",
+      "other": "{{count}} files ({{size}} total)"
+    }
+  },
+  "users": {
+    "zero": "No users online",
+    "one": "1 user online",
+    "other": "{{count}} users online",
+    "withStatus": {
+      "zero": "No {{status}} users",
+      "one": "1 {{status}} user",
+      "other": "{{count}} {{status}} users"
+    }
+  },
+  "complex": {
+    "taskCompletion": "{count, plural, =0 {No tasks completed} =1 {1 task completed} other {{count} tasks completed}} {progress, select, full {(all done)} partial {(in progress)} none {(not started)}}",
+    "userActivity": "{count, plural, =0 {No users} =1 {1 user} other {{count} users}} {action, select, view {viewing} edit {editing} delete {deleting}} {target, plural, =1 {this item} other {these items}}",
+    "fileUpload": "{count, plural, =0 {No files uploaded} =1 {1 file uploaded} other {{count} files uploaded}} ({size} {status, select, success {processed} pending {pending} error {failed}})",
+    "messageThread": "{count, plural, =0 {Empty thread} =1 {1 message} other {{count} messages}} in thread {status, select, active {(active)} archived {(archived)} locked {(locked)}}"
+  },
+  "timeAgo": {
+    "seconds": "{count, plural, =0 {just now} =1 {1 second ago} other {{count} seconds ago}}",
+    "minutes": "{count, plural, =1 {1 minute ago} other {{count} minutes ago}}",
+    "hours": "{count, plural, =1 {1 hour ago} other {{count} hours ago}}",
+    "days": "{count, plural, =1 {1 day ago} other {{count} days ago}}",
+    "weeks": "{count, plural, =1 {1 week ago} other {{count} weeks ago}}",
+    "months": "{count, plural, =1 {1 month ago} other {{count} months ago}}",
+    "years": "{count, plural, =1 {1 year ago} other {{count} years ago}}"
+  },
+  "duration": {
+    "lessThanMinute": "less than a minute",
+    "minutes": "{count, plural, =1 {1 minute} other {{count} minutes}}",
+    "hours": "{count, plural, =1 {1 hour} other {{count} hours}}",
+    "days": "{count, plural, =1 {1 day} other {{count} days}}",
+    "combined": "{hours} and {minutes}"
+  }
+} 

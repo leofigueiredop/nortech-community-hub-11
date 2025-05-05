@@ -36,7 +36,7 @@ export function useLanguagePreference(): UseLanguagePreference {
     languageService.on(LANGUAGE_EVENTS.LANGUAGE_CHANGED, handleLanguageChange);
 
     return () => {
-      languageService.removeListener(LANGUAGE_EVENTS.LANGUAGE_CHANGED, handleLanguageChange);
+      languageService.off(LANGUAGE_EVENTS.LANGUAGE_CHANGED, handleLanguageChange);
     };
   }, []);
 

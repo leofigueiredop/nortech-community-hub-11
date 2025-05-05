@@ -1,0 +1,70 @@
+{
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "confirmAction": "Yes, {{action}}",
+    "loading": "{{action}}ing..."
+  },
+  "messages": {
+    "loading": "Loading...",
+    "success": "Operation completed successfully",
+    "error": "An error occurred: {{message}}",
+    "notFound": "{{item}} not found",
+    "confirmDelete": "Are you sure you want to delete {{item}}?",
+    "saved": "{{item}} has been saved successfully",
+    "updated": "{{item}} has been updated successfully",
+    "deleted": "{{item}} has been deleted successfully",
+    "welcome": "Welcome back, {{name}}!",
+    "sessionExpired": "Your session has expired. Please log in again."
+  },
+  "labels": {
+    "name": "Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "address": "Address",
+    "description": "Description",
+    "status": "Status",
+    "date": "Date",
+    "time": "Time",
+    "required": "{{field}} is required",
+    "optional": "{{field}} (optional)"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "completed": "Completed",
+    "failed": "Failed",
+    "cancelled": "Cancelled",
+    "withCount": "{{status}} ({{count}})"
+  },
+  "time": {
+    "now": "Just now",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "minutes": "{{count}} minute(s) ago",
+    "hours": "{{count}} hour(s) ago",
+    "days": "{{count}} day(s) ago",
+    "format": {
+      "short": "{{date, datetime(year: numeric, month: short, day: numeric)}}",
+      "long": "{{date, datetime(weekday: long, year: numeric, month: long, day: numeric)}}",
+      "time": "{{date, datetime(hour: numeric, minute: numeric)}}"
+    }
+  },
+  "validation": {
+    "required": "{{field}} is required",
+    "email": "Please enter a valid email address",
+    "minLength": "{{field}} must be at least {{count}} characters",
+    "maxLength": "{{field}} cannot exceed {{count}} characters",
+    "pattern": "{{field}} format is invalid",
+    "number": "{{field}} must be a number",
+    "date": "Please enter a valid date"
+  }
+} 

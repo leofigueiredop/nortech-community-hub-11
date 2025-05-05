@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -80,9 +79,10 @@ const DomainSettings: React.FC = () => {
       {domain && <DNSInstructions targetDomain="pablos-community-9de6af.nortech.app" />}
 
       <Alert className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900">
-        <AlertDescription className="text-blue-700 dark:text-blue-400 text-sm">
-          DNS propagation may take up to 24 hours. SSL certificates are automatically provisioned once DNS is verified.
-        </AlertDescription>
+        <AlertDescription 
+          className="text-blue-700 dark:text-blue-400 text-sm"
+          translationKey="settings.domain.dnsInfo"
+        />
       </Alert>
     </div>
   );

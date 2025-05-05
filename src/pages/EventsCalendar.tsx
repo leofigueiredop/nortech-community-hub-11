@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { format, addMonths, subMonths } from 'date-fns';
@@ -13,6 +12,7 @@ import { useNotifications } from '@/context/NotificationsContext';
 import { EventType } from '@/components/events/types/EventTypes';
 import { usePoints } from '@/context/PointsContext';
 import EventConfirmDialog from '@/components/events/EventConfirmDialog';
+import { useTranslation } from 'react-i18next';
 
 const EventsCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -27,6 +27,7 @@ const EventsCalendar = () => {
   const { toast } = useToast();
   const { addNotification } = useNotifications();
   const { awardPoints } = usePoints();
+  const { t } = useTranslation();
 
   // Filter events when selectedTypes or premium filter changes
   useEffect(() => {
@@ -112,15 +113,13 @@ const EventsCalendar = () => {
   };
 
   return (
-    <MainLayout title="Calendar View">
+    <MainLayout title={t('events.calendar.title')}>
       <div className="container py-6">
         <div className="mb-6">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-bold">Calendar View</h1>
-              <p className="text-muted-foreground">
-                Browse events in a calendar format
-              </p>
+              <h1 className="text-2xl font-bold">{t('events.calendar.title')}</h1>
+              <p className="text-muted-foreground">{t('events.calendar.description')}</p>
             </div>
             
             <div className="flex items-center gap-3">
@@ -131,7 +130,7 @@ const EventsCalendar = () => {
                   onClick={() => setSelectedPremiumFilter('all')}
                   className="rounded-sm text-xs"
                 >
-                  All
+                  {t('events.calendar.filter.all')}
                 </Button>
                 <Button
                   variant={selectedPremiumFilter === 'premium' ? 'default' : 'ghost'}
@@ -139,7 +138,7 @@ const EventsCalendar = () => {
                   onClick={() => setSelectedPremiumFilter('premium')}
                   className="rounded-sm text-xs"
                 >
-                  Premium
+                  {t('events.calendar.filter.premium')}
                 </Button>
                 <Button
                   variant={selectedPremiumFilter === 'free' ? 'default' : 'ghost'}
@@ -147,7 +146,7 @@ const EventsCalendar = () => {
                   onClick={() => setSelectedPremiumFilter('free')}
                   className="rounded-sm text-xs"
                 >
-                  Free
+                  {t('events.calendar.filter.free')}
                 </Button>
               </div>
               
@@ -155,20 +154,20 @@ const EventsCalendar = () => {
                 <Link to="/events/calendar">
                   <Button variant="ghost" size="sm" className="rounded-none bg-muted">
                     <Calendar size={16} className="mr-2" />
-                    <span>Calendar</span>
+                    <span>{t('events.calendar.button.calendar')}</span>
                   </Button>
                 </Link>
                 <Link to="/events">
                   <Button variant="ghost" size="sm" className="rounded-none">
                     <List size={16} className="mr-2" />
-                    <span>List</span>
+                    <span>{t('events.calendar.button.list')}</span>
                   </Button>
                 </Link>
               </div>
               
               <Link to="/create-event">
                 <Button className="bg-nortech-purple hover:bg-nortech-purple/90">
-                  + Create Event
+                  {t('events.calendar.button.create')}
                 </Button>
               </Link>
             </div>
@@ -194,7 +193,7 @@ const EventsCalendar = () => {
               size="sm"
               onClick={() => setCurrentMonth(new Date())}
             >
-              Today
+              {t('events.calendar.button.today')}
             </Button>
           </div>
 

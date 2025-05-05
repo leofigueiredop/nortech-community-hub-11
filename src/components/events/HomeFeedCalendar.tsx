@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { format, isAfter, isBefore, addDays } from 'date-fns';
 import { ChevronRight, Calendar } from 'lucide-react';
 import { EVENT_TYPES, Event } from './EventTypes';
+import { useTranslation } from 'react-i18next';
 
 interface HomeFeedCalendarProps {
   events: Event[];
@@ -19,6 +19,7 @@ const HomeFeedCalendar: React.FC<HomeFeedCalendarProps> = ({
 }) => {
   const today = new Date();
   const nextWeek = addDays(today, 7);
+  const { t } = useTranslation();
   
   // Filter upcoming events for next 7 days
   const upcomingEvents = events
@@ -30,10 +31,11 @@ const HomeFeedCalendar: React.FC<HomeFeedCalendarProps> = ({
     <Card>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-lg">Upcoming Events</CardTitle>
+          <CardTitle className="text-lg">{/* @ts-expect-error i18next typing */}{t('calendar.upcomingEvents')}</CardTitle>
           <Link to="/events">
             <Button variant="ghost" size="sm" className="text-nortech-purple">
-              View all
+              {/* @ts-expect-error i18next typing */}
+              {t('calendar.viewAll')}
               <ChevronRight size={16} />
             </Button>
           </Link>
@@ -57,7 +59,8 @@ const HomeFeedCalendar: React.FC<HomeFeedCalendarProps> = ({
                       <h3 className="font-medium text-sm">{event.title}</h3>
                       <Badge className={`ml-2 flex items-center ${eventType.color}`}>
                         {eventType.icon}
-                        {eventType.label}
+                        {/* @ts-expect-error i18next typing */}
+                        {t(`eventType.${event.type}`)}
                       </Badge>
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
@@ -71,10 +74,11 @@ const HomeFeedCalendar: React.FC<HomeFeedCalendarProps> = ({
         ) : (
           <div className="py-6 text-center text-gray-500">
             <Calendar className="h-10 w-10 mx-auto mb-2 text-gray-400" />
-            <p>No upcoming events in the next 7 days</p>
+            <p>{/* @ts-expect-error i18next typing */}{t('calendar.noUpcomingEvents')}</p>
             <Link to="/events">
               <Button variant="link" className="mt-2 text-nortech-purple">
-                View all events
+                {/* @ts-expect-error i18next typing */}
+                {t('calendar.viewAllEvents')}
               </Button>
             </Link>
           </div>

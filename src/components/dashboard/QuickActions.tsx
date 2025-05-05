@@ -1,13 +1,14 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Users, FileText, Calendar, Palette, Megaphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 const QuickActions: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   
   const handleCreatePost = () => {
     navigate('/create-post');
@@ -45,65 +46,65 @@ const QuickActions: React.FC = () => {
   
   const actions = [
     {
-      title: 'Create Post',
+      title: t('common:dashboard.quickActions.createPost'),
       icon: <FileText size={18} />,
       emoji: '📝',
       onClick: handleCreatePost,
       bgColor: 'bg-blue-50',
       iconColor: 'text-blue-500',
-      description: 'Share your ideas'
+      description: t('common:dashboard.quickActions.shareIdeas')
     },
     {
-      title: 'Invite Members',
+      title: t('common:dashboard.quickActions.inviteMembers'),
       icon: <Users size={18} />,
       emoji: '📨',
       onClick: handleInviteMembers,
       bgColor: 'bg-green-50',
       iconColor: 'text-green-500',
-      description: 'Grow your community'
+      description: t('common:dashboard.quickActions.growCommunity')
     },
     {
-      title: 'Schedule Event',
+      title: t('common:dashboard.quickActions.scheduleEvent'),
       icon: <Calendar size={18} />,
       emoji: '📅',
       onClick: handleScheduleEvent,
       bgColor: 'bg-purple-50',
       iconColor: 'text-purple-500',
-      description: 'Host a session'
+      description: t('common:dashboard.quickActions.hostSession')
     },
     {
-      title: 'Create Space',
+      title: t('common:dashboard.quickActions.createSpace'),
       icon: <PlusCircle size={18} />,
       emoji: '🧩',
       onClick: handleCreateSpace,
       bgColor: 'bg-orange-50',
       iconColor: 'text-orange-500',
-      description: 'Organize topics'
+      description: t('common:dashboard.quickActions.organizeTopics')
     },
     {
-      title: 'Customize Brand',
+      title: t('common:dashboard.quickActions.customizeBrand'),
       icon: <Palette size={18} />,
       emoji: '🎨',
       onClick: handleCustomizeBrand,
       bgColor: 'bg-pink-50',
       iconColor: 'text-pink-500',
-      description: 'Personalize look'
+      description: t('common:dashboard.quickActions.personalizeLook')
     },
     {
-      title: 'Send Announcement',
+      title: t('common:dashboard.quickActions.sendAnnouncement'),
       icon: <Megaphone size={18} />,
       emoji: '📢',
       onClick: handleSendAnnouncement,
       bgColor: 'bg-teal-50',
       iconColor: 'text-teal-500',
-      description: 'Alert all members'
+      description: t('common:dashboard.quickActions.alertAll')
     }
   ];
   
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Quick Actions</CardTitle>
+        <CardTitle className="text-lg">{t('common:dashboard.quickActions.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

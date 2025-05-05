@@ -1,0 +1,170 @@
+{
+  "userProfile": {
+    "title": "User Profile",
+    "sections": {
+      "personal": "Personal Information",
+      "preferences": "Preferences",
+      "security": "Security Settings",
+      "notifications": "Notification Settings"
+    },
+    "fields": {
+      "avatar": {
+        "upload": "Upload Avatar",
+        "remove": "Remove Avatar",
+        "dropzone": "Drop image here or click to upload"
+      },
+      "bio": {
+        "label": "Bio",
+        "placeholder": "Tell us about yourself"
+      },
+      "location": {
+        "label": "Location",
+        "placeholder": "Where are you based?"
+      },
+      "website": {
+        "label": "Website",
+        "placeholder": "Your website URL"
+      },
+      "social": {
+        "title": "Social Links",
+        "twitter": "Twitter Profile",
+        "linkedin": "LinkedIn Profile",
+        "github": "GitHub Profile"
+      }
+    },
+    "messages": {
+      "updateSuccess": "",
+      "updateError": "",
+      "deleteAccount": "",
+      "confirmDelete": ""
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {{name}}",
+    "stats": {
+      "title": "Overview",
+      "today": "Today",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "metrics": {
+        "views": "{{count}} views",
+        "likes": "{{count}} likes",
+        "comments": "{{count}} comments",
+        "shares": "{{count}} shares"
+      }
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "empty": "No recent activity",
+      "loadMore": "Load More",
+      "filters": {
+        "all": "All Activities",
+        "comments": "Comments",
+        "likes": "Likes",
+        "shares": "Shares"
+      }
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No new notifications",
+    "types": {
+      "mention": "{{user}} mentioned you in {{context}}",
+      "like": "{{user}} liked your {{content}}",
+      "comment": "{{user}} commented on your {{content}}",
+      "follow": "{{user}} started following you",
+      "share": "{{user}} shared your {{content}}"
+    },
+    "timeago": {
+      "justNow": "just now",
+      "minutes": "{{count}}m ago",
+      "hours": "{{count}}h ago",
+      "days": "{{count}}d ago"
+    },
+    "deleteAll": "",
+    "settings": {
+      "title": "",
+      "email": "",
+      "push": "",
+      "sms": ""
+    }
+  },
+  "search": {
+    "title": "",
+    "placeholder": "Search {{context}}...",
+    "noResults": "",
+    "filters": {
+      "title": "Search Filters",
+      "date": "Date Range",
+      "type": "Content Type",
+      "status": "Status",
+      "category": "Category"
+    },
+    "results": {
+      "count": "{{count}} results found",
+      "empty": "No results found for \"{{query}}\"",
+      "suggestions": "Try adjusting your search terms",
+      "loading": "Searching...",
+      "error": "Error performing search"
+    },
+    "sorting": {
+      "relevance": "Most Relevant",
+      "recent": "Most Recent",
+      "popular": "Most Popular"
+    }
+  },
+  "settings": {
+    "title": "",
+    "sections": {
+      "account": "",
+      "privacy": "",
+      "notifications": "",
+      "security": "",
+      "appearance": ""
+    },
+    "messages": {
+      "saved": "",
+      "error": "",
+      "confirmReset": ""
+    }
+  },
+  "sharing": {
+    "title": "Share {{type}}",
+    "copyLink": "Copy Link",
+    "copied": "Link copied!",
+    "social": {
+      "twitter": "Share on Twitter",
+      "facebook": "Share on Facebook",
+      "linkedin": "Share on LinkedIn",
+      "email": "Share via Email"
+    },
+    "messages": {
+      "success": "Successfully shared!",
+      "error": "Error sharing content"
+    }
+  },
+  "comments": {
+    "title": "Comments",
+    "count": "{{count}} comments",
+    "write": "Write a comment...",
+    "placeholder": "Share your thoughts...",
+    "submit": "Post Comment",
+    "reply": "Reply to {{user}}",
+    "edit": "Edit Comment",
+    "delete": "Delete Comment",
+    "confirmDelete": "Are you sure you want to delete this comment?",
+    "edited": "Edited {{timeago}}",
+    "loading": "Loading comments...",
+    "loadMore": "Load more comments",
+    "empty": "No comments yet. Be the first to comment!"
+  },
+  "errors": {
+    "feature": {
+      "unavailable": "This feature is currently unavailable",
+      "maintenance": "This feature is under maintenance",
+      "permission": "You don't have permission to use this feature",
+      "subscription": "This feature requires a {{plan}} subscription"
+    }
+  }
+} 

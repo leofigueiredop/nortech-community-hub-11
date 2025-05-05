@@ -1,6 +1,7 @@
 import * as React from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { Check, ChevronRight, Circle } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { cn } from "@/lib/utils"
 
@@ -29,19 +30,31 @@ const Menubar = React.forwardRef<
 ))
 Menubar.displayName = MenubarPrimitive.Root.displayName
 
+interface MenubarTriggerProps extends
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Trigger> {
+  translationKey?: string
+  values?: Record<string, any>
+}
+
 const MenubarTrigger = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Trigger>
->(({ className, ...props }, ref) => (
-  <MenubarPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      "flex cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm font-medium outline-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
-      className
-    )}
-    {...props}
-  />
-))
+  MenubarTriggerProps
+>(({ className, translationKey, values, children, ...props }, ref) => {
+  const { t } = useTranslation('common')
+  
+  return (
+    <MenubarPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        "flex cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm font-medium outline-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
+        className
+      )}
+      {...props}
+    >
+      {translationKey ? t(translationKey, values) : children}
+    </MenubarPrimitive.Trigger>
+  )
+})
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName
 
 const MenubarSubTrigger = React.forwardRef<
@@ -105,85 +118,127 @@ const MenubarContent = React.forwardRef<
 )
 MenubarContent.displayName = MenubarPrimitive.Content.displayName
 
+interface MenubarItemProps extends
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Item> {
+  translationKey?: string
+  values?: Record<string, any>
+  inset?: boolean
+}
+
 const MenubarItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Item> & {
-    inset?: boolean
-  }
->(({ className, inset, ...props }, ref) => (
-  <MenubarPrimitive.Item
-    ref={ref}
-    className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      inset && "pl-8",
-      className
-    )}
-    {...props}
-  />
-))
+  MenubarItemProps
+>(({ className, translationKey, values, children, inset, ...props }, ref) => {
+  const { t } = useTranslation('common')
+  
+  return (
+    <MenubarPrimitive.Item
+      ref={ref}
+      className={cn(
+        "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        inset && "pl-8",
+        className
+      )}
+      {...props}
+    >
+      {translationKey ? t(translationKey, values) : children}
+    </MenubarPrimitive.Item>
+  )
+})
 MenubarItem.displayName = MenubarPrimitive.Item.displayName
+
+interface MenubarCheckboxItemProps extends
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.CheckboxItem> {
+  translationKey?: string
+  values?: Record<string, any>
+}
 
 const MenubarCheckboxItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.CheckboxItem>,
-  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.CheckboxItem>
->(({ className, children, checked, ...props }, ref) => (
-  <MenubarPrimitive.CheckboxItem
-    ref={ref}
-    className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    )}
-    checked={checked}
-    {...props}
-  >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <MenubarPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
-      </MenubarPrimitive.ItemIndicator>
-    </span>
-    {children}
-  </MenubarPrimitive.CheckboxItem>
-))
+  MenubarCheckboxItemProps
+>(({ className, children, checked, translationKey, values, ...props }, ref) => {
+  const { t } = useTranslation('common')
+  
+  return (
+    <MenubarPrimitive.CheckboxItem
+      ref={ref}
+      className={cn(
+        "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        className
+      )}
+      checked={checked}
+      {...props}
+    >
+      <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <MenubarPrimitive.ItemIndicator>
+          <Check className="h-4 w-4" />
+        </MenubarPrimitive.ItemIndicator>
+      </span>
+      {translationKey ? t(translationKey, values) : children}
+    </MenubarPrimitive.CheckboxItem>
+  )
+})
 MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName
+
+interface MenubarRadioItemProps extends
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.RadioItem> {
+  translationKey?: string
+  values?: Record<string, any>
+}
 
 const MenubarRadioItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.RadioItem>,
-  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.RadioItem>
->(({ className, children, ...props }, ref) => (
-  <MenubarPrimitive.RadioItem
-    ref={ref}
-    className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    )}
-    {...props}
-  >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <MenubarPrimitive.ItemIndicator>
-        <Circle className="h-2 w-2 fill-current" />
-      </MenubarPrimitive.ItemIndicator>
-    </span>
-    {children}
-  </MenubarPrimitive.RadioItem>
-))
+  MenubarRadioItemProps
+>(({ className, children, translationKey, values, ...props }, ref) => {
+  const { t } = useTranslation('common')
+  
+  return (
+    <MenubarPrimitive.RadioItem
+      ref={ref}
+      className={cn(
+        "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        className
+      )}
+      {...props}
+    >
+      <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <MenubarPrimitive.ItemIndicator>
+          <Circle className="h-2 w-2 fill-current" />
+        </MenubarPrimitive.ItemIndicator>
+      </span>
+      {translationKey ? t(translationKey, values) : children}
+    </MenubarPrimitive.RadioItem>
+  )
+})
 MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName
+
+interface MenubarLabelProps extends
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Label> {
+  translationKey?: string
+  values?: Record<string, any>
+  inset?: boolean
+}
 
 const MenubarLabel = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Label>,
-  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Label> & {
-    inset?: boolean
-  }
->(({ className, inset, ...props }, ref) => (
-  <MenubarPrimitive.Label
-    ref={ref}
-    className={cn(
-      "px-2 py-1.5 text-sm font-semibold",
-      inset && "pl-8",
-      className
-    )}
-    {...props}
-  />
-))
+  MenubarLabelProps
+>(({ className, translationKey, values, children, inset, ...props }, ref) => {
+  const { t } = useTranslation('common')
+  
+  return (
+    <MenubarPrimitive.Label
+      ref={ref}
+      className={cn(
+        "px-2 py-1.5 text-sm font-semibold",
+        inset && "pl-8",
+        className
+      )}
+      {...props}
+    >
+      {translationKey ? t(translationKey, values) : children}
+    </MenubarPrimitive.Label>
+  )
+})
 MenubarLabel.displayName = MenubarPrimitive.Label.displayName
 
 const MenubarSeparator = React.forwardRef<
@@ -198,10 +253,21 @@ const MenubarSeparator = React.forwardRef<
 ))
 MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName
 
+interface MenubarShortcutProps extends
+  React.HTMLAttributes<HTMLSpanElement> {
+  translationKey?: string
+  values?: Record<string, any>
+}
+
 const MenubarShortcut = ({
   className,
+  translationKey,
+  values,
+  children,
   ...props
-}: React.HTMLAttributes<HTMLSpanElement>) => {
+}: MenubarShortcutProps) => {
+  const { t } = useTranslation('common')
+  
   return (
     <span
       className={cn(
@@ -209,7 +275,9 @@ const MenubarShortcut = ({
         className
       )}
       {...props}
-    />
+    >
+      {translationKey ? t(translationKey, values) : children}
+    </span>
   )
 }
 MenubarShortcut.displayname = "MenubarShortcut"

@@ -9,9 +9,11 @@ import {
   FormProvider,
   useFormContext,
 } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
+import { DynamicTranslate } from '@/components/DynamicTranslate'
 
 const Form = FormProvider
 
@@ -84,11 +86,24 @@ const FormItem = React.forwardRef<
 })
 FormItem.displayName = "FormItem"
 
+interface FormLabelProps extends
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> {
+  translationKey?: string
+  values?: Record<string, any>
+}
+
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+  FormLabelProps
+>(({ className, translationKey, values, children, ...props }, ref) => {
   const { error, formItemId } = useFormField()
+
+  let labelContent = children;
+  if (translationKey) {
+    labelContent = (
+      <DynamicTranslate translationKey={translationKey} ns="forms" params={values} />
+    );
+  }
 
   return (
     <Label
@@ -96,7 +111,9 @@ const FormLabel = React.forwardRef<
       className={cn(error && "text-destructive", className)}
       htmlFor={formItemId}
       {...props}
-    />
+    >
+      {labelContent}
+    </Label>
   )
 })
 FormLabel.displayName = "FormLabel"
@@ -123,11 +140,24 @@ const FormControl = React.forwardRef<
 })
 FormControl.displayName = "FormControl"
 
+interface FormDescriptionProps extends
+  React.HTMLAttributes<HTMLParagraphElement> {
+  translationKey?: string
+  values?: Record<string, any>
+}
+
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => {
+  FormDescriptionProps
+>(({ className, translationKey, values, children, ...props }, ref) => {
   const { formDescriptionId } = useFormField()
+
+  let descriptionContent = children;
+  if (translationKey) {
+    descriptionContent = (
+      <DynamicTranslate translationKey={translationKey} ns="forms" params={values} />
+    );
+  }
 
   return (
     <p
@@ -135,17 +165,37 @@ const FormDescription = React.forwardRef<
       id={formDescriptionId}
       className={cn("text-sm text-muted-foreground", className)}
       {...props}
-    />
+    >
+      {descriptionContent}
+    </p>
   )
 })
 FormDescription.displayName = "FormDescription"
 
+interface FormMessageProps extends
+  React.HTMLAttributes<HTMLParagraphElement> {
+  translationKey?: string
+  values?: Record<string, any>
+}
+
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, children, ...props }, ref) => {
+  FormMessageProps
+>(({ className, translationKey, values, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField()
-  const body = error ? String(error?.message) : children
+  
+  let body = children
+  if (error) {
+    if (translationKey) {
+      body = (
+        <DynamicTranslate translationKey={translationKey} ns="forms" params={values} />
+      );
+    } else {
+      body = (
+        <DynamicTranslate translationKey={`validation.${error.message}`} ns="forms" params={values} fallback={String(error.message)} />
+      );
+    }
+  }
 
   if (!body) {
     return null

@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface EventPreview {
   id: string;
@@ -14,6 +14,7 @@ interface EventPreview {
 
 const MiniCalendar: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   
   // Mock upcoming events
   const upcomingEvents: EventPreview[] = [
@@ -60,15 +61,15 @@ const MiniCalendar: React.FC = () => {
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center gap-2">
           <CalendarIcon className="h-5 w-5 text-nortech-purple" />
-          Upcoming Events
+          {t('common:calendar.upcomingEvents')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Mini calendar grid */}
         <div className="grid grid-cols-7 gap-1 text-center text-xs mb-2">
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+          {['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day, i) => (
             <div key={i} className="p-1 text-muted-foreground font-medium">
-              {day}
+              {t(`common:calendar.weekdays.${day}`)}
             </div>
           ))}
           {calendarDays.map((day, i) => (
@@ -100,7 +101,7 @@ const MiniCalendar: React.FC = () => {
               </div>
               {event.type === 'live' && (
                 <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
-                  Live
+                  {t('common:calendar.live')}
                 </span>
               )}
             </div>
@@ -112,7 +113,7 @@ const MiniCalendar: React.FC = () => {
           className="w-full text-center justify-center text-nortech-purple"
           onClick={() => navigate('/events')}
         >
-          View All Events
+          {t('common:calendar.viewAllEvents')}
           <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
       </CardContent>

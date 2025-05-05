@@ -1,0 +1,406 @@
+{
+  "welcome": {
+    "title": "Welcome to Nortech Community"
+  },
+  "language": {
+    "select": "Select Language",
+    "en-US": "English",
+    "pt-BR": "Portuguese"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "actions": {
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "share": "Share",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next"
+  },
+  "status": {
+    "loading": "Loading...",
+    "success": "Success!",
+    "error": "Error",
+    "notFound": "Not Found",
+    "offline": "You are offline",
+    "online": "You are online"
+  },
+  "notifications": {
+    "success": "Operation completed successfully",
+    "error": "An error occurred",
+    "info": "Information",
+    "warning": "Warning"
+  },
+  "time": {
+    "now": "Just now",
+    "minutesAgo": "{count} minutes ago",
+    "hoursAgo": "{count} hours ago",
+    "daysAgo": "{count} days ago",
+    "weeksAgo": "{count} weeks ago",
+    "monthsAgo": "{count} months ago",
+    "yearsAgo": "{count} years ago"
+  },
+  "errors": {
+    "general": "Something went wrong",
+    "notFound": "Page not found",
+    "offline": "Please check your internet connection",
+    "unauthorized": "You need to be logged in",
+    "forbidden": "You don't have permission to access this"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {number}",
+    "showing": "Showing {from} to {to} of {total} entries"
+  },
+  "meta": {
+    "title": "Nortech Community",
+    "description": "A community platform for tech professionals"
+  },
+  "loading": "Loading...",
+  "error": {
+    "generic": "An error occurred",
+    "notFound": "Not found"
+  },
+  "ui": {
+    "tabs": {
+      "aria": {
+        "tabList": "Tab List",
+        "tab": "Tab",
+        "tabPanel": "Tab Panel"
+      }
+    },
+    "menubar": {
+      "file": {
+        "title": "File",
+        "new": "New",
+        "open": "Open",
+        "save": "Save",
+        "saveAs": "Save As",
+        "close": "Close"
+      },
+      "edit": {
+        "title": "Edit",
+        "undo": "Undo",
+        "redo": "Redo",
+        "cut": "Cut",
+        "copy": "Copy",
+        "paste": "Paste"
+      },
+      "view": {
+        "title": "View",
+        "zoomIn": "Zoom In",
+        "zoomOut": "Zoom Out",
+        "resetZoom": "Reset Zoom"
+      },
+      "help": {
+        "title": "Help",
+        "about": "About",
+        "documentation": "Documentation",
+        "support": "Support"
+      }
+    },
+    "breadcrumb": {
+      "more": "More"
+    },
+    "alert": {
+      "error": "Error",
+      "warning": "Warning",
+      "success": "Success",
+      "info": "Information",
+      "close": "Close Alert"
+    },
+    "button": {
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "back": "Back",
+      "loading": "Loading...",
+      "retry": "Try Again"
+    },
+    "dialog": {
+      "close": "Close",
+      "confirm": {
+        "title": "Confirm Action",
+        "message": "Are you sure you want to proceed?",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "addNewLinkTitle": "Add a New Link",
+      "addNewLinkDescription": "Fill in the details below to add a new link."
+    },
+    "toast": {
+      "error": "Error: {message}",
+      "success": "Success: {message}",
+      "info": "Info: {message}",
+      "warning": "Warning: {message}",
+      "close": "Close"
+    },
+    "tooltip": {
+      "moreInfo": "Click for more information",
+      "required": "This field is required"
+    },
+    "toggle": {
+      "on": "On",
+      "off": "Off",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "calendar": {
+      "monthYear": "{month} {year}",
+      "today": "Today",
+      "weekdays": {
+        "short": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        "long": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+      },
+      "months": {
+        "short": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        "long": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      }
+    },
+    "dropdown": {
+      "placeholder": "Select an option",
+      "noOptions": "No options available",
+      "loading": "Loading options...",
+      "search": "Search..."
+    },
+    "input": {
+      "clear": "Clear",
+      "search": "Search",
+      "password": {
+        "show": "Show password",
+        "hide": "Hide password"
+      }
+    }
+  },
+  "view": {
+    "all": "All",
+    "free": "Free",
+    "premium": "Premium",
+    "mentor": "Mentor",
+    "label": "View"
+  },
+  "button": {
+    "post": "Post",
+    "createPost": "Create Post",
+    "addLink": "Add Link",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel"
+  },
+  "calendar": {
+    "upcomingEvents": "Upcoming Events",
+    "live": "Live",
+    "viewAllEvents": "View All Events",
+    "weekdays": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    }
+  },
+  "label": {
+    "linkText": "Link Text",
+    "url": "URL"
+  },
+  "placeholder": {
+    "linkText": "Enter link text",
+    "url": "Enter URL"
+  },
+  "feed": {
+    "premium": {
+      "unlockTitle": "Unlock Premium Content",
+      "unlockDesc": "Upgrade your membership to access exclusive premium content",
+      "exclusive": "Exclusive Content",
+      "exclusiveDesc": "Access premium tutorials, courses, and in-depth resources",
+      "early": "Early Access",
+      "earlyDesc": "Be the first to see new courses and community features",
+      "support": "Direct Support",
+      "supportDesc": "Get personalized help from our community mentors",
+      "groups": "Premium Groups",
+      "groupsDesc": "Join private discussion groups with industry experts",
+      "upgradeNow": "Upgrade Now"
+    },
+    "tabs": {
+      "all": "All Content",
+      "free": "Free Zone",
+      "premium": "Premium Zone",
+      "mentor": "Mentor Zone",
+      "premiumWarning": "Premium content requires an active subscription",
+      "viewPlans": "View Plans"
+    },
+    "empty": {
+      "noPosts": "No matching posts found",
+      "noPostsDesc": "We couldn't find any posts matching your current filters",
+      "clearFilters": "Clear all filters",
+      "welcome": "Welcome to your community",
+      "welcomeDesc": "Your feed is where you'll see new posts",
+      "createPost": "Create post"
+    },
+    "settings": {
+      "community": "Community",
+      "settings": "Settings",
+      "switchTheme": "Switch to light mode",
+      "customize": "Customize theme",
+      "shortcuts": "Keyboard shortcuts",
+      "viewAs": "View as",
+      "invite": "Invite member"
+    },
+    "filters": {
+      "filter": "Filter",
+      "contentType": "Content Type",
+      "accessLevel": "Access Level",
+      "all": "All",
+      "posts": "Posts only",
+      "events": "Events",
+      "lives": "Lives",
+      "content": "New content",
+      "allContent": "All content",
+      "freeContent": "Free content",
+      "paidContent": "Paid content",
+      "subscription": "My subscription only",
+      "trending": "Trending Topics",
+      "viewAll": "View all",
+      "active": "Active:",
+      "clearAll": "Clear All",
+      "searchPlaceholder": "Search posts, tags or keywords..."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "viewingAs": "Viewing as",
+    "viewingAsDescription": "You are now viewing your community as a {role} would see it.",
+    "viewAsAdmin": "View as Admin",
+    "viewAsFreeMember": "View as Free Member",
+    "viewAsPremiumMember": "View as Premium Member",
+    "viewAsPremiumPlusMember": "View as Premium+ Member",
+    "createSpace": "Create Space",
+    "memberResources": "Member Resources",
+    "memberResourcesDesc": "Find useful resources to help you get the most out of your membership.",
+    "communityGuidelines": "Community Guidelines",
+    "memberDirectory": "Member Directory",
+    "upcomingEvents": "Upcoming Events",
+    "welcome": {
+      "title": "Welcome to Nortech Communities",
+      "description": "Your all-in-one platform for community building, education, and engagement",
+      "guide": "Follow the setup guide to complete your community configuration. You can customize your branding, invite members, create content, and more.",
+      "customizeBranding": "Customize Branding",
+      "createFirstPost": "Create First Post",
+      "allSettings": "All Settings"
+    },
+    "aiSuggestions": {
+      "title": "AI Suggestions",
+      "basedOnSetup": "Based on your setup:",
+      "createWelcomePost": "Create a welcome post with AI",
+      "sendEmailToInactive": "Send an email to inactive members",
+      "addRewardToStore": "Add a reward to your points store",
+      "engagementOpportunities": "Engagement opportunities:",
+      "hostLiveQA": "Host a weekly live Q&A session",
+      "createChallenge": "Create a challenge for members",
+      "startDiscussion": "Start a discussion thread",
+      "exploreIdeas": "Explore Ideas",
+      "growthSuggestions": "Growth suggestions:",
+      "shareOnSocial": "Share your community on social media",
+      "offerFreeTier": "Offer a free membership tier",
+      "createReferral": "Create a referral program",
+      "tryNow": "Try Now",
+      "growNow": "Grow Now"
+    },
+    "setupChecklist": {
+      "title": "Setup checklist",
+      "basics": { "title": "Basics", "description": "Complete your community profile, add branding elements, and configure basic settings." },
+      "spaces": { "title": "Add Spaces", "description": "Create spaces for different topics, courses, or communities within your platform." },
+      "paywall": { "title": "Setup Paywall", "description": "Configure membership plans and payment options for premium content." },
+      "members": { "title": "Invite Members", "description": "Start growing your community by inviting your first members." },
+      "post": { "title": "Create First Post", "description": "Share your first post with your community members." },
+      "join": { "title": "Join Nortech Creator Group", "description": "Connect with other community creators for tips and best practices." },
+      "stepsComplete": "steps complete",
+      "continue": "Continue",
+      "learnMore": "Learn more",
+      "additionalDetails": "Additional details and instructions for {item} will be shown here."
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "createPost": "Create Post",
+      "shareIdeas": "Share your ideas",
+      "inviteMembers": "Invite Members",
+      "growCommunity": "Grow your community",
+      "scheduleEvent": "Schedule Event",
+      "hostSession": "Host a session",
+      "createSpace": "Create Space",
+      "organizeTopics": "Organize topics",
+      "customizeBrand": "Customize Brand",
+      "personalizeLook": "Personalize look",
+      "sendAnnouncement": "Send Announcement",
+      "alertAll": "Alert all members"
+    },
+    "overview": {
+      "title": "Community Overview",
+      "totalMembers": "Total Members",
+      "allTimeJoined": "All-time joined users",
+      "activeSpaces": "Active Spaces",
+      "spacesWithEngagement": "Spaces with engagement this week",
+      "noChange": "No change",
+      "postsThisWeek": "Posts this week",
+      "newPostsLast7Days": "New posts created in last 7 days",
+      "engagementLevel": "Engagement Level",
+      "medium": "Medium",
+      "calculatedByViews": "Calculated by views/comments ratio"
+    },
+    "guidedTour": {
+      "title": "Welcome to Your Community Dashboard",
+      "description": "Let's get you started with a few quick steps to set up your community.",
+      "quickStart": "Quick Start Guide",
+      "videoWalkthrough": "Video Walkthrough",
+      "videoPlaceholder": "Video walkthrough would be embedded here",
+      "branding": { "title": "Customize Your Brand", "description": "Upload your logo and set your community colors to match your brand identity.", "action": "Customize Branding" },
+      "space": { "title": "Create Your First Space", "description": "Spaces help organize your community content into dedicated areas for different topics or purposes.", "action": "Create a Space" },
+      "content": { "title": "Create Your First Content", "description": "Share updates, start discussions, or create educational content for your community.", "action": "Create Content" },
+      "skipTour": "Skip Tour",
+      "helpTooltip": "You can always access this guide later from help menu",
+      "hideVideoOption": "Hide Video Option",
+      "showVideoWalkthrough": "Show Video Walkthrough"
+    },
+    "createSpaceDialog": {
+      "chooseType": "Choose space type",
+      "spaceDetails": "Space details",
+      "selectType": "Select what type of space you want to create for your community.",
+      "posts": { "label": "Posts", "description": "Create and share articles, updates and news" },
+      "events": { "label": "Events", "description": "Schedule and manage community events" },
+      "chat": { "label": "Chat", "description": "Real-time conversations with members" },
+      "course": { "label": "Course", "description": "Create structured learning content" },
+      "members": { "label": "Members", "description": "Manage community membership" },
+      "images": { "label": "Images", "description": "Create a photo gallery or album" },
+      "support": { "label": "Support", "description": "Provide help and support for members" },
+      "faq": { "label": "FAQ", "description": "Frequently asked questions and answers" },
+      "spaceName": "Space name",
+      "enterSpaceName": "Enter space name",
+      "descriptionOptional": "Description (optional)",
+      "describeSpace": "Describe what this space is about",
+      "back": "Back",
+      "next": "Next",
+      "createSpace": "Create Space"
+    }
+  },
+  "dialog": {
+      "close": "Close",
+      "confirm": {
+        "title": "Confirm Action",
+        "message": "Are you sure you want to proceed?",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "addNewLinkTitle": "Add a New Link",
+      "addNewLinkDescription": "Fill in the details below to add a new link."
+    }
+} 

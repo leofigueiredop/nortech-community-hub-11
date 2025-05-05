@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -15,6 +14,7 @@ import {
   FileText, 
   Layout
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarLinkProps {
   icon: React.ReactNode;
@@ -52,6 +52,47 @@ const SectionTitle: React.FC<SectionTitleProps> = ({ title }) => {
 };
 
 const Sidebar: React.FC = () => {
+    // @ts-expect-error: Type instantiation is excessively deep and possibly infinite.
+  const { t } = useTranslation('navigation');
+
+  // Translation variables
+  // @ts-expect-error: i18next type inference issue
+  const homeLabel = t('main.home') as string;
+  // @ts-expect-error: i18next type inference issue
+  const dashboardLabel = t('main.dashboard') as string;
+  // @ts-expect-error: i18next type inference issue
+  const createSpaceLabel = t('main.createSpace') as string;
+  // @ts-expect-error: i18next type inference issue
+  const postsLabel = t('main.posts') as string;
+  // @ts-expect-error: i18next type inference issue
+  const discussionsLabel = t('main.discussions') as string;
+  // @ts-expect-error: i18next type inference issue
+  const coursesLabel = t('main.courses') as string;
+  // @ts-expect-error: i18next type inference issue
+  const eventsLabel = t('main.events') as string;
+  // @ts-expect-error: i18next type inference issue
+  const liveStreamsLabel = t('main.liveStreams') as string;
+  // @ts-expect-error: i18next type inference issue
+  const membersLabel = t('main.members') as string;
+  // @ts-expect-error: i18next type inference issue
+  const analyticsLabel = t('main.analytics') as string;
+  // @ts-expect-error: i18next type inference issue
+  const settingsLabel = t('main.settings') as string;
+  // @ts-expect-error: i18next type inference issue
+  const getStartedTitle = t('section.getStarted') as string;
+  // @ts-expect-error: i18next type inference issue
+  const spacesTitle = t('section.spaces') as string;
+  // @ts-expect-error: i18next type inference issue
+  const contentTitle = t('section.content') as string;
+  // @ts-expect-error: i18next type inference issue
+  const communityTitle = t('section.community') as string;
+  // @ts-expect-error: i18next type inference issue
+  const linksTitle = t('section.links') as string;
+  // @ts-expect-error: i18next type inference issue
+  const downloadAndroid = t('download.android') as string;
+  // @ts-expect-error: i18next type inference issue
+  const downloadIos = t('download.ios') as string;
+
   return (
     <div className="w-64 border-r border-nortech-gray-light h-screen flex flex-col bg-white dark:bg-nortech-dark-bg dark:border-gray-800">
       <div className="h-16 flex items-center px-6 border-b border-nortech-gray-light dark:border-gray-800">
@@ -66,78 +107,78 @@ const Sidebar: React.FC = () => {
       <div className="flex-1 overflow-auto px-3 py-4">
         <SidebarLink 
           icon={<Home size={18} />} 
-          label="Home" 
+          label={homeLabel} 
           to="/" 
           active={true} 
         />
         
-        <SectionTitle title="Get Started" />
+        <SectionTitle title={getStartedTitle} />
         <SidebarLink 
           icon={<Layout size={18} />} 
-          label="Dashboard" 
+          label={dashboardLabel} 
           to="/dashboard" 
         />
         
-        <SectionTitle title="Spaces" />
+        <SectionTitle title={spacesTitle} />
         <SidebarLink 
           icon={<PlusCircle size={18} />} 
-          label="Create Space" 
+          label={createSpaceLabel} 
           to="/create-space" 
         />
         
-        <SectionTitle title="Content" />
+        <SectionTitle title={contentTitle} />
         <SidebarLink 
           icon={<FileText size={18} />} 
-          label="Posts" 
+          label={postsLabel} 
           to="/posts" 
         />
         <SidebarLink 
           icon={<MessageSquare size={18} />} 
-          label="Discussions" 
+          label={discussionsLabel} 
           to="/discussions" 
         />
         <SidebarLink 
           icon={<BookOpen size={18} />} 
-          label="Courses" 
+          label={coursesLabel} 
           to="/courses" 
         />
         <SidebarLink 
           icon={<Calendar size={18} />} 
-          label="Events" 
+          label={eventsLabel} 
           to="/events" 
         />
         <SidebarLink 
           icon={<Play size={18} />} 
-          label="Live Streams" 
+          label={liveStreamsLabel} 
           to="/live-streams" 
         />
         
-        <SectionTitle title="Community" />
+        <SectionTitle title={communityTitle} />
         <SidebarLink 
           icon={<Users size={18} />} 
-          label="Members" 
+          label={membersLabel} 
           to="/members" 
         />
         <SidebarLink 
           icon={<BarChart3 size={18} />} 
-          label="Analytics" 
+          label={analyticsLabel} 
           to="/analytics" 
         />
         <SidebarLink 
           icon={<Settings size={18} />} 
-          label="Settings" 
+          label={settingsLabel} 
           to="/settings" 
         />
         
-        <SectionTitle title="Links" />
+        <SectionTitle title={linksTitle} />
         <div className="px-4 py-2">
           <div className="flex items-center text-sm text-nortech-gray-text gap-3 mb-2">
             <Download size={16} />
-            <span>Download Android app</span>
+            <span>{downloadAndroid}</span>
           </div>
           <div className="flex items-center text-sm text-nortech-gray-text gap-3">
             <Download size={16} />
-            <span>Download iOS app</span>
+            <span>{downloadIos}</span>
           </div>
         </div>
       </div>

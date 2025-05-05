@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "scan-translations": "ts-node src/scripts/scanTranslations.ts",
-    "build:translations": "node scripts/build-translations.js"
+    "build:translations": "node scripts/build-translations.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

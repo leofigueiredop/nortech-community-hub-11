@@ -1,10 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { getTranslationWithFallback, DynamicFallbackOptions } from '@/utils/i18n/dynamicFallback';
-import type { SupportedNamespaces } from '@/utils/i18n/types';
-import type { TFunction } from 'i18next';
+import { getTranslationWithFallback } from '@/utils/i18n/dynamicFallback';
 
 interface UseTranslationWithFallbackOptions {
-  ns?: SupportedNamespaces;
+  ns?: string;
   showMissingIndicator?: boolean;
 }
 
@@ -28,15 +26,12 @@ interface UseTranslationWithFallbackOptions {
  * }
  * ```
  */
-export function useTranslationWithFallback(options: UseTranslationWithFallbackOptions = {}) {
-  const { ns = 'common', showMissingIndicator } = options;
+export function useTranslationWithFallback(options: any = {}) {
+  const { ns = 'common', showMissingIndicator } = options
   const { t: baseT, ready, i18n } = useTranslation(ns);
 
-  const t = (
-    key: string,
-    options: Omit<DynamicFallbackOptions, 'key' | 'ns' | 'showMissingIndicator'> = {}
-  ) => {
-    return getTranslationWithFallback(baseT as TFunction<'common'>, {
+  const t = (key: string, options: any = {}) => {
+    return getTranslationWithFallback(baseT as any, {
       key,
       ns,
       showMissingIndicator,

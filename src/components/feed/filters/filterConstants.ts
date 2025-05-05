@@ -1,17 +1,18 @@
+import { TFunction } from 'i18next';
 
-export const contentTypes = [
-  { id: 'all', name: 'All' },
-  { id: 'posts', name: 'Posts only' },
-  { id: 'events', name: 'Events' },
-  { id: 'lives', name: 'Lives' },
-  { id: 'content', name: 'New content' }
+export const getContentTypes = (t: TFunction) => [
+  { id: 'all', name: t('feed.filters.all') },
+  { id: 'posts', name: t('feed.filters.posts') },
+  { id: 'events', name: t('feed.filters.events') },
+  { id: 'lives', name: t('feed.filters.lives') },
+  { id: 'content', name: t('feed.filters.content') }
 ];
 
-export const accessTypes = [
-  { id: 'all', name: 'All content' },
-  { id: 'free', name: 'Free content' },
-  { id: 'paid', name: 'Paid content' },
-  { id: 'subscription', name: 'My subscription only' }
+export const getAccessTypes = (t: TFunction) => [
+  { id: 'all', name: t('feed.filters.allContent') },
+  { id: 'free', name: t('feed.filters.freeContent') },
+  { id: 'paid', name: t('feed.filters.paidContent') },
+  { id: 'subscription', name: t('feed.filters.subscription') }
 ];
 
 // Smaller set of popular tags for a cleaner display

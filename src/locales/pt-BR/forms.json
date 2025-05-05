@@ -1,0 +1,108 @@
+{
+  "fields": {
+    "required": "Obrigatório",
+    "optional": "Opcional",
+    "email": "Endereço de Email",
+    "password": "Senha",
+    "confirmPassword": "Confirmar Senha",
+    "name": "Nome",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "phone": "Número de Telefone",
+    "address": "Endereço",
+    "city": "Cidade",
+    "state": "Estado",
+    "country": "País",
+    "zipCode": "CEP"
+  },
+  "buttons": {
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "back": "Voltar",
+    "next": "Próximo"
+  },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "email": "Por favor, insira um endereço de e-mail válido",
+    "minLength": "Deve ter pelo menos {{count}} caracteres",
+    "maxLength": "Deve ter no máximo {{count}} caracteres",
+    "passwordMatch": "As senhas devem ser iguais",
+    "invalidFormat": "Formato inválido",
+    "numeric": "Deve ser um número",
+    "url": "Por favor, insira uma URL válida",
+    "date": "Por favor, insira uma data válida",
+    "phone": "Por favor, insira um número de telefone válido",
+    "unique": "Este valor deve ser único",
+    "alreadyAdded": "Este(a) {{field}} já foi adicionado(a)",
+    "pattern": "Formato inválido para {{field}}",
+    "min": "O valor deve ser no mínimo {{min}}",
+    "max": "O valor deve ser no máximo {{max}}",
+    "between": "O valor deve estar entre {{min}} e {{max}}",
+    "oneOf": "O valor deve ser um dos: {{values}}",
+    "notOneOf": "O valor não pode ser um dos: {{values}}",
+    "matches": "O valor deve corresponder ao padrão exigido",
+    "emailArray": "Todos os e-mails devem ser válidos",
+    "arrayMin": "Pelo menos {{count}} item(ns) obrigatório(s)",
+    "arrayMax": "No máximo {{count}} item(ns) permitido(s)",
+    "boolean": "Deve ser verdadeiro ou falso",
+    "accepted": "Você deve aceitar o(a) {{field}}",
+    "custom": "{{message}}"
+  },
+  "placeholders": {
+    "email": "Digite seu endereço de email",
+    "password": "Digite sua senha",
+    "search": "Pesquisar...",
+    "phone": "Digite seu número de telefone",
+    "address": "Digite seu endereço"
+  },
+  "label": {
+    "email": "Endereço de E-mail",
+    "password": "Senha",
+    "confirmPassword": "Confirmar Senha",
+    "username": "Nome de Usuário",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "phone": "Número de Telefone",
+    "address": "Endereço",
+    "city": "Cidade",
+    "state": "Estado",
+    "country": "País",
+    "zipCode": "CEP"
+  },
+  "placeholder": {
+    "email": "Digite seu endereço de e-mail",
+    "password": "Digite sua senha",
+    "confirmPassword": "Confirme sua senha",
+    "username": "Escolha um nome de usuário",
+    "search": "Pesquisar...",
+    "select": "Selecione uma opção"
+  },
+  "helper": {
+    "password": "Deve conter pelo menos 8 caracteres, incluindo maiúsculas, minúsculas e números",
+    "optional": "Opcional",
+    "maxLength": "Máximo de {{count}} caracteres"
+  },
+  "error": {
+    "submission": "Ocorreu um erro ao enviar o formulário",
+    "required": "Por favor, preencha todos os campos obrigatórios",
+    "invalid": "Por favor, corrija os erros antes de enviar",
+    "network": "Erro de rede, tente novamente mais tarde",
+    "server": "Erro no servidor, entre em contato com o suporte",
+    "notFound": "Recurso não encontrado",
+    "forbidden": "Você não tem permissão para realizar esta ação"
+  },
+  "success": {
+    "submission": "Formulário enviado com sucesso",
+    "saved": "Alterações salvas com sucesso"
+  },
+  "button": {
+    "submit": "Enviar",
+    "save": "Salvar Alterações",
+    "cancel": "Cancelar",
+    "reset": "Limpar Formulário",
+    "edit": "Editar"
+  }
+} 

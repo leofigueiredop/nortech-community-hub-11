@@ -1,37 +1,38 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, FileText, Layout, TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const CommunityOverview: React.FC = () => {
+  const { t } = useTranslation('common');
   // Mock data - in a real app, this would come from an API or context
   const stats = [
     {
-      title: 'Total Members',
+      title: t('common:dashboard.overview.totalMembers'),
       value: '138',
       icon: <Users className="h-4 w-4" />,
-      description: 'All-time joined users',
+      description: t('common:dashboard.overview.allTimeJoined'),
       change: '+12% (30d)'
     },
     {
-      title: 'Active Spaces',
+      title: t('common:dashboard.overview.activeSpaces'),
       value: '4',
       icon: <Layout className="h-4 w-4" />,
-      description: 'Spaces with engagement this week',
-      change: 'No change'
+      description: t('common:dashboard.overview.spacesWithEngagement'),
+      change: t('common:dashboard.overview.noChange')
     },
     {
-      title: 'Posts this week',
+      title: t('common:dashboard.overview.postsThisWeek'),
       value: '17',
       icon: <FileText className="h-4 w-4" />,
-      description: 'New posts created in last 7 days',
+      description: t('common:dashboard.overview.newPostsLast7Days'),
       change: '+8% (7d)'
     },
     {
-      title: 'Engagement Level',
-      value: 'Medium',
+      title: t('common:dashboard.overview.engagementLevel'),
+      value: t('common:dashboard.overview.medium'),
       icon: <TrendingUp className="h-4 w-4" />,
-      description: 'Calculated by views/comments ratio',
+      description: t('common:dashboard.overview.calculatedByViews'),
       badgeColor: 'bg-yellow-100 text-yellow-800',
       emoji: '🟡'
     }
@@ -41,7 +42,7 @@ const CommunityOverview: React.FC = () => {
     <Card>
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <span>📊</span> Community Overview
+          <span>📊</span> {t('common:dashboard.overview.title')}
         </CardTitle>
       </CardHeader>
       <CardContent>

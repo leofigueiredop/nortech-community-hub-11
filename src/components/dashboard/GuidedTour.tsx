@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Dialog, 
@@ -18,6 +17,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowRight, Image, Layout, BookOpen, PlayCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface TourStep {
   id: string;
@@ -34,6 +34,7 @@ const GuidedTour: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [showVideoOption, setShowVideoOption] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     // Check if this is the first time visiting dashboard after onboarding
@@ -62,31 +63,31 @@ const GuidedTour: React.FC = () => {
   const tourSteps: TourStep[] = [
     {
       id: 'branding',
-      title: 'Customize Your Brand',
-      description: 'Upload your logo and set your community colors to match your brand identity.',
+      title: t('common:dashboard.guidedTour.branding.title'),
+      description: t('common:dashboard.guidedTour.branding.description'),
       icon: <Image className="h-10 w-10 text-purple-500" />,
       action: {
-        label: 'Customize Branding',
+        label: t('common:dashboard.guidedTour.branding.action'),
         path: '/settings/branding'
       }
     },
     {
       id: 'space',
-      title: 'Create Your First Space',
-      description: 'Spaces help organize your community content into dedicated areas for different topics or purposes.',
+      title: t('common:dashboard.guidedTour.space.title'),
+      description: t('common:dashboard.guidedTour.space.description'),
       icon: <Layout className="h-10 w-10 text-blue-500" />,
       action: {
-        label: 'Create a Space',
+        label: t('common:dashboard.guidedTour.space.action'),
         path: '/create-space'
       }
     },
     {
       id: 'content',
-      title: 'Create Your First Content',
-      description: 'Share updates, start discussions, or create educational content for your community.',
+      title: t('common:dashboard.guidedTour.content.title'),
+      description: t('common:dashboard.guidedTour.content.description'),
       icon: <BookOpen className="h-10 w-10 text-green-500" />,
       action: {
-        label: 'Create Content',
+        label: t('common:dashboard.guidedTour.content.action'),
         path: '/create-post'
       }
     }
@@ -96,18 +97,18 @@ const GuidedTour: React.FC = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden rounded-xl">
         <DialogHeader className="p-6 bg-gradient-to-r from-nortech-purple to-purple-700 text-white">
-          <DialogTitle className="text-2xl">Welcome to Your Community Dashboard</DialogTitle>
+          <DialogTitle className="text-2xl">{t('common:dashboard.guidedTour.title')}</DialogTitle>
           <DialogDescription className="text-gray-100">
-            Let's get you started with a few quick steps to set up your community.
+            {t('common:dashboard.guidedTour.description')}
           </DialogDescription>
         </DialogHeader>
         
         <Tabs defaultValue="steps" className="w-full">
           <div className="px-6 pt-4">
             <TabsList className="w-full">
-              <TabsTrigger value="steps" className="flex-1">Quick Start Guide</TabsTrigger>
+              <TabsTrigger value="steps" className="flex-1">{t('common:dashboard.guidedTour.quickStart')}</TabsTrigger>
               {showVideoOption && (
-                <TabsTrigger value="video" className="flex-1">Video Walkthrough</TabsTrigger>
+                <TabsTrigger value="video" className="flex-1">{t('common:dashboard.guidedTour.videoWalkthrough')}</TabsTrigger>
               )}
             </TabsList>
           </div>
@@ -149,7 +150,7 @@ const GuidedTour: React.FC = () => {
                 <div className="text-center">
                   <PlayCircle className="h-16 w-16 text-nortech-purple mx-auto mb-4" />
                   <p className="text-muted-foreground">
-                    Video walkthrough would be embedded here
+                    {t('common:dashboard.guidedTour.videoPlaceholder')}
                   </p>
                 </div>
               </div>
@@ -163,11 +164,11 @@ const GuidedTour: React.FC = () => {
               <TooltipTrigger asChild>
                 <Button variant="outline" size="sm" onClick={handleSkip} className="gap-1">
                   <X className="h-4 w-4" />
-                  Skip Tour
+                  {t('common:dashboard.guidedTour.skipTour')}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>You can always access this guide later from help menu</p>
+                <p>{t('common:dashboard.guidedTour.helpTooltip')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -178,7 +179,7 @@ const GuidedTour: React.FC = () => {
                 variant="outline" 
                 onClick={() => setShowVideoOption(false)}
               >
-                Hide Video Option
+                {t('common:dashboard.guidedTour.hideVideoOption')}
               </Button>
             )}
             {!showVideoOption && (
@@ -186,7 +187,7 @@ const GuidedTour: React.FC = () => {
                 variant="outline" 
                 onClick={() => setShowVideoOption(true)}
               >
-                Show Video Walkthrough
+                {t('common:dashboard.guidedTour.showVideoWalkthrough')}
               </Button>
             )}
           </div>

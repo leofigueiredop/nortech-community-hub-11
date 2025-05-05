@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogClose, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 type SpaceType = 'posts' | 'events' | 'chat' | 'course' | 'members' | 'images' | 'support' | 'faq';
 
@@ -26,6 +26,7 @@ const CreateSpaceDialog: React.FC<CreateSpaceDialogProps> = ({
   const [spaceName, setSpaceName] = useState('');
   const [spaceDescription, setSpaceDescription] = useState('');
   const { toast } = useToast();
+  const { t } = useTranslation('common');
   
   const handleNext = () => {
     if (step === 1) {
@@ -65,27 +66,27 @@ const CreateSpaceDialog: React.FC<CreateSpaceDialogProps> = ({
   };
   
   const spaceTypes = [
-    { type: 'posts' as SpaceType, icon: <FileText className="h-5 w-5" />, label: 'Posts', description: 'Create and share articles, updates and news' },
-    { type: 'events' as SpaceType, icon: <Calendar className="h-5 w-5" />, label: 'Events', description: 'Schedule and manage community events' },
-    { type: 'chat' as SpaceType, icon: <MessageSquare className="h-5 w-5" />, label: 'Chat', description: 'Real-time conversations with members' },
-    { type: 'course' as SpaceType, icon: <Layers className="h-5 w-5" />, label: 'Course', description: 'Create structured learning content' },
-    { type: 'members' as SpaceType, icon: <Users className="h-5 w-5" />, label: 'Members', description: 'Manage community membership' },
-    { type: 'images' as SpaceType, icon: <Image className="h-5 w-5" />, label: 'Images', description: 'Create a photo gallery or album' },
-    { type: 'support' as SpaceType, icon: <Inbox className="h-5 w-5" />, label: 'Support', description: 'Provide help and support for members' },
-    { type: 'faq' as SpaceType, icon: <HelpCircle className="h-5 w-5" />, label: 'FAQ', description: 'Frequently asked questions and answers' },
+    { type: 'posts' as SpaceType, icon: <FileText className="h-5 w-5" />, label: t('common:dashboard.createSpaceDialog.posts.label'), description: t('common:dashboard.createSpaceDialog.posts.description') },
+    { type: 'events' as SpaceType, icon: <Calendar className="h-5 w-5" />, label: t('common:dashboard.createSpaceDialog.events.label'), description: t('common:dashboard.createSpaceDialog.events.description') },
+    { type: 'chat' as SpaceType, icon: <MessageSquare className="h-5 w-5" />, label: t('common:dashboard.createSpaceDialog.chat.label'), description: t('common:dashboard.createSpaceDialog.chat.description') },
+    { type: 'course' as SpaceType, icon: <Layers className="h-5 w-5" />, label: t('common:dashboard.createSpaceDialog.course.label'), description: t('common:dashboard.createSpaceDialog.course.description') },
+    { type: 'members' as SpaceType, icon: <Users className="h-5 w-5" />, label: t('common:dashboard.createSpaceDialog.members.label'), description: t('common:dashboard.createSpaceDialog.members.description') },
+    { type: 'images' as SpaceType, icon: <Image className="h-5 w-5" />, label: t('common:dashboard.createSpaceDialog.images.label'), description: t('common:dashboard.createSpaceDialog.images.description') },
+    { type: 'support' as SpaceType, icon: <Inbox className="h-5 w-5" />, label: t('common:dashboard.createSpaceDialog.support.label'), description: t('common:dashboard.createSpaceDialog.support.description') },
+    { type: 'faq' as SpaceType, icon: <HelpCircle className="h-5 w-5" />, label: t('common:dashboard.createSpaceDialog.faq.label'), description: t('common:dashboard.createSpaceDialog.faq.description') },
   ];
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-gray-900 text-white border-gray-700">
         <DialogTitle className="text-xl font-semibold mb-4">
-          {step === 1 ? "Choose space type" : "Space details"}
+          {step === 1 ? t('common:dashboard.createSpaceDialog.chooseType') : t('common:dashboard.createSpaceDialog.spaceDetails')}
         </DialogTitle>
         
         {step === 1 && (
           <>
             <DialogDescription className="text-gray-300 mb-4">
-              Select what type of space you want to create for your community.
+              {t('common:dashboard.createSpaceDialog.selectType')}
             </DialogDescription>
             
             <div className="grid grid-cols-2 gap-3">
@@ -110,10 +111,10 @@ const CreateSpaceDialog: React.FC<CreateSpaceDialogProps> = ({
         {step === 2 && (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-white">Space name</Label>
+              <Label htmlFor="name" className="text-white">{t('common:dashboard.createSpaceDialog.spaceName')}</Label>
               <Input 
                 id="name" 
-                placeholder="Enter space name" 
+                placeholder={t('common:dashboard.createSpaceDialog.enterSpaceName')}
                 value={spaceName}
                 onChange={(e) => setSpaceName(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white"
@@ -121,10 +122,10 @@ const CreateSpaceDialog: React.FC<CreateSpaceDialogProps> = ({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-white">Description (optional)</Label>
+              <Label htmlFor="description" className="text-white">{t('common:dashboard.createSpaceDialog.descriptionOptional')}</Label>
               <Textarea 
                 id="description" 
-                placeholder="Describe what this space is about" 
+                placeholder={t('common:dashboard.createSpaceDialog.describeSpace')}
                 value={spaceDescription}
                 onChange={(e) => setSpaceDescription(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white min-h-[100px]"
@@ -140,7 +141,7 @@ const CreateSpaceDialog: React.FC<CreateSpaceDialogProps> = ({
               className="py-6 text-base font-medium rounded-full border-white text-white hover:bg-white/20"
               onClick={handleBack}
             >
-              Back
+              {t('common:dashboard.createSpaceDialog.back')}
             </Button>
           )}
           
@@ -149,7 +150,7 @@ const CreateSpaceDialog: React.FC<CreateSpaceDialogProps> = ({
             onClick={handleNext}
             disabled={step === 1 && !selectedType}
           >
-            {step === 1 ? "Next" : "Create Space"}
+            {step === 1 ? t('common:dashboard.createSpaceDialog.next') : t('common:dashboard.createSpaceDialog.createSpace')}
           </Button>
         </div>
         

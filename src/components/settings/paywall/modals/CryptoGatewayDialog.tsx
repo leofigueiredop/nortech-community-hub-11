@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -39,9 +38,7 @@ const CryptoGatewayDialog: React.FC<CryptoGatewayDialogProps> = ({
           <form className="space-y-6">
             <Alert>
               <Info className="h-4 w-4" />
-              <AlertDescription>
-                Connect to Binance Pay or use our native crypto gateway
-              </AlertDescription>
+              <AlertDescription translationKey="settings.paywall.crypto.info" />
             </Alert>
 
             <FormField

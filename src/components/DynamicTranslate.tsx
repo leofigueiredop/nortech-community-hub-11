@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslationWithFallback } from '../hooks/useTranslationWithFallback';
+import { useOptimizedTranslation } from '../hooks/useOptimizedTranslation';
 import { useTranslationDebug } from '../hooks/useTranslationDebug';
 import type { SupportedNamespaces } from '../utils/i18n/types';
 
@@ -14,6 +14,8 @@ interface DynamicTranslateProps {
   params?: Record<string, any>;
   /** Whether to show visual indicators for missing translations in dev mode */
   showMissingIndicator?: boolean;
+  /** Whether to preload all languages for this translation */
+  preloadAllLanguages?: boolean;
   /** Optional className for styling */
   className?: string;
   /** Optional style object */
@@ -21,7 +23,7 @@ interface DynamicTranslateProps {
 }
 
 /**
- * Component for rendering translated text with debug features in development
+ * Component for rendering translated text with optimized loading and debug features
  * 
  * @example
  * ```tsx
@@ -35,11 +37,12 @@ interface DynamicTranslateProps {
  *   fallback="Welcome, {{name}}!"
  * />
  * 
- * // With namespace
+ * // With namespace and preloading
  * <DynamicTranslate 
  *   translationKey="submit"
  *   ns="forms"
  *   fallback="Submit"
+ *   preloadAllLanguages={true}
  * />
  * ```
  */
@@ -49,17 +52,15 @@ export function DynamicTranslate({
   fallback,
   params,
   showMissingIndicator = true,
+  preloadAllLanguages = false,
   className,
   style
 }: DynamicTranslateProps) {
-  const { t } = useTranslationWithFallback({ ns });
+  const { t } = useOptimizedTranslation(ns, { preloadAllLanguages });
   const { isEnabled, wrapContent } = useTranslationDebug();
 
-  // Get the translation
-  const translation = t(translationKey, {
-    fallback,
-    params
-  });
+  // Get the translation with proper typing
+  const translation = t(translationKey, fallback, { params });
 
   // Apply debug features in development
   const content = isEnabled && showMissingIndicator

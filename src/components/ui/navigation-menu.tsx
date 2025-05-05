@@ -2,6 +2,7 @@ import * as React from "react"
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import { cva } from "class-variance-authority"
 import { ChevronDown } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { cn } from "@/lib/utils"
 
@@ -44,40 +45,86 @@ const navigationMenuTriggerStyle = cva(
   "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
 )
 
+interface NavigationMenuTriggerProps extends
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Trigger> {
+  translationKey?: string
+  values?: Record<string, any>
+}
+
 const NavigationMenuTrigger = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <NavigationMenuPrimitive.Trigger
-    ref={ref}
-    className={cn(navigationMenuTriggerStyle(), "group", className)}
-    {...props}
-  >
-    {children}{" "}
-    <ChevronDown
-      className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180"
-      aria-hidden="true"
-    />
-  </NavigationMenuPrimitive.Trigger>
-))
+  NavigationMenuTriggerProps
+>(({ className, translationKey, values, children, ...props }, ref) => {
+  const { t } = useTranslation('navigation')
+  const content = translationKey ? t(translationKey, values) : children
+  
+  return (
+    <NavigationMenuPrimitive.Trigger
+      ref={ref}
+      className={cn(navigationMenuTriggerStyle(), "group", className)}
+      {...props}
+    >
+      {content}{" "}
+      <ChevronDown
+        className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180"
+        aria-hidden="true"
+      />
+    </NavigationMenuPrimitive.Trigger>
+  )
+})
 NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName
+
+interface NavigationMenuContentProps extends
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Content> {
+  translationKey?: string
+  values?: Record<string, any>
+}
 
 const NavigationMenuContent = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Content>
->(({ className, ...props }, ref) => (
-  <NavigationMenuPrimitive.Content
-    ref={ref}
-    className={cn(
-      "left-0 top-0 w-full data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute md:w-auto ",
-      className
-    )}
-    {...props}
-  />
-))
+  NavigationMenuContentProps
+>(({ className, translationKey, values, children, ...props }, ref) => {
+  const { t } = useTranslation('navigation')
+  const content = translationKey ? t(translationKey, values) : children
+  
+  return (
+    <NavigationMenuPrimitive.Content
+      ref={ref}
+      className={cn(
+        "left-0 top-0 w-full data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute md:w-auto ",
+        className
+      )}
+      {...props}
+    >
+      {content}
+    </NavigationMenuPrimitive.Content>
+  )
+})
 NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName
 
-const NavigationMenuLink = NavigationMenuPrimitive.Link
+interface NavigationMenuLinkProps extends
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Link> {
+  translationKey?: string
+  values?: Record<string, any>
+}
+
+const NavigationMenuLink = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Link>,
+  NavigationMenuLinkProps
+>(({ translationKey, values, children, ...props }, ref) => {
+  const { t } = useTranslation('navigation')
+  const content = translationKey ? t(translationKey, values) : children
+  
+  return (
+    <NavigationMenuPrimitive.Link
+      ref={ref}
+      {...props}
+    >
+      {content}
+    </NavigationMenuPrimitive.Link>
+  )
+})
+NavigationMenuLink.displayName = NavigationMenuPrimitive.Link.displayName
 
 const NavigationMenuViewport = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,

@@ -56,16 +56,14 @@ export default function EmailConfirmation() {
           
           {status === 'success' && (
             <Alert className="bg-green-50">
-              <AlertTitle>Success!</AlertTitle>
-              <AlertDescription>
-                Your email has been verified. You will be redirected to complete your profile setup.
-              </AlertDescription>
+              <AlertTitle translationKey="auth.emailVerification.success" />
+              <AlertDescription translationKey="auth.emailVerification.successDescription" />
             </Alert>
           )}
           
           {status === 'error' && (
             <Alert variant="destructive">
-              <AlertTitle>Verification Failed</AlertTitle>
+              <AlertTitle translationKey="auth.emailVerification.failed" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}

@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar, MoreHorizontal } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useTranslation } from 'react-i18next';
 
 interface EventCalendarButtonsProps {
   title: string;
@@ -23,6 +23,8 @@ const EventCalendarButtons: React.FC<EventCalendarButtonsProps> = ({
   isRegistered,
   status
 }) => {
+  const { t } = useTranslation();
+
   // Format the date and time for calendar integration
   const formatGoogleCalendarDate = (date: Date, timeStr: string) => {
     const [startTime] = timeStr.split(' - ');
@@ -107,15 +109,18 @@ const EventCalendarButtons: React.FC<EventCalendarButtonsProps> = ({
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="text-xs">
             <Calendar className="h-3.5 w-3.5 mr-1" />
-            Add to Calendar
+            {/* @ts-expect-error i18next typing */}
+            {t('calendar.addToCalendar')}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => window.open(googleCalendarUrl, '_blank')}>
-            Google Calendar
+            {/* @ts-expect-error i18next typing */}
+            {t('calendar.googleCalendar')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={generateICalFile}>
-            Apple / Outlook Calendar
+            {/* @ts-expect-error i18next typing */}
+            {t('calendar.appleOutlookCalendar')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

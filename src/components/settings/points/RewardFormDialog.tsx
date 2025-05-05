@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -8,10 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RewardForm, RewardType, RewardVisibility } from '@/types/points-config';
+import { useFormatDate } from '@/utils/i18n/formatters';
 
 interface RewardFormDialogProps {
   open: boolean;
@@ -41,6 +40,8 @@ const RewardFormDialog: React.FC<RewardFormDialogProps> = ({
   const [enableStock, setEnableStock] = useState(false);
   const [enableExpiration, setEnableExpiration] = useState(false);
   const [date, setDate] = useState<Date | undefined>(undefined);
+
+  const formatDate = useFormatDate();
 
   // Reset form when dialog opens/closes or reward changes
   useEffect(() => {
@@ -244,7 +245,7 @@ const RewardFormDialog: React.FC<RewardFormDialogProps> = ({
                       disabled={!enableExpiration}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                      {date ? formatDate(date, 'MEDIUM') : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">

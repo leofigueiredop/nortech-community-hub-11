@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail, Lock, User, ArrowRight } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { useTranslation } from 'react-i18next';
 
 // Login form schema
 const loginSchema = z.object({
@@ -33,6 +34,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Step2Authentication: React.FC = () => {
+  const { t } = useTranslation('auth');
   const [isLogin, setIsLogin] = useState(true);
   const { login, register: registerUser, loginWithGoogle, updateOnboardingStep } = useAuth();
   const navigate = useNavigate();
@@ -62,8 +64,10 @@ const Step2Authentication: React.FC = () => {
     try {
       await login(data.email, data.password);
       toast({
-        title: "Login successful!",
-        description: "Welcome back to the community",
+        // @ts-expect-error i18next typing
+        title: t('login.successTitle'),
+        // @ts-expect-error i18next typing
+        description: t('login.successDescription'),
       });
       navigate('/auth/profile-setup');
     } catch (error) {
@@ -75,8 +79,10 @@ const Step2Authentication: React.FC = () => {
     try {
       await registerUser(data.email, data.password, data.name);
       toast({
-        title: "Account created successfully!",
-        description: "Your account has been created",
+        // @ts-expect-error i18next typing
+        title: t('register.successTitle'),
+        // @ts-expect-error i18next typing
+        description: t('register.successDescription'),
       });
       navigate('/auth/profile-setup');
     } catch (error) {
@@ -88,8 +94,10 @@ const Step2Authentication: React.FC = () => {
     try {
       await loginWithGoogle();
       toast({
-        title: "Google login successful!",
-        description: "You've signed in with Google",
+        // @ts-expect-error i18next typing
+        title: t('login.googleSuccessTitle'),
+        // @ts-expect-error i18next typing
+        description: t('login.googleSuccessDescription'),
       });
       navigate('/auth/profile-setup');
     } catch (error) {
@@ -101,12 +109,12 @@ const Step2Authentication: React.FC = () => {
     <Card className="w-full shadow-lg animate-fade-in">
       <CardContent className="pt-6">
         <h2 className="text-2xl font-bold text-center mb-2">
-          {isLogin ? 'Welcome Back' : 'Create Your Account'}
+          {/* @ts-expect-error i18next typing */}
+          {isLogin ? t('login.title') : t('register.title')}
         </h2>
         <p className="text-center text-muted-foreground mb-6">
-          {isLogin 
-            ? 'Sign in to access your community' 
-            : 'Join the community with a new account'}
+          {/* @ts-expect-error i18next typing */}
+          {isLogin ? t('login.subtitle') : t('register.subtitle')}
         </p>
 
         {isLogin ? (
@@ -117,14 +125,14 @@ const Step2Authentication: React.FC = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('login.email')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input 
                           {...field}
                           type="email"
-                          placeholder="your@email.com" 
+                          placeholder={t('login.emailPlaceholder')} 
                           className="pl-10"
                         />
                       </div>
@@ -139,14 +147,14 @@ const Step2Authentication: React.FC = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{t('login.password')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input 
                           {...field}
                           type="password"
-                          placeholder="••••••••" 
+                          placeholder={t('login.passwordPlaceholder')} 
                           className="pl-10"
                         />
                       </div>
@@ -169,7 +177,8 @@ const Step2Authentication: React.FC = () => {
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>
-                        Remember me for 30 days
+                        {/* @ts-expect-error i18next typing */}
+                        {t('login.rememberMe')}
                       </FormLabel>
                     </div>
                   </FormItem>
@@ -180,7 +189,8 @@ const Step2Authentication: React.FC = () => {
                 type="submit" 
                 className="w-full"
               >
-                Sign In <ArrowRight className="ml-2 h-4 w-4" />
+                {/* @ts-expect-error i18next typing */}
+                {t('login.button')} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </form>
           </Form>
@@ -192,13 +202,13 @@ const Step2Authentication: React.FC = () => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>{t('register.name')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input 
                           {...field}
-                          placeholder="Your full name" 
+                          placeholder={t('register.namePlaceholder')} 
                           className="pl-10"
                         />
                       </div>
@@ -213,14 +223,14 @@ const Step2Authentication: React.FC = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('register.email')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input 
                           {...field}
                           type="email"
-                          placeholder="your@email.com" 
+                          placeholder={t('register.emailPlaceholder')} 
                           className="pl-10"
                         />
                       </div>
@@ -235,14 +245,14 @@ const Step2Authentication: React.FC = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{t('register.password')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input 
                           {...field}
                           type="password"
-                          placeholder="Create a secure password" 
+                          placeholder={t('register.passwordPlaceholder')} 
                           className="pl-10"
                         />
                       </div>
@@ -265,7 +275,8 @@ const Step2Authentication: React.FC = () => {
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>
-                        I accept the <a href="#" className="text-primary underline">Terms of Service</a> and <a href="#" className="text-primary underline">Privacy Policy</a>
+                        {/* @ts-expect-error i18next typing */}
+                        {t('register.terms', { terms: '<a href="#" class="text-primary underline">' + t('register.termsOfService') + '</a>', privacy: '<a href="#" class="text-primary underline">' + t('register.privacyPolicy') + '</a>' })}
                       </FormLabel>
                     </div>
                   </FormItem>
@@ -276,7 +287,8 @@ const Step2Authentication: React.FC = () => {
                 type="submit" 
                 className="w-full"
               >
-                Create Account <ArrowRight className="ml-2 h-4 w-4" />
+                {/* @ts-expect-error i18next typing */}
+                {t('register.button')} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </form>
           </Form>
@@ -288,7 +300,8 @@ const Step2Authentication: React.FC = () => {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-2 bg-white text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-              or
+              {/* @ts-expect-error i18next typing */}
+              {t('common.or')}
             </span>
           </div>
         </div>
@@ -317,7 +330,8 @@ const Step2Authentication: React.FC = () => {
             />
             <path d="M1 1h22v22H1z" fill="none" />
           </svg>
-          Continue with Google
+          {/* @ts-expect-error i18next typing */}
+          {t('login.googleButton')}
         </Button>
         
         <div className="text-center mt-6">
@@ -326,7 +340,8 @@ const Step2Authentication: React.FC = () => {
             className="text-sm text-primary hover:underline"
             onClick={() => setIsLogin(!isLogin)}
           >
-            {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}
+            {/* @ts-expect-error i18next typing */}
+            {isLogin ? t('login.switchToRegister') : t('register.switchToLogin')}
           </button>
         </div>
       </CardContent>

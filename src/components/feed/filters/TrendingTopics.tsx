@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface TrendingTopicsProps {
   selectedTags: string[];
@@ -18,19 +18,21 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({
   clearTags,
   popularTags
 }) => {
+  const { t } = useTranslation('common');
+  const translate = t as (key: string) => string;
   return (
     <>
       <div className="bg-white dark:bg-gray-800 p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <TrendingUp size={16} className="text-purple-500" />
-            <span className="text-sm font-medium">Trending Topics</span>
+            <span className="text-sm font-medium">{translate('feed.filters.trending')}</span>
           </div>
           <Link 
             to="/tags" 
             className="text-xs text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300"
           >
-            View all
+            {translate('feed.filters.viewAll')}
           </Link>
         </div>
         
@@ -55,7 +57,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({
       {/* Only show active filters when there are any */}
       {selectedTags.length > 0 && (
         <div className="flex flex-wrap gap-2 items-center mt-4 p-3 bg-gray-50 dark:bg-gray-900">
-          <span className="text-sm font-medium">Active:</span>
+          <span className="text-sm font-medium">{translate('feed.filters.active')}</span>
           {selectedTags.map(tag => (
             <Badge 
               key={tag}
@@ -74,7 +76,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({
             className="text-xs h-7 ml-auto text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
             onClick={clearTags}
           >
-            Clear All
+            {translate('feed.filters.clearAll')}
           </Button>
         </div>
       )}

@@ -3,7 +3,15 @@ import path from 'path';
 import { glob } from 'glob';
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
-import type { Node, StringLiteral, ObjectExpression, Identifier } from '@babel/types';
+import type { 
+  Node, 
+  StringLiteral, 
+  ObjectExpression, 
+  Identifier, 
+  ObjectProperty,
+  JSXAttribute,
+  JSXIdentifier
+} from '@babel/types';
 import type { SupportedLanguage } from './supportedLanguages';
 
 interface TranslationKey {
@@ -17,7 +25,7 @@ interface TranslationFile {
   language: SupportedLanguage;
   namespace: string;
   path: string;
-  translations: Record<string, any>;
+  translations: Record<string, string | Record<string, string>>;
 }
 
 interface ScanResult {
@@ -59,6 +67,7 @@ export class TranslationScanner {
       traverse(ast, {
         CallExpression(path) {
           const node = path.node;
+          
           // Check for t() function calls
           if (node.callee.type === 'Identifier' && node.callee.name === 't') {
             const args = node.arguments;
@@ -71,7 +80,7 @@ export class TranslationScanner {
               // Check for namespace in options
               if (options?.type === 'ObjectExpression') {
                 const nsProp = options.properties.find(
-                  (p: any) => {
+                  (p: ObjectProperty) => {
                     const key = p.key as Identifier;
                     return key.name === 'ns' || key.name === 'namespace';
                   }
@@ -84,6 +93,55 @@ export class TranslationScanner {
               keys.push({
                 key,
                 namespace,
+                file,
+                line: node.loc?.start.line || 0
+              });
+            }
+          }
+          
+          // Check for useTranslation hook
+          if (node.callee.type === 'Identifier' && node.callee.name === 'useTranslation') {
+            const args = node.arguments;
+            if (args.length > 0 && args[0].type === 'StringLiteral') {
+              const namespace = args[0].value;
+              // Track namespace usage
+              keys.push({
+                key: '*',
+                namespace,
+                file,
+                line: node.loc?.start.line || 0
+              });
+            }
+          }
+        },
+        // Add support for Trans component
+        JSXElement(path) {
+          const node = path.node;
+          if (
+            node.openingElement.name.type === 'JSXIdentifier' && 
+            node.openingElement.name.name === 'Trans'
+          ) {
+            const i18nKey = node.openingElement.attributes.find(
+              (attr): attr is JSXAttribute => 
+                attr.type === 'JSXAttribute' && 
+                attr.name.type === 'JSXIdentifier' && 
+                attr.name.name === 'i18nKey'
+            );
+            
+            const i18nKeyValue = i18nKey?.value;
+            if (i18nKeyValue?.type === 'StringLiteral') {
+              const key = i18nKeyValue.value;
+              const namespace = node.openingElement.attributes.find(
+                (attr): attr is JSXAttribute => 
+                  attr.type === 'JSXAttribute' && 
+                  attr.name.type === 'JSXIdentifier' && 
+                  attr.name.name === 'ns'
+              );
+
+              const namespaceValue = namespace?.value;
+              keys.push({
+                key,
+                namespace: namespaceValue?.type === 'StringLiteral' ? namespaceValue.value : undefined,
                 file,
                 line: node.loc?.start.line || 0
               });
@@ -152,15 +210,28 @@ export class TranslationScanner {
       // Build a map of all defined keys
       const definedKeysMap = new Map<string, boolean>();
       files.forEach(file => {
-        Object.keys(file.translations).forEach(key => {
-          const fullKey = `${file.namespace}:${key}`;
-          definedKeysMap.set(fullKey, true);
-          definedKeys[lang].push(fullKey);
-        });
+        const addKeys = (obj: Record<string, string | Record<string, string>>, prefix = '') => {
+          Object.keys(obj).forEach(key => {
+            const fullKey = prefix ? `${prefix}.${key}` : key;
+            const value = obj[key];
+            
+            if (typeof value === 'object') {
+              // Handle nested translations
+              addKeys(value as Record<string, string>, fullKey);
+            } else {
+              const namespaceKey = `${file.namespace}:${fullKey}`;
+              definedKeysMap.set(namespaceKey, true);
+              definedKeys[lang].push(namespaceKey);
+            }
+          });
+        };
+        
+        addKeys(file.translations);
       });
 
       // Check each used key
       usedKeys.forEach(key => {
+        if (key.key === '*') return; // Skip namespace-only entries
         const fullKey = key.namespace ? `${key.namespace}:${key.key}` : key.key;
         if (!definedKeysMap.has(fullKey)) {
           missingKeys[lang].push(key);
@@ -171,7 +242,9 @@ export class TranslationScanner {
       definedKeys[lang].forEach(key => {
         const [namespace, keyName] = key.split(':');
         const isUsed = usedKeys.some(
-          used => used.key === keyName && (!used.namespace || used.namespace === namespace)
+          used => 
+            (used.key === keyName || used.key === '*') && 
+            (!used.namespace || used.namespace === namespace)
         );
         if (!isUsed) {
           unusedKeys[lang].push(key);

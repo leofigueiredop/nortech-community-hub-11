@@ -1,9 +1,9 @@
-
 import React from 'react';
 import SearchBar from './filters/SearchBar';
 import FilterDropdown from './filters/FilterDropdown';
 import TrendingTopics from './filters/TrendingTopics';
-import { contentTypes, accessTypes, popularTags } from './filters/filterConstants';
+import { getContentTypes, getAccessTypes, popularTags } from './filters/filterConstants';
+import { useTranslation } from 'react-i18next';
 
 interface FeedFiltersProps {
   contentFilter: string;
@@ -26,6 +26,10 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
   searchQuery,
   setSearchQuery
 }) => {
+  const { t } = useTranslation('common');
+  const contentTypes = getContentTypes(t);
+  const accessTypes = getAccessTypes(t);
+
   const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
       setSelectedTags(selectedTags.filter(t => t !== tag));
@@ -51,8 +55,6 @@ const FeedFilters: React.FC<FeedFiltersProps> = ({
           setContentFilter={setContentFilter}
           accessFilter={accessFilter}
           setAccessFilter={setAccessFilter}
-          contentTypes={contentTypes}
-          accessTypes={accessTypes}
         />
       </div>
       

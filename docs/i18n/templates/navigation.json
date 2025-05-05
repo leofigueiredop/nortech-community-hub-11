@@ -1,0 +1,113 @@
+{
+  "mainMenu": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "help": "Help & Support",
+    "logout": "Log Out",
+    "withBadge": {
+      "notifications": "Notifications ({{count}})",
+      "messages": "Messages ({{count}})",
+      "updates": "Updates Available ({{count}})"
+    }
+  },
+  "userMenu": {
+    "profile": "My Profile",
+    "settings": "Account Settings",
+    "preferences": "Preferences",
+    "security": "Security",
+    "billing": "Billing & Plans",
+    "help": "Get Help",
+    "signOut": "Sign Out",
+    "welcome": "Welcome, {{name}}"
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "separator": " / ",
+    "current": "{{page}}",
+    "back": "Back to {{page}}",
+    "dynamicPage": "{{parent}} / {{child}}"
+  },
+  "sidebar": {
+    "toggle": "Toggle Sidebar",
+    "collapse": "Collapse Menu",
+    "expand": "Expand Menu",
+    "sections": {
+      "main": "Main Navigation",
+      "account": "Account",
+      "admin": "Administration",
+      "other": "Other"
+    }
+  },
+  "tabs": {
+    "overview": "Overview",
+    "details": "Details",
+    "history": "History",
+    "settings": "Settings",
+    "withCount": {
+      "comments": "Comments ({{count}})",
+      "reviews": "Reviews ({{count}})",
+      "attachments": "Attachments ({{count}})"
+    }
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{current}} of {{total}}",
+    "showing": "Showing {{start}}-{{end}} of {{total}} items",
+    "goToPage": "Go to page {{page}}"
+  },
+  "sorting": {
+    "sortBy": "Sort by",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "options": {
+      "name": "Name",
+      "date": "Date",
+      "price": "Price",
+      "status": "Status"
+    }
+  },
+  "filters": {
+    "title": "Filters",
+    "apply": "Apply Filters",
+    "clear": "Clear Filters",
+    "selected": "{{count}} filters selected",
+    "clearAll": "Clear All Filters"
+  },
+  "actions": {
+    "view": "View {{item}}",
+    "edit": "Edit {{item}}",
+    "delete": "Delete {{item}}",
+    "share": "Share {{item}}",
+    "more": "More Actions"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "accessDenied": "Access denied",
+    "backToHome": "Back to Home",
+    "navigation": "Navigation error: {{message}}"
+  },
+  "sections": {
+    "dashboard": "",
+    "userProfile": "",
+    "accountSettings": "",
+    "security": "",
+    "preferences": "",
+    "notifications": ""
+  },
+  "footer": {
+    "about": "",
+    "contact": "",
+    "privacy": "",
+    "terms": "",
+    "help": ""
+  },
+  "mobileMenu": {
+    "open": "",
+    "close": "",
+    "back": "",
+    "menu": ""
+  }
+} 

@@ -1,11 +1,11 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Circle, ArrowRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useTranslation } from 'react-i18next';
 
 interface ChecklistItem {
   id: string;
@@ -17,56 +17,62 @@ interface ChecklistItem {
 }
 
 const SetupChecklist: React.FC = () => {
-  const [items, setItems] = useState<ChecklistItem[]>([
-    {
-      id: 'basics',
-      title: 'Basics',
-      emoji: '📋',
-      description: 'Complete your community profile, add branding elements, and configure basic settings.',
-      completed: true,
-      path: '/settings/general'
-    },
-    {
-      id: 'spaces',
-      title: 'Add Spaces',
-      emoji: '🧩',
-      description: 'Create spaces for different topics, courses, or communities within your platform.',
-      completed: false,
-      path: '/create-space'
-    },
-    {
-      id: 'paywall',
-      title: 'Setup Paywall',
-      emoji: '💰',
-      description: 'Configure membership plans and payment options for premium content.',
-      completed: false,
-      path: '/settings/paywall'
-    },
-    {
-      id: 'members',
-      title: 'Invite Members',
-      emoji: '👥',
-      description: 'Start growing your community by inviting your first members.',
-      completed: false,
-      path: '/settings/integration'
-    },
-    {
-      id: 'post',
-      title: 'Create First Post',
-      emoji: '✏️',
-      description: 'Share your first post with your community members.',
-      completed: false,
-      path: '/create-post'
-    },
-    {
-      id: 'join',
-      title: 'Join Nortech Creator Group',
-      emoji: '🤝',
-      description: 'Connect with other community creators for tips and best practices.',
-      completed: false,
-      path: '/settings/general'
-    }
-  ]);
+  const { t, i18n } = useTranslation('common');
+  const [items, setItems] = useState<ChecklistItem[]>([]);
+
+  // Dynamically update items when language changes
+  useEffect(() => {
+    setItems([
+      {
+        id: 'basics',
+        title: t('common:dashboard.setupChecklist.basics.title'),
+        emoji: '📋',
+        description: t('common:dashboard.setupChecklist.basics.description'),
+        completed: true,
+        path: '/settings/general'
+      },
+      {
+        id: 'spaces',
+        title: t('common:dashboard.setupChecklist.spaces.title'),
+        emoji: '🧩',
+        description: t('common:dashboard.setupChecklist.spaces.description'),
+        completed: false,
+        path: '/create-space'
+      },
+      {
+        id: 'paywall',
+        title: t('common:dashboard.setupChecklist.paywall.title'),
+        emoji: '💰',
+        description: t('common:dashboard.setupChecklist.paywall.description'),
+        completed: false,
+        path: '/settings/paywall'
+      },
+      {
+        id: 'members',
+        title: t('common:dashboard.setupChecklist.members.title'),
+        emoji: '👥',
+        description: t('common:dashboard.setupChecklist.members.description'),
+        completed: false,
+        path: '/settings/integration'
+      },
+      {
+        id: 'post',
+        title: t('common:dashboard.setupChecklist.post.title'),
+        emoji: '✏️',
+        description: t('common:dashboard.setupChecklist.post.description'),
+        completed: false,
+        path: '/create-post'
+      },
+      {
+        id: 'join',
+        title: t('common:dashboard.setupChecklist.join.title'),
+        emoji: '🤝',
+        description: t('common:dashboard.setupChecklist.join.description'),
+        completed: false,
+        path: '/settings/general'
+      }
+    ]);
+  }, [t, i18n.language]);
 
   const toggleItemCompletion = (id: string) => {
     setItems(items.map(item => 
@@ -105,13 +111,13 @@ const SetupChecklist: React.FC = () => {
             <path d="M9 15h.01" />
             <path d="M15 15h.01" />
           </svg>
-          Setup checklist
+          {t('common:dashboard.setupChecklist.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="mb-2">
           <div className="flex justify-between text-sm mb-1">
-            <span className="font-medium">{completedSteps}/{totalSteps} steps complete</span>
+            <span className="font-medium">{completedSteps}/{totalSteps} {t('common:dashboard.setupChecklist.stepsComplete')}</span>
             <span className="text-muted-foreground">{Math.round(progressPercentage)}%</span>
           </div>
           <Progress value={progressPercentage} className="h-2" />
@@ -143,7 +149,7 @@ const SetupChecklist: React.FC = () => {
                     className="text-nortech-purple border-nortech-purple/30 hover:bg-nortech-purple/10"
                     onClick={() => handleNavigate(item)}
                   >
-                    Continue <ArrowRight className="ml-2 h-4 w-4" />
+                    {t('common:dashboard.setupChecklist.continue')} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                   
                   <Collapsible className="ml-2">
@@ -153,11 +159,14 @@ const SetupChecklist: React.FC = () => {
                         className="text-nortech-purple p-0 h-auto mt-1"
                         size="sm"
                       >
-                        Learn more
+                        {t('common:dashboard.setupChecklist.learnMore')}
                       </Button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="text-sm mt-2 text-muted-foreground">
-                      Additional details and instructions for {item.title.toLowerCase()} will be shown here.
+                      {t('dashboard.setupChecklist.additionalDetails', {
+                         defaultValue: '0',
+                         item: item.title.toLowerCase(),
+                       })}  
                     </CollapsibleContent>
                   </Collapsible>
                 </div>

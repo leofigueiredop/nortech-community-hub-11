@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,29 +25,41 @@ export const LanguageSwitcher: React.FC<{
   className = 'h-8 w-8'
 }) => {
   const { currentLanguage, changeLanguage } = useLanguagePreference();
+  const [open, setOpen] = useState(false);
+
+  const handleSelect = async (langCode: string) => {
+    await changeLanguage(langCode);
+    setOpen(false); // Close dropdown immediately after selection
+  };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant={variant} size={size} className={className}>
-          <Globe className="h-5 w-5" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        {supportedLanguages.map((lang) => (
-          <DropdownMenuItem
-            key={lang.code}
-            onClick={() => changeLanguage(lang.code)}
-            className="flex items-center justify-between"
-          >
-            <span>{lang.name}</span>
-            {currentLanguage === lang.code && (
-              <Check className="h-4 w-4 text-nortech-purple" />
-            )}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button variant={variant} size={size} className={className}>
+            <Globe className="h-5 w-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          {supportedLanguages.map((lang) => (
+            <DropdownMenuItem
+              key={lang.code}
+              onClick={() => handleSelect(lang.code)}
+              className="flex items-center justify-between"
+            >
+              <span>{lang.name}</span>
+              {currentLanguage === lang.code && (
+                <Check className="h-4 w-4 text-nortech-purple" />
+              )}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {/* Debug: Show current language code */}
+      <div style={{ fontSize: '0.75rem', color: '#888', marginTop: 4, textAlign: 'center' }}>
+        Current: {currentLanguage}
+      </div>
+    </>
   );
 };
 

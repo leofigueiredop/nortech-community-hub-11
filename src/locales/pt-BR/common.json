@@ -1,0 +1,412 @@
+{
+  "welcome": {
+    "title": "Bem-vindo à Comunidade Nortech"
+  },
+  "language": {
+    "select": "Selecionar Idioma",
+    "en-US": "Inglês",
+    "pt-BR": "Português"
+  },
+  "navigation": {
+    "home": "Início",
+    "about": "Sobre",
+    "contact": "Contato"
+  },
+  "actions": {
+    "view": "Visualizar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "share": "Compartilhar",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "next": "Próximo"
+  },
+  "status": {
+    "loading": "Carregando...",
+    "success": "Sucesso!",
+    "error": "Erro",
+    "notFound": "Não Encontrado",
+    "offline": "Você está offline",
+    "online": "Você está online"
+  },
+  "notifications": {
+    "success": "Operação concluída com sucesso",
+    "error": "Ocorreu um erro",
+    "info": "Informação",
+    "warning": "Aviso"
+  },
+  "time": {
+    "now": "Agora mesmo",
+    "minutesAgo": "há {count} minutos",
+    "hoursAgo": "há {count} horas",
+    "daysAgo": "há {count} dias",
+    "weeksAgo": "há {count} semanas",
+    "monthsAgo": "há {count} meses",
+    "yearsAgo": "há {count} anos"
+  },
+  "errors": {
+    "general": "Algo deu errado",
+    "notFound": "Página não encontrada",
+    "offline": "Verifique sua conexão com a internet",
+    "unauthorized": "Você precisa estar logado",
+    "forbidden": "Você não tem permissão para acessar isso"
+  },
+  "pagination": {
+    "previous": "Anterior",
+    "next": "Próximo",
+    "page": "Página {number}",
+    "showing": "Mostrando {from} até {to} de {total} registros"
+  },
+  "meta": {
+    "title": "Comunidade Nortech",
+    "description": "Uma plataforma comunitária para profissionais de tecnologia"
+  },
+  "loading": "Carregando...",
+  "error": {
+    "generic": "Ocorreu um erro",
+    "notFound": "Não encontrado"
+  },
+  "ui": {
+    "tabs": {
+      "aria": {
+        "tabList": "Lista de Abas",
+        "tab": "Aba",
+        "tabPanel": "Painel da Aba"
+      }
+    },
+    "menubar": {
+      "file": {
+        "title": "Arquivo",
+        "new": "Novo",
+        "open": "Abrir",
+        "save": "Salvar",
+        "saveAs": "Salvar Como",
+        "close": "Fechar"
+      },
+      "edit": {
+        "title": "Editar",
+        "undo": "Desfazer",
+        "redo": "Refazer",
+        "cut": "Recortar",
+        "copy": "Copiar",
+        "paste": "Colar"
+      },
+      "view": {
+        "title": "Visualizar",
+        "zoomIn": "Aumentar Zoom",
+        "zoomOut": "Diminuir Zoom",
+        "resetZoom": "Redefinir Zoom"
+      },
+      "help": {
+        "title": "Ajuda",
+        "about": "Sobre",
+        "documentation": "Documentação",
+        "support": "Suporte"
+      }
+    },
+    "breadcrumb": {
+      "more": "Mais"
+    },
+    "alert": {
+      "error": "Erro",
+      "warning": "Aviso",
+      "success": "Sucesso",
+      "info": "Informação",
+      "close": "Fechar Alerta"
+    },
+    "button": {
+      "submit": "Enviar",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "back": "Voltar",
+      "loading": "Carregando...",
+      "retry": "Tentar Novamente",
+      "addLink": "Adicionar Link",
+      "edit": "Editar",
+      "delete": "Excluir"
+    },
+    "dialog": {
+      "close": "Fechar",
+      "confirm": {
+        "title": "Confirmar Ação",
+        "message": "Tem certeza que deseja prosseguir?",
+        "yes": "Sim",
+        "no": "Não"
+      },
+      "addNewLinkTitle": "Adicionar Novo Link",
+      "addNewLinkDescription": "Preencha os detalhes abaixo para adicionar um novo link."
+    },
+    "toast": {
+      "error": "Erro: {message}",
+      "success": "Sucesso: {message}",
+      "info": "Info: {message}",
+      "warning": "Aviso: {message}",
+      "close": "Fechar"
+    },
+    "tooltip": {
+      "moreInfo": "Clique para mais informações",
+      "required": "Este campo é obrigatório"
+    },
+    "toggle": {
+      "on": "Ligado",
+      "off": "Desligado",
+      "enabled": "Ativado",
+      "disabled": "Desativado"
+    },
+    "calendar": {
+      "monthYear": "{month} de {year}",
+      "today": "Hoje",
+      "weekdays": {
+        "short": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+        "long": ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"]
+      },
+      "months": {
+        "short": ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
+        "long": ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+      },
+      "upcomingEvents": "Próximos Eventos",
+      "live": "Ao Vivo",
+      "viewAllEvents": "Ver Todos os Eventos"
+    },
+    "dropdown": {
+      "placeholder": "Selecione uma opção",
+      "noOptions": "Nenhuma opção disponível",
+      "loading": "Carregando opções...",
+      "search": "Pesquisar..."
+    },
+    "input": {
+      "clear": "Limpar",
+      "search": "Pesquisar",
+      "password": {
+        "show": "Mostrar senha",
+        "hide": "Ocultar senha"
+      }
+    }
+  },
+  "view": {
+    "all": "Todos",
+    "free": "Grátis",
+    "premium": "Premium",
+    "mentor": "Mentor",
+    "label": "Visualizar"
+  },
+  "button": {
+    "post": "Publicar",
+    "createPost": "Criar Publicação",
+    "addLink": "Adicionar Link",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "cancel": "Cancelar"
+  },
+  "dialog": {
+    "close": "Fechar",
+    "confirm": {
+      "title": "Confirmar Ação",
+      "message": "Tem certeza que deseja prosseguir?",
+      "yes": "Sim",
+      "no": "Não"
+    },
+    "addNewLinkTitle": "Adicionar Novo Link",
+    "addNewLinkDescription": "Preencha os detalhes abaixo para adicionar um novo link."
+  },
+  "label": {
+    "linkText": "Texto do Link",
+    "url": "URL"
+  },
+  "placeholder": {
+    "linkText": "Digite o texto do link",
+    "url": "Digite a URL"
+  },
+  "feed": {
+    "premium": {
+      "unlockTitle": "Desbloqueie Conteúdo Premium",
+      "unlockDesc": "Atualize sua assinatura para acessar conteúdo exclusivo",
+      "exclusive": "Conteúdo Exclusivo",
+      "exclusiveDesc": "Acesse tutoriais, cursos e recursos premium",
+      "early": "Acesso Antecipado",
+      "earlyDesc": "Seja o primeiro a ver novos cursos e recursos",
+      "support": "Suporte Direto",
+      "supportDesc": "Receba ajuda personalizada dos mentores da comunidade",
+      "groups": "Grupos Premium",
+      "groupsDesc": "Participe de grupos privados com especialistas do setor",
+      "upgradeNow": "Atualizar Agora"
+    },
+    "tabs": {
+      "all": "Todo o Conteúdo",
+      "free": "Área Gratuita",
+      "premium": "Área Premium",
+      "mentor": "Área Mentor",
+      "premiumWarning": "Conteúdo premium requer uma assinatura ativa",
+      "viewPlans": "Ver Planos"
+    },
+    "empty": {
+      "noPosts": "Nenhuma publicação encontrada",
+      "noPostsDesc": "Não encontramos publicações com os filtros atuais",
+      "clearFilters": "Limpar todos os filtros",
+      "welcome": "Bem-vindo à sua comunidade",
+      "welcomeDesc": "Seu feed é onde você verá novas publicações",
+      "createPost": "Criar publicação"
+    },
+    "settings": {
+      "community": "Comunidade",
+      "settings": "Configurações",
+      "switchTheme": "Mudar para modo claro",
+      "customize": "Personalizar tema",
+      "shortcuts": "Atalhos de teclado",
+      "viewAs": "Visualizar como",
+      "invite": "Convidar membro"
+    },
+    "filters": {
+      "filter": "Filtrar",
+      "contentType": "Tipo de Conteúdo",
+      "accessLevel": "Nível de Acesso",
+      "all": "Todos",
+      "posts": "Apenas publicações",
+      "events": "Eventos",
+      "lives": "Lives",
+      "content": "Novo conteúdo",
+      "allContent": "Todo o conteúdo",
+      "freeContent": "Conteúdo gratuito",
+      "paidContent": "Conteúdo pago",
+      "subscription": "Apenas minha assinatura",
+      "trending": "Tópicos em Alta",
+      "viewAll": "Ver todos",
+      "active": "Ativo:",
+      "clearAll": "Limpar Tudo",
+      "searchPlaceholder": "Buscar publicações, tags ou palavras-chave..."
+    }
+  },
+  "dashboard": {
+    "title": "Painel",
+    "viewingAs": "Visualizando como",
+    "viewingAsDescription": "Você está visualizando sua comunidade como um(a) {role} veria.",
+    "viewAsAdmin": "Visualizar como Administrador",
+    "viewAsFreeMember": "Visualizar como Membro Gratuito",
+    "viewAsPremiumMember": "Visualizar como Membro Premium",
+    "viewAsPremiumPlusMember": "Visualizar como Membro Premium+",
+    "createSpace": "Criar Espaço",
+    "memberResources": "Recursos do Membro",
+    "memberResourcesDesc": "Encontre recursos úteis para aproveitar ao máximo sua associação.",
+    "communityGuidelines": "Diretrizes da Comunidade",
+    "memberDirectory": "Diretório de Membros",
+    "upcomingEvents": "Próximos Eventos",
+    "welcome": {
+      "title": "Bem-vindo às Comunidades Nortech",
+      "description": "Sua plataforma tudo-em-um para construção de comunidade, educação e engajamento",
+      "guide": "Siga o guia de configuração para completar sua comunidade. Você pode personalizar sua marca, convidar membros, criar conteúdo e mais.",
+      "customizeBranding": "Personalizar Marca",
+      "createFirstPost": "Criar Primeiro Post",
+      "allSettings": "Todas as Configurações"
+    },
+    "aiSuggestions": {
+      "title": "Sugestões de IA",
+      "basedOnSetup": "Com base na sua configuração:",
+      "createWelcomePost": "Crie um post de boas-vindas com IA",
+      "sendEmailToInactive": "Envie um e-mail para membros inativos",
+      "addRewardToStore": "Adicione uma recompensa à sua loja de pontos",
+      "engagementOpportunities": "Oportunidades de engajamento:",
+      "hostLiveQA": "Realize uma sessão semanal de perguntas e respostas ao vivo",
+      "createChallenge": "Crie um desafio para membros",
+      "startDiscussion": "Inicie um tópico de discussão",
+      "exploreIdeas": "Explorar Ideias",
+      "growthSuggestions": "Sugestões de crescimento:",
+      "shareOnSocial": "Compartilhe sua comunidade nas redes sociais",
+      "offerFreeTier": "Ofereça um plano gratuito de associação",
+      "createReferral": "Crie um programa de indicação",
+      "tryNow": "Experimentar Agora",
+      "growNow": "Crescer Agora"
+    },
+    "setupChecklist": {
+      "title": "Checklist de Configuração",
+      "basics": { "title": "Básico", "description": "Complete o perfil da sua comunidade, adicione elementos de marca e configure as opções básicas." },
+      "spaces": { "title": "Adicionar Espaços", "description": "Crie espaços para diferentes tópicos, cursos ou comunidades dentro da sua plataforma." },
+      "paywall": { "title": "Configurar Paywall", "description": "Configure planos de associação e opções de pagamento para conteúdo premium." },
+      "members": { "title": "Convidar Membros", "description": "Comece a crescer sua comunidade convidando seus primeiros membros." },
+      "post": { "title": "Criar Primeiro Post", "description": "Compartilhe seu primeiro post com os membros da comunidade." },
+      "join": { "title": "Entrar no Grupo de Criadores Nortech", "description": "Conecte-se com outros criadores para dicas e melhores práticas." },
+      "stepsComplete": "passos completos",
+      "continue": "Continuar",
+      "learnMore": "Saiba mais",
+      "additionalDetails": "Detalhes e instruções adicionais para {item} serão exibidos aqui."
+    },
+    "quickActions": {
+      "title": "Ações Rápidas",
+      "createPost": "Criar Post",
+      "shareIdeas": "Compartilhe suas ideias",
+      "inviteMembers": "Convidar Membros",
+      "growCommunity": "Cresça sua comunidade",
+      "scheduleEvent": "Agendar Evento",
+      "hostSession": "Organizar sessão",
+      "createSpace": "Criar Espaço",
+      "organizeTopics": "Organizar tópicos",
+      "customizeBrand": "Personalizar Marca",
+      "personalizeLook": "Personalizar visual",
+      "sendAnnouncement": "Enviar Aviso",
+      "alertAll": "Avisar todos os membros"
+    },
+    "overview": {
+      "title": "Visão Geral da Comunidade",
+      "totalMembers": "Total de Membros",
+      "allTimeJoined": "Usuários que já entraram",
+      "activeSpaces": "Espaços Ativos",
+      "spacesWithEngagement": "Espaços com engajamento nesta semana",
+      "noChange": "Sem alteração",
+      "postsThisWeek": "Posts nesta semana",
+      "newPostsLast7Days": "Novos posts nos últimos 7 dias",
+      "engagementLevel": "Nível de Engajamento",
+      "medium": "Médio",
+      "calculatedByViews": "Calculado pela razão de visualizações/comentários"
+    },
+    "guidedTour": {
+      "title": "Bem-vindo ao Painel da Comunidade",
+      "description": "Vamos começar com alguns passos rápidos para configurar sua comunidade.",
+      "quickStart": "Guia Rápido",
+      "videoWalkthrough": "Vídeo Tutorial",
+      "videoPlaceholder": "O vídeo tutorial será exibido aqui",
+      "branding": { "title": "Personalize sua Marca", "description": "Envie seu logo e defina as cores da sua comunidade.", "action": "Personalizar Marca" },
+      "space": { "title": "Crie seu Primeiro Espaço", "description": "Espaços ajudam a organizar o conteúdo da comunidade em áreas dedicadas.", "action": "Criar Espaço" },
+      "content": { "title": "Crie seu Primeiro Conteúdo", "description": "Compartilhe novidades, inicie discussões ou crie conteúdo educativo.", "action": "Criar Conteúdo" },
+      "skipTour": "Pular Tour",
+      "helpTooltip": "Você pode acessar este guia depois no menu de ajuda",
+      "hideVideoOption": "Ocultar Vídeo",
+      "showVideoWalkthrough": "Mostrar Vídeo Tutorial"
+    },
+    "createSpaceDialog": {
+      "chooseType": "Escolha o tipo de espaço",
+      "spaceDetails": "Detalhes do espaço",
+      "selectType": "Selecione o tipo de espaço que deseja criar para sua comunidade.",
+      "posts": { "label": "Posts", "description": "Crie e compartilhe artigos, atualizações e notícias" },
+      "events": { "label": "Eventos", "description": "Agende e gerencie eventos da comunidade" },
+      "chat": { "label": "Chat", "description": "Conversas em tempo real com membros" },
+      "course": { "label": "Curso", "description": "Crie conteúdo de aprendizagem estruturado" },
+      "members": { "label": "Membros", "description": "Gerencie os membros da comunidade" },
+      "images": { "label": "Imagens", "description": "Crie uma galeria de fotos ou álbum" },
+      "support": { "label": "Suporte", "description": "Ofereça ajuda e suporte aos membros" },
+      "faq": { "label": "FAQ", "description": "Perguntas frequentes e respostas" },
+      "spaceName": "Nome do espaço",
+      "enterSpaceName": "Digite o nome do espaço",
+      "descriptionOptional": "Descrição (opcional)",
+      "describeSpace": "Descreva sobre o que é este espaço",
+      "back": "Voltar",
+      "next": "Próximo",
+      "createSpace": "Criar Espaço"
+    }
+  },
+  "calendar": {
+    "upcomingEvents": "Próximos Eventos",
+    "weekdays": {
+      "sunday": "Domingo",
+      "monday": "Segunda",
+      "tuesday": "Terça",
+      "wednesday": "Quarta",
+      "thursday": "Quinta",
+      "friday": "Sexta",
+      "saturday": "Sábado"
+    },
+    "live": "Ao Vivo",
+    "viewAllEvents": "Ver Todos os Eventos"
+  }
+} 

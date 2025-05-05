@@ -1,5 +1,6 @@
 import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
+import { useTranslation } from "react-i18next"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -71,57 +72,104 @@ const AlertDialogFooter = ({
 )
 AlertDialogFooter.displayName = "AlertDialogFooter"
 
+interface AlertDialogTitleProps extends
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Title> {
+  translationKey?: string
+  values?: Record<string, any>
+}
+
 const AlertDialogTitle = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Title
-    ref={ref}
-    className={cn("text-lg font-semibold", className)}
-    {...props}
-  />
-))
+  AlertDialogTitleProps
+>(({ className, translationKey, values, children, ...props }, ref) => {
+  const { t } = useTranslation()
+  
+  return (
+    <AlertDialogPrimitive.Title
+      ref={ref}
+      className={cn("text-lg font-semibold", className)}
+      {...props}
+    >
+      {translationKey ? t(translationKey, values) : children}
+    </AlertDialogPrimitive.Title>
+  )
+})
 AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName
+
+interface AlertDialogDescriptionProps extends
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Description> {
+  translationKey?: string
+  values?: Record<string, any>
+}
 
 const AlertDialogDescription = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Description
-    ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
-    {...props}
-  />
-))
-AlertDialogDescription.displayName =
-  AlertDialogPrimitive.Description.displayName
+  AlertDialogDescriptionProps
+>(({ className, translationKey, values, children, ...props }, ref) => {
+  const { t } = useTranslation()
+  
+  return (
+    <AlertDialogPrimitive.Description
+      ref={ref}
+      className={cn("text-sm text-muted-foreground", className)}
+      {...props}
+    >
+      {translationKey ? t(translationKey, values) : children}
+    </AlertDialogPrimitive.Description>
+  )
+})
+AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName
+
+interface AlertDialogActionProps extends
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action> {
+  translationKey?: string
+  values?: Record<string, any>
+}
 
 const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>
->(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Action
-    ref={ref}
-    className={cn(buttonVariants(), className)}
-    {...props}
-  />
-))
+  AlertDialogActionProps
+>(({ className, translationKey, values, children, ...props }, ref) => {
+  const { t } = useTranslation()
+  
+  return (
+    <AlertDialogPrimitive.Action
+      ref={ref}
+      className={cn(buttonVariants(), className)}
+      {...props}
+    >
+      {translationKey ? t(translationKey, values) : children}
+    </AlertDialogPrimitive.Action>
+  )
+})
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName
+
+interface AlertDialogCancelProps extends
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel> {
+  translationKey?: string
+  values?: Record<string, any>
+}
 
 const AlertDialogCancel = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>
->(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Cancel
-    ref={ref}
-    className={cn(
-      buttonVariants({ variant: "outline" }),
-      "mt-2 sm:mt-0",
-      className
-    )}
-    {...props}
-  />
-))
+  AlertDialogCancelProps
+>(({ className, translationKey, values, children, ...props }, ref) => {
+  const { t } = useTranslation()
+  
+  return (
+    <AlertDialogPrimitive.Cancel
+      ref={ref}
+      className={cn(
+        buttonVariants({ variant: "outline" }),
+        "mt-2 sm:mt-0",
+        className
+      )}
+      {...props}
+    >
+      {translationKey ? t(translationKey, values) : children}
+    </AlertDialogPrimitive.Cancel>
+  )
+})
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName
 
 export {

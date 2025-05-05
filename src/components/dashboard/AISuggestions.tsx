@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Suggestion {
   id: number;
@@ -13,38 +13,39 @@ interface Suggestion {
 }
 
 const AISuggestions: React.FC = () => {
+  const { t } = useTranslation('common');
   const suggestions: Suggestion[] = [
     {
       id: 1,
-      title: "Based on your setup:",
+      title: t('common:dashboard.aiSuggestions.basedOnSetup'),
       tips: [
-        "Create a welcome post with AI",
-        "Send an email to inactive members",
-        "Add a reward to your points store"
+        t('common:dashboard.aiSuggestions.createWelcomePost'),
+        t('common:dashboard.aiSuggestions.sendEmailToInactive'),
+        t('common:dashboard.aiSuggestions.addRewardToStore')
       ],
-      action: "Try Now",
+      action: t('common:dashboard.aiSuggestions.tryNow'),
       path: "/create-post"
     },
     {
       id: 2,
-      title: "Engagement opportunities:",
+      title: t('common:dashboard.aiSuggestions.engagementOpportunities'),
       tips: [
-        "Host a weekly live Q&A session",
-        "Create a challenge for members",
-        "Start a discussion thread"
+        t('common:dashboard.aiSuggestions.hostLiveQA'),
+        t('common:dashboard.aiSuggestions.createChallenge'),
+        t('common:dashboard.aiSuggestions.startDiscussion')
       ],
-      action: "Explore Ideas",
+      action: t('common:dashboard.aiSuggestions.exploreIdeas'),
       path: "/events/create"
     },
     {
       id: 3,
-      title: "Growth suggestions:",
+      title: t('common:dashboard.aiSuggestions.growthSuggestions'),
       tips: [
-        "Share your community on social media",
-        "Offer a free membership tier",
-        "Create a referral program"
+        t('common:dashboard.aiSuggestions.shareOnSocial'),
+        t('common:dashboard.aiSuggestions.offerFreeTier'),
+        t('common:dashboard.aiSuggestions.createReferral')
       ],
-      action: "Grow Now",
+      action: t('common:dashboard.aiSuggestions.growNow'),
       path: "/settings/marketing"
     }
   ];
@@ -66,7 +67,7 @@ const AISuggestions: React.FC = () => {
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Lightbulb className="h-5 w-5 text-amber-500" />
-          AI Suggestions
+          {t('common:dashboard.aiSuggestions.title')}
         </CardTitle>
       </CardHeader>
       <CardContent>

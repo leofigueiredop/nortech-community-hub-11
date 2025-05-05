@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, addMonths, subMonths } from 'date-fns';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
@@ -8,6 +7,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import EventCard from './EventCard';
 import { Event } from './types/EventTypes';
+import { useTranslation } from 'react-i18next';
 
 interface CalendarViewProps {
   events: Event[];
@@ -17,6 +17,7 @@ interface CalendarViewProps {
 const CalendarView: React.FC<CalendarViewProps> = ({ events, onRSVP }) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [month, setMonth] = useState(new Date());
+  const { t } = useTranslation();
 
   // Filter events for the selected date
   const selectedDateEvents = events.filter(event => 
@@ -85,7 +86,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onRSVP }) => {
       <ResizablePanel defaultSize={40}>
         <div className="pl-4">
           <h2 className="text-lg font-medium mb-4">
-            {date ? format(date, 'MMMM d, yyyy') : 'No date selected'}
+            {date ? format(date, 'MMMM d, yyyy') : /* @ts-expect-error i18next typing */ t('calendar.noDateSelected')}
           </h2>
           
           {selectedDateEvents.length > 0 ? (
@@ -95,7 +96,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onRSVP }) => {
           ) : (
             <Card>
               <CardContent className="py-8 text-center text-gray-500">
-                <p>No events scheduled for this date.</p>
+                <p>{/* @ts-expect-error i18next typing */} {t('calendar.noEventsForDate')}</p>
               </CardContent>
             </Card>
           )}

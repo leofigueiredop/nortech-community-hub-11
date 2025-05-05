@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { format, isSameDay, eachDayOfInterval, startOfWeek, endOfWeek, addWeeks,
 import { useToast } from '@/hooks/use-toast';
 import { Event } from './types/EventTypes';
 import WeeklyEventCard from './WeeklyEventCard';
+import { useTranslation } from 'react-i18next';
 
 interface WeeklyCalendarViewProps {
   events: Event[];
@@ -26,6 +26,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }); // Week starts on Monday
   const weekEnd = endOfWeek(currentWeek, { weekStartsOn: 1 });
   const daysOfWeek = eachDayOfInterval({ start: weekStart, end: weekEnd });
+  const { t } = useTranslation();
 
   // Handle navigation between weeks
   const handlePreviousWeek = () => {
@@ -50,13 +51,16 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handlePreviousWeek}>
               <ChevronLeft size={16} className="mr-1" />
-              Previous
+              {/* @ts-expect-error i18next typing */}
+              {t('calendar.previous')}
             </Button>
             <Button variant="outline" size="sm" onClick={handleToday}>
-              Today
+              {/* @ts-expect-error i18next typing */}
+              {t('calendar.today')}
             </Button>
             <Button variant="outline" size="sm" onClick={handleNextWeek}>
-              Next
+              {/* @ts-expect-error i18next typing */}
+              {t('calendar.next')}
               <ChevronRight size={16} className="ml-1" />
             </Button>
           </div>
@@ -72,7 +76,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
                 isSameDay(day, new Date()) ? 'bg-purple-100 dark:bg-purple-900/30 rounded-md' : ''
               }`}
             >
-              <div className="mb-1">{format(day, 'EEE')}</div>
+              <div className="mb-1">{/* @ts-expect-error i18next typing */}{t(`calendar.weekdays.${format(day, 'EEEE').toLowerCase()}`)}</div>
               <div className="text-lg">{format(day, 'd')}</div>
             </div>
           ))}
@@ -97,7 +101,8 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
                   </div>
                 ) : (
                   <div className="h-full flex items-center justify-center text-gray-400 text-sm">
-                    No events
+                    {/* @ts-expect-error i18next typing */}
+                    {t('calendar.noEvents')}
                   </div>
                 )}
               </div>
