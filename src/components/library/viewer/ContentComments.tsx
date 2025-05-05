@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -18,7 +17,7 @@ const ContentComments: React.FC<ContentCommentsProps> = ({ itemId }) => {
       id: '1',
       user: {
         name: 'Sarah Johnson',
-        avatar: 'https://via.placeholder.com/40'
+        avatar: 'https://placehold.co/40'
       },
       text: 'This was really helpful! I especially liked the section on performance optimization.',
       date: '2 days ago',
@@ -27,7 +26,7 @@ const ContentComments: React.FC<ContentCommentsProps> = ({ itemId }) => {
       id: '2',
       user: {
         name: 'Mike Thompson',
-        avatar: 'https://via.placeholder.com/40'
+        avatar: 'https://placehold.co/40'
       },
       text: 'Great content! Would love to see a follow-up on advanced techniques.',
       date: '1 week ago',
@@ -49,7 +48,7 @@ const ContentComments: React.FC<ContentCommentsProps> = ({ itemId }) => {
       
       <form onSubmit={handleSubmit} className="flex gap-3">
         <Avatar className="h-8 w-8">
-          <AvatarImage src="https://via.placeholder.com/40" alt="Your avatar" />
+          <AvatarImage src="https://placehold.co/40" alt="Your avatar" />
           <AvatarFallback>YA</AvatarFallback>
         </Avatar>
         <div className="flex-1 space-y-2">

@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 export default function EmailConfirmation() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { emailConfirmation } = useAuth();
+  const { handleAuthCallback } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [error, setError] = useState<string>('');
 
@@ -22,23 +23,33 @@ export default function EmailConfirmation() {
 
     const verifyEmail = async () => {
       try {
-        const { error: verifyError } = await emailConfirmation.verifyToken(token);
+        const response = await handleAuthCallback();
         
-        if (verifyError) {
-          throw verifyError;
+        if (!response.user) {
+          throw new Error('Failed to verify email');
         }
         
         setStatus('success');
+        toast({
+          title: "Email verified successfully",
+          description: "You will be redirected to complete your profile setup.",
+        });
         // Redirect to profile setup after 3 seconds on success
         setTimeout(() => navigate('/auth/profile-setup'), 3000);
       } catch (err) {
         setStatus('error');
-        setError(err instanceof Error ? err.message : 'Failed to verify email');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to verify email';
+        setError(errorMessage);
+        toast({
+          title: "Verification failed",
+          description: errorMessage,
+          variant: "destructive"
+        });
       }
     };
 
     verifyEmail();
-  }, [searchParams, emailConfirmation, navigate]);
+  }, [searchParams, handleAuthCallback, navigate]);
 
   return (
     <div className="container mx-auto max-w-md py-12">

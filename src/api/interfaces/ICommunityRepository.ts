@@ -1,19 +1,22 @@
 import { Result } from '@/types/api';
+import { UUID } from '@/types/common';
 
 // Define and export the Community interface so it can be used elsewhere
 export interface Community {
-  id: string;
+  id: UUID;
   name: string;
-  description: string;
-  slug: string;
-  isPrivate: boolean;
+  description: string | null;
+  slug: string | null;
+  is_private: boolean;
   status: string;
   category: string;
-  creatorId: string;
-  creatorName: string;
-  logo_url?: string;
-  banner_url?: string;
-  memberCount?: number;
+  creator_id: UUID;
+  domain: string | null;
+  logo_url: string | null;
+  banner_url: string | null;
+  theme_config: any | null;
+  api_keys: any | null;
+  member_count: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,21 +30,19 @@ export interface ICommunityRepository {
   
   getFeaturedCommunities(): Promise<Result<Community[]>>;
   
-  getCommunityById(id: string): Promise<Result<Community>>;
+  getCommunityById(id: UUID): Promise<Result<Community>>;
   
   getCommunityBySlug(slug: string): Promise<Result<Community>>;
   
   createCommunity(data: Partial<Community>): Promise<Result<Community>>;
   
-  updateCommunity(id: string, data: Partial<Community>): Promise<Result<Community>>;
+  updateCommunity(id: UUID, data: Partial<Community>): Promise<Result<Community>>;
   
-  deleteCommunity(id: string): Promise<Result<void>>;
+  deleteCommunity(id: UUID): Promise<Result<void>>;
   
-  joinCommunity(communityId: string, userId: string): Promise<Result<void>>;
+  joinCommunity(communityId: UUID, userId: UUID): Promise<Result<void>>;
   
-  leaveCommunity(communityId: string, userId: string): Promise<Result<void>>;
+  isMember(communityId: UUID, userId: UUID): Promise<Result<boolean>>;
   
-  getAllMembers(communityId: string): Promise<Result<string[]>>;
-  
-  isMember(communityId: string, userId: string): Promise<Result<boolean>>;
+  getAllMembers(communityId: UUID): Promise<Result<string[]>>;
 }

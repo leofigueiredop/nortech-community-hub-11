@@ -1,11 +1,13 @@
+// Add UUID type at the top
+type UUID = string; // Type alias for UUID strings
 
 export interface PointsActivity {
-  id: string;
-  user_id: string;
-  community_id: string;
+  id: UUID;
+  user_id: UUID;
+  community_id: UUID;
   points: number;
   activity_type: string;
-  entity_id?: string;
+  entity_id?: UUID;
   entity_type?: string;
   created_at: string;
   metadata?: Record<string, any>;

@@ -1,34 +1,30 @@
 import { useEffect } from 'react';
 import { ApiClient } from '@/api/ApiClient';
 import { usePoints } from '@/context/PointsContext';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 
 export const usePointsSubscription = () => {
   const api = ApiClient.getInstance();
   const { user } = useAuth();
-  const { awardPoints } = usePoints();
+  const { updatePoints } = usePoints();
 
   useEffect(() => {
     if (!user) return;
 
-    // Subscribe to points channel for the current user
-    const pointsChannel = api.supabase
-      .channel(`points:${user.id}`)
+    const channel = api.supabase
+      .channel('points_changes')
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: 'UPDATE',
           schema: 'public',
-          table: 'points_transactions',
-          filter: `user_id=eq.${user.id}`
+          table: 'users',
+          filter: `id=eq.${user.id}`,
         },
         (payload) => {
-          // Update points in context when new transaction is received
-          awardPoints({
-            type: payload.new.source,
-            description: payload.new.description,
-            points: payload.new.points
-          });
+          if (payload.new && payload.new.points !== undefined) {
+            updatePoints(payload.new.points);
+          }
         }
       )
       .subscribe();
@@ -52,8 +48,8 @@ export const usePointsSubscription = () => {
       .subscribe();
 
     return () => {
-      pointsChannel.unsubscribe();
+      api.supabase.removeChannel(channel);
       leaderboardChannel.unsubscribe();
     };
-  }, [user, api.supabase, awardPoints]);
+  }, [user, api.supabase, updatePoints]);
 }; 

@@ -1,3 +1,6 @@
+// Add UUID type at the top
+type UUID = string; // Type alias for UUID strings
+
 // API Response types
 export interface ApiResponse<T = any> {
   data?: T;
@@ -23,14 +26,14 @@ export interface Result<T> {
 }
 
 export interface AuthUser {
-  id: string;
+  id: UUID;
   email: string;
   name: string;
   role: string;
   accessLevel: 'free' | 'premium' | 'creator';
   interests: string[];
   isOnboarded: boolean;
-  communityId?: string;
+  communityId?: UUID;
   communityRole?: 'admin' | 'moderator' | 'member';
 }
 

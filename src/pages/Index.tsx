@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Plus, Globe, Users, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import PricingPlans from '@/components/settings/PricingPlans';
+import { useAuth } from '@/context/AuthContext';
 
 // Sample community data
 const communities = [
@@ -84,6 +85,8 @@ const Index: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
   
   useEffect(() => {
     document.title = "Nortech Communities - Discover & Create Communities";
@@ -125,7 +128,7 @@ const Index: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <Link to="/dashboard" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+            <Link to="/login" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
               Log in
             </Link>
             <Button asChild variant="outline" className="hidden sm:flex">

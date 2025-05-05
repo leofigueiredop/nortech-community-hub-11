@@ -59,7 +59,7 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
       return { ok: true, data: communities };
     } catch (error) {
       console.error('Error searching communities:', error);
-      return { ok: false, error: 'Failed to search communities' };
+      return { ok: false, error: { message: 'Failed to search communities' } };
     }
   }
 
@@ -99,7 +99,7 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
       return { ok: true, data: communities };
     } catch (error) {
       console.error('Error getting featured communities:', error);
-      return { ok: false, error: 'Failed to get featured communities' };
+      return { ok: false, error: { message: 'Failed to get featured communities' } };
     }
   }
 
@@ -139,7 +139,7 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
       return { ok: true, data: community };
     } catch (error) {
       console.error('Error getting community by ID:', error);
-      return { ok: false, error: 'Failed to get community' };
+      return { ok: false, error: { message: 'Failed to get community' } };
     }
   }
 
@@ -179,34 +179,38 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
       return { ok: true, data: community };
     } catch (error) {
       console.error('Error getting community by slug:', error);
-      return { ok: false, error: 'Failed to get community' };
+      return { ok: false, error: { message: 'Failed to get community' } };
     }
   }
 
   async createCommunity(data: Partial<Community>): Promise<Result<Community>> {
     try {
+      console.log("Creating community with data:", data);
+      
       const { data: community, error } = await this.client
         .from('communities')
         .insert([{
           name: data.name,
           description: data.description,
           slug: data.slug,
-          is_private: data.isPrivate,
+          is_private: data.is_private,
           status: data.status || 'active',
           category: data.category,
-          creator_id: data.creatorId,
+          creator_id: data.creator_id,
           logo_url: data.logo_url,
-          banner_url: data.banner_url
+          banner_url: data.banner_url,
+          member_count: data.member_count || 0,
+          domain: data.domain,
+          theme_config: data.theme_config,
+          api_keys: data.api_keys
         }])
-        .select(`
-          *,
-          profiles!communities_creator_id_fkey (
-            full_name
-          )
-        `)
+        .select('*')
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating community:', error);
+        throw error;
+      }
       if (!community) throw new Error('Failed to create community');
 
       return {
@@ -216,21 +220,28 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
           name: community.name,
           description: community.description,
           slug: community.slug,
-          isPrivate: community.is_private,
+          is_private: community.is_private,
           status: community.status,
           category: community.category,
-          creatorId: community.creator_id,
-          creatorName: community.profiles?.full_name || 'Unknown',
+          creator_id: community.creator_id,
+          domain: community.domain,
           logo_url: community.logo_url,
           banner_url: community.banner_url,
-          memberCount: community.member_count,
+          theme_config: community.theme_config,
+          api_keys: community.api_keys,
+          member_count: community.member_count,
           createdAt: new Date(community.created_at),
           updatedAt: new Date(community.updated_at)
         }
       };
     } catch (error) {
       console.error('Error creating community:', error);
-      return { ok: false, error: 'Failed to create community' };
+      return { 
+        ok: false, 
+        error: error instanceof Error 
+          ? { message: error.message } 
+          : { message: 'Failed to create community' }
+      };
     }
   }
 
@@ -249,12 +260,7 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
           banner_url: data.banner_url
         })
         .eq('id', id)
-        .select(`
-          *,
-          profiles!communities_creator_id_fkey (
-            full_name
-          )
-        `)
+        .select('*')
         .single();
 
       if (error) throw error;
@@ -271,7 +277,7 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
           status: community.status,
           category: community.category,
           creatorId: community.creator_id,
-          creatorName: community.profiles?.full_name || 'Unknown',
+          creatorName: 'Unknown',
           logo_url: community.logo_url,
           banner_url: community.banner_url,
           memberCount: community.member_count,
@@ -281,7 +287,7 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
       };
     } catch (error) {
       console.error('Error updating community:', error);
-      return { ok: false, error: 'Failed to update community' };
+      return { ok: false, error: { message: 'Failed to update community' } };
     }
   }
 
@@ -294,10 +300,10 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
 
       if (error) throw error;
 
-      return { ok: true };
+      return { ok: true, data: undefined };
     } catch (error) {
       console.error('Error deleting community:', error);
-      return { ok: false, error: 'Failed to delete community' };
+      return { ok: false, error: { message: 'Failed to delete community' } };
     }
   }
 
@@ -305,21 +311,19 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
     try {
       const { error } = await this.client
         .from('community_members')
-        .insert([{
+        .insert({
           community_id: communityId,
           user_id: userId,
-          role: 'member'
-        }]);
+          role: 'member',
+          joined_at: new Date().toISOString()
+        });
 
       if (error) throw error;
 
-      // Update member count
-      await this.client.rpc('increment_member_count', { community_id: communityId });
-
-      return { ok: true };
+      return { ok: true, data: undefined };
     } catch (error) {
       console.error('Error joining community:', error);
-      return { ok: false, error: 'Failed to join community' };
+      return { ok: false, error: { message: 'Failed to join community' } };
     }
   }
 
@@ -333,13 +337,10 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
 
       if (error) throw error;
 
-      // Update member count
-      await this.client.rpc('decrement_member_count', { community_id: communityId });
-
-      return { ok: true };
+      return { ok: true, data: undefined };
     } catch (error) {
       console.error('Error leaving community:', error);
-      return { ok: false, error: 'Failed to leave community' };
+      return { ok: false, error: { message: 'Failed to leave community' } };
     }
   }
 
@@ -355,7 +356,7 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
       return { ok: true, data: data.map(member => member.user_id) };
     } catch (error) {
       console.error('Error getting community members:', error);
-      return { ok: false, error: 'Failed to get community members' };
+      return { ok: false, error: { message: 'Failed to get community members' } };
     }
   }
 
@@ -363,17 +364,17 @@ export class SupabaseCommunityRepository implements ICommunityRepository {
     try {
       const { data, error } = await this.client
         .from('community_members')
-        .select('id')
+        .select('user_id')
         .eq('community_id', communityId)
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "not found"
+      if (error) throw error;
 
       return { ok: true, data: !!data };
     } catch (error) {
       console.error('Error checking community membership:', error);
-      return { ok: false, error: 'Failed to check membership' };
+      return { ok: false, error: { message: 'Failed to check community membership' } };
     }
   }
 }

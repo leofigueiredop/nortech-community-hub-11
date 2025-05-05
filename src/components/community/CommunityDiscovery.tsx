@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApi } from '@/hooks/useApi';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import { Community } from '@/api/interfaces/ICommunityRepository';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -162,7 +162,7 @@ export function CommunityDiscovery() {
                     <div>
                       <h3 className="font-semibold text-lg">{community.name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        by {community.creatorName || 'Anonymous'}
+                        by {community.creator_name || 'Anonymous'}
                       </p>
                     </div>
                   </div>
@@ -171,7 +171,7 @@ export function CommunityDiscovery() {
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">
-                      {community.memberCount?.toLocaleString() || '0'} members
+                      {community.member_count?.toLocaleString() || '0'} members
                     </span>
                     <Button
                       onClick={() => handleJoinCommunity(community)}

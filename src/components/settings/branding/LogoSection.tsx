@@ -1,19 +1,151 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { FileImage, X } from 'lucide-react';
+import { FileImage, X, Loader2 } from 'lucide-react';
+import { StorageService } from '@/api/services/StorageService';
+import { toast } from '@/components/ui/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
-const LogoSection: React.FC = () => {
-  const [logo, setLogo] = useState<string | null>(null);
-  const [icon, setIcon] = useState<string | null>(null);
-  const [ogImage, setOgImage] = useState<string | null>(null);
+interface LogoSectionProps {
+  initialLogo?: string;
+  initialIcon?: string;
+  initialOgImage?: string;
+  onLogoChange?: (url: string) => void;
+  onIconChange?: (url: string) => void;
+  onOgImageChange?: (url: string) => void;
+}
 
-  const handleImageUpload = (setter: (value: string | null) => void) => {
-    // Simulated upload - in real app would handle actual file upload
-    setter("/lovable-uploads/598c2a9d-a24a-4854-ba20-b22476ca4f7b.png");
+const LogoSection: React.FC<LogoSectionProps> = ({
+  initialLogo,
+  initialIcon,
+  initialOgImage,
+  onLogoChange,
+  onIconChange,
+  onOgImageChange
+}) => {
+  const { communityContext } = useAuth();
+  const [logo, setLogo] = useState<string | null>(initialLogo || null);
+  const [icon, setIcon] = useState<string | null>(initialIcon || null);
+  const [ogImage, setOgImage] = useState<string | null>(initialOgImage || null);
+  const [isUploading, setIsUploading] = useState<string | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = async (file: File, type: 'logo' | 'icon' | 'og') => {
+    if (!file || !communityContext?.communityId) return;
+
+    try {
+      setIsUploading(type);
+      
+      // Create custom filename based on type
+      const fileExt = file.name.split('.').pop();
+      const customFileName = `${type}.${fileExt}`;
+      
+      const url = await StorageService.uploadFile(
+        file,
+        'branding',
+        communityContext.communityId,
+        {
+          customFileName,
+          contentType: file.type
+        }
+      );
+
+      switch (type) {
+        case 'logo':
+          setLogo(url);
+          onLogoChange?.(url);
+          break;
+        case 'icon':
+          setIcon(url);
+          onIconChange?.(url);
+          break;
+        case 'og':
+          setOgImage(url);
+          onOgImageChange?.(url);
+          break;
+      }
+
+      toast({
+        title: 'Upload successful',
+        description: 'Your image has been uploaded successfully.',
+      });
+    } catch (error) {
+      console.error('Upload failed:', error);
+      toast({
+        title: 'Upload failed',
+        description: 'There was an error uploading your image. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsUploading(null);
+    }
   };
+
+  const handleImageUpload = (type: 'logo' | 'icon' | 'og') => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        handleFileSelect(file, type);
+      }
+    };
+    input.click();
+  };
+
+  const handleRemoveImage = async (type: 'logo' | 'icon' | 'og', url: string) => {
+    if (!communityContext?.communityId) return;
+
+    try {
+      // Extract filename from URL
+      const fileName = url.split('/').pop();
+      if (fileName) {
+        await StorageService.deleteFile(communityContext.communityId, 'branding', fileName);
+      }
+
+      switch (type) {
+        case 'logo':
+          setLogo(null);
+          onLogoChange?.('');
+          break;
+        case 'icon':
+          setIcon(null);
+          onIconChange?.('');
+          break;
+        case 'og':
+          setOgImage(null);
+          onOgImageChange?.('');
+          break;
+      }
+
+      toast({
+        title: 'Image removed',
+        description: 'The image has been removed successfully.',
+      });
+    } catch (error) {
+      console.error('Delete failed:', error);
+      toast({
+        title: 'Delete failed',
+        description: 'There was an error deleting your image. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  if (!communityContext?.communityId) {
+    return (
+      <Card>
+        <CardContent className="py-6">
+          <p className="text-center text-muted-foreground">
+            Please select a community to manage branding assets.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -33,10 +165,13 @@ const LogoSection: React.FC = () => {
             <div className="flex items-center gap-4">
               <Button 
                 variant="outline" 
-                className="w-full h-24 flex items-center justify-center"
-                onClick={() => handleImageUpload(setLogo)}
+                className="w-full h-24 flex items-center justify-center relative"
+                onClick={() => handleImageUpload('logo')}
+                disabled={isUploading === 'logo'}
               >
-                {logo ? (
+                {isUploading === 'logo' ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : logo ? (
                   <div className="relative w-full h-full">
                     <img 
                       src={logo} 
@@ -49,7 +184,7 @@ const LogoSection: React.FC = () => {
                       className="absolute top-1 right-1"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setLogo(null);
+                        if (logo) handleRemoveImage('logo', logo);
                       }}
                     >
                       <X className="h-4 w-4" />
@@ -69,10 +204,13 @@ const LogoSection: React.FC = () => {
             <div className="flex items-center gap-4">
               <Button 
                 variant="outline" 
-                className="w-full h-24 flex items-center justify-center"
-                onClick={() => handleImageUpload(setIcon)}
+                className="w-full h-24 flex items-center justify-center relative"
+                onClick={() => handleImageUpload('icon')}
+                disabled={isUploading === 'icon'}
               >
-                {icon ? (
+                {isUploading === 'icon' ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : icon ? (
                   <div className="relative w-full h-full">
                     <img 
                       src={icon} 
@@ -85,7 +223,7 @@ const LogoSection: React.FC = () => {
                       className="absolute top-1 right-1"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setIcon(null);
+                        if (icon) handleRemoveImage('icon', icon);
                       }}
                     >
                       <X className="h-4 w-4" />
@@ -105,10 +243,13 @@ const LogoSection: React.FC = () => {
             <div className="flex items-center gap-4">
               <Button 
                 variant="outline" 
-                className="w-full h-32 flex items-center justify-center"
-                onClick={() => handleImageUpload(setOgImage)}
+                className="w-full h-32 flex items-center justify-center relative"
+                onClick={() => handleImageUpload('og')}
+                disabled={isUploading === 'og'}
               >
-                {ogImage ? (
+                {isUploading === 'og' ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : ogImage ? (
                   <div className="relative w-full h-full">
                     <img 
                       src={ogImage} 
@@ -121,7 +262,7 @@ const LogoSection: React.FC = () => {
                       className="absolute top-1 right-1"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOgImage(null);
+                        if (ogImage) handleRemoveImage('og', ogImage);
                       }}
                     >
                       <X className="h-4 w-4" />

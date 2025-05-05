@@ -1,11 +1,12 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Palette, RotateCcw } from 'lucide-react';
+import { HexColorPicker } from 'react-colorful';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface BrandColorsProps {
   brandColor: string;
@@ -20,6 +21,9 @@ const BrandColors: React.FC<BrandColorsProps> = ({
   onBrandColorChange,
   onBrandColorDarkChange
 }) => {
+  const [isLightPickerOpen, setIsLightPickerOpen] = useState(false);
+  const [isDarkPickerOpen, setIsDarkPickerOpen] = useState(false);
+
   return (
     <Card>
       <CardHeader>
@@ -36,10 +40,17 @@ const BrandColors: React.FC<BrandColorsProps> = ({
               Button Color (Light Theme)
             </Label>
             <div className="flex items-center gap-3">
-              <div 
-                className="w-6 h-6 rounded border border-gray-300" 
-                style={{ backgroundColor: brandColor }}
-              />
+              <Popover open={isLightPickerOpen} onOpenChange={setIsLightPickerOpen}>
+                <PopoverTrigger asChild>
+                  <div 
+                    className="w-6 h-6 rounded border border-gray-300 cursor-pointer" 
+                    style={{ backgroundColor: brandColor }}
+                  />
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 border-none">
+                  <HexColorPicker color={brandColor} onChange={onBrandColorChange} />
+                </PopoverContent>
+              </Popover>
               <Input 
                 value={brandColor}
                 onChange={(e) => onBrandColorChange(e.target.value)}
@@ -72,10 +83,17 @@ const BrandColors: React.FC<BrandColorsProps> = ({
               Button Color (Dark Theme)
             </Label>
             <div className="flex items-center gap-3">
-              <div 
-                className="w-6 h-6 rounded border border-gray-300" 
-                style={{ backgroundColor: brandColorDark }}
-              />
+              <Popover open={isDarkPickerOpen} onOpenChange={setIsDarkPickerOpen}>
+                <PopoverTrigger asChild>
+                  <div 
+                    className="w-6 h-6 rounded border border-gray-300 cursor-pointer" 
+                    style={{ backgroundColor: brandColorDark }}
+                  />
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 border-none">
+                  <HexColorPicker color={brandColorDark} onChange={onBrandColorDarkChange} />
+                </PopoverContent>
+              </Popover>
               <Input 
                 value={brandColorDark}
                 onChange={(e) => onBrandColorDarkChange(e.target.value)}

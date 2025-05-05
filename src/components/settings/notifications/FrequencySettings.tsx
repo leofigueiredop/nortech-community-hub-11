@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -29,8 +28,10 @@ const frequencyOptions = [
 export const FrequencySettings: React.FC<FrequencySettingsProps> = ({ frequency, onFrequencyChange }) => {
   return (
     <div className="space-y-6">
-      <Label className="text-base font-semibold text-nortech-dark-blue">Frequência de notificações</Label>
-      <p className="text-nortech-text-muted text-sm mb-4">Escolha com que frequência você recebe notificações</p>
+      <div>
+        <Label className="text-base font-semibold">Frequência de notificações</Label>
+        <p className="text-muted-foreground text-sm mb-4">Escolha com que frequência você recebe notificações</p>
+      </div>
 
       <RadioGroup 
         value={frequency} 
@@ -40,9 +41,9 @@ export const FrequencySettings: React.FC<FrequencySettingsProps> = ({ frequency,
         {frequencyOptions.map((item) => (
           <div key={item.value} className="flex items-center space-x-2">
             <RadioGroupItem value={item.value} id={item.value} />
-            <Label htmlFor={item.value} className="text-nortech-dark-blue">
+            <Label htmlFor={item.value}>
               <span className="font-semibold">{item.label}</span>
-              <p className="text-nortech-text-muted text-sm">{item.description}</p>
+              <p className="text-muted-foreground text-sm">{item.description}</p>
             </Label>
           </div>
         ))}

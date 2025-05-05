@@ -1,22 +1,25 @@
 /**
+ * Add UUID type at the top
+ */
+type UUID = string; // Type alias for UUID strings
+
+/**
  * Content format types
  */
 export type ContentFormat = 'video' | 'article' | 'pdf' | 'course' | 'audio' | 'image' | 'link';
 
 /**
- * Content item interface
+ * Content item interface matching Supabase schema
  */
 export interface ContentItem {
-  id: string;
-  community_id: string;
+  id: UUID;
   title: string;
   description?: string;
   format: string;
   thumbnail?: string;
   thumbnail_url?: string;
   resource_url?: string;
-  author?: Profile;
-  author_id?: string;
+  author_id?: UUID;
   duration?: number;
   tags?: string[];
   access_level: 'free' | 'premium' | 'unlockable';
@@ -31,15 +34,8 @@ export interface ContentItem {
   completion_criteria: string;
   completion_threshold: number;
   file_size?: number;
-  space_id?: string;
-  url?: string;
-  likes: number;
-  is_featured: boolean;
-  content?: string;
-  is_new: boolean;
-  freeAccessesLeft: number;
-  isExclusive: boolean;
-  allow_comments: boolean;
+  space_id?: UUID;
+  community_id: UUID;
 }
 
 /**
@@ -110,25 +106,6 @@ export interface ContentMetadata {
   author?: string;
   tags?: string[];
   customFields?: Record<string, any>;
-}
-
-export interface ContentItem {
-  id: string;
-  communityId: string;
-  metadata: ContentMetadata;
-  url?: string;
-  resourceUrl?: string;
-  readonly accessLevel: 'free' | 'premium' | 'premium_plus';
-  status: 'draft' | 'published' | 'archived' | 'scheduled';
-  publishedAt?: string;
-  scheduledAt?: string;
-  version: number;
-  seoTitle?: string;
-  seoDescription?: string;
-  slug?: string;
-  previewUrl?: string;
-  readonly createdAt: string;
-  readonly updatedAt: string;
 }
 
 // Content Type Adapter Interface

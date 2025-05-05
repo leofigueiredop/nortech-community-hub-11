@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -9,7 +8,6 @@ import {
   Settings, 
   BookOpen, 
   PlusCircle, 
-  Download, 
   BarChart3, 
   MessageSquare, 
   FileText, 
@@ -128,17 +126,11 @@ const Sidebar: React.FC = () => {
           label="Settings" 
           to="/settings" 
         />
-        
-        <SectionTitle title="Links" />
-        <div className="px-4 py-2">
-          <div className="flex items-center text-sm text-nortech-gray-text gap-3 mb-2">
-            <Download size={16} />
-            <span>Download Android app</span>
-          </div>
-          <div className="flex items-center text-sm text-nortech-gray-text gap-3">
-            <Download size={16} />
-            <span>Download iOS app</span>
-          </div>
+      </div>
+      
+      <div className="mt-auto border-t border-nortech-gray-light dark:border-gray-800 p-4">
+        <div className="flex items-center justify-center text-sm text-nortech-gray-text">
+          Powered by Nortech
         </div>
       </div>
     </div>

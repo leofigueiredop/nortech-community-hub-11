@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { useLibraryState } from '@/hooks/useLibraryState';
 import ContentViewer from '@/components/library/ContentViewer';
 import CreateContentModal from '@/components/library/CreateContentModal';
-import LibraryTopBar from '@/components/library/LibraryTopBar';
+import LibraryFilters from '@/components/library/LibraryFilters';
 import LibraryContentArea from '@/components/library/LibraryContentArea';
-import ContentFilters from '@/components/library/ContentFilters';
+import LibraryFiltersSection from '@/components/library/LibraryFiltersSection';
+import { useContentProgress } from '@/hooks/useContentProgress';
 import { Button } from '@/components/ui/button';
 import { Trophy, Star, Award } from 'lucide-react';
-import { useContentProgress } from '@/hooks/useContentProgress';
 
 const Library: React.FC = () => {
+  const navigate = useNavigate();
   const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateContentOpen, setIsCreateContentOpen] = useState(false);
@@ -43,7 +45,6 @@ const Library: React.FC = () => {
 
   const { contentProgress, getAllProgress } = useContentProgress();
 
-  // Calculate total progress
   const totalItems = content.length;
   const completedItems = contentProgress.filter(item => item.completed || item.completed_at !== null).length;
   const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
@@ -68,7 +69,6 @@ const Library: React.FC = () => {
 
   const isSearchActive = searchQuery.trim() !== '';
 
-  // Helper function to get video completion count for weekly challenge
   const getCompletedVideosThisWeek = () => {
     const now = new Date();
     const startOfWeek = new Date(now);
@@ -83,6 +83,10 @@ const Library: React.FC = () => {
     });
     
     return completedThisWeek.length;
+  };
+
+  const handleContentManagement = () => {
+    navigate('/content-management');
   };
 
   return (
@@ -137,20 +141,25 @@ const Library: React.FC = () => {
           </div>
         )}
 
-        <LibraryTopBar
+        <LibraryFilters
+          searchQuery={searchQuery}
+          onSearchChange={setGlobalSearchQuery}
+        />
+
+        <LibraryFiltersSection
           formatFilter={formatFilter}
           tagFilter={tagFilter}
+          accessFilter={accessFilter}
           sortBy={sortBy}
-          activeView={activeView}
           searchQuery={searchQuery}
-          setActiveView={setActiveView}
-          setSearchQuery={setSearchQuery}
-          setGlobalSearchQuery={setGlobalSearchQuery}
           allTags={allTags}
           allFormats={allFormats}
           setFormatFilter={setFormatFilter}
           setTagFilter={setTagFilter}
+          setAccessFilter={setAccessFilter}
+          setSearchQuery={setGlobalSearchQuery}
           setSortBy={setSortBy}
+          showFilters={true}
         />
 
         <LibraryContentArea

@@ -8,20 +8,26 @@ export interface ContentCategory extends BaseContentCategory {
   icon?: string;
 }
 
+// Add UUID type at the top
+type UUID = string; // Type alias for UUID strings
+
 export interface LibraryContentItem extends ContentItem {
   // Required fields from base interface
   createdAt: string;
   updatedAt: string;
+  created_at: string;
+  updated_at: string;
+  views: number;
+  visibility: 'public' | 'private';
+  featured: boolean;
+  community_id: UUID;
   
   // Optional fields specific to library content
-  created_at?: string; // Legacy field
-  updated_at?: string; // Legacy field
-  author_id?: string;
+  author_id?: UUID;
   is_featured?: boolean;
-  views?: number;
   likes?: number;
   duration?: number;
-  access_level: 'free' | 'premium' | 'premium_plus';
+  access_level: 'free' | 'premium' | 'unlockable';
   category_id?: string;
   tags?: string[];
   
@@ -32,19 +38,18 @@ export interface LibraryContentItem extends ContentItem {
   freeAccessesLeft?: number;
   isExclusive?: boolean;
   author?: {
-    id: string;
+    id: UUID;
     name: string;
     avatar?: string;
-  } | string | null;
+  } | UUID | null;
   
   // Properties used in various components
   resourceUrl?: string;
-  visibility?: 'public' | 'premium' | 'points' | 'hidden' | 'vip-only' | 'limited-time';
   completionCriteria?: 'view' | 'scroll_end' | 'watch_percent' | 'time_spent';
   completionThreshold?: number;
-  fileSize?: number | string;
-  featured?: boolean;
+  fileSize?: number;
   allowComments?: boolean;
+  space_id?: UUID;
 }
 
 // Course-related types
@@ -54,7 +59,7 @@ export interface CourseModuleItem {
   description?: string;
   type: string;
   content?: string;
-  contentId?: string; // Add contentId for Course components
+  contentId?: string;
   duration?: number;
   completed?: boolean;
   url?: string;
@@ -72,18 +77,18 @@ export interface Course extends ContentItem {
   modules?: CourseModule[];
 }
 
-// Content progress tracking types - update to match how it's used
+// Content progress tracking types
 export interface ContentProgress {
-  id: string;
-  user_id: string;
-  content_id: string;
+  id: UUID;
+  user_id: UUID;
+  content_id: UUID;
   progress_percent: number;
   completed_at?: string | null;
   last_accessed_at: string;
   points_awarded: boolean;
   // Add aliases for consistent access
-  userId?: string;
-  contentId?: string;
+  userId?: UUID;
+  contentId?: UUID;
   progress?: number;
   completed?: boolean;
   lastAccessedAt?: string;
@@ -92,24 +97,24 @@ export interface ContentProgress {
 
 // Content interaction types
 export interface ContentInteraction {
-  id: string;
-  user_id: string;
-  content_id: string;
+  id: UUID;
+  user_id: UUID;
+  content_id: UUID;
   interaction_type: 'view' | 'like' | 'share' | 'download';
   created_at: string;
 }
 
 // Content comment types
 export interface ContentComment {
-  id: string;
-  user_id: string;
-  content_id: string;
+  id: UUID;
+  user_id: UUID;
+  content_id: UUID;
   comment: string;
   created_at: string;
   updated_at?: string;
-  parent_id?: string;
+  parent_id?: UUID;
   author?: {
-    id: string;
+    id: UUID;
     name: string;
     avatar?: string;
   };

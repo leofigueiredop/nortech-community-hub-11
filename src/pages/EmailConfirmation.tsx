@@ -1,56 +1,46 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from 'react-hot-toast';
 
 export default function EmailConfirmation() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { emailConfirmation } = useAuth();
-  const [verifying, setVerifying] = useState(true);
+  const { handleAuthCallback } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = searchParams.get('token');
-    
-    if (!token) {
-      toast.error('Invalid confirmation link');
-      navigate('/login');
-      return;
-    }
-
-    async function verifyEmail() {
+    const verifyEmail = async () => {
       try {
-        const { error } = await emailConfirmation.verifyToken(token);
-        
-        if (error) {
-          throw error;
+        const response = await handleAuthCallback();
+        if (response.user) {
+          toast.success('Email verified successfully!');
+          navigate('/auth/profile-setup');
+        } else {
+          throw new Error('Failed to verify email');
         }
-
-        toast.success('Email confirmed successfully!');
-        navigate('/login');
-      } catch (error: any) {
-        toast.error(error.message || 'Failed to verify email');
-        navigate('/login');
+      } catch (error) {
+        console.error('Error verifying email:', error);
+        toast.error('Failed to verify email. Please try again.');
+        navigate('/auth/login');
       } finally {
-        setVerifying(false);
+        setIsLoading(false);
       }
-    }
+    };
 
     verifyEmail();
-  }, [searchParams, navigate, emailConfirmation]);
+  }, [handleAuthCallback, navigate]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Email Verification
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {verifying ? 'Verifying your email...' : 'Verification complete'}
-          </p>
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4">Verifying your email...</p>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return null;
 } 

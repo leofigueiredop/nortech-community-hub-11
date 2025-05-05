@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import { Spinner } from '@/components/ui/Spinner';
 
 export default function AuthCallback() {
@@ -8,28 +8,26 @@ export default function AuthCallback() {
   const { handleAuthCallback } = useAuth();
 
   useEffect(() => {
-    const processAuth = async () => {
+    const handleCallback = async () => {
       try {
-        const { data, error } = await handleAuthCallback();
-        if (error) throw error;
-        if (!data?.session || !data?.user) throw new Error('No session or user found');
-        
-        // Auth successful, redirect to dashboard
-        navigate('/dashboard');
+        const response = await handleAuthCallback();
+        if (response.user) {
+          navigate('/dashboard');
+        } else {
+          navigate('/auth/login');
+        }
       } catch (error) {
-        console.error('Error processing auth callback:', error);
-        // Auth failed, redirect to login
-        navigate('/login');
+        console.error('Auth callback error:', error);
+        navigate('/auth/login');
       }
     };
 
-    processAuth();
-  }, [navigate, handleAuthCallback]);
+    handleCallback();
+  }, [handleAuthCallback, navigate]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="min-h-screen flex items-center justify-center">
       <Spinner size="lg" />
-      <p className="mt-4 text-lg text-gray-600">Processando autenticação...</p>
     </div>
   );
 } 

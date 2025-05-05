@@ -1,32 +1,23 @@
+// Add UUID type at the top
+type UUID = string; // Type alias for UUID strings
+
 export interface Community {
-  id: string;
+  id: UUID;
   name: string;
   description?: string;
-  slug: string;
-  owner_id: string;
-  created_at: string;
-  updated_at: string;
   logo_url?: string;
   banner_url?: string;
-  is_private: boolean;
-  access_code?: string;
   domain?: string;
-  custom_domain?: string;
+  creator_id: UUID;
+  created_at: string;
+  updated_at: string;
   status: 'active' | 'inactive' | 'pending';
-  theme?: {
-    primary_color?: string;
-    secondary_color?: string;
-    accent_color?: string;
-    logo_position?: 'left' | 'center';
-    font_family?: string;
-  };
-  settings?: Record<string, any>;
-  analytics?: {
-    member_count?: number;
-    activity_score?: number;
-    engagement_rate?: number;
-  };
-  features?: string[];
+  theme_config: Record<string, any>;
+  api_keys: Record<string, any>;
+  is_private: boolean;
+  member_count?: number;
+  category?: string;
+  slug?: string;
 }
 
 export interface CommunitySettings {
@@ -39,9 +30,9 @@ export interface CommunitySettings {
 }
 
 export interface CommunityMember {
-  id: string;
-  community_id: string;
-  user_id: string;
+  id: UUID;
+  community_id: UUID;
+  user_id: UUID;
   role: 'owner' | 'admin' | 'moderator' | 'member';
   status: 'active' | 'pending' | 'banned';
   joined_at: string;
@@ -61,8 +52,8 @@ export const mockCommunities: Community[] = [
     name: "Nortech",
     slug: "nortech",
     description: "A technology learning community",
-    logo_url: "https://via.placeholder.com/150",
-    banner_url: "https://via.placeholder.com/1200x300",
+    logo_url: "https://placehold.co/150",
+    banner_url: "https://placehold.co/1200x300",
     primary_color: "#6E56CF",
     secondary_color: "#4A36A0",
     is_public: true,

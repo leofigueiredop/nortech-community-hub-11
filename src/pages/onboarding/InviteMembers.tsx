@@ -1,4 +1,3 @@
-
 import React from 'react';
 import OnboardingLayout from '../OnboardingLayout';
 import InviteMembersForm from '@/components/onboarding/InviteMembersForm';

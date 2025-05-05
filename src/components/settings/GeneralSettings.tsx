@@ -14,14 +14,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCommunitySettings } from '@/hooks/useCommunitySettings';
 
 const GeneralSettings: React.FC = () => {
   const { toast } = useToast();
-  const [communityName, setCommunityName] = useState("Pablo's Community");
-  const [language, setLanguage] = useState("english");
-  const [isPrivate, setIsPrivate] = useState(true);
-  const [communityUrl, setCommunityUrl] = useState("pablos-community-9de6a");
-  const [isSaving, setIsSaving] = useState(false);
+  const { 
+    isLoading, 
+    generalSettings, 
+    basicInfo, 
+    updateGeneralSettings, 
+    updateBasicInfo 
+  } = useCommunitySettings();
+
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -33,27 +37,49 @@ const GeneralSettings: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSaveSettings = () => {
-    setIsSaving(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSaving(false);
+  const handleSaveSettings = async () => {
+    try {
+      await Promise.all([
+        updateBasicInfo({
+          name: basicInfo?.name,
+          description: basicInfo?.description,
+          domain: basicInfo?.domain,
+          is_private: basicInfo?.is_private
+        }),
+        updateGeneralSettings({
+          language: generalSettings?.language,
+          timezone: generalSettings?.timezone,
+          dateFormat: generalSettings?.dateFormat,
+          defaultPrivacy: generalSettings?.defaultPrivacy,
+          allowGuestAccess: generalSettings?.allowGuestAccess,
+          customWelcomeMessage: generalSettings?.customWelcomeMessage,
+          notificationPreferences: generalSettings?.notificationPreferences,
+          contentModeration: generalSettings?.contentModeration
+        })
+      ]);
+    } catch (error) {
+      console.error('Error saving settings:', error);
       toast({
-        title: "Settings saved",
-        description: `Changes were saved successfully at ${new Date().toLocaleTimeString()}`,
+        title: "Error saving settings",
+        description: "There was a problem saving your settings. Please try again.",
+        variant: "destructive"
       });
-    }, 800);
+    }
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="space-y-8 pb-16 relative">
       {/* Community Preview Badge */}
       <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg p-3 mb-6 inline-flex items-center gap-2">
-        <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${communityName}`} 
+        <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${basicInfo?.name}`} 
              className="w-8 h-8 rounded" 
              alt="Community" />
         <div>
-          <div className="text-sm font-medium">{communityName}</div>
+          <div className="text-sm font-medium">{basicInfo?.name}</div>
           <div className="text-xs text-gray-500 dark:text-gray-400">Community Preview</div>
         </div>
       </div>
@@ -78,8 +104,8 @@ const GeneralSettings: React.FC = () => {
               <Input 
                 id="community-name" 
                 placeholder="Enter community name" 
-                value={communityName}
-                onChange={(e) => setCommunityName(e.target.value)}
+                value={basicInfo?.name || ''}
+                onChange={(e) => updateBasicInfo({ name: e.target.value })}
                 className="w-full"
               />
             </div>
@@ -93,7 +119,10 @@ const GeneralSettings: React.FC = () => {
               <p className="text-gray-500 dark:text-gray-400 mb-2 text-sm">Default for new members</p>
             </div>
             <div>
-              <Select value={language} onValueChange={setLanguage}>
+              <Select 
+                value={generalSettings?.language || 'english'} 
+                onValueChange={(value) => updateGeneralSettings({ language: value })}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a language" />
                 </SelectTrigger>
@@ -117,7 +146,7 @@ const GeneralSettings: React.FC = () => {
             <div>
               <Input 
                 id="community-id" 
-                value="331737"
+                value={basicInfo?.id || ''}
                 readOnly
                 className="bg-gray-50 dark:bg-gray-800"
               />
@@ -150,15 +179,15 @@ const GeneralSettings: React.FC = () => {
                   <Input 
                     id="community-url" 
                     className="rounded-r-none"
-                    value={communityUrl}
-                    onChange={(e) => setCommunityUrl(e.target.value)}
+                    value={basicInfo?.domain || ''}
+                    onChange={(e) => updateBasicInfo({ domain: e.target.value })}
                   />
                   <div className="flex items-center px-3 border border-l-0 border-gray-200 dark:border-gray-700 rounded-r-md text-gray-500 bg-gray-50 dark:bg-gray-800">
                     .nortech.app
                   </div>
                 </div>
                 <Button variant="outline" size="icon" asChild>
-                  <a href={`https://${communityUrl}.nortech.app`} target="_blank" rel="noopener noreferrer">
+                  <a href={`https://${basicInfo?.domain || ''}.nortech.app`} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </Button>
@@ -196,8 +225,8 @@ const GeneralSettings: React.FC = () => {
                 </Tooltip>
               </TooltipProvider>
               <Switch 
-                checked={isPrivate} 
-                onCheckedChange={setIsPrivate}
+                checked={basicInfo?.is_private || false}
+                onCheckedChange={(checked) => updateBasicInfo({ is_private: checked })}
               />
             </div>
           </div>
@@ -214,7 +243,7 @@ const GeneralSettings: React.FC = () => {
             <div className="flex gap-2">
               <Input 
                 id="custom-signup-link" 
-                value={`https://${communityUrl}.nortech.io/signup`}
+                value={`https://${basicInfo?.domain || ''}.nortech.io/signup`}
                 readOnly
                 className="bg-gray-50 dark:bg-gray-800 flex-1"
               />
@@ -232,11 +261,11 @@ const GeneralSettings: React.FC = () => {
       `}>
         <Button 
           onClick={handleSaveSettings} 
-          disabled={isSaving}
+          disabled={isLoading}
           size="lg"
           className="bg-nortech-purple hover:bg-nortech-purple/90 shadow-lg"
         >
-          {isSaving ? 'Saving...' : 'Save Changes'}
+          {isLoading ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>
     </div>

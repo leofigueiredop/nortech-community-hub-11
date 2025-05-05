@@ -1,10 +1,12 @@
+// Add UUID type at the top
+type UUID = string; // Type alias for UUID strings
 
 export interface Post {
-  id: string;
+  id: UUID;
   title: string;
   content: string;
-  author_id: string;
-  community_id: string;
+  author_id: UUID;
+  community_id: UUID;
   created_at: string;
   updated_at: string;
   media_urls?: string[];
@@ -17,7 +19,7 @@ export interface Post {
   space_id?: string;
   pinned: boolean;
   author?: {
-    id: string;
+    id: UUID;
     name: string;
     avatar_url?: string;
   };
@@ -36,24 +38,24 @@ export interface Post {
 }
 
 export interface PostComment {
-  id: string;
-  post_id: string;
+  id: UUID;
+  post_id: UUID;
   content: string;
-  author_id: string;
+  author_id: UUID;
   created_at: string;
   updated_at: string;
   parent_id?: string;
   author?: {
-    id: string;
+    id: UUID;
     name: string;
     avatar_url?: string;
   };
 }
 
 export interface PostReaction {
-  id: string;
-  post_id: string;
-  user_id: string;
+  id: UUID;
+  post_id: UUID;
+  user_id: UUID;
   reaction_type: string;
   created_at: string;
 }

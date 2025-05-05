@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, FolderPlus, List, Grid } from 'lucide-react';
@@ -7,12 +7,32 @@ import { Button } from '@/components/ui/button';
 import ContentUploadForm from '@/components/library/management/ContentUploadForm';
 import ContentList from '@/components/library/management/ContentList';
 import CategoriesManagement from '@/components/library/management/CategoriesManagement';
-import { ContentItem } from '@/types/library';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
 import { useToast } from '@/hooks/use-toast';
 import { adaptLibraryArrayToContentType } from '@/utils/contentTypeAdapter';
 
+// Define ContentItem if it's not exported from the library
+interface ContentItem {
+  id: string;
+  title: string;
+  description?: string;
+  format?: string;
+  thumbnail?: string;
+  author?: any;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  views?: number;
+  duration?: number;
+  accessLevel?: string;
+  featured?: boolean;
+  pointsEnabled?: boolean;
+  pointsValue?: number;
+  [key: string]: any;
+}
+
 const ContentManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<ContentItem | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
@@ -50,14 +70,26 @@ const ContentManagement: React.FC = () => {
     });
   };
 
-  const adaptedContent = adaptLibraryArrayToContentType(content);
+  // Check if ContentList component accepts these props, otherwise remove them
+  const handleNavigate = (item: ContentItem) => {
+    if (item.format === 'course') {
+      navigate(`/course/${item.id}`);
+    } else {
+      navigate(`/content/${item.id}`);
+    }
+  };
 
   return (
     <MainLayout title="Content Management">
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Content Management</h1>
-          <div className="flex gap-2">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold mb-2">Content Management</h1>
+            <p className="text-muted-foreground">
+              Manage your courses, videos, and other content
+            </p>
+          </div>
+          <div className="flex gap-2 mt-4 md:mt-0">
             <Button onClick={() => setViewMode('list')} variant={viewMode === 'list' ? 'default' : 'outline'}>
               <List size={16} />
             </Button>

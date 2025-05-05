@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -11,24 +10,35 @@ import { useNotifications } from '@/context/NotificationsContext';
 import EventsList from '@/components/events/EventsList';
 import EventGrid from '@/components/events/EventGrid';
 import { mockEvents } from '@/components/events/data/EventsMockData';
-import { Event as ComponentEvent } from '@/components/events/types/EventTypes';
+import { Event, EventType } from '@/components/events/types/EventTypes';
 import EventConfirmDialog from '@/components/events/EventConfirmDialog';
+import CalendarView from '@/components/events/CalendarView';
+import { format } from 'date-fns';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import EventsHeader from '@/components/events/EventsHeader';
+import EventFilters from '@/components/events/filters/EventFilters';
+import ViewTypeSwitcher from '@/components/events/ViewTypeSwitcher';
 import { adaptEventForComponent } from '@/components/events/utils/EventTypeAdapter';
 
+// Define view type for the events
+type ViewType = 'grid' | 'list' | 'calendar';
+
 const Events = () => {
-  const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
-  
-  // Use the adapted events for components
-  const [allEvents, setAllEvents] = useState<ComponentEvent[]>(mockEvents);
-  const [filteredEvents, setFilteredEvents] = useState<ComponentEvent[]>(mockEvents);
+  const [viewType, setViewType] = useState<ViewType>('grid');
+  const [allEvents, setAllEvents] = useState(mockEvents);
+  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
   const [confirmEvent, setConfirmEvent] = useState<number | null>(null);
   const [selectedPremiumFilter, setSelectedPremiumFilter] = useState<'all' | 'premium' | 'free'>('all');
+  const [selectedTypeFilters, setSelectedTypeFilters] = useState<EventType[]>(['workshop', 'webinar', 'meetup', 'conference']);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [showAvailableOnly, setShowAvailableOnly] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   
   const { toast } = useToast();
   const { awardPoints } = usePoints();
   const { addNotification } = useNotifications();
 
-  // Filter events based on premium status
+  // Filter events based on premium status, type, and availability
   useEffect(() => {
     let events = [...allEvents];
     
@@ -38,12 +48,31 @@ const Events = () => {
       events = events.filter(event => !event.isPremium);
     }
     
+    if (selectedTypeFilters.length > 0) {
+      events = events.filter(event => {
+        if (!event.type) return false;
+        return selectedTypeFilters.includes(event.type as EventType);
+      });
+    }
+    
+    if (showAvailableOnly) {
+      events = events.filter(event => event.attendees < (event.capacity || 0));
+    }
+    
+    if (selectedDate) {
+      events = events.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate.getDate() === selectedDate.getDate() && 
+               eventDate.getMonth() === selectedDate.getMonth() &&
+               eventDate.getFullYear() === selectedDate.getFullYear();
+      });
+    }
+    
     setFilteredEvents(events);
-  }, [selectedPremiumFilter, allEvents]);
+  }, [selectedPremiumFilter, selectedTypeFilters, showAvailableOnly, selectedDate, allEvents]);
 
   // RSVP handler
   const handleRSVP = (eventId: number) => {
-    // Show confirmation dialog first
     setConfirmEvent(eventId);
   };
   
@@ -51,36 +80,31 @@ const Events = () => {
   const confirmRSVP = () => {
     if (!confirmEvent) return;
     
-    // Get the event that is being registered for
-    const event = allEvents.find(e => e.id === confirmEvent);
+    const event = allEvents.find(e => Number(e.id) === confirmEvent);
     
     if (event) {
-      // Show toast notification
       toast({
         title: "Registration Confirmed",
         description: `You've successfully registered for "${event.title}"`,
       });
       
-      // Award points for registering to an event
       awardPoints({
         type: "event_registration",
         description: `Registered for ${event.title}`,
-        points: 10
+        points: 5
       });
       
-      // Add to notifications system
       addNotification({
         type: 'event',
         title: 'Event Registration Confirmed',
-        message: `You're registered for "${event.title}" on ${event.date.toLocaleDateString()}`,
+        message: `You're registered for "${event.title}" on ${format(new Date(event.date), 'dd/MM/yyyy')}`,
         link: '/events',
       });
     }
     
-    // Update the event's attendees count and registered users
     setAllEvents(prevEvents => 
       prevEvents.map(event => 
-        event.id === confirmEvent 
+        Number(event.id) === confirmEvent 
           ? { 
               ...event, 
               attendees: event.attendees + 1,
@@ -91,127 +115,159 @@ const Events = () => {
       )
     );
     
-    // Clear the confirmEvent state
     setConfirmEvent(null);
   };
 
-  const handleAttendanceModal = (eventId: number) => {
-    // This would open a modal to manage attendance
-    console.log(`Open attendance modal for event ID: ${eventId}`);
+  // Handle date selection in calendar
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    if (date && window.innerWidth < 768) {
+      setIsDrawerOpen(true);
+    }
   };
+
+  const eventsForSelectedDate = selectedDate 
+    ? filteredEvents.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate.getDate() === selectedDate.getDate() && 
+               eventDate.getMonth() === selectedDate.getMonth() &&
+               eventDate.getFullYear() === selectedDate.getFullYear();
+      })
+    : [];
 
   return (
     <MainLayout title="Events">
       <div className="container py-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Community Events</h1>
-            <p className="text-muted-foreground mt-1">
-              Discover and attend upcoming community events
-            </p>
-          </div>
+        <div className="flex flex-col gap-6">
+          <EventsHeader />
           
-          <div className="flex items-center gap-4">
-            <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-md p-1">
-              <Button
-                variant={selectedPremiumFilter === 'all' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setSelectedPremiumFilter('all')}
-                className="rounded-sm text-xs"
-              >
-                All
-              </Button>
-              <Button
-                variant={selectedPremiumFilter === 'premium' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setSelectedPremiumFilter('premium')}
-                className="rounded-sm text-xs"
-              >
-                Premium
-              </Button>
-              <Button
-                variant={selectedPremiumFilter === 'free' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setSelectedPremiumFilter('free')}
-                className="rounded-sm text-xs"
-              >
-                Free
-              </Button>
-            </div>
-            
-            <div className="hidden md:flex border rounded-lg overflow-hidden">
-              <Button 
-                variant={viewType === 'list' ? 'default' : 'outline'} 
-                size="sm" 
-                onClick={() => setViewType('list')}
-                className="rounded-none flex items-center gap-2"
-              >
-                <List size={16} />
-                <span className="hidden sm:inline">List</span>
-              </Button>
-              <Button 
-                variant={viewType === 'grid' ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => setViewType('grid')}
-                className="rounded-none flex items-center gap-2"
-              >
-                <Grid size={16} />
-                <span className="hidden sm:inline">Grid</span>
-              </Button>
-            </div>
-            
-            <Link to="/create-event">
-              <Button className="bg-nortech-purple hover:bg-nortech-purple/90">
-                <Plus size={16} className="mr-2" />
-                Create Event
-              </Button>
-            </Link>
-          </div>
-        </div>
+          {/* Filters section */}
+          <EventFilters 
+            selectedPremiumFilter={selectedPremiumFilter}
+            setSelectedPremiumFilter={setSelectedPremiumFilter}
+            selectedTypeFilters={selectedTypeFilters}
+            setSelectedTypeFilters={setSelectedTypeFilters}
+            showAvailableOnly={showAvailableOnly}
+            setShowAvailableOnly={setShowAvailableOnly}
+          />
+          
+          {/* View type tabs */}
+          <Tabs 
+            defaultValue={viewType} 
+            onValueChange={(v) => setViewType(v as ViewType)}
+            className="w-full"
+          >
+            <ViewTypeSwitcher
+              viewType={viewType}
+              onViewTypeChange={(v) => setViewType(v as ViewType)}
+              selectedDate={selectedDate}
+              onDateClear={() => setSelectedDate(undefined)}
+            />
 
-        {viewType === 'grid' ? (
-          <EventGrid 
-            events={filteredEvents} 
-            viewType={viewType} 
-            onRSVP={handleRSVP} 
-            onOpenAttendanceModal={handleAttendanceModal}
-          />
-        ) : (
-          <EventsList 
-            events={filteredEvents} 
-            onRSVP={handleRSVP} 
-            onOpenAttendanceModal={handleAttendanceModal}
-          />
-        )}
-        
-        <div className="mt-8 text-center">
-          <div className="text-sm text-muted-foreground mb-3">
-            Looking for more viewing options?
-          </div>
-          <div className="flex gap-4 justify-center">
-            <Link to="/events/calendar">
-              <Button variant="outline" className="min-w-32">
-                <Calendar size={16} className="mr-2" />
-                Calendar View
-              </Button>
-            </Link>
-            <Link to="/events/weekly">
-              <Button variant="outline" className="min-w-32">
-                <Calendar size={16} className="mr-2" />
-                Weekly Calendar
-              </Button>
-            </Link>
-          </div>
+            <TabsContent value="grid">
+              <EventGrid 
+                events={filteredEvents} 
+                viewType="grid"
+                onRSVP={handleRSVP} 
+                onOpenAttendanceModal={() => {}}
+              />
+            </TabsContent>
+            
+            <TabsContent value="list">
+              <EventsList 
+                events={filteredEvents} 
+                onRSVP={handleRSVP} 
+                onOpenAttendanceModal={() => {}}
+              />
+            </TabsContent>
+            
+            <TabsContent value="calendar" className="md:flex space-x-4">
+              <div className={`md:w-[60%] ${selectedDate && window.innerWidth >= 768 ? '' : 'w-full'}`}>
+                <CalendarView 
+                  events={allEvents} 
+                  onRSVP={handleRSVP}
+                  onDateSelect={handleDateSelect}
+                />
+              </div>
+              
+              {selectedDate && window.innerWidth >= 768 && (
+                <div className="hidden md:block md:w-[40%] border-l pl-4">
+                  <h3 className="font-medium text-lg mb-4">
+                    Events on {format(selectedDate, 'dd/MM/yyyy')}
+                  </h3>
+                  
+                  {eventsForSelectedDate.length > 0 ? (
+                    <div className="space-y-4">
+                      {eventsForSelectedDate.map((event) => (
+                        <div key={event.id} className="border rounded-md p-4">
+                          <h4 className="font-medium">{event.title}</h4>
+                          <p className="text-sm text-gray-500">{event.time}</p>
+                          <p className="text-sm mt-2">{event.description.substring(0, 100)}...</p>
+                          <div className="mt-3">
+                            <Button 
+                              size="sm" 
+                              className="bg-nortech-purple hover:bg-nortech-purple/90"
+                              onClick={() => handleRSVP(Number(event.id))}
+                              disabled={(event.attendees || 0) >= (event.capacity || 0)}
+                            >
+                              {(event.attendees || 0) >= (event.capacity || 0) ? "No spots left" : "Register"}
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No events scheduled for this date.</p>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
-        
-        {/* Event confirmation dialog */}
-        <EventConfirmDialog
-          isOpen={confirmEvent !== null}
-          onClose={() => setConfirmEvent(null)}
-          onConfirm={confirmRSVP}
-          event={allEvents.find(e => e.id === confirmEvent) || null}
-        />
       </div>
+      
+      {/* Mobile drawer for calendar view */}
+      <Sheet open={isDrawerOpen && !!selectedDate} onOpenChange={setIsDrawerOpen}>
+        <SheetContent>
+          <div className="px-1">
+            <h3 className="font-medium text-lg mb-4">
+              Events on {selectedDate ? format(selectedDate, 'dd/MM/yyyy') : ''}
+            </h3>
+            
+            {eventsForSelectedDate.length > 0 ? (
+              <div className="space-y-4">
+                {eventsForSelectedDate.map((event) => (
+                  <div key={event.id} className="border rounded-md p-4">
+                    <h4 className="font-medium">{event.title}</h4>
+                    <p className="text-sm text-gray-500">{event.time}</p>
+                    <p className="text-sm mt-2">{event.description.substring(0, 100)}...</p>
+                    <div className="mt-3">
+                      <Button 
+                        size="sm" 
+                        className="bg-nortech-purple hover:bg-nortech-purple/90"
+                        onClick={() => handleRSVP(Number(event.id))}
+                        disabled={(event.attendees || 0) >= (event.capacity || 0)}
+                      >
+                        {(event.attendees || 0) >= (event.capacity || 0) ? "No spots left" : "Register"}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No events scheduled for this date.</p>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+      
+      {/* Event confirmation dialog */}
+      <EventConfirmDialog
+        isOpen={confirmEvent !== null}
+        onClose={() => setConfirmEvent(null)}
+        onConfirm={confirmRSVP}
+        event={allEvents.find(e => Number(e.id) === confirmEvent) || null}
+      />
     </MainLayout>
   );
 };

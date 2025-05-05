@@ -1,3 +1,6 @@
+// Add UUID type at the top
+type UUID = string; // Type alias for UUID strings
+
 export type ModerationStatus = 'pending' | 'reviewed' | 'resolved';
 
 export type ModerationAction = {
@@ -7,15 +10,15 @@ export type ModerationAction = {
 };
 
 export type ModerationFlag = {
-  id: string;
-  contentId: string;
+  id: UUID;
+  contentId: UUID;
   contentType: 'post' | 'comment';
   reason: string;
-  reporterId: string;
+  reporterId: UUID;
   reportedAt: Date;
   status: ModerationStatus;
-  communityId: string;
-  moderatorId?: string;
+  communityId: UUID;
+  moderatorId?: UUID;
   reviewedAt?: Date;
   action?: ModerationAction;
 }; 

@@ -1,5 +1,7 @@
-
 import { ContentFormat } from "./content";
+
+// Add UUID type at the top
+type UUID = string; // Type alias for UUID strings
 
 export type DiscussionFilter = {
   type: 'tag' | 'status' | 'time' | 'format' | 'topic';
@@ -32,10 +34,10 @@ export interface DiscussionTopic {
 }
 
 export interface Discussion {
-  id: string;
-  topic_id: string;
-  user_id: string;
-  community_id?: string; // Added for compatibility with repository
+  id: UUID;
+  topic_id: UUID;
+  user_id: UUID;
+  community_id?: UUID;
   title: string;
   description: string;
   content?: string;
@@ -63,29 +65,29 @@ export interface Discussion {
   isAnswered?: boolean;
   lastActivity?: string;
   author?: {
-    id: string;
+    id: UUID;
     name: string;
     avatar?: string;
-    avatar_url?: string; // Added for compatibility
+    avatar_url?: string;
     role?: string;
     level?: number;
     xp?: number;
   };
-  topicId?: string; // For UI compatibility
+  topicId?: UUID; // For UI compatibility
 }
 
 export interface DiscussionComment {
-  id: string;
-  discussion_id: string;
-  user_id: string;
+  id: UUID;
+  discussion_id: UUID;
+  user_id: UUID;
   content: string;
-  parent_id?: string;
+  parent_id?: UUID;
   is_answer: boolean;
   likes: number;
   created_at: string;
   updated_at: string;
   author?: {
-    id: string;
+    id: UUID;
     name: string;
     avatar?: string;
     role?: string;
@@ -115,9 +117,9 @@ export interface DiscussionReply {
 }
 
 export interface DiscussionVote {
-  id: string;
-  discussion_id: string;
-  user_id: string;
+  id: UUID;
+  discussion_id: UUID;
+  user_id: UUID;
   is_upvote: boolean;
   created_at: string;
 }
@@ -130,7 +132,7 @@ export interface DiscussionBadge {
 }
 
 export interface DiscussionUser {
-  id: string;
+  id: UUID;
   name: string;
   avatar?: string;
   level?: number;

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -37,8 +36,8 @@ const Step1CommunityContext: React.FC = () => {
             name: 'Design Masters',
             description: 'A community for UI/UX designers to share work and get feedback',
             creator_id: 'creator-1',
-            logo_url: 'https://via.placeholder.com/150',
-            banner_url: 'https://via.placeholder.com/800x200',
+            logo_url: 'https://placehold.co/150',
+            banner_url: 'https://placehold.co/800x200',
             theme_config: { primaryColor: '#7E69AB' },
             status: 'active' as const,
             // Mock additional properties for UI
@@ -50,8 +49,8 @@ const Step1CommunityContext: React.FC = () => {
             name: 'Web3 Explorers',
             description: 'Exploring the frontiers of blockchain and web3 technology',
             creator_id: 'creator-2',
-            logo_url: 'https://via.placeholder.com/150',
-            banner_url: 'https://via.placeholder.com/800x200',
+            logo_url: 'https://placehold.co/150',
+            banner_url: 'https://placehold.co/800x200',
             theme_config: { primaryColor: '#3B82F6' },
             status: 'active' as const,
             // Mock additional properties for UI
@@ -63,8 +62,8 @@ const Step1CommunityContext: React.FC = () => {
             name: 'Creator Economy',
             description: 'For content creators building their business online',
             creator_id: 'creator-3',
-            logo_url: 'https://via.placeholder.com/150',
-            banner_url: 'https://via.placeholder.com/800x200',
+            logo_url: 'https://placehold.co/150',
+            banner_url: 'https://placehold.co/800x200',
             theme_config: { primaryColor: '#F97316' },
             status: 'active' as const,
             // Mock additional properties for UI

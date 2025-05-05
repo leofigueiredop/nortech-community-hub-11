@@ -6,8 +6,7 @@ import {
   CreditCard, DollarSign, BarChart3, Share2, Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 const settingsGroups = [
   {
@@ -55,7 +54,6 @@ const settingsGroups = [
 ];
 
 const SettingsMenu: React.FC = () => {
-  const [searchQuery, setSearchQuery] = React.useState("");
   const [pinnedItems, setPinnedItems] = React.useState(["analytics", "branding"]);
   
   const togglePin = (itemName: string) => {
@@ -65,42 +63,22 @@ const SettingsMenu: React.FC = () => {
         : [...prev, itemName]
     );
   };
-  
-  const filteredGroups = searchQuery.trim() === "" 
-    ? settingsGroups 
-    : settingsGroups.map(group => ({
-        ...group,
-        items: group.items.filter(item => 
-          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.description.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      })).filter(group => group.items.length > 0);
 
   return (
-    <div className="space-y-8">
-      <div className="relative max-w-md mx-auto md:mx-0">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-        <Input
-          placeholder="Search settings..."
-          className="pl-9 bg-white dark:bg-gray-800"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-      
+    <div className="space-y-8">      
       {pinnedItems.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-4">
             <Star className="h-4 w-4 text-amber-400" />
             <h2 className="font-semibold text-lg">Pinned Settings</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {settingsGroups.flatMap(group => 
               group.items.filter(item => 
                 pinnedItems.includes(item.name.toLowerCase())
               ).map((item, itemIndex) => (
                 <Link key={`pinned-${itemIndex}`} to={item.path}>
-                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow flex items-center gap-3 h-full">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow flex items-center gap-3">
                     <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full p-2">
                       {item.icon}
                     </div>
@@ -126,17 +104,17 @@ const SettingsMenu: React.FC = () => {
         </div>
       )}
 
-      {filteredGroups.map((group, index) => (
+      {settingsGroups.map((group, index) => (
         <div key={index}>
           <div className="border-b border-gray-200 dark:border-gray-700 mb-6 pb-2">
             <h2 className="text-xl font-bold">{group.title}</h2>
             <p className="text-gray-500 dark:text-gray-400 mt-1">{group.description}</p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {group.items.map((item, itemIndex) => (
               <Link key={itemIndex} to={item.path}>
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow h-full">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow h-full">
                   <div className="flex items-start">
                     <div className="bg-gray-100 dark:bg-gray-700 rounded-full p-2 mr-3">
                       {item.icon}

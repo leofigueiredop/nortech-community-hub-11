@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -50,8 +49,8 @@ export const DeliveryChannels: React.FC<DeliveryChannelsProps> = ({ channels, on
             <div className="flex items-center gap-3">
               <item.icon className={`h-5 w-5 ${item.iconColor}`} />
               <div>
-                <Label className="text-base font-semibold text-nortech-dark-blue block">{item.label}</Label>
-                <p className="text-nortech-text-muted text-sm">{item.description}</p>
+                <Label className="text-base font-semibold block">{item.label}</Label>
+                <p className="text-muted-foreground text-sm">{item.description}</p>
               </div>
             </div>
             <Switch 
@@ -59,7 +58,7 @@ export const DeliveryChannels: React.FC<DeliveryChannelsProps> = ({ channels, on
               onCheckedChange={() => onToggleChannel(item.key)}
             />
           </div>
-          {index < channelItems.length - 1 && <Separator className="bg-nortech-gray-light" />}
+          {index < channelItems.length - 1 && <Separator />}
         </React.Fragment>
       ))}
     </div>

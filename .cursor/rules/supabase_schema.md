@@ -5,21 +5,41 @@
 -- DROP TABLE public.communities;
 
 CREATE TABLE public.communities (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	"name" text NOT NULL,
 	description text NULL,
 	logo_url text NULL,
 	banner_url text NULL,
-	"domain" text NULL,
-	creator_id text NOT NULL,
+	"domain" text NULL, -- Optional custom domain for the community
+	creator_id uuid DEFAULT auth.uid() NOT NULL,
 	created_at timestamptz DEFAULT now() NULL,
 	updated_at timestamptz DEFAULT now() NULL,
 	status text DEFAULT 'active'::text NULL,
 	theme_config jsonb NULL,
 	api_keys jsonb NULL,
 	is_private bool DEFAULT false NULL,
-	CONSTRAINT communities_pkey PRIMARY KEY (id)
+	member_count int4 DEFAULT 0 NULL,
+	category text DEFAULT 'general'::text NULL,
+	slug text NULL, -- URL-friendly version of community name - used for routing
+	CONSTRAINT communities_pkey PRIMARY KEY (id),
+	CONSTRAINT communities_slug_unique UNIQUE (slug)
 );
+CREATE INDEX communities_slug_idx ON public.communities USING btree (slug);
+
+-- Column comments
+
+COMMENT ON COLUMN public.communities.id IS 'Unique identifier - automatically generated UUID v4';
+COMMENT ON COLUMN public.communities."domain" IS 'Optional custom domain for the community';
+COMMENT ON COLUMN public.communities.slug IS 'URL-friendly version of community name - used for routing';
+
+-- Table Triggers
+
+create trigger ensure_community_slug before
+insert
+    or
+update
+    on
+    public.communities for each row execute function generate_community_slug();
 
 -- Permissions
 
@@ -30,6 +50,29 @@ GRANT ALL ON TABLE public.communities TO authenticated;
 GRANT ALL ON TABLE public.communities TO service_role;
 
 
+-- public.profiles definição
+
+-- Drop table
+
+-- DROP TABLE public.profiles;
+
+CREATE TABLE public.profiles (
+	id text NOT NULL,
+	full_name text NULL,
+	avatar_url text NULL,
+	updated_at timestamptz DEFAULT now() NULL,
+	CONSTRAINT profiles_pkey PRIMARY KEY (id)
+);
+
+-- Permissions
+
+ALTER TABLE public.profiles OWNER TO postgres;
+GRANT ALL ON TABLE public.profiles TO postgres;
+GRANT ALL ON TABLE public.profiles TO anon;
+GRANT ALL ON TABLE public.profiles TO authenticated;
+GRANT ALL ON TABLE public.profiles TO service_role;
+
+
 -- public.analytics_events definição
 
 -- Drop table
@@ -37,7 +80,7 @@ GRANT ALL ON TABLE public.communities TO service_role;
 -- DROP TABLE public.analytics_events;
 
 CREATE TABLE public.analytics_events (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	event_type text NOT NULL,
 	user_id text NULL,
@@ -47,6 +90,10 @@ CREATE TABLE public.analytics_events (
 	CONSTRAINT analytics_events_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 CREATE INDEX analytics_events_community_idx ON public.analytics_events USING btree (community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.analytics_events.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -64,7 +111,7 @@ GRANT ALL ON TABLE public.analytics_events TO service_role;
 -- DROP TABLE public.badges;
 
 CREATE TABLE public.badges (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	"name" text NOT NULL,
 	description text NULL,
@@ -78,6 +125,10 @@ CREATE TABLE public.badges (
 	CONSTRAINT badges_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 CREATE INDEX badges_community_id_idx ON public.badges USING btree (community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.badges.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -95,7 +146,7 @@ GRANT ALL ON TABLE public.badges TO service_role;
 -- DROP TABLE public.community_members;
 
 CREATE TABLE public.community_members (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	user_id text NOT NULL,
 	"role" text DEFAULT 'member'::text NULL,
@@ -114,6 +165,10 @@ CREATE TABLE public.community_members (
 CREATE INDEX community_members_community_id_idx ON public.community_members USING btree (community_id);
 CREATE INDEX community_members_user_id_idx ON public.community_members USING btree (user_id);
 
+-- Column comments
+
+COMMENT ON COLUMN public.community_members.id IS 'Unique identifier - automatically generated UUID v4';
+
 -- Permissions
 
 ALTER TABLE public.community_members OWNER TO postgres;
@@ -130,7 +185,7 @@ GRANT ALL ON TABLE public.community_members TO service_role;
 -- DROP TABLE public.community_settings;
 
 CREATE TABLE public.community_settings (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	settings_type text NOT NULL,
 	settings_data jsonb NOT NULL,
@@ -140,6 +195,10 @@ CREATE TABLE public.community_settings (
 	CONSTRAINT community_settings_pkey PRIMARY KEY (id),
 	CONSTRAINT community_settings_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
+
+-- Column comments
+
+COMMENT ON COLUMN public.community_settings.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -157,7 +216,7 @@ GRANT ALL ON TABLE public.community_settings TO service_role;
 -- DROP TABLE public.content_categories;
 
 CREATE TABLE public.content_categories (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	"name" text NOT NULL,
 	description text NULL,
 	parent_id uuid NULL,
@@ -168,6 +227,10 @@ CREATE TABLE public.content_categories (
 	CONSTRAINT content_categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.content_categories(id)
 );
 CREATE INDEX content_categories_community_id_idx ON public.content_categories USING btree (community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.content_categories.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -185,7 +248,7 @@ GRANT ALL ON TABLE public.content_categories TO service_role;
 -- DROP TABLE public.conversations;
 
 CREATE TABLE public.conversations (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	"type" text DEFAULT 'private'::text NULL,
 	title text NULL,
@@ -194,6 +257,10 @@ CREATE TABLE public.conversations (
 	CONSTRAINT conversations_pkey PRIMARY KEY (id),
 	CONSTRAINT conversations_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
+
+-- Column comments
+
+COMMENT ON COLUMN public.conversations.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -211,7 +278,7 @@ GRANT ALL ON TABLE public.conversations TO service_role;
 -- DROP TABLE public.level_configs;
 
 CREATE TABLE public.level_configs (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	"level" int4 NOT NULL,
 	points_required int4 NOT NULL,
@@ -226,6 +293,10 @@ CREATE TABLE public.level_configs (
 	CONSTRAINT level_configs_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 CREATE INDEX level_configs_community_idx ON public.level_configs USING btree (community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.level_configs.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -243,7 +314,7 @@ GRANT ALL ON TABLE public.level_configs TO service_role;
 -- DROP TABLE public.messages;
 
 CREATE TABLE public.messages (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	conversation_id uuid NULL,
 	sender_id text NOT NULL,
 	"content" text NOT NULL,
@@ -255,6 +326,10 @@ CREATE TABLE public.messages (
 	CONSTRAINT messages_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.conversations(id)
 );
 CREATE INDEX messages_conversation_idx ON public.messages USING btree (conversation_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.messages.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -272,7 +347,7 @@ GRANT ALL ON TABLE public.messages TO service_role;
 -- DROP TABLE public.notification_settings;
 
 CREATE TABLE public.notification_settings (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	user_id text NOT NULL,
 	settings_data jsonb NOT NULL,
@@ -282,6 +357,10 @@ CREATE TABLE public.notification_settings (
 	CONSTRAINT notification_settings_pkey PRIMARY KEY (id),
 	CONSTRAINT notification_settings_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
+
+-- Column comments
+
+COMMENT ON COLUMN public.notification_settings.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -299,7 +378,7 @@ GRANT ALL ON TABLE public.notification_settings TO service_role;
 -- DROP TABLE public.notifications;
 
 CREATE TABLE public.notifications (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	user_id text NOT NULL,
 	"type" text NOT NULL,
@@ -312,6 +391,10 @@ CREATE TABLE public.notifications (
 	CONSTRAINT notifications_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 CREATE INDEX notifications_user_community_idx ON public.notifications USING btree (user_id, community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.notifications.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -329,7 +412,7 @@ GRANT ALL ON TABLE public.notifications TO service_role;
 -- DROP TABLE public.payment_gateways;
 
 CREATE TABLE public.payment_gateways (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	gateway_type text NOT NULL,
 	is_active bool DEFAULT false NULL,
@@ -340,6 +423,10 @@ CREATE TABLE public.payment_gateways (
 	CONSTRAINT payment_gateways_pkey PRIMARY KEY (id),
 	CONSTRAINT payment_gateways_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
+
+-- Column comments
+
+COMMENT ON COLUMN public.payment_gateways.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -357,7 +444,7 @@ GRANT ALL ON TABLE public.payment_gateways TO service_role;
 -- DROP TABLE public.permissions;
 
 CREATE TABLE public.permissions (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	"role" text NOT NULL,
 	resource text NOT NULL,
@@ -369,6 +456,10 @@ CREATE TABLE public.permissions (
 	CONSTRAINT permissions_pkey PRIMARY KEY (id),
 	CONSTRAINT permissions_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
+
+-- Column comments
+
+COMMENT ON COLUMN public.permissions.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -386,7 +477,7 @@ GRANT ALL ON TABLE public.permissions TO service_role;
 -- DROP TABLE public.points_activities;
 
 CREATE TABLE public.points_activities (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	user_id text NOT NULL,
 	activity_type text NOT NULL,
@@ -401,6 +492,10 @@ CREATE TABLE public.points_activities (
 CREATE INDEX points_activities_created_idx ON public.points_activities USING btree (created_at);
 CREATE INDEX points_activities_type_idx ON public.points_activities USING btree (activity_type);
 CREATE INDEX points_activities_user_community_idx ON public.points_activities USING btree (user_id, community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.points_activities.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -418,7 +513,7 @@ GRANT ALL ON TABLE public.points_activities TO service_role;
 -- DROP TABLE public.posts;
 
 CREATE TABLE public.posts (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	author_id text NOT NULL,
 	"content" text NOT NULL,
@@ -431,6 +526,10 @@ CREATE TABLE public.posts (
 );
 CREATE INDEX posts_author_id_idx ON public.posts USING btree (author_id);
 CREATE INDEX posts_community_id_idx ON public.posts USING btree (community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.posts.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -448,7 +547,7 @@ GRANT ALL ON TABLE public.posts TO service_role;
 -- DROP TABLE public.rewards;
 
 CREATE TABLE public.rewards (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	"name" text NOT NULL,
 	description text NULL,
 	image_url text NULL,
@@ -462,6 +561,10 @@ CREATE TABLE public.rewards (
 	CONSTRAINT rewards_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 CREATE INDEX rewards_community_id_idx ON public.rewards USING btree (community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.rewards.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -479,7 +582,7 @@ GRANT ALL ON TABLE public.rewards TO service_role;
 -- DROP TABLE public.spaces;
 
 CREATE TABLE public.spaces (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	"name" text NOT NULL,
 	description text NULL,
@@ -494,6 +597,10 @@ CREATE TABLE public.spaces (
 	CONSTRAINT spaces_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 CREATE INDEX spaces_community_id_idx ON public.spaces USING btree (community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.spaces.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -511,7 +618,7 @@ GRANT ALL ON TABLE public.spaces TO service_role;
 -- DROP TABLE public.subscription_plans;
 
 CREATE TABLE public.subscription_plans (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	community_id uuid NOT NULL,
 	"name" text NOT NULL,
 	description text NULL,
@@ -530,6 +637,10 @@ CREATE TABLE public.subscription_plans (
 	CONSTRAINT subscription_plans_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id)
 );
 CREATE INDEX subscription_plans_community_id_idx ON public.subscription_plans USING btree (community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.subscription_plans.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -629,7 +740,7 @@ GRANT ALL ON TABLE public.user_points TO service_role;
 -- DROP TABLE public.content_items;
 
 CREATE TABLE public.content_items (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	title text NOT NULL,
 	description text NULL,
 	format text NOT NULL,
@@ -660,6 +771,10 @@ CREATE TABLE public.content_items (
 CREATE INDEX content_items_community_id_idx ON public.content_items USING btree (community_id);
 CREATE INDEX content_items_space_id_idx ON public.content_items USING btree (space_id);
 
+-- Column comments
+
+COMMENT ON COLUMN public.content_items.id IS 'Unique identifier - automatically generated UUID v4';
+
 -- Permissions
 
 ALTER TABLE public.content_items OWNER TO postgres;
@@ -676,7 +791,7 @@ GRANT ALL ON TABLE public.content_items TO service_role;
 -- DROP TABLE public.conversation_members;
 
 CREATE TABLE public.conversation_members (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	conversation_id uuid NULL,
 	user_id text NOT NULL,
 	"role" text DEFAULT 'member'::text NULL,
@@ -687,6 +802,10 @@ CREATE TABLE public.conversation_members (
 	CONSTRAINT conversation_members_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.conversations(id)
 );
 CREATE INDEX conversation_members_user_idx ON public.conversation_members USING btree (user_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.conversation_members.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -704,7 +823,7 @@ GRANT ALL ON TABLE public.conversation_members TO service_role;
 -- DROP TABLE public.discussion_topics;
 
 CREATE TABLE public.discussion_topics (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	"name" text NOT NULL,
 	description text NULL,
 	icon text NULL,
@@ -717,6 +836,10 @@ CREATE TABLE public.discussion_topics (
 	CONSTRAINT discussion_topics_space_id_fkey FOREIGN KEY (space_id) REFERENCES public.spaces(id)
 );
 CREATE INDEX discussion_topics_community_id_idx ON public.discussion_topics USING btree (community_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.discussion_topics.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -734,7 +857,7 @@ GRANT ALL ON TABLE public.discussion_topics TO service_role;
 -- DROP TABLE public.discussions;
 
 CREATE TABLE public.discussions (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	title text NOT NULL,
 	"content" text NOT NULL,
 	topic_id uuid NULL,
@@ -752,6 +875,10 @@ CREATE TABLE public.discussions (
 CREATE INDEX discussions_author_id_idx ON public.discussions USING btree (author_id);
 CREATE INDEX discussions_community_id_idx ON public.discussions USING btree (community_id);
 CREATE INDEX discussions_topic_id_idx ON public.discussions USING btree (topic_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.discussions.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -808,7 +935,7 @@ GRANT ALL ON TABLE public.events TO service_role;
 -- DROP TABLE public.message_attachments;
 
 CREATE TABLE public.message_attachments (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	message_id uuid NULL,
 	file_url text NOT NULL,
 	file_type text NOT NULL,
@@ -817,6 +944,10 @@ CREATE TABLE public.message_attachments (
 	CONSTRAINT message_attachments_pkey PRIMARY KEY (id),
 	CONSTRAINT message_attachments_message_id_fkey FOREIGN KEY (message_id) REFERENCES public.messages(id)
 );
+
+-- Column comments
+
+COMMENT ON COLUMN public.message_attachments.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -834,7 +965,7 @@ GRANT ALL ON TABLE public.message_attachments TO service_role;
 -- DROP TABLE public.post_comments;
 
 CREATE TABLE public.post_comments (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	post_id uuid NULL,
 	author_id text NOT NULL,
 	"content" text NOT NULL,
@@ -844,6 +975,10 @@ CREATE TABLE public.post_comments (
 	CONSTRAINT post_comments_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.posts(id)
 );
 CREATE INDEX post_comments_post_id_idx ON public.post_comments USING btree (post_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.post_comments.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -861,7 +996,7 @@ GRANT ALL ON TABLE public.post_comments TO service_role;
 -- DROP TABLE public.post_reactions;
 
 CREATE TABLE public.post_reactions (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	post_id uuid NULL,
 	user_id text NOT NULL,
 	reaction_type text NOT NULL,
@@ -870,6 +1005,10 @@ CREATE TABLE public.post_reactions (
 	CONSTRAINT post_reactions_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.posts(id)
 );
 CREATE INDEX post_reactions_post_id_idx ON public.post_reactions USING btree (post_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.post_reactions.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -887,7 +1026,7 @@ GRANT ALL ON TABLE public.post_reactions TO service_role;
 -- DROP TABLE public.redemptions;
 
 CREATE TABLE public.redemptions (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	user_id text NOT NULL,
 	reward_id uuid NULL,
 	redeemed_at timestamptz DEFAULT now() NULL,
@@ -900,6 +1039,10 @@ CREATE TABLE public.redemptions (
 );
 CREATE INDEX redemptions_community_id_idx ON public.redemptions USING btree (community_id);
 CREATE INDEX redemptions_user_id_idx ON public.redemptions USING btree (user_id);
+
+-- Column comments
+
+COMMENT ON COLUMN public.redemptions.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 
@@ -917,7 +1060,7 @@ GRANT ALL ON TABLE public.redemptions TO service_role;
 -- DROP TABLE public.discussion_replies;
 
 CREATE TABLE public.discussion_replies (
-	id uuid NOT NULL,
+	id uuid DEFAULT uuid_generate_v4() NOT NULL, -- Unique identifier - automatically generated UUID v4
 	"content" text NOT NULL,
 	discussion_id uuid NULL,
 	author_id text NOT NULL,
@@ -927,6 +1070,10 @@ CREATE TABLE public.discussion_replies (
 	CONSTRAINT discussion_replies_pkey PRIMARY KEY (id),
 	CONSTRAINT discussion_replies_discussion_id_fkey FOREIGN KEY (discussion_id) REFERENCES public.discussions(id)
 );
+
+-- Column comments
+
+COMMENT ON COLUMN public.discussion_replies.id IS 'Unique identifier - automatically generated UUID v4';
 
 -- Permissions
 

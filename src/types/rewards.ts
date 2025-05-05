@@ -1,3 +1,5 @@
+// Add UUID type at the top
+type UUID = string; // Type alias for UUID strings
 
 export interface Reward {
   id: string;
@@ -46,13 +48,13 @@ export interface Redemption {
 }
 
 export interface PointsTransaction {
-  id: string;
-  user_id: string;
-  community_id: string;
+  id: UUID;
+  user_id: UUID;
+  community_id: UUID;
   points: number;
   source: string;
   description: string;
   created_at: string;
-  reference_id?: string;
+  reference_id?: UUID;
   reference_type?: string;
 }

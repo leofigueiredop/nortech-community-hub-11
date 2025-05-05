@@ -1,0 +1,44 @@
+-- Disable RLS on all tables based on supabase_schema.md
+ALTER TABLE public.communities DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.analytics_events DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.badges DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.community_members DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.community_settings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.content_categories DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.conversations DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.level_configs DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.messages DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notification_settings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payment_gateways DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.permissions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.points_activities DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.posts DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.rewards DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.spaces DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.subscription_plans DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_activity DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_badges DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_points DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.content_items DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.conversation_members DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.discussion_topics DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.discussions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.events DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.message_attachments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.post_comments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.post_reactions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.redemptions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.discussion_replies DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.event_attendees DISABLE ROW LEVEL SECURITY;
+
+-- Drop all existing policies
+DROP POLICY IF EXISTS "Users can create communities" ON public.communities;
+DROP POLICY IF EXISTS "Anyone can view non-private communities" ON public.communities;
+DROP POLICY IF EXISTS "Creators can update their communities" ON public.communities;
+DROP POLICY IF EXISTS "Creators can delete their communities" ON public.communities;
+DROP POLICY IF EXISTS "Public communities are viewable by anyone" ON public.communities;
+DROP POLICY IF EXISTS "Private communities are viewable by members" ON public.communities;
+DROP POLICY IF EXISTS "Only owners can update communities" ON public.communities;
+DROP POLICY IF EXISTS "Allow public read access to community slugs" ON public.communities; 
