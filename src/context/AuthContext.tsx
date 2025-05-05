@@ -2,31 +2,27 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '@/api/ApiClient';
 import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { AuthUser, AuthResponse } from '@/types/api';
+import { AuthUser, AuthResponse, LoginCredentials, SignupType } from '@/types/api';
+import { SupabaseAuthRepository } from '@/api/repositories/SupabaseAuthRepository';
+import { SupabaseCommunityRepository } from '@/api/repositories/SupabaseCommunityRepository';
+import { Community } from '@/api/interfaces/ICommunityRepository';
+import { createClient } from '@supabase/supabase-js';
+import { supabaseConfig } from '@/api/config';
 
 interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
-  communityContext: {
-    communityId: string;
-    communityName: string;
-    creatorName: string;
-    branding: {
-      logo: string;
-      primaryColor: string;
-      bannerUrl: string;
-    };
-    entryType: 'free' | 'premium';
-  } | null;
-  setCommunityContext: (context: any) => void;
-  login: (email: string, password: string) => Promise<void>;
+  communityContext: Community | null;
+  setCommunityContext: (community: Community | null) => void;
+  login: (credentials: LoginCredentials) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
+  loginWithApple: () => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<AuthUser>) => Promise<void>;
   updateOnboardingStep: (step: number) => void;
   currentOnboardingStep: number;
-  handleAuthCallback: () => Promise<AuthResponse>;
+  handleAuthCallback: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -37,6 +33,7 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   register: async () => {},
   loginWithGoogle: async () => {},
+  loginWithApple: async () => {},
   logout: async () => {},
   updateProfile: async () => {},
   updateOnboardingStep: () => {},
@@ -46,12 +43,14 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [communityContext, setCommunityContext] = useState<AuthContextType['communityContext']>(null);
-  const [currentOnboardingStep, setCurrentOnboardingStep] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [currentCommunity, setCurrentCommunity] = useState<Community | null>(null);
   const navigate = useNavigate();
+
+  const authRepository = new SupabaseAuthRepository();
+  const communityRepository = new SupabaseCommunityRepository(createClient(supabaseConfig.url, supabaseConfig.anonKey));
 
   // Check for existing session and community context on mount
   useEffect(() => {
@@ -61,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (storedCommunityContext) {
           const parsedContext = JSON.parse(storedCommunityContext);
-          setCommunityContext(prev => ({
+          setCurrentCommunity(prev => ({
             ...prev,
             ...parsedContext
           }));
@@ -80,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (error) {
         console.debug('Session check error:', error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
     
@@ -89,57 +88,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Store community context when it changes
   useEffect(() => {
-    if (communityContext) {
-      localStorage.setItem('nortechCommunityContext', JSON.stringify(communityContext));
+    if (currentCommunity) {
+      localStorage.setItem('nortechCommunityContext', JSON.stringify(currentCommunity));
     }
-  }, [communityContext]);
+  }, [currentCommunity]);
   
   // Update API client when community context changes
   useEffect(() => {
-    if (communityContext?.communityId) {
-      api.setCurrentCommunity(communityContext.communityId);
+    if (currentCommunity?.communityId) {
+      api.setCurrentCommunity(currentCommunity.communityId);
     }
-  }, [communityContext?.communityId]);
+  }, [currentCommunity?.communityId]);
 
-  const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    
+  const login = async (credentials: LoginCredentials) => {
     try {
-      console.log('Starting login...');
-      const response = await api.auth.login({ email, password });
-      
-      if (!response.user) {
-        throw new Error('No user data returned from authentication');
+      const response = await authRepository.login(credentials);
+      setUser(response.user);
+
+      // Se o usuário for um criador, buscar sua comunidade
+      if (response.user.role === 'admin' || response.user.role === 'creator') {
+        const { data: communities } = await communityRepository.searchCommunities('', {
+          status: 'active'
+        });
+        
+        const userCommunity = communities?.find(c => c.creator_id === response.user.id);
+        
+        if (userCommunity) {
+          setCurrentCommunity(userCommunity);
+          localStorage.setItem('nortechCommunityContext', JSON.stringify(userCommunity));
+          api.setCurrentCommunity(userCommunity.id);
+        }
       }
 
-      console.log('Login successful, user:', response.user.id);
-      
-      // Set user state
-      setUser(response.user);
-      
-      // If user is a creator, redirect to dashboard
-      if (response.user.role === 'creator' || response.user.role === 'admin') {
-        navigate('/dashboard');
-      } else {
-        // For regular users, continue with onboarding
-        setCurrentOnboardingStep(3); // Move to profile setup
-        navigate('/auth/profile-setup');
-      }
+      navigate('/dashboard');
     } catch (error) {
-      console.error('Login failed:', error);
-      toast({
-        title: "Login failed",
-        description: error instanceof Error ? error.message : "Invalid credentials",
-        variant: "destructive"
-      });
+      console.error('Login error:', error);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const register = async (email: string, password: string, name: string) => {
-    setIsLoading(true);
+    setLoading(true);
     
     try {
       const response = await api.auth.register({
@@ -150,8 +139,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       setUser(response.user);
-      setCurrentOnboardingStep(3); // Move to profile setup after registration
-      navigate('/auth/profile-setup');
+      setCurrentCommunity(null);
+      localStorage.removeItem('nortechCommunityContext');
+      navigate('/');
     } catch (error) {
       console.error('Registration failed:', error);
       toast({
@@ -161,7 +151,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       throw error;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -182,19 +172,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginWithApple = async () => {
+    // Implementation needed
+  };
+
   const handleAuthCallback = async () => {
     try {
-      const response = await api.auth.handleAuthCallback();
+      const response = await authRepository.handleAuthCallback();
       setUser(response.user);
-      return response;
+
+      // Se o usuário for um criador, buscar sua comunidade
+      if (response.user.role === 'admin' || response.user.role === 'creator') {
+        const { data: communities } = await communityRepository.searchCommunities('', {
+          status: 'active'
+        });
+        
+        const userCommunity = communities?.find(c => c.creator_id === response.user.id);
+        
+        if (userCommunity) {
+          setCurrentCommunity(userCommunity);
+          localStorage.setItem('nortechCommunityContext', JSON.stringify(userCommunity));
+          api.setCurrentCommunity(userCommunity.id);
+        }
+      }
+
+      navigate('/dashboard');
     } catch (error) {
-      console.error('Auth callback failed:', error);
-      toast({
-        title: "Authentication failed",
-        description: error instanceof Error ? error.message : "Could not complete authentication",
-        variant: "destructive"
-      });
-      throw error;
+      console.error('Auth callback error:', error);
+      navigate('/login');
     }
   };
 
@@ -202,8 +207,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await api.auth.logout();
       setUser(null);
-      setCommunityContext(null);
-      setCurrentOnboardingStep(1);
+      setCurrentCommunity(null);
       localStorage.removeItem('nortechCommunityContext');
       navigate('/');
     } catch (error) {
@@ -234,21 +238,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateOnboardingStep = (step: number) => {
-    setCurrentOnboardingStep(step);
+    // Implementation needed
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
-    isLoading,
-    communityContext,
-    setCommunityContext,
+    isLoading: loading,
+    communityContext: currentCommunity,
+    setCommunityContext: setCurrentCommunity,
     login,
     register,
     loginWithGoogle,
+    loginWithApple,
     logout,
     updateProfile,
     updateOnboardingStep,
-    currentOnboardingStep,
+    currentOnboardingStep: 1,
     handleAuthCallback
   };
 
@@ -257,4 +262,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </AuthContext.Provider>
   );
-};
+}

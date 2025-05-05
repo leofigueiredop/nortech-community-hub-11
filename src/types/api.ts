@@ -55,3 +55,23 @@ export interface LoginCredentials {
 }
 
 export type SignupType = 'member' | 'community_creator' | 'content_creator';
+
+export interface Community {
+  id: string;
+  name: string;
+  description: string;
+  slug: string;
+  isPrivate: boolean;
+  status: string;
+  category: string;
+  creator_id: string;
+  creatorName: string;
+  logo_url: string;
+  banner_url: string;
+  memberCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+  domain?: string;
+  theme_config?: any;
+  api_keys?: any;
+}
