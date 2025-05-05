@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -13,6 +12,7 @@ import CreateDiscussionDialog from '@/components/discussions/CreateDiscussionDia
 import DiscussionFilters from '@/components/discussions/DiscussionFilters';
 import ActiveUsersList from '@/components/discussions/ActiveUsersList';
 import { Discussion, DiscussionFilter, DiscussionTopic as DiscussionTopicType } from '@/types/discussion';
+import { useTranslation } from 'react-i18next';
 
 const DiscussionTopic = () => {
   const { topicId } = useParams<{ topicId: string }>();
@@ -28,6 +28,7 @@ const DiscussionTopic = () => {
     getDiscussions, 
     filterDiscussions 
   } = useDiscussions();
+  const { t, i18n } = useTranslation('common');
   
   // Get topic data
   const topicData = topicId ? getTopic(topicId) : null;
@@ -102,8 +103,8 @@ const DiscussionTopic = () => {
   useEffect(() => {
     if (!topicData && topicId) {
       toast({
-        title: "Tópico não encontrado",
-        description: "O tópico que você procura não existe ou foi removido.",
+        title: t('discussions.topic.notFound'),
+        description: t('discussions.topic.notFoundDesc'),
         variant: "destructive",
         duration: 3000,
       });
@@ -111,12 +112,18 @@ const DiscussionTopic = () => {
     }
   }, [topicId, topicData, toast, navigate]);
 
+  // Memoize the translated title so it updates on language change
+  const mainLayoutTitle = React.useMemo(
+    () => t('discussions.topic.pageTitle', { topic: topicData?.name }),
+    [t, topicData?.name, i18n.language]
+  );
+
   if (!topicData) {
     return null;
   }
 
   return (
-    <MainLayout title={`Discussões: ${topicData.name}`}>
+    <MainLayout title={mainLayoutTitle}>
       <div className="mb-6">
         <div className="flex items-center mb-2">
           <Button 
@@ -126,7 +133,7 @@ const DiscussionTopic = () => {
             onClick={() => navigate('/discussions')}
           >
             <ArrowLeft size={16} />
-            <span>Voltar para Tópicos</span>
+            <span key={i18n.language}>{t('discussions.topic.backToTopics')}</span>
           </Button>
         </div>
 
@@ -157,10 +164,10 @@ const DiscussionTopic = () => {
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
               <TabsList>
-                <TabsTrigger value="all">Todas</TabsTrigger>
-                <TabsTrigger value="active">Ativas</TabsTrigger>
-                <TabsTrigger value="popular">Populares</TabsTrigger>
-                <TabsTrigger value="unanswered">Sem Resposta</TabsTrigger>
+                <TabsTrigger value="all">{t('discussions.topic.tabs.all')}</TabsTrigger>
+                <TabsTrigger value="active">{t('discussions.topic.tabs.active')}</TabsTrigger>
+                <TabsTrigger value="popular">{t('discussions.topic.tabs.popular')}</TabsTrigger>
+                <TabsTrigger value="unanswered">{t('discussions.topic.tabs.unanswered')}</TabsTrigger>
               </TabsList>
               <TabsContent value="all" className="mt-4">
                 {filteredDiscussions.length > 0 ? (
@@ -169,7 +176,7 @@ const DiscussionTopic = () => {
                   ))
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    <p>Não há discussões para exibir com os filtros atuais.</p>
+                    <p>{t('discussions.topic.noDiscussionsWithFilters')}</p>
                   </div>
                 )}
               </TabsContent>
@@ -180,7 +187,7 @@ const DiscussionTopic = () => {
                   ))
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    <p>Não há discussões ativas no momento.</p>
+                    <p>{t('discussions.topic.noActiveDiscussions')}</p>
                   </div>
                 )}
               </TabsContent>
@@ -191,7 +198,7 @@ const DiscussionTopic = () => {
                   ))
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    <p>Não há discussões populares no momento.</p>
+                    <p>{t('discussions.topic.noPopularDiscussions')}</p>
                   </div>
                 )}
               </TabsContent>
@@ -202,7 +209,7 @@ const DiscussionTopic = () => {
                   ))
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    <p>Não há discussões sem resposta no momento.</p>
+                    <p>{t('discussions.topic.noUnansweredDiscussions')}</p>
                   </div>
                 )}
               </TabsContent>
@@ -213,21 +220,21 @@ const DiscussionTopic = () => {
             <ActiveUsersList />
             
             <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-4">
-              <h3 className="text-sm font-medium mb-3">Sobre este Tópico</h3>
+              <h3 className="text-sm font-medium mb-3">{t('discussions.topic.aboutTitle')}</h3>
               <div className="text-sm text-muted-foreground space-y-2">
-                <p><strong>Membros:</strong> {topicData.memberCount}</p>
-                <p><strong>Discussões:</strong> {topicData.discussionCount}</p>
-                <p><strong>Criado em:</strong> {new Date(topicData.createdAt || topicData.created_at).toLocaleDateString('pt-BR')}</p>
-                <p><strong>Atividade recente:</strong> {topicData.recentActivity}</p>
+                <p><strong>{t('discussions.topic.members')}:</strong> {topicData.memberCount}</p>
+                <p><strong>{t('discussions.topic.discussions')}:</strong> {topicData.discussionCount}</p>
+                <p><strong>{t('discussions.topic.createdAt')}:</strong> {new Date(topicData.createdAt || topicData.created_at).toLocaleDateString('pt-BR')}</p>
+                <p><strong>{t('discussions.topic.recentActivity')}:</strong> {topicData.recentActivity}</p>
               </div>
               
               <div className="mt-4">
-                <h4 className="text-sm font-medium mb-2">Regras do tópico</h4>
+                <h4 className="text-sm font-medium mb-2">{t('discussions.topic.rulesTitle')}</h4>
                 <ul className="text-xs text-muted-foreground list-disc list-inside space-y-1">
-                  <li>Seja respeitoso com todos os membros</li>
-                  <li>Mantenha as discussões relevantes ao tema</li>
-                  <li>Não compartilhe conteúdo inadequado</li>
-                  <li>Antes de criar uma nova discussão, verifique se já existe</li>
+                  <li>{t('discussions.topic.rules.respect')}</li>
+                  <li>{t('discussions.topic.rules.relevant')}</li>
+                  <li>{t('discussions.topic.rules.noInappropriate')}</li>
+                  <li>{t('discussions.topic.rules.checkBeforeCreate')}</li>
                 </ul>
               </div>
             </div>

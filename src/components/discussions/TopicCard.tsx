@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MessageSquare, Users } from 'lucide-react';
@@ -6,12 +5,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { DiscussionTopic } from '@/types/discussion';
 import { Clock, TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface TopicCardProps {
   topic: DiscussionTopic;
 }
 
 const TopicCard: React.FC<TopicCardProps> = ({ topic }) => {
+  const { t } = useTranslation('common');
+
   // Map icon string to component
   const getIconComponent = () => {
     switch (topic.icon) {
@@ -46,17 +48,17 @@ const TopicCard: React.FC<TopicCardProps> = ({ topic }) => {
       <CardContent>
         <div className="flex items-center gap-4 text-sm text-gray-500">
           <span className="flex items-center gap-1">
-            <MessageSquare size={14} /> {topic.discussionCount} discussões
+            <MessageSquare size={14} /> {topic.discussionCount} {t('discussions.topicCard.discussions')}
           </span>
           <span className="flex items-center gap-1">
-            <Users size={14} /> {topic.memberCount} membros
+            <Users size={14} /> {topic.memberCount} {t('discussions.topicCard.members')}
           </span>
-          <span>Atividade recente: {topic.recentActivity}</span>
+          <span>{t('discussions.topicCard.recentActivity')} {topic.recentActivity}</span>
         </div>
       </CardContent>
       <CardFooter className="pt-2">
         <Link to={`/discussions/${topic.id}`}>
-          <Button variant="outline">Explorar Tópico</Button>
+          <Button variant="outline">{t('discussions.topicCard.exploreTopic')}</Button>
         </Link>
       </CardFooter>
     </Card>

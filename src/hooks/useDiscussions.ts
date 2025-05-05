@@ -323,11 +323,7 @@ export const useDiscussions = () => {
     }));
 
     // Award points for creating a discussion
-    awardPoints({
-      type: 'discussion_creation',
-      description: `Criou uma discussão: ${discussion.title}`,
-      points: 10
-    });
+    awardPoints(10, `Criou uma discussão: ${discussion.title}`);
 
     return newDiscussion;
   }, [setDiscussions, setTopics, awardPoints]);
@@ -372,11 +368,7 @@ export const useDiscussions = () => {
     }
 
     // Award points for replying
-    awardPoints({
-      type: 'discussion_reply',
-      description: `Respondeu à discussão #${discussionId}`,
-      points: 5
-    });
+    awardPoints(5, `Respondeu à discussão #${discussionId}`);
 
     return newReply;
   }, [setReplies, discussions, setDiscussions, awardPoints]);
@@ -413,11 +405,7 @@ export const useDiscussions = () => {
     }));
 
     // Award points for creating a topic
-    awardPoints({
-      type: 'topic_creation',
-      description: `Criou o tópico: ${topic.name}`,
-      points: 20
-    });
+    awardPoints(20, `Criou o tópico: ${topic.name}`);
 
     return newTopic;
   }, [setTopics, setDiscussions, awardPoints]);
@@ -444,11 +432,7 @@ export const useDiscussions = () => {
     if (isUpvote) {
       const discussion = getDiscussion(discussionId);
       if (discussion) {
-        awardPoints({
-          type: 'received_upvote',
-          description: `Recebeu um upvote na discussão: ${discussion.title}`,
-          points: 2
-        });
+        awardPoints(2, `Recebeu um upvote na discussão: ${discussion.title}`);
       }
     }
   }, [discussions, setDiscussions, getDiscussion, awardPoints]);
@@ -472,11 +456,7 @@ export const useDiscussions = () => {
     if (isUpvote) {
       const reply = replies[discussionId]?.find(r => r.id === replyId);
       if (reply) {
-        awardPoints({
-          type: 'received_reply_upvote',
-          description: 'Recebeu um upvote em uma resposta',
-          points: 1
-        });
+        awardPoints(1, 'Recebeu um upvote em uma resposta');
       }
     }
   }, [replies, setReplies, awardPoints]);
@@ -510,11 +490,7 @@ export const useDiscussions = () => {
     // Award points for having answer accepted
     const reply = replies[discussionId]?.find(r => r.id === replyId);
     if (reply) {
-      awardPoints({
-        type: 'answer_accepted',
-        description: 'Sua resposta foi marcada como solução',
-        points: 15
-      });
+      awardPoints(15, 'Sua resposta foi marcada como solução');
     }
   }, [replies, setReplies, discussions, setDiscussions, awardPoints]);
 

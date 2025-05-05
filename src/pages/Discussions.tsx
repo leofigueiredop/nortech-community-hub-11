@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -12,6 +11,7 @@ import CreateTopicDialog from '@/components/discussions/CreateTopicDialog';
 import DiscussionFilters from '@/components/discussions/DiscussionFilters';
 import ActiveUsersList from '@/components/discussions/ActiveUsersList';
 import { DiscussionFilter } from '@/types/discussion';
+import { useTranslation } from 'react-i18next';
 
 const Discussions = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,6 +25,7 @@ const Discussions = () => {
     getDiscussions, 
     filterDiscussions
   } = useDiscussions();
+  const { t } = useTranslation('common');
   
   const topics = getAllTopics();
   
@@ -91,10 +92,10 @@ const Discussions = () => {
   const canCreateTopic = viewAs === 'admin' || viewAs === 'moderator';
 
   return (
-    <MainLayout title="Discussions">
+    <MainLayout title={t('discussions.pageTitle')}>
       <div className="mb-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Fóruns de Discussão</h1>
+          <h1 className="text-2xl font-bold">{t('discussions.title')}</h1>
           {canCreateTopic && (
             <CreateTopicDialog 
               isOpen={isDialogOpen}
@@ -115,24 +116,24 @@ const Discussions = () => {
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
               <TabsList>
-                <TabsTrigger value="topics">Tópicos</TabsTrigger>
-                <TabsTrigger value="recent">Discussões Recentes</TabsTrigger>
-                <TabsTrigger value="popular">Populares</TabsTrigger>
+                <TabsTrigger value="topics">{t('discussions.tabs.topics')}</TabsTrigger>
+                <TabsTrigger value="recent">{t('discussions.tabs.recent')}</TabsTrigger>
+                <TabsTrigger value="popular">{t('discussions.tabs.popular')}</TabsTrigger>
               </TabsList>
               <TabsContent value="topics" className="mt-4">
-                <h2 className="text-lg font-semibold mb-4">Tópicos da Comunidade</h2>
+                <h2 className="text-lg font-semibold mb-4">{t('discussions.communityTopics')}</h2>
                 {topics.length > 0 ? (
                   topics.map(topic => (
                     <TopicCard key={topic.id} topic={topic} />
                   ))
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    <p>Não há tópicos disponíveis no momento.</p>
+                    <p>{t('discussions.noTopics')}</p>
                   </div>
                 )}
               </TabsContent>
               <TabsContent value="recent" className="mt-4">
-                <h2 className="text-lg font-semibold mb-4">Discussões Recentes</h2>
+                <h2 className="text-lg font-semibold mb-4">{t('discussions.recentDiscussions')}</h2>
                 {recentDiscussions.length > 0 ? (
                   recentDiscussions.map(discussion => (
                     <DiscussionCard 
@@ -143,12 +144,12 @@ const Discussions = () => {
                   ))
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    <p>Não há discussões recentes no momento.</p>
+                    <p>{t('discussions.noRecentDiscussions')}</p>
                   </div>
                 )}
               </TabsContent>
               <TabsContent value="popular" className="mt-4">
-                <h2 className="text-lg font-semibold mb-4">Discussões Populares</h2>
+                <h2 className="text-lg font-semibold mb-4">{t('discussions.popularDiscussions')}</h2>
                 {popularDiscussions.length > 0 ? (
                   popularDiscussions.map(discussion => (
                     <DiscussionCard 
@@ -159,7 +160,7 @@ const Discussions = () => {
                   ))
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    <p>Não há discussões populares no momento.</p>
+                    <p>{t('discussions.noPopularDiscussions')}</p>
                   </div>
                 )}
               </TabsContent>
@@ -170,15 +171,15 @@ const Discussions = () => {
             <ActiveUsersList />
             
             <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-4">
-              <h3 className="text-sm font-medium mb-3">Sobre os Fóruns</h3>
+              <h3 className="text-sm font-medium mb-3">{t('discussions.aboutForumsTitle')}</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Participe das discussões da comunidade, faça perguntas, ajude outros membros e ganhe pontos de experiência.
+                {t('discussions.aboutForumsDesc')}
               </p>
               <div className="text-sm text-muted-foreground">
-                <p>• Ganhe 10 XP ao criar discussões</p>
-                <p>• Ganhe 5 XP ao responder</p>
-                <p>• Ganhe 15 XP quando sua resposta for aceita</p>
-                <p>• Ganhe 2 XP por cada upvote recebido</p>
+                <p>{t('discussions.xp.createDiscussion')}</p>
+                <p>{t('discussions.xp.reply')}</p>
+                <p>{t('discussions.xp.acceptedAnswer')}</p>
+                <p>{t('discussions.xp.upvote')}</p>
               </div>
             </div>
           </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -13,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { Discussion } from '@/types/discussion';
+import { useTranslation } from 'react-i18next';
 
 interface DiscussionCardProps {
   discussion: Discussion;
@@ -20,6 +20,7 @@ interface DiscussionCardProps {
 }
 
 const DiscussionCard = ({ discussion, topicId }: DiscussionCardProps) => {
+  const { t } = useTranslation('common');
   return (
     <div className={cn(
       "relative group border rounded-lg p-4 bg-card hover:border-primary/20 hover:bg-accent/50 transition-colors",
@@ -39,7 +40,7 @@ const DiscussionCard = ({ discussion, topicId }: DiscussionCardProps) => {
         {discussion.is_featured && (
           <Badge variant="outline" className="flex items-center gap-1 border-amber-200 text-amber-600 bg-amber-50">
             <Star className="h-3 w-3" />
-            <span>Featured</span>
+            <span>{t('discussions.discussionCard.featured')}</span>
           </Badge>
         )}
       </div>

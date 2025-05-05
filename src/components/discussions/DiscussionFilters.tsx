@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -12,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DiscussionFilter } from '@/types/discussion';
+import { useTranslation } from 'react-i18next';
 
 interface DiscussionFiltersProps {
   topicId: string;
@@ -29,6 +29,7 @@ const DiscussionFilters = ({
   activeFilters
 }: DiscussionFiltersProps) => {
   const [searchValue, setSearchValue] = useState(searchQuery);
+  const { t } = useTranslation('common');
   
   // Update component if prop changes
   useEffect(() => {
@@ -90,19 +91,19 @@ const DiscussionFilters = ({
         <div className="relative flex-grow">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search discussions..."
+            placeholder={t('discussions.filters.searchPlaceholder')}
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             onKeyDown={handleKeyDown}
             className="pl-8"
           />
         </div>
-        <Button onClick={handleSearch}>Search</Button>
+        <Button onClick={handleSearch}>{t('discussions.filters.search')}</Button>
       </div>
       
       {activeFilters.length > 0 && (
         <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-sm text-muted-foreground">Filters:</span>
+          <span className="text-sm text-muted-foreground">{t('discussions.filters.filtersLabel')}</span>
           {activeFilters.map((filter, index) => {
             // Don't show the topic filter badge
             if (filter.type === 'topic') return null;
@@ -139,7 +140,7 @@ const DiscussionFilters = ({
               className="h-7 text-xs" 
               onClick={clearFilters}
             >
-              Clear all
+              {t('discussions.filters.clearAll')}
             </Button>
           )}
         </div>
@@ -149,38 +150,38 @@ const DiscussionFilters = ({
         {/* Status Filters */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">Status</Button>
+            <Button variant="outline" size="sm">{t('discussions.filters.status')}</Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={() => 
               addFilter({ 
                 type: 'status', 
                 value: 'hot', 
-                label: 'Hot discussions',
+                label: t('discussions.filters.hotDiscussions'),
                 id: 'hot'
               })
             }>
-              🔥 Hot discussions
+              {t('discussions.filters.hotDiscussions')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => 
               addFilter({ 
                 type: 'status', 
                 value: 'answered',
-                label: 'Answered questions',
+                label: t('discussions.filters.answeredQuestions'),
                 id: 'answered'
               })
             }>
-              ✅ Answered questions
+              {t('discussions.filters.answeredQuestions')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => 
               addFilter({ 
                 type: 'status', 
                 value: 'unanswered',
-                label: 'Unanswered questions',
+                label: t('discussions.filters.unansweredQuestions'),
                 id: 'unanswered'
               })
             }>
-              ❓ Unanswered questions
+              {t('discussions.filters.unansweredQuestions')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -188,38 +189,38 @@ const DiscussionFilters = ({
         {/* Time Filters */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">Time</Button>
+            <Button variant="outline" size="sm">{t('discussions.filters.time')}</Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={() => 
               addFilter({ 
                 type: 'time', 
                 value: 'today',
-                label: 'Today',
+                label: t('discussions.filters.today'),
                 id: 'today'
               })
             }>
-              📅 Today
+              {t('discussions.filters.today')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => 
               addFilter({ 
                 type: 'time', 
                 value: 'week',
-                label: 'This week',
+                label: t('discussions.filters.thisWeek'),
                 id: 'week'
               })
             }>
-              📅 This week
+              {t('discussions.filters.thisWeek')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => 
               addFilter({ 
                 type: 'time', 
                 value: 'month',
-                label: 'This month',
+                label: t('discussions.filters.thisMonth'),
                 id: 'month' 
               })
             }>
-              📅 This month
+              {t('discussions.filters.thisMonth')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -227,38 +228,38 @@ const DiscussionFilters = ({
         {/* Format Filters */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">Format</Button>
+            <Button variant="outline" size="sm">{t('discussions.filters.format')}</Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={() => 
               addFilter({ 
                 type: 'format', 
                 value: 'question',
-                label: 'Questions',
+                label: t('discussions.filters.questions'),
                 id: 'question'
               })
             }>
-              ❓ Questions
+              {t('discussions.filters.questions')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => 
               addFilter({ 
                 type: 'format', 
                 value: 'discussion',
-                label: 'Discussions',
+                label: t('discussions.filters.discussions'),
                 id: 'discussion'
               })
             }>
-              💬 Discussions
+              {t('discussions.filters.discussions')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => 
               addFilter({ 
                 type: 'format', 
                 value: 'announcement',
-                label: 'Announcements',
+                label: t('discussions.filters.announcements'),
                 id: 'announcement'
               })
             }>
-              📢 Announcements
+              {t('discussions.filters.announcements')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -266,7 +267,7 @@ const DiscussionFilters = ({
         {/* Common tags - this would be dynamic based on popular tags */}
         <Tabs defaultValue="all" className="w-auto">
           <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="all">{t('discussions.filters.all')}</TabsTrigger>
             <TabsTrigger value="react" onClick={() => 
               addFilter({ type: 'tag', value: 'React', label: 'React' })
             }>

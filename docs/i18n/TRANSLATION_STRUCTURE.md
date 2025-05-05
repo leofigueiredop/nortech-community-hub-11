@@ -2,10 +2,10 @@
 
 ## Directory Structure
 
-The translation files are organized in the `/public/locales` directory, with subdirectories for each supported language:
+The translation files are organized in the `src/locales` directory, with subdirectories for each supported language:
 
 ```
-public/locales/
+src/locales/
 ├── en-US/                 # English (United States)
 │   ├── common.json       # Common UI elements
 │   ├── navigation.json   # Navigation-related text

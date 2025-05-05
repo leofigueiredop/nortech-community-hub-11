@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Dialog,
@@ -23,6 +22,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { TagInput } from '@/components/ui/tag-input';
 import { useUser } from '@/hooks/use-user';
 import { Discussion, DiscussionTopic } from '@/types/discussion';
+import { useTranslation } from 'react-i18next';
 
 interface CreateDiscussionDialogProps {
   open: boolean;
@@ -57,14 +57,15 @@ export default function CreateDiscussionDialog({
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
   const { toast } = useToast();
   const { user } = useUser();
+  const { t } = useTranslation('common');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!title || !description || !selectedFormat) {
       toast({
-        title: "Missing fields",
-        description: "Please fill out all required fields",
+        title: t('discussions.createDiscussionDialog.missingFields'),
+        description: t('discussions.createDiscussionDialog.fillAllFields'),
         variant: "destructive",
       });
       return;
@@ -96,8 +97,8 @@ export default function CreateDiscussionDialog({
     createDiscussion(newDiscussion)
       .then(() => {
         toast({
-          title: "Discussion created",
-          description: "Your discussion has been created successfully",
+          title: t('discussions.createDiscussionDialog.success'),
+          description: t('discussions.createDiscussionDialog.successMessage'),
         });
         onDiscussionCreated?.();
         onOpenChange(false);
@@ -105,7 +106,7 @@ export default function CreateDiscussionDialog({
       })
       .catch((error) => {
         toast({
-          title: "Error creating discussion",
+          title: t('discussions.createDiscussionDialog.error'),
           description: error.message,
           variant: "destructive",
         });
@@ -123,57 +124,58 @@ export default function CreateDiscussionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
-          <DialogTitle>Create New Discussion</DialogTitle>
+          <DialogTitle>{t('discussions.createDiscussionDialog.title')}</DialogTitle>
           <DialogDescription>
-            Start a new discussion in <strong>{topic.title}</strong> topic.
+            {t('discussions.createDiscussionDialog.description', { topic: topic.title })}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">{t('discussions.createDiscussionDialog.titleLabel')}</Label>
             <Input
               id="title"
-              placeholder="What's this discussion about?"
+              placeholder={t('discussions.createDiscussionDialog.titlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('discussions.createDiscussionDialog.descriptionLabel')}</Label>
             <Textarea
               id="description"
-              placeholder="Elaborate more on your discussion..."
+              placeholder={t('discussions.createDiscussionDialog.descriptionPlaceholder')}
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="format">Format</Label>
+            <Label htmlFor="format">{t('discussions.createDiscussionDialog.formatLabel')}</Label>
             <Select value={selectedFormat} onValueChange={setSelectedFormat}>
               <SelectTrigger id="format">
-                <SelectValue placeholder="Select a format" />
+                <SelectValue placeholder={t('discussions.createDiscussionDialog.formatPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
-                {formats.map((format) => (
-                  <SelectItem key={format.value} value={format.value}>
-                    {format.label}
-                  </SelectItem>
-                ))}
+                <SelectItem key="discussion" value="discussion">
+                  {t('discussions.createDiscussionDialog.formatDiscussion')}
+                </SelectItem>
+                <SelectItem key="question" value="question">
+                  {t('discussions.createDiscussionDialog.formatQuestion')}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="tags">Tags</Label>
+            <Label htmlFor="tags">{t('discussions.createDiscussionDialog.tagsLabel')}</Label>
             <TagInput
               id="tags"
               tags={selectedTags}
               onTagsChange={setSelectedTags}
-              placeholder="Add some tags..."
+              placeholder={t('discussions.createDiscussionDialog.tagsPlaceholder')}
             />
           </div>
           <DialogFooter>
-            <Button type="submit">Create Discussion</Button>
+            <Button type="submit">{t('discussions.createDiscussionDialog.create')}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

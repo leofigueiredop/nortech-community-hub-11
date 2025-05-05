@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -28,6 +27,7 @@ import { useDiscussions } from '@/hooks/useDiscussions';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
 import { usePoints } from '@/context/PointsContext';
+import { useTranslation } from 'react-i18next';
 
 const DiscussionDetail = () => {
   const { topicId, discussionId } = useParams<{ topicId: string; discussionId: string }>();
@@ -44,6 +44,7 @@ const DiscussionDetail = () => {
     voteReply, 
     acceptAnswer 
   } = useDiscussions();
+  const { t } = useTranslation('common');
   
   const [replyContent, setReplyContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,8 +84,8 @@ const DiscussionDetail = () => {
     });
     
     toast({
-      title: "Resposta enviada",
-      description: "Sua resposta foi adicionada à discussão",
+      title: t('discussions.detail.replySent'),
+      description: t('discussions.detail.replyAdded'),
       duration: 3000,
     });
     
@@ -100,8 +101,8 @@ const DiscussionDetail = () => {
     setLikedDiscussion(true);
     
     toast({
-      title: "Apoiado!",
-      description: "Você deu um upvote nesta discussão",
+      title: t('discussions.detail.upvoted'),
+      description: t('discussions.detail.upvotedDiscussion'),
       duration: 1500,
     });
   };
@@ -117,8 +118,8 @@ const DiscussionDetail = () => {
     }));
     
     toast({
-      title: "Apoiado!",
-      description: "Você deu um upvote nesta resposta",
+      title: t('discussions.detail.upvoted'),
+      description: t('discussions.detail.upvotedReply'),
       duration: 1500,
     });
   };
@@ -130,8 +131,8 @@ const DiscussionDetail = () => {
     acceptAnswer(discussionId, replyId);
     
     toast({
-      title: "Resposta aceita",
-      description: "Você marcou esta resposta como solução para a pergunta",
+      title: t('discussions.detail.answerAccepted'),
+      description: t('discussions.detail.markedAsSolution'),
       duration: 3000,
     });
   };
@@ -147,8 +148,8 @@ const DiscussionDetail = () => {
         // Fallback if share API fails
         navigator.clipboard.writeText(window.location.href);
         toast({
-          title: "Link copiado",
-          description: "O link da discussão foi copiado para a área de transferência",
+          title: t('discussions.detail.linkCopied'),
+          description: t('discussions.detail.linkCopiedDesc'),
           duration: 3000,
         });
       });
@@ -156,8 +157,8 @@ const DiscussionDetail = () => {
       // Fallback for browsers that don't support share API
       navigator.clipboard.writeText(window.location.href);
       toast({
-        title: "Link copiado",
-        description: "O link da discussão foi copiado para a área de transferência",
+        title: t('discussions.detail.linkCopied'),
+        description: t('discussions.detail.linkCopiedDesc'),
         duration: 3000,
       });
     }
@@ -167,8 +168,8 @@ const DiscussionDetail = () => {
   useEffect(() => {
     if (!topicData && topicId) {
       toast({
-        title: "Tópico não encontrado",
-        description: "O tópico que você procura não existe ou foi removido.",
+        title: t('discussions.detail.topicNotFound'),
+        description: t('discussions.detail.topicNotFoundDesc'),
         variant: "destructive",
         duration: 3000,
       });
@@ -177,8 +178,8 @@ const DiscussionDetail = () => {
     
     if (topicData && !discussion && discussionId) {
       toast({
-        title: "Discussão não encontrada",
-        description: "A discussão que você procura não existe ou foi removida.",
+        title: t('discussions.detail.discussionNotFound'),
+        description: t('discussions.detail.discussionNotFoundDesc'),
         variant: "destructive",
         duration: 3000,
       });
@@ -207,7 +208,7 @@ const DiscussionDetail = () => {
             onClick={() => navigate(`/discussions/${topicId}`)}
           >
             <ArrowLeft size={16} />
-            <span>Voltar para {topicData.name}</span>
+            <span>{t('discussions.detail.backToTopic', { topic: topicData.name })}</span>
           </Button>
         </div>
 
@@ -218,23 +219,23 @@ const DiscussionDetail = () => {
               <div>
                 <h1 className="text-xl font-bold">{discussion.title}</h1>
                 <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-muted-foreground">
-                  <span>Por {discussion.author?.name}</span>
+                  <span>{t('discussions.detail.by')} {discussion.author?.name}</span>
                   <span className="text-gray-400">•</span>
                   <span>{discussion.created_at}</span>
                   <span className="text-gray-400">•</span>
                   <div className="flex items-center gap-1">
                     <Eye size={14} />
-                    <span>{discussion.view_count || 0} visualizações</span>
+                    <span>{discussion.view_count || 0} {t('discussions.detail.views')}</span>
                   </div>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
                 {discussion.isHot && (
-                  <Badge variant="destructive">Hot</Badge>
+                  <Badge variant="destructive">{t('discussions.detail.hot')}</Badge>
                 )}
                 {discussion.format && (
                   <Badge className={`${discussion.format === 'question' ? 'bg-blue-500' : 'bg-slate-500'}`}>
-                    {discussion.format === 'question' ? 'Pergunta' : 'Discussão'}
+                    {discussion.format === 'question' ? t('discussions.detail.question') : t('discussions.detail.discussion')}
                   </Badge>
                 )}
                 <DropdownMenu>
@@ -244,12 +245,12 @@ const DiscussionDetail = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={handleShare}>Compartilhar</DropdownMenuItem>
-                    <DropdownMenuItem>Reportar</DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleShare}>{t('discussions.detail.share')}</DropdownMenuItem>
+                    <DropdownMenuItem>{t('discussions.detail.report')}</DropdownMenuItem>
                     {(viewAs === 'admin' || viewAs === 'moderator') && (
                       <>
-                        <DropdownMenuItem>Fixar discussão</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-500">Remover discussão</DropdownMenuItem>
+                        <DropdownMenuItem>{t('discussions.detail.pinDiscussion')}</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-500">{t('discussions.detail.removeDiscussion')}</DropdownMenuItem>
                       </>
                     )}
                   </DropdownMenuContent>
@@ -285,21 +286,21 @@ const DiscussionDetail = () => {
                 className={`text-xs flex items-center gap-1 ${likedDiscussion ? 'text-purple-600' : ''}`}
                 onClick={handleLikeDiscussion}
               >
-                <ThumbsUp size={14} /> {discussion.upvotes || 0} {likedDiscussion && '(votado)'}
+                <ThumbsUp size={14} /> {discussion.upvotes || 0} {likedDiscussion && t('discussions.detail.voted')}
               </Button>
               <Button variant="ghost" size="sm" className="text-xs flex items-center gap-1">
-                <MessageSquare size={14} /> {typeof discussion.replies === 'number' ? discussion.replies : (Array.isArray(discussion.replies) ? discussion.replies.length : 0)} respostas
+                <MessageSquare size={14} /> {typeof discussion.replies === 'number' ? discussion.replies : (Array.isArray(discussion.replies) ? discussion.replies.length : 0)} {t('discussions.detail.replies')}
               </Button>
             </div>
             <Button variant="ghost" size="sm" onClick={handleShare} className="text-xs flex items-center gap-1">
-              <Share size={14} /> Compartilhar
+              <Share size={14} /> {t('discussions.detail.share')}
             </Button>
           </CardFooter>
         </Card>
 
         {/* Replies section */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">Respostas ({replies.length})</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('discussions.detail.answers', { count: replies.length })}</h2>
           
           {replies.length > 0 ? (
             <div className="space-y-4">
@@ -317,13 +318,13 @@ const DiscussionDetail = () => {
                             <span className="font-medium">{reply.author?.name}</span>
                             {reply.author?.level && (
                               <Badge variant="outline" className="text-xs h-5 px-1.5">
-                                Nível {reply.author.level}
+                                {t('discussions.detail.level', { level: reply.author.level })}
                               </Badge>
                             )}
                             {reply.isAcceptedAnswer && (
                               <Badge className="bg-green-500 text-white flex items-center gap-1">
                                 <CheckCircle size={12} />
-                                <span>Solução</span>
+                                <span>{t('discussions.detail.solution')}</span>
                               </Badge>
                             )}
                           </div>
@@ -339,15 +340,15 @@ const DiscussionDetail = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={handleShare}>Compartilhar</DropdownMenuItem>
-                          <DropdownMenuItem>Reportar</DropdownMenuItem>
+                          <DropdownMenuItem onClick={handleShare}>{t('discussions.detail.share')}</DropdownMenuItem>
+                          <DropdownMenuItem>{t('discussions.detail.report')}</DropdownMenuItem>
                           {canAcceptAnswer && discussion.format === 'question' && !reply.isAcceptedAnswer && (
                             <DropdownMenuItem onClick={() => handleAcceptAnswer(reply.id)}>
-                              Marcar como solução
+                              {t('discussions.detail.markAsSolution')}
                             </DropdownMenuItem>
                           )}
                           {(viewAs === 'admin' || viewAs === 'moderator') && (
-                            <DropdownMenuItem className="text-red-500">Remover resposta</DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-500">{t('discussions.detail.removeReply')}</DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -361,7 +362,7 @@ const DiscussionDetail = () => {
                       <div className="flex items-center gap-2 mt-3">
                         <span className="text-xs text-amber-500 flex items-center">
                           <Star size={12} className="mr-0.5" />
-                          {reply.author.xp} XP
+                          {reply.author.xp} {t('discussions.detail.xp')}
                         </span>
                         <Progress value={reply.author.xp % 100} className="h-1.5 w-24" />
                       </div>
@@ -376,10 +377,10 @@ const DiscussionDetail = () => {
                     >
                       <ThumbsUp size={14} /> 
                       {reply.upvotes} 
-                      {likedReplies[reply.id] && ' (votado)'}
+                      {likedReplies[reply.id] && ` (${t('discussions.detail.voted')})`}
                     </Button>
                     <Button variant="ghost" size="sm" className="text-xs flex items-center gap-1">
-                      Responder
+                      {t('discussions.detail.reply')}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -387,17 +388,17 @@ const DiscussionDetail = () => {
             </div>
           ) : (
             <Card className="p-6 text-center text-muted-foreground">
-              <p>Seja o primeiro a responder esta discussão!</p>
+              <p>{t('discussions.detail.firstToReply')}</p>
             </Card>
           )}
         </div>
 
         {/* Reply form */}
         <div>
-          <h3 className="text-lg font-semibold mb-3">Sua Resposta</h3>
+          <h3 className="text-lg font-semibold mb-3">{t('discussions.detail.yourAnswer')}</h3>
           <form onSubmit={handleSubmitReply}>
             <Textarea
-              placeholder="Escreva sua resposta aqui..."
+              placeholder={t('discussions.detail.writeYourAnswer')}
               className="min-h-[150px] mb-3"
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
@@ -409,7 +410,7 @@ const DiscussionDetail = () => {
                 className="bg-nortech-purple hover:bg-nortech-purple/90"
                 disabled={isSubmitting || !replyContent.trim()}
               >
-                {isSubmitting ? 'Enviando...' : 'Publicar Resposta'}
+                {isSubmitting ? t('discussions.detail.sending') : t('discussions.detail.publishAnswer')}
               </Button>
             </div>
           </form>

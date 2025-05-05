@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { DiscussionTopic } from '@/types/discussion';
 import { useDiscussions } from '@/hooks/useDiscussions';
+import { useTranslation } from 'react-i18next';
 
 interface CreateTopicDialogProps {
   isOpen: boolean;
@@ -21,14 +21,15 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ isOpen, onClose, 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { createTopic } = useDiscussions();
+  const { t } = useTranslation('common');
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!title.trim()) {
       toast({
-        title: "Error",
-        description: "Topic title is required",
+        title: t('discussions.createTopicDialog.error'),
+        description: t('discussions.createTopicDialog.titleRequired'),
         variant: "destructive"
       });
       return;
@@ -55,8 +56,8 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ isOpen, onClose, 
       const createdTopic = await createTopic(newTopic);
       
       toast({
-        title: "Success",
-        description: "Topic created successfully"
+        title: t('discussions.createTopicDialog.success'),
+        description: t('discussions.createTopicDialog.successMessage')
       });
       
       if (onSuccess) {
@@ -69,8 +70,8 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ isOpen, onClose, 
     } catch (error) {
       console.error('Error creating topic:', error);
       toast({
-        title: "Error",
-        description: "Failed to create topic. Please try again.",
+        title: t('discussions.createTopicDialog.error'),
+        description: t('discussions.createTopicDialog.failed'),
         variant: "destructive"
       });
     } finally {
@@ -83,31 +84,31 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ isOpen, onClose, 
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Create New Topic</DialogTitle>
+            <DialogTitle>{t('discussions.createTopicDialog.title')}</DialogTitle>
             <DialogDescription>
-              Create a new discussion topic for the community.
+              {t('discussions.createTopicDialog.description')}
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="title">Topic Name</Label>
+              <Label htmlFor="title">{t('discussions.createTopicDialog.topicName')}</Label>
               <Input 
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter topic name"
+                placeholder={t('discussions.createTopicDialog.topicNamePlaceholder')}
                 autoFocus
               />
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t('discussions.createTopicDialog.topicDescription')}</Label>
               <Textarea 
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter topic description"
+                placeholder={t('discussions.createTopicDialog.topicDescriptionPlaceholder')}
                 rows={3}
               />
             </div>
@@ -120,13 +121,13 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({ isOpen, onClose, 
               onClick={onClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('discussions.createTopicDialog.cancel')}
             </Button>
             <Button 
               type="submit"
               disabled={isSubmitting || !title.trim()}
             >
-              {isSubmitting ? "Creating..." : "Create Topic"}
+              {isSubmitting ? t('discussions.createTopicDialog.creating') : t('discussions.createTopicDialog.create')}
             </Button>
           </DialogFooter>
         </form>
