@@ -1,14 +1,16 @@
-import { createClient } from '@/api/supabase';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { IPointsRepository } from '@/api/interfaces/IPointsRepository';
+import { IBaseRepository } from '@/api/interfaces/IBaseRepository';
 import { PointsActivity, PointsRedemption } from '@/types/points';
 import { LeaderboardUser } from '@/types/leaderboard';
 
-export class SupabasePointsRepository implements IPointsRepository {
-  private supabase = createClient();
-  private communityId: string;
+export class SupabasePointsRepository implements IPointsRepository, IBaseRepository {
+  private currentCommunityId: string | null = null;
 
-  constructor(communityId: string = 'default') {
-    this.communityId = communityId;
+  constructor(private supabase: SupabaseClient) {}
+
+  setCommunityContext(communityId: string | null): void {
+    this.currentCommunityId = communityId;
   }
 
   async getUserPoints(userId: string): Promise<number> {
@@ -31,7 +33,7 @@ export class SupabasePointsRepository implements IPointsRepository {
         .from('points_activities')
         .select('points')
         .eq('user_id', userId)
-        .eq('community_id', this.communityId);
+        .eq('community_id', this.currentCommunityId);
 
       if (error) throw error;
 
@@ -48,7 +50,7 @@ export class SupabasePointsRepository implements IPointsRepository {
         .from('points_activities')
         .insert({
           user_id: userId,
-          community_id: this.communityId,
+          community_id: this.currentCommunityId,
           points: points,
           activity_type: activityType,
           entity_id: entityId || null,
@@ -80,7 +82,7 @@ export class SupabasePointsRepository implements IPointsRepository {
         .from('points_activities')
         .select('*')
         .eq('user_id', userId)
-        .eq('community_id', this.communityId)
+        .eq('community_id', this.currentCommunityId)
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
@@ -113,7 +115,7 @@ export class SupabasePointsRepository implements IPointsRepository {
         .from('points_redemptions')
         .insert({
           user_id: userId,
-          community_id: this.communityId,
+          community_id: this.currentCommunityId,
           reward_id: rewardId,
           points_spent: pointsCost,
           status: 'pending',
@@ -148,7 +150,7 @@ export class SupabasePointsRepository implements IPointsRepository {
           rewards:reward_id (*)
         `)
         .eq('user_id', userId)
-        .eq('community_id', this.communityId)
+        .eq('community_id', this.currentCommunityId)
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 

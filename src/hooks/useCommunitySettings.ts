@@ -7,26 +7,26 @@ import { useToast } from '@/components/ui/use-toast';
 const settingsRepository = new SupabaseCommunitySettingsRepository();
 
 export function useCommunitySettings() {
-  const { currentCommunity } = useAuth();
+  const { community } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [generalSettings, setGeneralSettings] = useState<GeneralSettings | null>(null);
   const [basicInfo, setBasicInfo] = useState<CommunityBasicInfo | null>(null);
 
   useEffect(() => {
-    if (currentCommunity?.id) {
+    if (community?.id) {
       loadSettings();
     }
-  }, [currentCommunity?.id]);
+  }, [community?.id]);
 
   const loadSettings = async () => {
-    if (!currentCommunity?.id) return;
+    if (!community?.id) return;
     
     setIsLoading(true);
     try {
       const [settings, info] = await Promise.all([
-        settingsRepository.getGeneralSettings(currentCommunity.id),
-        settingsRepository.getCommunityBasicInfo(currentCommunity.id)
+        settingsRepository.getGeneralSettings(community.id),
+        settingsRepository.getCommunityBasicInfo(community.id)
       ]);
       
       setGeneralSettings(settings);
@@ -44,10 +44,10 @@ export function useCommunitySettings() {
   };
 
   const updateGeneralSettings = async (settings: Partial<GeneralSettings>) => {
-    if (!currentCommunity?.id) return;
+    if (!community?.id) return;
     
     try {
-      await settingsRepository.updateGeneralSettings(currentCommunity.id, settings);
+      await settingsRepository.updateGeneralSettings(community.id, settings);
       setGeneralSettings(prev => prev ? { ...prev, ...settings } : null);
       toast({
         title: "Settings updated",
@@ -64,10 +64,10 @@ export function useCommunitySettings() {
   };
 
   const updateBasicInfo = async (data: Partial<CommunityBasicInfo>) => {
-    if (!currentCommunity?.id) return;
+    if (!community?.id) return;
     
     try {
-      await settingsRepository.updateCommunityBasicInfo(currentCommunity.id, data);
+      await settingsRepository.updateCommunityBasicInfo(community.id, data);
       setBasicInfo(prev => prev ? { ...prev, ...data } : null);
       toast({
         title: "Community info updated",

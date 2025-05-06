@@ -2,17 +2,26 @@ import { supabase } from '@/lib/supabase';
 
 export type StorageModule = 'branding' | 'posts' | 'events' | 'discussions';
 
+interface UploadOptions {
+  customFileName?: string;
+  contentType?: string;
+  maxSizeMB?: number;
+}
+
 export class StorageService {
   private static BUCKET_NAME = 'community-assets';
 
   private static async ensureCommunityFolder(communityId: string): Promise<void> {
     try {
+      console.log('Ensuring community folder exists:', communityId);
+      
       // Try to list files in the community folder to check if it exists
       const { data, error } = await supabase.storage
         .from(this.BUCKET_NAME)
         .list(`${communityId}`);
 
       if (error) {
+        console.log('Creating community folder with placeholder...');
         // If folder doesn't exist, create it with a placeholder file
         // Supabase doesn't support creating empty folders, so we need a placeholder
         const placeholderContent = new Blob([''], { type: 'text/plain' });
@@ -27,66 +36,72 @@ export class StorageService {
   }
 
   static async uploadFile(
-    file: File, 
-    module: StorageModule, 
-    communityId: string,
-    options?: { 
-      customFileName?: string,
-      contentType?: string 
-    }
-  ): Promise<string> {
+    file: File,
+    bucket: string,
+    path: string,
+    options?: UploadOptions
+  ): Promise<string | null> {
     try {
-      // Ensure community folder exists
-      await this.ensureCommunityFolder(communityId);
+      console.log('Starting file upload:', {
+        bucket,
+        path,
+        fileName: options?.customFileName || file.name,
+        fileSize: file.size,
+        contentType: options?.contentType
+      });
 
-      // Create unique file name if not provided
-      const fileExt = file.name.split('.').pop();
-      const fileName = options?.customFileName || `${Date.now()}.${fileExt}`;
+      // Ensure the community folder exists
+      await this.ensureCommunityFolder(path);
 
-      // Construct the full path
-      const filePath = module === 'branding' 
-        ? `${communityId}/${fileName}` // branding files in community root
-        : `${communityId}/${module}/${fileName}`; // other modules in subfolders
-
-      // Upload file to Supabase Storage
       const { data, error } = await supabase.storage
-        .from(this.BUCKET_NAME)
-        .upload(filePath, file, {
-          contentType: options?.contentType,
-          upsert: true
-        });
+        .from(bucket)
+        .upload(
+          `${path}/${options?.customFileName || file.name}`,
+          file,
+          {
+            contentType: options?.contentType,
+            cacheControl: '3600',
+            upsert: true // Add upsert option to overwrite existing files
+          }
+        );
 
       if (error) {
+        console.error('Upload error:', error);
         throw error;
       }
+
+      console.log('Upload successful:', data);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from(this.BUCKET_NAME)
-        .getPublicUrl(filePath);
+        .from(bucket)
+        .getPublicUrl(`${path}/${options?.customFileName || file.name}`);
+
+      console.log('Generated public URL:', publicUrl);
 
       return publicUrl;
     } catch (error) {
-      console.error('Error uploading file:', error);
-      throw error;
+      console.error('Upload error:', error);
+      throw error; // Re-throw the error instead of returning null
     }
   }
 
-  static async deleteFile(communityId: string, module: StorageModule, fileName: string): Promise<void> {
+  static async deleteFile(communityId: string, bucket: string, fileName: string): Promise<void> {
     try {
-      const filePath = module === 'branding'
-        ? `${communityId}/${fileName}`
-        : `${communityId}/${module}/${fileName}`;
-
+      console.log('Deleting file:', { communityId, bucket, fileName });
+      
       const { error } = await supabase.storage
-        .from(this.BUCKET_NAME)
-        .remove([filePath]);
+        .from(bucket)
+        .remove([`${communityId}/${fileName}`]);
 
       if (error) {
+        console.error('Delete error:', error);
         throw error;
       }
+
+      console.log('File deleted successfully');
     } catch (error) {
-      console.error('Error deleting file:', error);
+      console.error('Delete error:', error);
       throw error;
     }
   }

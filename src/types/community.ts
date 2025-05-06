@@ -2,22 +2,13 @@
 type UUID = string; // Type alias for UUID strings
 
 export interface Community {
-  id: UUID;
+  id: string;
   name: string;
-  description?: string;
-  logo_url?: string;
-  banner_url?: string;
-  domain?: string;
-  creator_id: UUID;
-  created_at: string;
-  updated_at: string;
-  status: 'active' | 'inactive' | 'pending';
-  theme_config: Record<string, any>;
-  api_keys: Record<string, any>;
-  is_private: boolean;
-  member_count?: number;
-  category?: string;
-  slug?: string;
+  description: string | null;
+  logo_url: string | null;
+  theme_config: {
+    primaryColor: string;
+  } | null;
 }
 
 export interface CommunitySettings {
@@ -62,3 +53,16 @@ export const mockCommunities: Community[] = [
     updated_at: new Date().toISOString()
   }
 ];
+
+export interface CommunityContext {
+  id: string;
+  name: string;
+  description?: string;
+  logo_url?: string | null;
+  theme_config?: {
+    primary_color?: string;
+    secondary_color?: string;
+    background_color?: string;
+    text_color?: string;
+  };
+}

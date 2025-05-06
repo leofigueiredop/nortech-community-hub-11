@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -8,9 +8,9 @@ import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 
 interface LogoSectionProps {
-  initialLogo?: string;
-  initialIcon?: string;
-  initialOgImage?: string;
+  initialLogo?: string | null;
+  initialIcon?: string | null;
+  initialOgImage?: string | null;
   onLogoChange?: (url: string) => void;
   onIconChange?: (url: string) => void;
   onOgImageChange?: (url: string) => void;
@@ -29,29 +29,65 @@ const LogoSection: React.FC<LogoSectionProps> = ({
   const [icon, setIcon] = useState<string | null>(initialIcon || null);
   const [ogImage, setOgImage] = useState<string | null>(initialOgImage || null);
   const [isUploading, setIsUploading] = useState<string | null>(null);
-
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    console.log('LogoSection mounted with community context:', communityContext);
+    if (communityContext?.community) {
+      setLogo(communityContext.community.logo_url || null);
+      setIcon(communityContext.community.icon_url || null);
+      setOgImage(communityContext.community.og_image_url || null);
+    }
+  }, [communityContext]);
+
   const handleFileSelect = async (file: File, type: 'logo' | 'icon' | 'og') => {
-    if (!file || !communityContext?.communityId) return;
+    if (!file || !communityContext?.community?.id) {
+      toast({
+        title: 'Upload failed',
+        description: 'Community context not found. Please try again.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Reset error state
+    setUploadError(null);
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast({
+        title: 'File too large',
+        description: 'Please select a file smaller than 5MB.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please select a JPEG, PNG, GIF, or WebP file.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     try {
       setIsUploading(type);
-      
-      // Create custom filename based on type
-      const fileExt = file.name.split('.').pop();
-      const customFileName = `${type}.${fileExt}`;
-      
-      const url = await StorageService.uploadFile(
-        file,
-        'branding',
-        communityContext.communityId,
-        {
-          customFileName,
-          contentType: file.type
-        }
-      );
 
+      const path = `${communityContext.community.id}/${type}`;
+      const url = await StorageService.uploadFile(file, 'community-assets', path, {
+        maxSizeMB: 5,
+        contentType: file.type
+      });
+
+      if (!url) throw new Error('Upload failed');
+
+      // Update state based on type
       switch (type) {
         case 'logo':
           setLogo(url);
@@ -69,13 +105,14 @@ const LogoSection: React.FC<LogoSectionProps> = ({
 
       toast({
         title: 'Upload successful',
-        description: 'Your image has been uploaded successfully.',
+        description: `${type.charAt(0).toUpperCase() + type.slice(1)} has been updated.`
       });
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error(`Error uploading ${type}:`, error);
+      setUploadError(`Failed to upload ${type}. Please try again.`);
       toast({
         title: 'Upload failed',
-        description: 'There was an error uploading your image. Please try again.',
+        description: error instanceof Error ? error.message : 'Please try again.',
         variant: 'destructive'
       });
     } finally {
@@ -83,66 +120,32 @@ const LogoSection: React.FC<LogoSectionProps> = ({
     }
   };
 
-  const handleImageUpload = (type: 'logo' | 'icon' | 'og') => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        handleFileSelect(file, type);
-      }
-    };
-    input.click();
-  };
-
-  const handleRemoveImage = async (type: 'logo' | 'icon' | 'og', url: string) => {
-    if (!communityContext?.communityId) return;
-
-    try {
-      // Extract filename from URL
-      const fileName = url.split('/').pop();
-      if (fileName) {
-        await StorageService.deleteFile(communityContext.communityId, 'branding', fileName);
-      }
-
-      switch (type) {
-        case 'logo':
-          setLogo(null);
-          onLogoChange?.('');
-          break;
-        case 'icon':
-          setIcon(null);
-          onIconChange?.('');
-          break;
-        case 'og':
-          setOgImage(null);
-          onOgImageChange?.('');
-          break;
-      }
-
-      toast({
-        title: 'Image removed',
-        description: 'The image has been removed successfully.',
-      });
-    } catch (error) {
-      console.error('Delete failed:', error);
-      toast({
-        title: 'Delete failed',
-        description: 'There was an error deleting your image. Please try again.',
-        variant: 'destructive'
-      });
+  const handleRemove = (type: 'logo' | 'icon' | 'og') => {
+    switch (type) {
+      case 'logo':
+        setLogo(null);
+        onLogoChange?.('');
+        break;
+      case 'icon':
+        setIcon(null);
+        onIconChange?.('');
+        break;
+      case 'og':
+        setOgImage(null);
+        onOgImageChange?.('');
+        break;
     }
   };
 
-  if (!communityContext?.communityId) {
+  if (!communityContext?.community?.id) {
     return (
       <Card>
-        <CardContent className="py-6">
-          <p className="text-center text-muted-foreground">
+        <CardHeader>
+          <CardTitle>Logo & Images</CardTitle>
+          <CardDescription>
             Please select a community to manage branding assets.
-          </p>
-        </CardContent>
+          </CardDescription>
+        </CardHeader>
       </Card>
     );
   }
@@ -150,131 +153,166 @@ const LogoSection: React.FC<LogoSectionProps> = ({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-2">
-          <FileImage className="h-5 w-5 text-gray-500" />
-          <CardTitle>Logo & Images</CardTitle>
-        </div>
-        <CardDescription>Upload your community's visual assets</CardDescription>
+        <CardTitle>Logo & Images</CardTitle>
+        <CardDescription>
+          Upload your community logo and other brand assets. Supported formats: JPEG, PNG, GIF, WebP. Max size: 5MB.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-6">
-          <div>
-            <Label className="text-base font-semibold mb-2 block">
-              Community Logo (240x60 – 4:1 ratio)
-            </Label>
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="outline" 
-                className="w-full h-24 flex items-center justify-center relative"
-                onClick={() => handleImageUpload('logo')}
+        {/* Logo Upload Section */}
+        <div className="space-y-2">
+          <Label>Community Logo</Label>
+          <div className="flex items-center gap-4">
+            {logo ? (
+              <div className="relative h-20 w-20">
+                <img
+                  src={logo}
+                  alt="Community Logo"
+                  className="h-full w-full object-contain"
+                />
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute -right-2 -top-2"
+                  onClick={() => handleRemove('logo')}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex h-20 w-20 items-center justify-center rounded-lg border border-dashed">
+                <FileImage className="h-8 w-8 text-muted-foreground" />
+              </div>
+            )}
+            <div className="flex-1">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                className="hidden"
+                onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 'logo')}
+                ref={fileInputRef}
+              />
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading === 'logo'}
               >
                 {isUploading === 'logo' ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : logo ? (
-                  <div className="relative w-full h-full">
-                    <img 
-                      src={logo} 
-                      alt="Logo preview" 
-                      className="object-contain w-full h-full"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-1 right-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (logo) handleRemoveImage('logo', logo);
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading...
+                  </>
                 ) : (
-                  "Upload Logo"
-                )}
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <Label className="text-base font-semibold mb-2 block">
-              App/Browser Icon (32x32)
-            </Label>
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="outline" 
-                className="w-full h-24 flex items-center justify-center relative"
-                onClick={() => handleImageUpload('icon')}
-                disabled={isUploading === 'icon'}
-              >
-                {isUploading === 'icon' ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : icon ? (
-                  <div className="relative w-full h-full">
-                    <img 
-                      src={icon} 
-                      alt="Icon preview" 
-                      className="object-contain w-full h-full"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-1 right-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (icon) handleRemoveImage('icon', icon);
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  "Upload Icon"
-                )}
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <Label className="text-base font-semibold mb-2 block">
-              Social Sharing Preview Image (1200x630 recommended)
-            </Label>
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="outline" 
-                className="w-full h-32 flex items-center justify-center relative"
-                onClick={() => handleImageUpload('og')}
-                disabled={isUploading === 'og'}
-              >
-                {isUploading === 'og' ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : ogImage ? (
-                  <div className="relative w-full h-full">
-                    <img 
-                      src={ogImage} 
-                      alt="OG image preview" 
-                      className="object-cover w-full h-full"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-1 right-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (ogImage) handleRemoveImage('og', ogImage);
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  "Upload Image"
+                  'Upload Logo'
                 )}
               </Button>
             </div>
           </div>
         </div>
+
+        {/* Icon Upload Section */}
+        <div className="space-y-2">
+          <Label>Community Icon</Label>
+          <div className="flex items-center gap-4">
+            {icon ? (
+              <div className="relative h-20 w-20">
+                <img
+                  src={icon}
+                  alt="Community Icon"
+                  className="h-full w-full object-contain"
+                />
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute -right-2 -top-2"
+                  onClick={() => handleRemove('icon')}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex h-20 w-20 items-center justify-center rounded-lg border border-dashed">
+                <FileImage className="h-8 w-8 text-muted-foreground" />
+              </div>
+            )}
+            <div className="flex-1">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                className="hidden"
+                onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 'icon')}
+              />
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading === 'icon'}
+              >
+                {isUploading === 'icon' ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  'Upload Icon'
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* OG Image Upload Section */}
+        <div className="space-y-2">
+          <Label>Social Share Image</Label>
+          <div className="flex items-center gap-4">
+            {ogImage ? (
+              <div className="relative h-20 w-20">
+                <img
+                  src={ogImage}
+                  alt="Social Share Image"
+                  className="h-full w-full object-contain"
+                />
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute -right-2 -top-2"
+                  onClick={() => handleRemove('og')}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex h-20 w-20 items-center justify-center rounded-lg border border-dashed">
+                <FileImage className="h-8 w-8 text-muted-foreground" />
+              </div>
+            )}
+            <div className="flex-1">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                className="hidden"
+                onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 'og')}
+              />
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading === 'og'}
+              >
+                {isUploading === 'og' ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  'Upload Social Image'
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {uploadError && (
+          <p className="text-sm text-destructive">{uploadError}</p>
+        )}
       </CardContent>
     </Card>
   );

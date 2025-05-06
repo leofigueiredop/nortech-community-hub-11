@@ -21,19 +21,9 @@ export class BaseRepository implements IBaseRepository {
     }
   }
 
-  protected handleError<T>(error: unknown): Promise<T> {
+  protected handleError(error: any): never {
     console.error('Repository error:', error);
-    
-    // Get appropriate error message
-    let errorMessage = 'An unexpected error occurred';
-    
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    } else if ((error as PostgrestError)?.message) {
-      errorMessage = (error as PostgrestError).message;
-    }
-    
-    throw new Error(errorMessage);
+    throw error;
   }
 
   protected async handleResponse<T>(response: ApiResponse<T>): Promise<T> {

@@ -1,75 +1,165 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent } from '@/components/ui/card';
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
-
-const formSchema = z.object({
-  email: z.string().email('E-mail inválido'),
-  password: z.string().min(1, 'Senha é obrigatória'),
-  rememberMe: z.boolean().default(false)
-});
-
-type FormData = z.infer<typeof formSchema>;
+import { Label } from '@/components/ui/label';
+import { Link } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login, loginWithGoogle } = useAuth();
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const { login } = useAuth();
+  const { toast } = useToast();
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      rememberMe: false
-    }
-  });
-
-  const onSubmit = async (data: FormData) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
+    setLoginError(null);
+
     try {
-      await login({ email: data.email, password: data.password });
+      console.log('Login form submitted');
+      await login(email, password);
+      
+      toast({
+        title: 'Login successful',
+        description: 'Welcome back!',
+      });
     } catch (error) {
       console.error('Login error:', error);
-      form.setError('root', {
-        type: 'manual',
-        message: 'Email ou senha inválidos'
-      });
+      
+      if (error instanceof Error) {
+        // Handle specific errors with clear messages
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          setLoginError("Connection error. The system will attempt to use a demo mode. Please try again.");
+        } else if (error.message.includes('Invalid login credentials')) {
+          setLoginError("Incorrect email or password. Please try again.");
+        } else if (error.message.includes('No community access')) {
+          setLoginError("You don't have access to any communities. Please contact an administrator.");
+        } else {
+          setLoginError(`Login error: ${error.message}`);
+        }
+      } else {
+        setLoginError('An unknown error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
-      <Card className="w-full max-w-md mx-4 shadow-lg">
-        <CardContent className="pt-6">
-          <div className="flex flex-col space-y-2 text-center mb-8">
-            <h1 className="text-2xl font-semibold tracking-tight">Bem-vindo de volta</h1>
-            <p className="text-sm text-muted-foreground">
-              Entre com suas credenciais para acessar sua conta
-            </p>
-          </div>
-
-          <div className="grid gap-6">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={loginWithGoogle}
-              disabled={isLoading}
-            >
-              <svg
-                className="mr-2 h-4 w-4"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+    <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-slate-900">
+      <div className="w-full max-w-md p-4">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome Back</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">
+            Sign in to access your community
+          </p>
+        </div>
+        
+        <Card>
+          <CardContent className="pt-6">
+            {loginError && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{loginError}</AlertDescription>
+              </Alert>
+            )}
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    className="pl-10"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <Link to="/auth/forgot-password" className="text-sm font-medium text-primary hover:underline">
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    className="pl-10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="remember"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                />
+                <Label 
+                  htmlFor="remember" 
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Remember me for 30 days
+                </Label>
+              </div>
+              
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
               >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  'Sign In'
+                )}
+              </Button>
+            </form>
+            
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">
+                  or
+                </span>
+              </div>
+            </div>
+            
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => {/* Google login function */}}
+            >
+              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   fill="#4285F4"
@@ -86,110 +176,22 @@ const LoginPage: React.FC = () => {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   fill="#EA4335"
                 />
+                <path d="M1 1h22v22H1z" fill="none" />
               </svg>
-              Entrar com Google
+              Continue with Google
             </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Ou continue com
-                </span>
-              </div>
+            
+            <div className="mt-6 text-center text-sm">
+              <p className="text-gray-500 dark:text-gray-400">
+                Don't have an account?{' '}
+                <Link to="/auth/signup" className="font-medium text-primary hover:underline">
+                  Sign up
+                </Link>
+              </p>
             </div>
-
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>E-mail</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                          <Input
-                            placeholder="nome@exemplo.com"
-                            className="pl-10"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Senha</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                          <Input
-                            type="password"
-                            placeholder="Digite sua senha"
-                            className="pl-10"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="rememberMe"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormLabel className="text-sm font-normal">Lembrar de mim</FormLabel>
-                    </FormItem>
-                  )}
-                />
-
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    "Entrando..."
-                  ) : (
-                    <>
-                      Entrar
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-              </form>
-            </Form>
-
-            <div className="text-center">
-              <Link
-                to="/auth/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
-                Esqueceu sua senha?
-              </Link>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

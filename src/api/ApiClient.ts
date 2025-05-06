@@ -15,8 +15,8 @@ import { SupabasePointsRepository } from './repositories/SupabasePointsRepositor
 import { SupabaseMigrationRepository } from './repositories/SupabaseMigrationRepository';
 import { SupabaseCommunityRepository } from './repositories/SupabaseCommunityRepository';
 import { SupabasePostRepository } from './repositories/SupabasePostRepository';
-import { supabaseConfig } from './config';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 export class ApiClient {
   private static instance: ApiClient;
@@ -32,14 +32,8 @@ export class ApiClient {
   public supabase: SupabaseClient;
 
   private constructor() {
-    this.supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true
-      }
-    });
-    this._auth = new SupabaseAuthRepository(this.supabase);
+    this.supabase = supabase;
+    this._auth = new SupabaseAuthRepository();
     this._content = new SupabaseContentRepository(this.supabase);
     this._events = new SupabaseEventsRepository(this.supabase);
     this._discussions = new SupabaseDiscussionRepository(this.supabase);
@@ -58,7 +52,15 @@ export class ApiClient {
 
   public setCurrentCommunity(communityId: string | null) {
     this._currentCommunityId = communityId;
-    // Update context in all repositories
+    
+    if (communityId) {
+      try {
+        this.supabase.rpc('set_tenant_context', { tenant_id: communityId });
+      } catch (err) {
+        console.error('Error setting tenant context:', err);
+      }
+    }
+    
     (this._content as unknown as IBaseRepository).setCommunityContext(communityId);
     (this._events as unknown as IBaseRepository).setCommunityContext(communityId);
     (this._discussions as unknown as IBaseRepository).setCommunityContext(communityId);

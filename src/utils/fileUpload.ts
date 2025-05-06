@@ -1,12 +1,5 @@
-
-import { createClient } from '@supabase/supabase-js';
-import { supabaseConfig } from '@/api/config';
+import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/ui/use-toast';
-
-const supabase = createClient(
-  supabaseConfig.url,
-  supabaseConfig.anonKey
-);
 
 export const uploadFile = async (
   file: File, 

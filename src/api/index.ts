@@ -1,18 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
-import { supabaseConfig } from './config';
+import { supabase } from '@/lib/supabase';
 
 class ApiClient {
   private static instance: ApiClient;
   public supabase;
 
   private constructor() {
-    this.supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true
-      }
-    });
+    this.supabase = supabase;
   }
 
   public static getInstance(): ApiClient {
@@ -24,7 +18,8 @@ class ApiClient {
 
   public setCurrentCommunity(communityId: string) {
     // Set tenant context for RLS policies
-    this.supabase.rpc('set_tenant_context', { tenant_id: communityId });
+    this.supabase.rpc('set_tenant_context', { tenant_id: communityId })
+      .catch(err => console.error('Error setting tenant context:', err));
   }
 }
 

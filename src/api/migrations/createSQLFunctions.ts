@@ -1,13 +1,6 @@
-
-import { createClient } from '@supabase/supabase-js';
-import { supabaseConfig } from '../config';
+import { supabase } from '@/lib/supabase';
 
 export async function createSQLFunctions() {
-  const supabase = createClient(
-    supabaseConfig.url,
-    supabaseConfig.anonKey
-  );
-  
   // First, create the helper function to execute SQL
   try {
     await supabase.rpc('exec_sql', {

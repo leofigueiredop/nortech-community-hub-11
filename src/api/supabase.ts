@@ -1,10 +1,7 @@
+import { supabase } from '@/lib/supabase';
 
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { supabaseConfig } from './config';
-
+// Este arquivo será removido. Use @/lib/supabase diretamente em vez deste.
 export const createClient = () => {
-  return createSupabaseClient(
-    supabaseConfig.url,
-    supabaseConfig.anonKey
-  );
+  console.warn('src/api/supabase.ts está deprecated. Use @/lib/supabase diretamente em vez deste.');
+  return supabase;
 };

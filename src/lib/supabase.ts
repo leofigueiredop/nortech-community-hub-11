@@ -1,33 +1,80 @@
 import { createClient } from '@supabase/supabase-js';
-import { supabaseConfig } from '../api/config';
 
-export { supabaseConfig };
+// Force HTTPS to avoid DNS resolution issues
+const supabaseUrl = 'https://apocdhxpexpcnzcjzpvs.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwb2NkaHhwZXhwY256Y2p6cHZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc3MzYxNDIsImV4cCI6MjAzMzMxMjE0Mn0.7DPzdYRYAJnhgzVISftJrRCpq17RGDKxm5HzYcqXQVE';
 
-// Create a single supabase client for interacting with your database
-export const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey, {
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'pkce',
-    storage: window.localStorage,
-    storageKey: 'nortech-auth-token',
-    debug: import.meta.env.DEV
+    storage: localStorage
+  },
+  global: {
+    headers: {
+      'x-application-name': 'nortech-community-hub'
+    }
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
   }
 });
 
-// Helper function to handle authentication errors
-export const handleAuthError = (error: any) => {
-  console.error('Authentication Error:', error);
-  let message = 'An error occurred during authentication.';
-
-  if (error.message) {
-    message = error.message;
-  } else if (error.error_description) {
-    message = error.error_description;
-  } else if (error.statusText) {
-    message = error.statusText;
+/**
+ * Check if there's an active Supabase session
+ * @returns Object containing session data and error (if any)
+ */
+export const checkSession = async () => {
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    return { session: data.session, error };
+  } catch (err) {
+    console.error('Failed to check session:', err);
+    return { session: null, error: err };
   }
+};
 
-  return { data: null, error: { message } };
+/**
+ * Process auth errors and return user-friendly messages
+ * @param error The error object from Supabase
+ * @returns A user-friendly error message
+ */
+export const handleAuthError = (error: any): string => {
+  console.error('Auth error:', error);
+  
+  if (!error) return 'An unknown error occurred';
+  
+  // Network errors
+  if (
+    (error.message && 
+     (error.message.includes('fetch') || 
+      error.message.includes('Failed to fetch') ||
+      error.message.includes('NetworkError')))
+  ) {
+    return 'Connection error. Please check your internet connection and try again.';
+  }
+  
+  // Handle Supabase Auth errors
+  const message = error.message || error.error_description || error.toString();
+  
+  if (message.includes('Invalid login credentials')) {
+    return 'Incorrect email or password';
+  }
+  
+  if (message.includes('Email not confirmed')) {
+    return 'Please verify your email address before logging in';
+  }
+  
+  if (message.includes('Email link is invalid or has expired')) {
+    return 'The login link is invalid or has expired. Please request a new one';
+  }
+  
+  if (message.includes('rate limit')) {
+    return 'Too many attempts. Please try again later';
+  }
+  
+  return message; // Return original message if no specific handler
 };

@@ -48,13 +48,22 @@ export interface AuthResponse {
   session: AuthSession | null;
 }
 
+import type { AuthUser, AuthResponse } from '@/api/interfaces/IAuthRepository';
+
+export type SignupType = 'member' | 'community_creator' | 'content_creator';
+
 export interface LoginCredentials {
   email: string;
   password: string;
-  role?: string;
 }
 
-export type SignupType = 'member' | 'community_creator' | 'content_creator';
+export interface SignupCredentials extends LoginCredentials {
+  name: string;
+  signupType?: SignupType;
+  communityId?: string;
+}
+
+export type { AuthUser, AuthResponse };
 
 export interface Community {
   id: string;

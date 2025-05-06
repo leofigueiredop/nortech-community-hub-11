@@ -1,15 +1,11 @@
 import { IPostRepository } from '../interfaces/IPostRepository';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { BaseRepository } from './BaseRepository';
-import { supabaseConfig } from '../config';
 import { Post, PostComment, PostReaction } from '@/types/post';
 
 export class SupabasePostRepository extends BaseRepository implements IPostRepository {
-  private supabase: SupabaseClient;
-
   constructor(supabaseClient: SupabaseClient) {
-    super();
-    this.supabase = supabaseClient;
+    super(supabaseClient);
   }
 
   async getAll(page: number = 1, limit: number = 10): Promise<{ posts: Post[], total: number }> {
