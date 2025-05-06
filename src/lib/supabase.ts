@@ -1,8 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Force HTTPS to avoid DNS resolution issues
-const supabaseUrl = 'https://apocdhxpexpcnzcjzpvs.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwb2NkaHhwZXhwY256Y2p6cHZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc3MzYxNDIsImV4cCI6MjAzMzMxMjE0Mn0.7DPzdYRYAJnhgzVISftJrRCpq17RGDKxm5HzYcqXQVE';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables. Please check your .env file.');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {

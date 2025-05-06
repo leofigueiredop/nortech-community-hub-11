@@ -76,8 +76,8 @@ const SettingsMenu: React.FC = () => {
             {settingsGroups.flatMap(group => 
               group.items.filter(item => 
                 pinnedItems.includes(item.name.toLowerCase())
-              ).map((item, itemIndex) => (
-                <Link key={`pinned-${itemIndex}`} to={item.path}>
+              ).map((item) => (
+                <Link key={`pinned-${item.name.toLowerCase()}`} to={item.path}>
                   <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow flex items-center gap-3">
                     <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full p-2">
                       {item.icon}

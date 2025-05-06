@@ -14,13 +14,6 @@ export class BaseRepository implements IBaseRepository {
     this.currentCommunityId = communityId;
   }
 
-  protected async setTenantContext(): Promise<void> {
-    if (this.currentCommunityId) {
-      // Set Postgres RLS policy context
-      await this.supabase.rpc('set_tenant_context', { community_uuid: this.currentCommunityId });
-    }
-  }
-
   protected handleError(error: any): never {
     console.error('Repository error:', error);
     throw error;
@@ -28,7 +21,13 @@ export class BaseRepository implements IBaseRepository {
 
   protected async handleResponse<T>(response: ApiResponse<T>): Promise<T> {
     if (response.error) {
-      throw new Error(response.error);
+      if (typeof response.error === 'string') {
+        throw new Error(response.error);
+      } else if (response.error.message) {
+        throw new Error(response.error.message);
+      } else {
+        throw new Error('Unknown error occurred');
+      }
     }
     return response.data as T;
   }

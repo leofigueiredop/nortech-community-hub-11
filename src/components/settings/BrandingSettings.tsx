@@ -17,10 +17,19 @@ const BrandingSettings: React.FC = () => {
   const { toast } = useToast();
   const { community } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
-  const [primaryColor, setPrimaryColor] = useState("#6E56CF");
-  const [secondaryColor, setSecondaryColor] = useState("#4A36A0");
-  const [textColor, setTextColor] = useState("#FFFFFF");
-  const [bgColor, setBgColor] = useState("#F9FAFB");
+  const [hasChanges, setHasChanges] = useState(false);
+  const [initialValues, setInitialValues] = useState({
+    primaryColor: "#6E56CF",
+    secondaryColor: "#4A36A0",
+    textColor: "#FFFFFF",
+    bgColor: "#F9FAFB",
+    logo: null as string | null,
+    favicon: null as string | null
+  });
+  const [primaryColor, setPrimaryColor] = useState(initialValues.primaryColor);
+  const [secondaryColor, setSecondaryColor] = useState(initialValues.secondaryColor);
+  const [textColor, setTextColor] = useState(initialValues.textColor);
+  const [bgColor, setBgColor] = useState(initialValues.bgColor);
   const [logo, setLogo] = useState<string | null>(null);
   const [favicon, setFavicon] = useState<string | null>(null);
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
@@ -35,14 +44,22 @@ const BrandingSettings: React.FC = () => {
 
       try {
         // Os dados já estarão no contexto de auth
-        setLogo(community.logo_url);
+        const newInitialValues = {
+          primaryColor: community.theme_config?.primary_color || "#6E56CF",
+          secondaryColor: community.theme_config?.secondary_color || "#4A36A0",
+          textColor: community.theme_config?.text_color || "#FFFFFF",
+          bgColor: community.theme_config?.background_color || "#F9FAFB",
+          logo: community.logo_url,
+          favicon: null
+        };
         
-        if (community.theme_config) {
-          setPrimaryColor(community.theme_config.primary_color || "#6E56CF");
-          setSecondaryColor(community.theme_config.secondary_color || "#4A36A0");
-          setTextColor(community.theme_config.text_color || "#FFFFFF");
-          setBgColor(community.theme_config.background_color || "#F9FAFB");
-        }
+        setInitialValues(newInitialValues);
+        setPrimaryColor(newInitialValues.primaryColor);
+        setSecondaryColor(newInitialValues.secondaryColor);
+        setTextColor(newInitialValues.textColor);
+        setBgColor(newInitialValues.bgColor);
+        setLogo(newInitialValues.logo);
+        setHasChanges(false);
       } catch (error) {
         console.error('Error loading branding data:', error);
         toast({
@@ -55,7 +72,24 @@ const BrandingSettings: React.FC = () => {
 
     loadBrandingData();
   }, [community]);
-  
+
+  // Check for changes
+  useEffect(() => {
+    const hasColorChanges = 
+      primaryColor !== initialValues.primaryColor ||
+      secondaryColor !== initialValues.secondaryColor ||
+      textColor !== initialValues.textColor ||
+      bgColor !== initialValues.bgColor ||
+      logo !== initialValues.logo ||
+      favicon !== initialValues.favicon;
+    
+    setHasChanges(hasColorChanges);
+  }, [primaryColor, secondaryColor, textColor, bgColor, logo, favicon, initialValues]);
+
+  const handleUpdateColor = (color: string, setter: (color: string) => void) => {
+    setter(color);
+  };
+
   const handleSaveSettings = async () => {
     if (!community?.id) {
       toast({
@@ -197,11 +231,14 @@ const BrandingSettings: React.FC = () => {
                         />
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 border-none">
-                        <HexColorPicker color={primaryColor} onChange={setPrimaryColor} />
+                        <HexColorPicker 
+                          color={primaryColor} 
+                          onChange={(color) => handleUpdateColor(color, setPrimaryColor)} 
+                        />
                         <div className="p-2 bg-white border-t">
                           <Input 
                             value={primaryColor}
-                            onChange={(e) => setPrimaryColor(e.target.value)}
+                            onChange={(e) => handleUpdateColor(e.target.value, setPrimaryColor)}
                             className="font-mono text-xs"
                           />
                         </div>
@@ -209,7 +246,7 @@ const BrandingSettings: React.FC = () => {
                     </Popover>
                     <Input 
                       value={primaryColor}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      onChange={(e) => handleUpdateColor(e.target.value, setPrimaryColor)}
                       className="font-mono w-32"
                     />
                     <Button className="ml-2" style={{ backgroundColor: primaryColor, color: textColor }}>
@@ -234,11 +271,14 @@ const BrandingSettings: React.FC = () => {
                         />
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 border-none">
-                        <HexColorPicker color={secondaryColor} onChange={setSecondaryColor} />
+                        <HexColorPicker 
+                          color={secondaryColor} 
+                          onChange={(color) => handleUpdateColor(color, setSecondaryColor)} 
+                        />
                         <div className="p-2 bg-white border-t">
                           <Input 
                             value={secondaryColor}
-                            onChange={(e) => setSecondaryColor(e.target.value)}
+                            onChange={(e) => handleUpdateColor(e.target.value, setSecondaryColor)}
                             className="font-mono text-xs"
                           />
                         </div>
@@ -246,7 +286,7 @@ const BrandingSettings: React.FC = () => {
                     </Popover>
                     <Input 
                       value={secondaryColor}
-                      onChange={(e) => setSecondaryColor(e.target.value)}
+                      onChange={(e) => handleUpdateColor(e.target.value, setSecondaryColor)}
                       className="font-mono w-32"
                     />
                     <Button className="ml-2" style={{ backgroundColor: secondaryColor, color: textColor }}>
@@ -275,11 +315,14 @@ const BrandingSettings: React.FC = () => {
                         />
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 border-none">
-                        <HexColorPicker color={textColor} onChange={setTextColor} />
+                        <HexColorPicker 
+                          color={textColor} 
+                          onChange={(color) => handleUpdateColor(color, setTextColor)} 
+                        />
                         <div className="p-2 bg-white border-t">
                           <Input 
                             value={textColor}
-                            onChange={(e) => setTextColor(e.target.value)}
+                            onChange={(e) => handleUpdateColor(e.target.value, setTextColor)}
                             className="font-mono text-xs"
                           />
                         </div>
@@ -287,7 +330,7 @@ const BrandingSettings: React.FC = () => {
                     </Popover>
                     <Input 
                       value={textColor}
-                      onChange={(e) => setTextColor(e.target.value)}
+                      onChange={(e) => handleUpdateColor(e.target.value, setTextColor)}
                       className="font-mono w-32"
                     />
                     <div className="ml-2 flex items-center justify-center h-10 px-4 rounded-md border" 
@@ -313,11 +356,14 @@ const BrandingSettings: React.FC = () => {
                         />
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 border-none">
-                        <HexColorPicker color={bgColor} onChange={setBgColor} />
+                        <HexColorPicker 
+                          color={bgColor} 
+                          onChange={(color) => handleUpdateColor(color, setBgColor)} 
+                        />
                         <div className="p-2 bg-white border-t">
                           <Input 
                             value={bgColor}
-                            onChange={(e) => setBgColor(e.target.value)}
+                            onChange={(e) => handleUpdateColor(e.target.value, setBgColor)}
                             className="font-mono text-xs"
                           />
                         </div>
@@ -325,7 +371,7 @@ const BrandingSettings: React.FC = () => {
                     </Popover>
                     <Input 
                       value={bgColor}
-                      onChange={(e) => setBgColor(e.target.value)}
+                      onChange={(e) => handleUpdateColor(e.target.value, setBgColor)}
                       className="font-mono w-32"
                     />
                     <div className="ml-2 h-10 w-14 border rounded-md flex items-center justify-center"
@@ -404,9 +450,9 @@ const BrandingSettings: React.FC = () => {
                     <p className="text-xs text-muted-foreground">
                       Recommended size: 240x60 pixels (4:1 ratio). Max 2MB. PNG, JPG, GIF, WEBP formats.
                     </p>
-                  </div>
                 </div>
-                
+              </div>
+
                 <div className="space-y-3">
                   <Label className="text-base font-semibold block">
                     App/Browser Icon (32x32)
@@ -546,7 +592,7 @@ const BrandingSettings: React.FC = () => {
       <div className="fixed bottom-8 right-8">
         <Button 
           onClick={handleSaveSettings} 
-          disabled={isSaving || !community?.id}
+          disabled={isSaving || !community?.id || !hasChanges}
           size="lg"
           className="shadow-lg"
           style={{ backgroundColor: primaryColor, color: textColor }}

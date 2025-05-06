@@ -61,9 +61,6 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         };
       }
       
-      // Set tenant context for RLS
-      await this.supabase.rpc('set_tenant_context', { tenant_id: null });
-      
       // Check if user is a creator of any community
       const { data: creatorCommunity, error: creatorError } = await this.supabase
         .from('communities')
@@ -73,9 +70,6 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
 
       if (creatorCommunity) {
         console.log('User is a creator of community:', creatorCommunity.id);
-        
-        // Set tenant context for this community
-        await this.supabase.rpc('set_tenant_context', { tenant_id: creatorCommunity.id });
         
         return {
           id: creatorCommunity.id,
@@ -105,9 +99,6 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
           
         if (communityData) {
           console.log('User is a member of community:', communityData.id);
-          
-          // Set tenant context for this community
-          await this.supabase.rpc('set_tenant_context', { tenant_id: communityData.id });
           
           return {
             id: communityData.id,

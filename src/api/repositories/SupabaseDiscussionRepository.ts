@@ -10,7 +10,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async getAllTopics(): Promise<DiscussionTopic[]> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('discussion_topics')
         .select('*')
@@ -25,7 +24,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async getTopicById(id: string): Promise<DiscussionTopic> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('discussion_topics')
         .select('*')
@@ -42,7 +40,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async createTopic(topic: Partial<DiscussionTopic>): Promise<DiscussionTopic> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('discussion_topics')
         .insert([{
@@ -61,7 +58,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async updateTopic(id: string, topic: Partial<DiscussionTopic>): Promise<DiscussionTopic> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('discussion_topics')
         .update(topic)
@@ -79,7 +75,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async deleteTopic(id: string): Promise<void> {
     try {
-      await this.setTenantContext();
       const { error } = await this.supabase
         .from('discussion_topics')
         .delete()
@@ -94,7 +89,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async getDiscussionsByTopic(topicId: string): Promise<Discussion[]> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('discussions')
         .select('*, author:profiles(*)')
@@ -110,7 +104,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async getDiscussion(id: string): Promise<Discussion> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('discussions')
         .select('*, author:profiles(*), replies:discussion_replies(*, author:profiles(*))')
@@ -127,7 +120,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async createDiscussion(discussion: Partial<Discussion>): Promise<Discussion> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('discussions')
         .insert([{
@@ -146,7 +138,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async updateDiscussion(id: string, discussion: Partial<Discussion>): Promise<Discussion> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('discussions')
         .update(discussion)
@@ -164,7 +155,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async deleteDiscussion(id: string): Promise<void> {
     try {
-      await this.setTenantContext();
       const { error } = await this.supabase
         .from('discussions')
         .delete()
@@ -179,7 +169,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async addReply(discussionId: string, reply: Partial<DiscussionReply>): Promise<DiscussionReply> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('discussion_replies')
         .insert([{
@@ -198,7 +187,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async updateReply(id: string, reply: Partial<DiscussionReply>): Promise<DiscussionReply> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('discussion_replies')
         .update(reply)
@@ -215,7 +203,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async deleteReply(id: string): Promise<void> {
     try {
-      await this.setTenantContext();
       const { error } = await this.supabase
         .from('discussion_replies')
         .delete()
@@ -229,8 +216,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async markReplyAsSolution(replyId: string): Promise<DiscussionReply> {
     try {
-      await this.setTenantContext();
-      
       // First, get the reply to find the discussion ID
       const { data: replyData, error: replyError } = await this.supabase
         .from('discussion_replies')
@@ -272,7 +257,6 @@ export class SupabaseDiscussionRepository extends BaseRepository implements IDis
 
   async incrementViewCount(discussionId: string): Promise<void> {
     try {
-      await this.setTenantContext();
       const { error } = await this.supabase
         .rpc('increment_discussion_views', {
           discussion_id_param: discussionId

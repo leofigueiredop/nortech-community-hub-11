@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -118,7 +117,7 @@ const SetupChecklist: React.FC = () => {
         </div>
         
         {items.map((item, index) => (
-          <React.Fragment key={item.id}>
+          <div key={item.id}>
             {index > 0 && <Separator />}
             <div className="flex items-start gap-3 py-2">
               <button 
@@ -163,7 +162,7 @@ const SetupChecklist: React.FC = () => {
                 </div>
               </div>
             </div>
-          </React.Fragment>
+          </div>
         ))}
       </CardContent>
     </Card>

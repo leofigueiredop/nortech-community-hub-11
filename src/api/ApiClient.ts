@@ -53,14 +53,7 @@ export class ApiClient {
   public setCurrentCommunity(communityId: string | null) {
     this._currentCommunityId = communityId;
     
-    if (communityId) {
-      try {
-        this.supabase.rpc('set_tenant_context', { tenant_id: communityId });
-      } catch (err) {
-        console.error('Error setting tenant context:', err);
-      }
-    }
-    
+    // Update community context in all repositories
     (this._content as unknown as IBaseRepository).setCommunityContext(communityId);
     (this._events as unknown as IBaseRepository).setCommunityContext(communityId);
     (this._discussions as unknown as IBaseRepository).setCommunityContext(communityId);
