@@ -1,51 +1,69 @@
-import React, { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import SettingsMenu from './SettingsMenu';
-import { useAuth } from '@/context/AuthContext';
 
-const SettingsLayout: React.FC = () => {
-  const { user, isLoading } = useAuth();
-  const navigate = useNavigate();
+import React, { ReactNode, useState } from 'react';
+import MainLayout from '@/components/layout/MainLayout';
+import SettingsSidebar from '@/components/settings/SettingsSidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-  // Verify user has proper permissions to access settings
-  useEffect(() => {
-    if (!isLoading && user) {
-      const role = user.role || user.communityRole;
-      const isAuthorized = role === 'owner' || role === 'admin' || role === 'moderator';
-      
-      if (!isAuthorized) {
-        console.log('User not authorized to access settings:', user);
-        navigate('/dashboard');
-      }
-    }
-  }, [user, isLoading, navigate]);
+interface SettingsLayoutProps {
+  children: ReactNode;
+  activeSection?: string;
+  title?: string;
+}
 
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+const SettingsLayout: React.FC<SettingsLayoutProps> = ({ 
+  children, 
+  activeSection = "general",
+  title
+}) => {
+  const { isMobile } = useIsMobile();
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
-  // Don't render anything if user is not authorized
-  const role = user?.role || user?.communityRole;
-  if (!user || !(role === 'owner' || role === 'admin' || role === 'moderator')) {
-    return null;
-  }
-
+  const toggleMobileSidebar = () => {
+    setShowMobileSidebar(!showMobileSidebar);
+  };
+  
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex gap-6">
-        <aside className="w-64">
-          <SettingsMenu />
-        </aside>
-        <main className="flex-1">
-          <Outlet />
-        </main>
+    <MainLayout>
+      <div className="flex flex-col h-full bg-white dark:bg-slate-900">
+        {isMobile && (
+          <div className="border-b border-gray-200 dark:border-gray-800 p-2">
+            <Button 
+              variant="outline" 
+              className="w-full flex justify-between items-center text-sm"
+              onClick={toggleMobileSidebar}
+            >
+              <span>Settings Menu</span>
+              {showMobileSidebar ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </Button>
+            
+            {showMobileSidebar && (
+              <div className="mt-2 border rounded-md overflow-hidden">
+                <SettingsSidebar activeSection={activeSection} />
+              </div>
+            )}
+          </div>
+        )}
+        
+        <div className="flex h-full overflow-y-auto">
+          <div className="hidden md:block w-56 h-full overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-slate-800">
+            <SettingsSidebar activeSection={activeSection} />
+          </div>
+          
+          <div className="flex-1 flex flex-col h-full overflow-hidden">
+            <div className="border-b border-gray-200 dark:border-gray-800 p-3 md:p-4">
+              <h1 className="text-lg md:text-xl font-semibold">
+                {title || activeSection.charAt(0).toUpperCase() + activeSection.slice(1)} Settings
+              </h1>
+            </div>
+            <div className="flex-1 overflow-y-auto p-3 md:p-5">
+              {children}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

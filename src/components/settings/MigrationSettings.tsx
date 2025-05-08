@@ -240,7 +240,7 @@ const MigrationSettings: React.FC = () => {
 };
 
 export default MigrationSettings;
+
 export const fixMigrationReferences = () => {
   console.log('Use api.migration instead of api.migrations');
 };
-
