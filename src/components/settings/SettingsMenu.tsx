@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import { 
   Settings, Palette, Globe, RefreshCw, 
   MessageSquare, FileText, Layout, Shield, Workflow, Bot, Trophy,
-  CreditCard, DollarSign, BarChart3, Share2, Bell
+  CreditCard, DollarSign, BarChart3, Share2, Bell, User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
 const settingsGroups = [
   {
@@ -17,7 +19,8 @@ const settingsGroups = [
       { name: 'Branding', icon: <Palette className="mr-2 h-5 w-5" />, path: '/settings/branding', description: 'Customize the look and feel of your community' },
       { name: 'Domain', icon: <Globe className="mr-2 h-5 w-5" />, path: '/settings/domain', description: 'Connect and manage custom domains' },
       { name: 'Migration', icon: <RefreshCw className="mr-2 h-5 w-5" />, path: '/settings/migration', description: 'Import or export community data' },
-    ]
+    ],
+    requiredRole: 'admin' // owner or admin
   },
   {
     title: '🧩 Content & Engagement',
@@ -30,7 +33,8 @@ const settingsGroups = [
       { name: 'Workflows', icon: <Workflow className="mr-2 h-5 w-5" />, path: '/settings/workflows', description: 'Automate community processes and actions' },
       { name: 'AI Agents', icon: <Bot className="mr-2 h-5 w-5" />, path: '/settings/ai-agents', description: 'Configure AI assistants for your community' },
       { name: 'Points Configuration', icon: <Trophy className="mr-2 h-5 w-5" />, path: '/settings/points-configuration', description: 'Set up gamification and rewards' },
-    ]
+    ],
+    requiredRole: 'moderator' // owner, admin, or moderator with can_edit_user_content permission
   },
   {
     title: '💸 Monetization',
@@ -41,7 +45,8 @@ const settingsGroups = [
       { name: 'Paywall Setup', icon: <DollarSign className="mr-2 h-5 w-5" />, path: '/settings/paywall', description: 'Configure content access rules' },
       { name: 'Analytics', icon: <BarChart3 className="mr-2 h-5 w-5" />, path: '/settings/analytics', description: 'Community growth and engagement metrics' },
       { name: 'Affiliates', icon: <Share2 className="mr-2 h-5 w-5" />, path: '/settings/affiliates', description: 'Manage affiliate programs and tracking' },
-    ]
+    ],
+    requiredRole: 'admin' // owner or admin
   },
   {
     title: '🧑‍🤝‍🧑 Member Experience',
@@ -49,12 +54,33 @@ const settingsGroups = [
     items: [
       { name: 'Legal', icon: <FileText className="mr-2 h-5 w-5" />, path: '/settings/legal', description: 'Manage terms of service and privacy policies' },
       { name: 'Notifications', icon: <Bell className="mr-2 h-5 w-5" />, path: '/settings/notifications', description: 'Manage notification preferences' },
-    ]
+    ],
+    requiredRole: 'admin' // owner or admin
   }
 ];
 
 const SettingsMenu: React.FC = () => {
-  const [pinnedItems, setPinnedItems] = React.useState(["analytics", "branding"]);
+  const [pinnedItems, setPinnedItems] = useState<string[]>(["analytics", "branding"]);
+  const { user } = useAuth();
+
+  if (!user) return null;
+
+  // Get the effective role - prefer communityRole if exists, otherwise use role
+  const effectiveRole = user.communityRole || user.role || 'member';
+  
+  // Role-based permission checks
+  const isOwner = effectiveRole === 'owner';
+  const isAdmin = effectiveRole === 'admin' || isOwner;
+  const isModerator = effectiveRole === 'moderator' || isAdmin;
+  
+  // Moderator-specific permission checks
+  const canManageUsers = isAdmin || (isModerator && user.moderatorPermissions?.can_ban_users);
+  const canManageContent = isAdmin || (isModerator && user.moderatorPermissions?.can_edit_user_content);
+  
+  // If user shouldn't access settings, don't render anything
+  if (!isModerator) {
+    return null;
+  }
   
   const togglePin = (itemName: string) => {
     setPinnedItems(prev => 
@@ -64,8 +90,16 @@ const SettingsMenu: React.FC = () => {
     );
   };
 
+  // Filter settings groups based on user role
+  const filteredSettingsGroups = settingsGroups.filter(group => {
+    if (group.requiredRole === 'admin' && !isAdmin) return false;
+    if (group.requiredRole === 'moderator' && !isModerator) return false;
+    return true;
+  });
+
   return (
-    <div className="space-y-8">      
+    <div className="space-y-8">
+      {/* Pinned settings section */}
       {pinnedItems.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-4">
@@ -73,7 +107,7 @@ const SettingsMenu: React.FC = () => {
             <h2 className="font-semibold text-lg">Pinned Settings</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {settingsGroups.flatMap(group => 
+            {filteredSettingsGroups.flatMap(group => 
               group.items.filter(item => 
                 pinnedItems.includes(item.name.toLowerCase())
               ).map((item) => (
@@ -104,7 +138,8 @@ const SettingsMenu: React.FC = () => {
         </div>
       )}
 
-      {settingsGroups.map((group, index) => (
+      {/* Main settings groups */}
+      {filteredSettingsGroups.map((group, index) => (
         <div key={index}>
           <div className="border-b border-gray-200 dark:border-gray-700 mb-6 pb-2">
             <h2 className="text-xl font-bold">{group.title}</h2>
@@ -140,6 +175,103 @@ const SettingsMenu: React.FC = () => {
           </div>
         </div>
       ))}
+
+      {/* Core settings navigation */}
+      <nav className="space-y-1 border-t border-gray-200 dark:border-gray-700 pt-4">
+        <NavLink
+          to="/settings/profile"
+          className={({ isActive }) =>
+            `block px-3 py-2 rounded-md flex items-center ${
+              isActive
+                ? 'bg-gray-900 text-white'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+            }`
+          }
+        >
+          <User className="mr-2 h-4 w-4" />
+          Profile Settings
+        </NavLink>
+
+        {isModerator && (
+          <NavLink
+            to="/settings/community"
+            className={({ isActive }) =>
+              `block px-3 py-2 rounded-md flex items-center ${
+                isActive
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+              }`
+            }
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            Community Settings
+          </NavLink>
+        )}
+
+        {canManageUsers && (
+          <NavLink
+            to="/settings/users"
+            className={({ isActive }) =>
+              `block px-3 py-2 rounded-md flex items-center ${
+                isActive
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+              }`
+            }
+          >
+            <User className="mr-2 h-4 w-4" />
+            User Management
+          </NavLink>
+        )}
+
+        {canManageContent && (
+          <NavLink
+            to="/settings/content"
+            className={({ isActive }) =>
+              `block px-3 py-2 rounded-md flex items-center ${
+                isActive
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+              }`
+            }
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            Content Management
+          </NavLink>
+        )}
+
+        {isAdmin && (
+          <>
+            <NavLink
+              to="/settings/roles"
+              className={({ isActive }) =>
+                `block px-3 py-2 rounded-md flex items-center ${
+                  isActive
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                }`
+              }
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              Role Management
+            </NavLink>
+
+            <NavLink
+              to="/settings/advanced"
+              className={({ isActive }) =>
+                `block px-3 py-2 rounded-md flex items-center ${
+                  isActive
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                }`
+              }
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Advanced Settings
+            </NavLink>
+          </>
+        )}
+      </nav>
     </div>
   );
 };

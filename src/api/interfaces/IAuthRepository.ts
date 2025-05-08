@@ -12,12 +12,25 @@ export interface Profile {
 export interface AuthUser {
   id: string;
   email: string;
-  profile: Profile;
+  profile: {
+    id: string;
+    full_name: string;
+    avatar_url: string | null;
+  };
+  role?: 'owner' | 'admin' | 'moderator' | 'member';
+  communityRole?: 'owner' | 'admin' | 'moderator' | 'member';
+  moderatorPermissions?: {
+    can_delete_content: boolean;
+    can_ban_users: boolean;
+    can_edit_user_content: boolean;
+    can_approve_flagged_content: boolean;
+  };
 }
 
 export interface AuthResponse {
   user: AuthUser;
-  community: CommunityContext;
+  community?: CommunityContext;
+  role?: 'owner' | 'admin' | 'moderator' | 'member';
 }
 
 export interface IAuthRepository {

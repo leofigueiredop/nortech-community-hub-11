@@ -44,7 +44,7 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
     }
   }
 
-  private async fetchUserCommunity(userId: string): Promise<CommunityContext> {
+  private async fetchUserCommunity(userId: string): Promise<{ community: CommunityContext, role: string }> {
     try {
       console.log('Fetching user community for user ID:', userId);
       
@@ -53,11 +53,14 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         const mockCommunity = mockCommunities[0];
         console.log('Using mock community data:', mockCommunity.id);
         return {
-          id: mockCommunity.id,
-          name: mockCommunity.name,
-          description: mockCommunity.description || '',
-          logo_url: mockCommunity.logo_url,
-          theme_config: mockCommunity.theme_config
+          community: {
+            id: mockCommunity.id,
+            name: mockCommunity.name,
+            description: mockCommunity.description || '',
+            logo_url: mockCommunity.logo_url,
+            theme_config: mockCommunity.theme_config
+          },
+          role: 'owner' // Default role for mock data
         };
       }
       
@@ -72,11 +75,14 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         console.log('User is a creator of community:', creatorCommunity.id);
         
         return {
-          id: creatorCommunity.id,
-          name: creatorCommunity.name,
-          description: creatorCommunity.description || '',
-          logo_url: creatorCommunity.logo_url,
-          theme_config: creatorCommunity.theme_config
+          community: {
+            id: creatorCommunity.id,
+            name: creatorCommunity.name,
+            description: creatorCommunity.description || '',
+            logo_url: creatorCommunity.logo_url,
+            theme_config: creatorCommunity.theme_config
+          },
+          role: 'owner' // Creator is always owner
         };
       }
 
@@ -84,7 +90,7 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
       // First get the community members record
       const { data: memberData, error: memberError } = await this.supabase
         .from('community_members')
-        .select('community_id')
+        .select('community_id, role')
         .eq('user_id', userId)
         .eq('status', 'active')
         .maybeSingle();
@@ -98,14 +104,17 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
           .maybeSingle();
           
         if (communityData) {
-          console.log('User is a member of community:', communityData.id);
+          console.log('User is a member of community:', communityData.id, 'with role:', memberData.role);
           
           return {
-            id: communityData.id,
-            name: communityData.name,
-            description: communityData.description || '',
-            logo_url: communityData.logo_url,
-            theme_config: communityData.theme_config
+            community: {
+              id: communityData.id,
+              name: communityData.name,
+              description: communityData.description || '',
+              logo_url: communityData.logo_url,
+              theme_config: communityData.theme_config
+            },
+            role: memberData.role || 'member' // Use the role from community_members table
           };
         }
       }
@@ -114,11 +123,14 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
       const mockCommunity = mockCommunities[0];
       console.log('No community found, using mock community data:', mockCommunity.id);
       return {
-        id: mockCommunity.id,
-        name: mockCommunity.name,
-        description: mockCommunity.description || '',
-        logo_url: mockCommunity.logo_url,
-        theme_config: mockCommunity.theme_config
+        community: {
+          id: mockCommunity.id,
+          name: mockCommunity.name,
+          description: mockCommunity.description || '',
+          logo_url: mockCommunity.logo_url,
+          theme_config: mockCommunity.theme_config
+        },
+        role: 'member' // Default role for mock data when not creator
       };
     } catch (error) {
       console.error('Error fetching user community:', error);
@@ -127,11 +139,14 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
       const mockCommunity = mockCommunities[0];
       console.log('Error fetching community, using mock community data:', mockCommunity.id);
       return {
-        id: mockCommunity.id,
-        name: mockCommunity.name,
-        description: mockCommunity.description || '',
-        logo_url: mockCommunity.logo_url,
-        theme_config: mockCommunity.theme_config
+        community: {
+          id: mockCommunity.id,
+          name: mockCommunity.name,
+          description: mockCommunity.description || '',
+          logo_url: mockCommunity.logo_url,
+          theme_config: mockCommunity.theme_config
+        },
+        role: 'member' // Default role for mock data when error
       };
     }
   }
@@ -197,7 +212,7 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         console.log('Using mock auth data for login');
         const mockUserId = '00000000-0000-0000-0000-000000000001';
         const profile = await this.fetchProfile(mockUserId);
-        const community = await this.fetchUserCommunity(mockUserId);
+        const { community, role } = await this.fetchUserCommunity(mockUserId);
         
         return {
           user: {
@@ -205,7 +220,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
             email: email,
             profile
           },
-          community
+          community,
+          role
         };
       }
       
@@ -216,7 +232,7 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
       if (!authData?.user) throw new Error('Login successful but no user data returned');
 
       const profile = await this.fetchProfile(authData.user.id);
-      const community = await this.fetchUserCommunity(authData.user.id);
+      const { community: userCommunity, role } = await this.fetchUserCommunity(authData.user.id);
 
       return {
         user: {
@@ -224,7 +240,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
           email: authData.user.email || '',
           profile
         },
-        community
+        community: userCommunity,
+        role
       };
     } catch (error) {
       console.error('Login error:', error);
@@ -253,7 +270,7 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         console.log('Using mock session data');
         const mockUserId = '00000000-0000-0000-0000-000000000001';
         const profile = await this.fetchProfile(mockUserId);
-        const community = await this.fetchUserCommunity(mockUserId);
+        const { community, role } = await this.fetchUserCommunity(mockUserId);
         
         return {
           user: {
@@ -261,7 +278,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
             email: 'test@example.com',
             profile
           },
-          community
+          community,
+          role
         };
       }
       
@@ -271,7 +289,7 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
       if (!session?.user) throw new Error('No active session');
 
       const profile = await this.fetchProfile(session.user.id);
-      const community = await this.fetchUserCommunity(session.user.id);
+      const { community: userCommunity, role } = await this.fetchUserCommunity(session.user.id);
 
       return {
         user: {
@@ -279,7 +297,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
           email: session.user.email || '',
           profile
         },
-        community
+        community: userCommunity,
+        role
       };
     } catch (error) {
       console.error('Session error:', error);
@@ -326,7 +345,7 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         console.log('Using mock callback data');
         const mockUserId = '00000000-0000-0000-0000-000000000001';
         const profile = await this.fetchProfile(mockUserId);
-        const community = await this.fetchUserCommunity(mockUserId);
+        const { community, role } = await this.fetchUserCommunity(mockUserId);
         
         return {
           user: {
@@ -334,7 +353,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
             email: 'test@example.com',
             profile
           },
-          community
+          community,
+          role
         };
       }
       
@@ -344,7 +364,7 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
       if (!session?.user) throw new Error('No active session during callback');
 
       const profile = await this.fetchProfile(session.user.id);
-      const community = await this.fetchUserCommunity(session.user.id);
+      const { community: userCommunity, role } = await this.fetchUserCommunity(session.user.id);
 
       return {
         user: {
@@ -352,7 +372,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
           email: session.user.email || '',
           profile
         },
-        community
+        community: userCommunity,
+        role
       };
     } catch (error) {
       console.error('Auth callback error:', error);

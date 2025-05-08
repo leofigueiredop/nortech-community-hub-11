@@ -40,6 +40,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Update user with proper role from auth response
+  const updateUserWithRole = (userData: AuthUser, roleValue: string) => {
+    console.log('Setting user role to:', roleValue);
+    
+    // Create a new user object with the role assigned
+    const updatedUser: AuthUser = {
+      ...userData,
+      role: roleValue as 'owner' | 'admin' | 'moderator' | 'member'
+    };
+    
+    setUser(updatedUser);
+  };
+
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -77,8 +90,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Update community context to allow access
             updateCommunityContext(mockCommunity);
             
-            // Set mock user
-            setUser({
+            // Set mock user with owner role for testing
+            const mockUser = {
               id: '00000000-0000-0000-0000-000000000001',
               email: 'test@example.com',
               profile: {
@@ -86,7 +99,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 full_name: 'Test User',
                 avatar_url: null
               }
-            });
+            };
+            
+            updateUserWithRole(mockUser, 'owner');
           }
           
           setIsLoading(false);
@@ -106,7 +121,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const authResponse = await api.auth.getSession();
           console.log('Auth response received:', authResponse);
           
-          setUser(authResponse.user);
+          // Use the role from the auth response
+          if (authResponse.role) {
+            updateUserWithRole(authResponse.user, authResponse.role);
+          } else {
+            setUser(authResponse.user);
+          }
           
           // Update community context
           if (authResponse.community) {
@@ -135,7 +155,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const authResponse = await api.auth.login(email, password);
       console.log('Login successful:', authResponse);
       
-      setUser(authResponse.user);
+      // Use the role from the auth response
+      if (authResponse.role) {
+        updateUserWithRole(authResponse.user, authResponse.role);
+      } else {
+        setUser(authResponse.user);
+      }
       
       // Update community context
       if (authResponse.community) {

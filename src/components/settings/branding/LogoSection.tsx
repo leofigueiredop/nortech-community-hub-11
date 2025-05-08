@@ -79,6 +79,7 @@ const LogoSection: React.FC<LogoSectionProps> = ({
     try {
       setIsUploading(type);
 
+      // Construct the path with the correct structure
       const path = `${communityContext.community.id}/${type}`;
       const url = await StorageService.uploadFile(file, 'community-assets', path, {
         maxSizeMB: 5,

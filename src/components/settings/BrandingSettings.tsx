@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import imageCompression from 'browser-image-compression';
 
 const BrandingSettings: React.FC = () => {
   const { toast } = useToast();
@@ -148,21 +149,37 @@ const BrandingSettings: React.FC = () => {
     }
     
     try {
-      const fileExt = file.name.split('.').pop();
+      // Check file size before upload (50MB limit)
+      if (file.size > 50 * 1024 * 1024) {
+        throw new Error('File size exceeds 50MB limit');
+      }
+
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        throw new Error('Please select a JPEG, PNG, GIF, or WebP file');
+      }
+
+      // Get file extension from original file
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${community.id}/${type}/${fileName}`;
 
-      // Verificar tamanho do arquivo (max 2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        throw new Error('File size exceeds 2MB limit');
+      // Upload file using standard upload
+      const { data, error: uploadError } = await supabase.storage
+        .from('community-assets')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          contentType: file.type,
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Upload error details:', uploadError);
+        throw new Error(uploadError.message || 'Error uploading file');
       }
 
-      const { error: uploadError } = await supabase.storage
-        .from('community-assets')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
+      // Get public URL after successful upload
       const { data: { publicUrl } } = supabase.storage
         .from('community-assets')
         .getPublicUrl(filePath);
@@ -177,6 +194,8 @@ const BrandingSettings: React.FC = () => {
         title: `${type.charAt(0).toUpperCase() + type.slice(1)} uploaded`,
         description: `Your ${type} has been uploaded. Don't forget to save changes.`,
       });
+
+      setHasChanges(true);
     } catch (error: any) {
       console.error(`Error uploading ${type}:`, error);
       toast({

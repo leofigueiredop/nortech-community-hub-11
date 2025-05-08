@@ -12,6 +12,7 @@ export function useCommunitySettings() {
   const [isLoading, setIsLoading] = useState(true);
   const [generalSettings, setGeneralSettings] = useState<GeneralSettings | null>(null);
   const [basicInfo, setBasicInfo] = useState<CommunityBasicInfo | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (community?.id) {
@@ -20,9 +21,14 @@ export function useCommunitySettings() {
   }, [community?.id]);
 
   const loadSettings = async () => {
-    if (!community?.id) return;
+    if (!community?.id) {
+      setError("No community context found");
+      return;
+    }
     
     setIsLoading(true);
+    setError(null);
+    
     try {
       const [settings, info] = await Promise.all([
         settingsRepository.getGeneralSettings(community.id),
@@ -33,9 +39,11 @@ export function useCommunitySettings() {
       setBasicInfo(info);
     } catch (error) {
       console.error('Error loading settings:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(errorMessage);
       toast({
         title: "Error loading settings",
-        description: "There was a problem loading your community settings.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -44,7 +52,10 @@ export function useCommunitySettings() {
   };
 
   const updateGeneralSettings = async (settings: Partial<GeneralSettings>) => {
-    if (!community?.id) return;
+    if (!community?.id) {
+      setError("No community context found");
+      return;
+    }
     
     try {
       await settingsRepository.updateGeneralSettings(community.id, settings);
@@ -55,16 +66,21 @@ export function useCommunitySettings() {
       });
     } catch (error) {
       console.error('Error updating general settings:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(errorMessage);
       toast({
         title: "Error saving settings",
-        description: "There was a problem saving your general settings.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
   };
 
   const updateBasicInfo = async (data: Partial<CommunityBasicInfo>) => {
-    if (!community?.id) return;
+    if (!community?.id) {
+      setError("No community context found");
+      return;
+    }
     
     try {
       await settingsRepository.updateCommunityBasicInfo(community.id, data);
@@ -75,9 +91,11 @@ export function useCommunitySettings() {
       });
     } catch (error) {
       console.error('Error updating basic info:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(errorMessage);
       toast({
         title: "Error saving info",
-        description: "There was a problem saving your community information.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -85,6 +103,7 @@ export function useCommunitySettings() {
 
   return {
     isLoading,
+    error,
     generalSettings,
     basicInfo,
     updateGeneralSettings,
