@@ -51,19 +51,20 @@ export class StorageService {
       });
 
       // Ensure the community folder exists
-      await this.ensureCommunityFolder(path);
+      const communityId = path.split('/')[0];
+      await this.ensureCommunityFolder(communityId);
+
+      // Construct the full path properly
+      const fileName = options?.customFileName || `${Date.now()}.${file.name.split('.').pop()}`;
+      const fullPath = `${path}/${fileName}`;
 
       const { data, error } = await supabase.storage
         .from(bucket)
-        .upload(
-          `${path}/${options?.customFileName || file.name}`,
-          file,
-          {
-            contentType: options?.contentType,
-            cacheControl: '3600',
-            upsert: true // Add upsert option to overwrite existing files
-          }
-        );
+        .upload(fullPath, file, {
+          contentType: options?.contentType,
+          cacheControl: '3600',
+          upsert: true
+        });
 
       if (error) {
         console.error('Upload error:', error);
@@ -75,14 +76,14 @@ export class StorageService {
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from(bucket)
-        .getPublicUrl(`${path}/${options?.customFileName || file.name}`);
+        .getPublicUrl(fullPath);
 
       console.log('Generated public URL:', publicUrl);
 
       return publicUrl;
     } catch (error) {
       console.error('Upload error:', error);
-      throw error; // Re-throw the error instead of returning null
+      throw error;
     }
   }
 
