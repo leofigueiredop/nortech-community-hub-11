@@ -201,9 +201,99 @@ function App() {
                 </ProtectedRoute>
               } />
               
-              <Route path="/settings/points" element={
+              <Route path="/settings/domain" element={
+                <ProtectedRoute>
+                  <Settings.Domain />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/migration" element={
+                <ProtectedRoute>
+                  <Settings.Migration />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/marketing" element={
+                <ProtectedRoute>
+                  <Settings.Marketing />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/posts" element={
+                <ProtectedRoute>
+                  <Settings.Posts />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/spaces" element={
+                <ProtectedRoute>
+                  <Settings.Spaces />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/moderation" element={
+                <ProtectedRoute>
+                  <Settings.Moderation />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/workflows" element={
+                <ProtectedRoute>
+                  <Settings.Workflows />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/ai-agents" element={
+                <ProtectedRoute>
+                  <Settings.AIAgents />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/points-configuration" element={
                 <ProtectedRoute>
                   <Settings.PointsConfiguration />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/plans" element={
+                <ProtectedRoute>
+                  <Settings.Plans />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/subscriptions" element={
+                <ProtectedRoute>
+                  <Settings.Subscriptions />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/paywall" element={
+                <ProtectedRoute>
+                  <Settings.Paywall />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/analytics" element={
+                <ProtectedRoute>
+                  <Settings.Analytics />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/affiliates" element={
+                <ProtectedRoute>
+                  <Settings.Affiliates />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/legal" element={
+                <ProtectedRoute>
+                  <Settings.Legal />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings/notifications" element={
+                <ProtectedRoute>
+                  <Settings.Notifications />
                 </ProtectedRoute>
               } />
               

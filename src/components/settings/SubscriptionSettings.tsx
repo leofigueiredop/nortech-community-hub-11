@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +25,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/context/AuthContext';
 
 interface SubscriptionPlan {
   id: string;
@@ -160,6 +160,9 @@ const SubscriptionSettings: React.FC = () => {
     active: true,
     visibility: 'public',
   });
+
+  const { user, community } = useAuth();
+  const isOwner = user?.id && community?.owner_id && user.id === community.owner_id;
 
   // Payment gateway functions
   const toggleGatewayActive = (id: string) => {
@@ -330,64 +333,71 @@ const SubscriptionSettings: React.FC = () => {
         <TabsContent value="active" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {subscriptions.filter(plan => plan.active).map((plan) => (
-              <Card key={plan.id} className="border border-gray-200 dark:border-gray-700">
-                <CardHeader>
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-2">
-                      {getVisibilityIcon(plan.visibility)}
-                      <span className="text-xs text-gray-500">{plan.visibility === 'public' ? 'Público' : plan.visibility === 'private' ? 'Privado' : 'Convidados'}</span>
+              <div className="relative group" key={plan.id}>
+                <Card className="border border-gray-200 dark:border-gray-700">
+                  <CardHeader>
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center gap-2">
+                        {getVisibilityIcon(plan.visibility)}
+                        <span className="text-xs text-gray-500">{plan.visibility === 'public' ? 'Público' : plan.visibility === 'private' ? 'Privado' : 'Convidados'}</span>
+                      </div>
+                      {plan.trialDays && (
+                        <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                          {plan.trialDays} dias de teste
+                        </span>
+                      )}
                     </div>
-                    {plan.trialDays && (
-                      <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                        {plan.trialDays} dias de teste
+                    <CardTitle className="flex justify-between">
+                      <span>{plan.name}</span>
+                      <span className="text-purple-600">
+                        {typeof plan.price === 'number' ? 
+                          `R$${plan.price.toFixed(2)}` : 
+                          plan.price
+                        }
+                        <span className="text-sm text-gray-400">{plan.interval !== 'one-time' ? formatInterval(plan.interval) : ''}</span>
                       </span>
+                    </CardTitle>
+                    <CardDescription>{plan.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-center">
+                          <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    {plan.maxMembers && (
+                      <div className="mt-3 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <Users className="h-4 w-4 mr-1" />
+                        <span>Limite de {plan.maxMembers} membros</span>
+                      </div>
                     )}
-                  </div>
-                  <CardTitle className="flex justify-between">
-                    <span>{plan.name}</span>
-                    <span className="text-purple-600">
-                      {typeof plan.price === 'number' ? 
-                        `R$${plan.price.toFixed(2)}` : 
-                        plan.price
-                      }
-                      <span className="text-sm text-gray-400">{plan.interval !== 'one-time' ? formatInterval(plan.interval) : ''}</span>
-                    </span>
-                  </CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center">
-                        <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  {plan.maxMembers && (
-                    <div className="mt-3 flex items-center text-sm text-gray-500 dark:text-gray-400">
-                      <Users className="h-4 w-4 mr-1" />
-                      <span>Limite de {plan.maxMembers} membros</span>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan.id)}>
+                        <Edit className="h-4 w-4 mr-1" />
+                        Editar
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleTogglePlanActive(plan.id)}>
+                        <EyeOff className="h-4 w-4 mr-1" />
+                        Desativar
+                      </Button>
                     </div>
-                  )}
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan.id)}>
-                      <Edit className="h-4 w-4 mr-1" />
-                      Editar
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleTogglePlanActive(plan.id)}>
-                      <EyeOff className="h-4 w-4 mr-1" />
-                      Desativar
-                    </Button>
-                  </div>
-                  <Button variant="destructive" size="sm" onClick={() => handleDeletePlan(plan.id)}>
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Excluir
-                  </Button>
-                </CardFooter>
-              </Card>
+                    {isOwner && (
+                      <button
+                        className="absolute top-3 right-3 z-10 bg-black/20 hover:bg-red-600/80 text-white rounded-full p-2 opacity-60 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleDeletePlan(plan.id)}
+                        title="Excluir plano"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                  </CardFooter>
+                </Card>
+              </div>
             ))}
           </div>
         </TabsContent>
@@ -395,70 +405,77 @@ const SubscriptionSettings: React.FC = () => {
         <TabsContent value="all" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {subscriptions.map((plan) => (
-              <Card key={plan.id} className={`border ${plan.active ? 'border-gray-200 dark:border-gray-700' : 'border-gray-300 dark:border-gray-600 opacity-80'}`}>
-                <CardHeader>
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-2">
-                      {getVisibilityIcon(plan.visibility)}
-                      <span className="text-xs text-gray-500">{plan.visibility === 'public' ? 'Público' : plan.visibility === 'private' ? 'Privado' : 'Convidados'}</span>
-                    </div>
-                    {plan.trialDays && (
-                      <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                        {plan.trialDays} dias de teste
-                      </span>
-                    )}
-                  </div>
-                  <CardTitle className="flex justify-between">
-                    <div className="flex items-center gap-2">
-                      <span>{plan.name}</span>
-                      {!plan.active && <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Inativo</span>}
-                    </div>
-                    <span className="text-purple-600">
-                      {typeof plan.price === 'number' ? 
-                        `R$${plan.price.toFixed(2)}` : 
-                        plan.price
-                      }
-                      <span className="text-sm text-gray-400">{plan.interval !== 'one-time' ? formatInterval(plan.interval) : ''}</span>
-                    </span>
-                  </CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center">
-                        <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan.id)}>
-                      <Edit className="h-4 w-4 mr-1" />
-                      Editar
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleTogglePlanActive(plan.id)}>
-                      {plan.active ? (
-                        <>
-                          <EyeOff className="h-4 w-4 mr-1" />
-                          Desativar
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="h-4 w-4 mr-1" />
-                          Ativar
-                        </>
+              <div className="relative group" key={plan.id}>
+                <Card className={`border ${plan.active ? 'border-gray-200 dark:border-gray-700' : 'border-gray-300 dark:border-gray-600 opacity-80'}`}>
+                  <CardHeader>
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center gap-2">
+                        {getVisibilityIcon(plan.visibility)}
+                        <span className="text-xs text-gray-500">{plan.visibility === 'public' ? 'Público' : plan.visibility === 'private' ? 'Privado' : 'Convidados'}</span>
+                      </div>
+                      {plan.trialDays && (
+                        <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                          {plan.trialDays} dias de teste
+                        </span>
                       )}
-                    </Button>
-                  </div>
-                  <Button variant="destructive" size="sm" onClick={() => handleDeletePlan(plan.id)}>
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Excluir
-                  </Button>
-                </CardFooter>
-              </Card>
+                    </div>
+                    <CardTitle className="flex justify-between">
+                      <div className="flex items-center gap-2">
+                        <span>{plan.name}</span>
+                        {!plan.active && <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Inativo</span>}
+                      </div>
+                      <span className="text-purple-600">
+                        {typeof plan.price === 'number' ? 
+                          `R$${plan.price.toFixed(2)}` : 
+                          plan.price
+                        }
+                        <span className="text-sm text-gray-400">{plan.interval !== 'one-time' ? formatInterval(plan.interval) : ''}</span>
+                      </span>
+                    </CardTitle>
+                    <CardDescription>{plan.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-center">
+                          <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleEditPlan(plan.id)}>
+                        <Edit className="h-4 w-4 mr-1" />
+                        Editar
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleTogglePlanActive(plan.id)}>
+                        {plan.active ? (
+                          <>
+                            <EyeOff className="h-4 w-4 mr-1" />
+                            Desativar
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="h-4 w-4 mr-1" />
+                            Ativar
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {isOwner && (
+                      <button
+                        className="absolute top-3 right-3 z-10 bg-black/20 hover:bg-red-600/80 text-white rounded-full p-2 opacity-60 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleDeletePlan(plan.id)}
+                        title="Excluir plano"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                  </CardFooter>
+                </Card>
+              </div>
             ))}
           </div>
         </TabsContent>

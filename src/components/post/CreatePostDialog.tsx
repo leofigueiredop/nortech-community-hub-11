@@ -1,5 +1,4 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -29,7 +28,8 @@ import {
   SquareCode, 
   Quote, 
   Minus, 
-  AtSign
+  AtSign,
+  Loader2
 } from 'lucide-react';
 import {
   Select,
@@ -44,13 +44,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Card } from '@/components/ui/card';
+import { useApi } from '@/hooks/useApi';
+import { useAuth } from '@/context/AuthContext';
+import { Post } from '@/types/post';
 
 interface CreatePostDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-// Mock data for spaces
+// Mock data for spaces - TODO: Replace with data from API
 const spaces = [
   { id: 1, name: 'General Discussion' },
   { id: 2, name: 'Free Group' },
@@ -85,8 +88,20 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
   const [showPollDialog, setShowPollDialog] = useState(false);
   const [showFileAttachDialog, setShowFileAttachDialog] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { client } = useApi();
+  const { user, community } = useAuth();
+
+  // Reset form when dialog opens
+  useEffect(() => {
+    if (open) {
+      setTitle('');
+      setContent('');
+      setSelectedSpace('');
+    }
+  }, [open]);
 
   // Poll state
   const [pollQuestion, setPollQuestion] = useState('');
@@ -132,7 +147,7 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
     }
   };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!selectedSpace) {
       toast({
         title: "Space Required",
@@ -151,17 +166,57 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
       return;
     }
 
-    // Logic to publish the post
-    toast({
-      title: "Post Published",
-      description: "Your post has been published successfully.",
-    });
-    
-    // Close the dialog and reset form
-    onOpenChange(false);
-    setTitle('');
-    setContent('');
-    setSelectedSpace('');
+    if (!user || !community) {
+      toast({
+        title: "Authentication Error",
+        description: "You must be logged in to publish a post.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsPublishing(true);
+
+      // Create post object
+      const newPost: Partial<Post> = {
+        title: title.trim() || undefined,
+        content: content.trim(),
+        author_id: user.id,
+        community_id: community.id,
+        space_id: selectedSpace,
+        type: 'text', // Default type
+        status: 'published',
+        view_count: 0,
+        comment_count: 0,
+        pinned: false,
+        tags: [],
+        visibility: 'public', // Default visibility
+      };
+
+      // Call repository to create post
+      const createdPost = await client.posts.create(newPost);
+
+      toast({
+        title: "Post Published",
+        description: "Your post has been published successfully.",
+      });
+      
+      // Close the dialog and reset form
+      onOpenChange(false);
+      setTitle('');
+      setContent('');
+      setSelectedSpace('');
+    } catch (error) {
+      console.error('Error publishing post:', error);
+      toast({
+        title: "Publication Failed",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   const formatText = (format: string) => {
@@ -268,10 +323,19 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
               </Select>
 
               <Button 
-                className="bg-nortech-purple hover:bg-nortech-purple/90 text-white"
+                variant="default" 
+                className="w-full md:w-auto" 
                 onClick={handlePublish}
+                disabled={isPublishing}
               >
-                Publish
+                {isPublishing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Publishing...
+                  </>
+                ) : (
+                  'Publish'
+                )}
               </Button>
             </div>
           </div>

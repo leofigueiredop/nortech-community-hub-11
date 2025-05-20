@@ -9,7 +9,6 @@ import { usePoints } from '@/context/PointsContext';
 import { useNotifications } from '@/context/NotificationsContext';
 import EventsList from '@/components/events/EventsList';
 import EventGrid from '@/components/events/EventGrid';
-import { mockEvents } from '@/components/events/data/EventsMockData';
 import { Event, EventType } from '@/components/events/types/EventTypes';
 import EventConfirmDialog from '@/components/events/EventConfirmDialog';
 import CalendarView from '@/components/events/CalendarView';
@@ -18,6 +17,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import EventsHeader from '@/components/events/EventsHeader';
 import EventFilters from '@/components/events/filters/EventFilters';
 import ViewTypeSwitcher from '@/components/events/ViewTypeSwitcher';
+import { useRealEvents } from '@/hooks/useRealEvents';
 import { adaptEventForComponent } from '@/components/events/utils/EventTypeAdapter';
 
 // Define view type for the events
@@ -25,8 +25,8 @@ type ViewType = 'grid' | 'list' | 'calendar';
 
 const Events = () => {
   const [viewType, setViewType] = useState<ViewType>('grid');
-  const [allEvents, setAllEvents] = useState(mockEvents);
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [confirmEvent, setConfirmEvent] = useState<number | null>(null);
   const [selectedPremiumFilter, setSelectedPremiumFilter] = useState<'all' | 'premium' | 'free'>('all');
   const [selectedTypeFilters, setSelectedTypeFilters] = useState<EventType[]>(['workshop', 'webinar', 'meetup', 'conference']);
@@ -37,39 +37,42 @@ const Events = () => {
   const { toast } = useToast();
   const { awardPoints } = usePoints();
   const { addNotification } = useNotifications();
+  const { 
+    loading, 
+    events, 
+    upcomingEvents,
+    registerForEvent: registerForEventApi,
+    loadAllEvents,
+    filterEvents
+  } = useRealEvents();
+
+  // Load events on component mount
+  useEffect(() => {
+    loadAllEvents();
+  }, [loadAllEvents]);
+
+  // Update all events when events change
+  useEffect(() => {
+    if (events.length > 0) {
+      // Convert Supabase events to the component format if needed
+      const adaptedEvents = events.map(event => adaptEventForComponent(event));
+      setAllEvents(adaptedEvents);
+    }
+  }, [events]);
 
   // Filter events based on premium status, type, and availability
   useEffect(() => {
-    let events = [...allEvents];
-    
-    if (selectedPremiumFilter === 'premium') {
-      events = events.filter(event => event.isPremium);
-    } else if (selectedPremiumFilter === 'free') {
-      events = events.filter(event => !event.isPremium);
-    }
-    
-    if (selectedTypeFilters.length > 0) {
-      events = events.filter(event => {
-        if (!event.type) return false;
-        return selectedTypeFilters.includes(event.type as EventType);
-      });
-    }
-    
-    if (showAvailableOnly) {
-      events = events.filter(event => event.attendees < (event.capacity || 0));
-    }
-    
-    if (selectedDate) {
-      events = events.filter(event => {
-        const eventDate = new Date(event.date);
-        return eventDate.getDate() === selectedDate.getDate() && 
-               eventDate.getMonth() === selectedDate.getMonth() &&
-               eventDate.getFullYear() === selectedDate.getFullYear();
-      });
-    }
-    
-    setFilteredEvents(events);
-  }, [selectedPremiumFilter, selectedTypeFilters, showAvailableOnly, selectedDate, allEvents]);
+    if (allEvents.length === 0) return;
+
+    const filtered = filterEvents(allEvents, {
+      isPremium: selectedPremiumFilter === 'all' ? undefined : selectedPremiumFilter === 'premium',
+      type: selectedTypeFilters,
+      showAvailableOnly,
+      selectedDate
+    });
+
+    setFilteredEvents(filtered);
+  }, [selectedPremiumFilter, selectedTypeFilters, showAvailableOnly, selectedDate, allEvents, filterEvents]);
 
   // RSVP handler
   const handleRSVP = (eventId: number) => {
@@ -77,43 +80,34 @@ const Events = () => {
   };
   
   // Confirm RSVP after dialog
-  const confirmRSVP = () => {
+  const confirmRSVP = async () => {
     if (!confirmEvent) return;
     
     const event = allEvents.find(e => Number(e.id) === confirmEvent);
     
     if (event) {
-      toast({
-        title: "Registration Confirmed",
-        description: `You've successfully registered for "${event.title}"`,
-      });
+      const success = await registerForEventApi(confirmEvent);
       
-      awardPoints({
-        type: "event_registration",
-        description: `Registered for ${event.title}`,
-        points: 5
-      });
-      
-      addNotification({
-        type: 'event',
-        title: 'Event Registration Confirmed',
-        message: `You're registered for "${event.title}" on ${format(new Date(event.date), 'dd/MM/yyyy')}`,
-        link: '/events',
-      });
+      if (success) {
+        toast({
+          title: "Registration Confirmed",
+          description: `You've successfully registered for "${event.title}"`,
+        });
+        
+        awardPoints({
+          type: "event_registration",
+          description: `Registered for ${event.title}`,
+          points: 5
+        });
+        
+        addNotification({
+          type: 'event',
+          title: 'Event Registration Confirmed',
+          message: `You're registered for "${event.title}" on ${format(new Date(event.date), 'dd/MM/yyyy')}`,
+          link: '/events',
+        });
+      }
     }
-    
-    setAllEvents(prevEvents => 
-      prevEvents.map(event => 
-        Number(event.id) === confirmEvent 
-          ? { 
-              ...event, 
-              attendees: event.attendees + 1,
-              isRegistered: true,
-              registeredUsers: [...(event.registeredUsers || []), 'current-user'] 
-            }
-          : event
-      )
-    );
     
     setConfirmEvent(null);
   };
@@ -165,61 +159,81 @@ const Events = () => {
             />
 
             <TabsContent value="grid">
-              <EventGrid 
-                events={filteredEvents} 
-                viewType="grid"
-                onRSVP={handleRSVP} 
-                onOpenAttendanceModal={() => {}}
-              />
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="spinner animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full"></div>
+                </div>
+              ) : (
+                <EventGrid 
+                  events={filteredEvents} 
+                  viewType="grid"
+                  onRSVP={handleRSVP} 
+                  onOpenAttendanceModal={() => {}}
+                />
+              )}
             </TabsContent>
             
             <TabsContent value="list">
-              <EventsList 
-                events={filteredEvents} 
-                onRSVP={handleRSVP} 
-                onOpenAttendanceModal={() => {}}
-              />
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="spinner animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full"></div>
+                </div>
+              ) : (
+                <EventsList 
+                  events={filteredEvents} 
+                  onRSVP={handleRSVP} 
+                  onOpenAttendanceModal={() => {}}
+                />
+              )}
             </TabsContent>
             
             <TabsContent value="calendar" className="md:flex space-x-4">
-              <div className={`md:w-[60%] ${selectedDate && window.innerWidth >= 768 ? '' : 'w-full'}`}>
-                <CalendarView 
-                  events={allEvents} 
-                  onRSVP={handleRSVP}
-                  onDateSelect={handleDateSelect}
-                />
-              </div>
-              
-              {selectedDate && window.innerWidth >= 768 && (
-                <div className="hidden md:block md:w-[40%] border-l pl-4">
-                  <h3 className="font-medium text-lg mb-4">
-                    Events on {format(selectedDate, 'dd/MM/yyyy')}
-                  </h3>
-                  
-                  {eventsForSelectedDate.length > 0 ? (
-                    <div className="space-y-4">
-                      {eventsForSelectedDate.map((event) => (
-                        <div key={event.id} className="border rounded-md p-4">
-                          <h4 className="font-medium">{event.title}</h4>
-                          <p className="text-sm text-gray-500">{event.time}</p>
-                          <p className="text-sm mt-2">{event.description.substring(0, 100)}...</p>
-                          <div className="mt-3">
-                            <Button 
-                              size="sm" 
-                              className="bg-nortech-purple hover:bg-nortech-purple/90"
-                              onClick={() => handleRSVP(Number(event.id))}
-                              disabled={(event.attendees || 0) >= (event.capacity || 0)}
-                            >
-                              {(event.attendees || 0) >= (event.capacity || 0) ? "No spots left" : "Register"}
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500">No events scheduled for this date.</p>
-                  )}
+              {loading ? (
+                <div className="flex justify-center items-center py-12 w-full">
+                  <div className="spinner animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full"></div>
                 </div>
+              ) : (
+                <>
+                  <div className={`md:w-[60%] ${selectedDate && window.innerWidth >= 768 ? '' : 'w-full'}`}>
+                    <CalendarView 
+                      events={allEvents} 
+                      onRSVP={handleRSVP}
+                      onDateSelect={handleDateSelect}
+                    />
+                  </div>
+                  
+                  {selectedDate && window.innerWidth >= 768 && (
+                    <div className="hidden md:block md:w-[40%] border-l pl-4">
+                      <h3 className="font-medium text-lg mb-4">
+                        Events on {format(selectedDate, 'dd/MM/yyyy')}
+                      </h3>
+                      
+                      {eventsForSelectedDate.length > 0 ? (
+                        <div className="space-y-4">
+                          {eventsForSelectedDate.map((event) => (
+                            <div key={event.id} className="border rounded-md p-4">
+                              <h4 className="font-medium">{event.title}</h4>
+                              <p className="text-sm text-gray-500">{event.time}</p>
+                              <p className="text-sm mt-2">{event.description.substring(0, 100)}...</p>
+                              <div className="mt-3">
+                                <Button 
+                                  size="sm" 
+                                  className="bg-nortech-purple hover:bg-nortech-purple/90"
+                                  onClick={() => handleRSVP(Number(event.id))}
+                                  disabled={(event.attendees || 0) >= (event.capacity || 0)}
+                                >
+                                  {(event.attendees || 0) >= (event.capacity || 0) ? "No spots left" : "Register"}
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">No events scheduled for this date.</p>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
           </Tabs>
@@ -261,10 +275,12 @@ const Events = () => {
         </SheetContent>
       </Sheet>
       
-      {/* Event confirmation dialog */}
-      <EventConfirmDialog
-        isOpen={confirmEvent !== null}
-        onClose={() => setConfirmEvent(null)}
+      {/* Event registration confirmation dialog */}
+      <EventConfirmDialog 
+        open={!!confirmEvent}
+        onOpenChange={(open) => {
+          if (!open) setConfirmEvent(null);
+        }}
         onConfirm={confirmRSVP}
         event={allEvents.find(e => Number(e.id) === confirmEvent) || null}
       />

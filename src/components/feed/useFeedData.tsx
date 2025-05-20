@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PostProps } from '@/components/post/Post';
-import { samplePosts, spaceOptions } from './utils/feedConstants';
 import { useFilterState } from './hooks/useFilterState';
 import { usePagination } from './hooks/usePagination';
 import {
@@ -13,12 +12,42 @@ import {
 } from './utils/feedFilterUtils';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
+import { usePosts } from '@/hooks/usePosts';
+import { adaptPostToProps } from '@/utils/postAdapter';
+import { spaceOptions } from './utils/feedConstants';
+import { useAuth } from '@/context/AuthContext';
 
 export const useFeedData = (postsPerPage: number = 5, initialSegment: string = 'all') => {
   const [currentView, setCurrentView] = useState('all');
   const [filterState, filterActions] = useFilterState(initialSegment);
   const [hasSeenUpgradePrompt, setHasSeenUpgradePrompt] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  
+  // Get posts from Supabase using our new hook
+  const { posts: dbPosts, loading, error, totalPosts } = usePosts({
+    page: 1,
+    limit: 50 // We'll handle pagination client-side after filtering
+  });
+  
+  // Check if the user has a premium subscription
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  
+  useEffect(() => {
+    // In a real app, we would check the user's subscription from the backend
+    // For now, let's assume the user doesn't have premium
+    setIsPremiumUser(false);
+    
+    // TODO: Implement real subscription check with Supabase
+    // Example:
+    // async function checkSubscription() {
+    //   if (user) {
+    //     const subscription = await client.subscriptions.getUserSubscription(user.id);
+    //     setIsPremiumUser(subscription && subscription.status === 'active');
+    //   }
+    // }
+    // checkSubscription();
+  }, [user]);
   
   useEffect(() => {
     const premiumInteractions = parseInt(localStorage.getItem('premiumInteractions') || '0');
@@ -42,8 +71,17 @@ export const useFeedData = (postsPerPage: number = 5, initialSegment: string = '
     }
   }, [initialSegment, hasSeenUpgradePrompt, toast]);
   
+  // Convert DB posts to PostProps format
+  const allPosts: PostProps[] = useMemo(() => {
+    if (!dbPosts || dbPosts.length === 0) {
+      return [];
+    }
+    
+    return dbPosts.map(post => adaptPostToProps(post, isPremiumUser));
+  }, [dbPosts, isPremiumUser]);
+  
   const applyFilters = () => {
-    let filteredPosts = [...samplePosts];
+    let filteredPosts = [...allPosts];
     
     filteredPosts = filterBySpace(filteredPosts, filterState.activeSpace);
     filteredPosts = filterByContentType(filteredPosts, filterState.contentFilter);
@@ -101,5 +139,8 @@ export const useFeedData = (postsPerPage: number = 5, initialSegment: string = '
     totalPages,
     hasFilters,
     clearAllFilters: filterActions.clearAllFilters,
+    loading,
+    error,
+    isPremiumUser
   };
 };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -15,7 +14,8 @@ import {
   Pin,
   Lock,
   Unlock,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { 
@@ -25,6 +25,9 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/components/ui/use-toast';
+import { api } from '@/api/ApiClient';
+import { useAuth } from '@/context/AuthContext';
+import PostComments from './PostComments';
 
 export interface PostProps {
   id: string;
@@ -47,6 +50,7 @@ export interface PostProps {
   tags?: string[];
   accessBadge?: 'free' | 'premium' | 'unlocked';
   showAccessBadge?: boolean;
+  onCommentClick?: (postId: string) => void;
 }
 
 const Post: React.FC<PostProps> = ({ 
@@ -65,23 +69,78 @@ const Post: React.FC<PostProps> = ({
   teaser,
   tags,
   accessBadge = 'free',
-  showAccessBadge = false
+  showAccessBadge = false,
+  onCommentClick
 }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
   const [premiumInteractions, setPremiumInteractions] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
   
-  const handleLike = () => {
-    if (isLiked) {
-      setLikeCount(prev => prev - 1);
-    } else {
-      setLikeCount(prev => prev + 1);
-      if (isPaid && accessBadge === 'premium') {
-        trackPremiumInteraction();
+  // Fetch the user's like status when the component mounts
+  useEffect(() => {
+    if (!user || !id) return;
+    
+    const fetchUserLikeStatus = async () => {
+      try {
+        const { data: userReaction } = await api.reactions.getUserReaction(id, user.id);
+        setIsLiked(!!userReaction);
+      } catch (error) {
+        console.error('Error fetching like status:', error);
       }
+    };
+    
+    fetchUserLikeStatus();
+  }, [id, user]);
+  
+  const handleLike = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to like posts",
+        variant: "destructive"
+      });
+      return;
     }
-    setIsLiked(!isLiked);
+    
+    setLoading(true);
+    
+    try {
+      if (isLiked) {
+        // Remove the like
+        await api.reactions.removeReaction(id, user.id);
+        setLikeCount(prev => prev - 1);
+        setIsLiked(false);
+      } else {
+        // Add the like
+        await api.reactions.addReaction(id, user.id, 'like');
+        setLikeCount(prev => prev + 1);
+        setIsLiked(true);
+        
+        if (isPaid && accessBadge === 'premium') {
+          trackPremiumInteraction();
+        }
+      }
+    } catch (error) {
+      console.error('Error updating like status:', error);
+      toast({
+        title: "Failed to update reaction",
+        description: "An error occurred while updating your reaction",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCommentClick = () => {
+    if (onCommentClick) {
+      onCommentClick(id);
+    }
+    setShowComments(!showComments);
   };
 
   const trackPremiumInteraction = () => {
@@ -278,6 +337,9 @@ const Post: React.FC<PostProps> = ({
             </p>
           </div>
         )}
+        
+        {/* Comments section */}
+        <PostComments postId={id} isOpen={showComments} />
       </CardContent>
       <CardFooter className="pt-0 flex justify-between">
         <div className="flex space-x-2">
@@ -286,11 +348,22 @@ const Post: React.FC<PostProps> = ({
             size="sm" 
             className={`text-xs flex items-center gap-1 ${isLiked ? 'text-purple-600' : ''}`}
             onClick={handleLike}
+            disabled={loading}
           >
-            <ThumbsUp size={14} /> {likeCount}
+            {loading ? (
+              <Loader2 size={14} className="animate-spin mr-1" />
+            ) : (
+              <ThumbsUp size={14} className={isLiked ? 'fill-purple-600' : ''} />
+            )}
+            {likeCount}
           </Button>
-          <Button variant="ghost" size="sm" className="text-xs flex items-center gap-1">
-            <MessageSquare size={14} /> {comments}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`text-xs flex items-center gap-1 ${showComments ? 'text-purple-600' : ''}`}
+            onClick={handleCommentClick}
+          >
+            <MessageSquare size={14} className={showComments ? 'fill-purple-600' : ''} /> {comments}
           </Button>
         </div>
         <Button variant="ghost" size="sm" className="text-xs flex items-center gap-1">

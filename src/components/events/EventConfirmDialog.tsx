@@ -1,111 +1,96 @@
-
 import React from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import { Event } from '@/components/events/types/EventTypes';
+import { format } from 'date-fns';
+import {
+  Dialog,
+  DialogContent,
   DialogDescription,
-  DialogFooter
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, Clock, Users, Crown, ExternalLink } from 'lucide-react';
-import { format } from 'date-fns';
-import { Event } from './types/EventTypes';
+import { Calendar, MapPin, Users, Clock } from 'lucide-react';
 
 interface EventConfirmDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   event: Event | null;
 }
 
 const EventConfirmDialog: React.FC<EventConfirmDialogProps> = ({
-  isOpen,
-  onClose,
+  open,
+  onOpenChange,
   onConfirm,
   event
 }) => {
   if (!event) return null;
   
-  const isOnlineEvent = event.location.toLowerCase().includes('online') || 
-                        event.location.toLowerCase().includes('zoom') || 
-                        event.location.toLowerCase().includes('meet') ||
-                        event.location.toLowerCase().includes('teams');
-
+  // Format the event date
+  const formattedDate = format(new Date(event.date), 'EEEE, MMMM d, yyyy');
+  
+  // Calculate remaining spots
+  const capacity = typeof event.capacity === 'string' ? parseInt(event.capacity) : (event.capacity || 0);
+  const attendees = typeof event.attendees === 'string' ? parseInt(event.attendees) : (event.attendees || 0);
+  const remainingSpots = capacity - attendees;
+  
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-xl">Confirm Registration</DialogTitle>
+          <DialogTitle>Confirm Registration</DialogTitle>
           <DialogDescription>
-            You're about to register for this event
+            You are registering for the following event:
           </DialogDescription>
         </DialogHeader>
         
         <div className="py-4">
-          <h3 className="text-lg font-semibold mb-1">{event.title}</h3>
+          <h3 className="text-lg font-semibold mb-4">{event.title}</h3>
           
-          <div className="space-y-3 mt-4">
-            <div className="flex items-start">
-              <Calendar className="w-5 h-5 mr-3 text-gray-500 mt-0.5" />
-              <div>
-                <p className="font-medium text-sm">Date</p>
-                <p className="text-sm text-gray-600">
-                  {format(new Date(event.date), 'EEEE, MMMM d, yyyy')}
-                </p>
-              </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span>{formattedDate}</span>
             </div>
             
-            <div className="flex items-start">
-              <Clock className="w-5 h-5 mr-3 text-gray-500 mt-0.5" />
-              <div>
-                <p className="font-medium text-sm">Time</p>
-                <p className="text-sm text-gray-600">{event.time}</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span>{event.time || '(Time not specified)'}</span>
             </div>
             
-            <div className="flex items-start">
-              <MapPin className="w-5 h-5 mr-3 text-gray-500 mt-0.5" />
-              <div>
-                <p className="font-medium text-sm">Location</p>
-                <p className="text-sm text-gray-600">{event.location}</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              <span>{event.location || (event.is_virtual ? 'Online Event' : 'Location TBD')}</span>
             </div>
             
-            {event.isPremium && (
-              <div className="flex items-start">
-                <Crown className="w-5 h-5 mr-3 text-amber-500 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Premium Event</p>
-                  <p className="text-sm text-gray-600">This is a premium event</p>
-                </div>
-              </div>
-            )}
-            
-            {event.url && (
-              <div className="flex items-start">
-                <ExternalLink className="w-5 h-5 mr-3 text-gray-500 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Event Link</p>
-                  <p className="text-sm text-blue-600 truncate">
-                    <a href={event.url} target="_blank" rel="noopener noreferrer">
-                      {event.url}
-                    </a>
-                  </p>
-                </div>
+            {capacity > 0 && (
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <span>{remainingSpots} {remainingSpots === 1 ? 'spot' : 'spots'} remaining</span>
               </div>
             )}
           </div>
+          
+          {event.isPremium && (
+            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+              <p className="text-sm text-amber-700">
+                This is a premium event. Your membership includes access to this event.
+              </p>
+            </div>
+          )}
         </div>
         
-        <DialogFooter className="flex gap-2 sm:gap-0">
-          <Button variant="outline" onClick={onClose}>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button 
-            onClick={onConfirm}
-            className="bg-nortech-purple hover:bg-nortech-purple/90"
+            className="bg-purple-600 hover:bg-purple-700"
+            onClick={() => {
+              onConfirm();
+              onOpenChange(false);
+            }}
           >
             Confirm Registration
           </Button>

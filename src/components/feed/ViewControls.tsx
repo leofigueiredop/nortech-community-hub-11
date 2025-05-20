@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Eye, ChevronDown, PlusCircle } from 'lucide-react';
+import { Eye, ChevronDown, PlusCircle, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface ViewControlsProps {
   currentView: string;
@@ -22,6 +22,10 @@ const ViewControls: React.FC<ViewControlsProps> = ({
   onCreatePost 
 }) => {
   const { isMobile } = useIsMobile();
+  const { isOwner, isAdmin, loading } = useUserRole();
+  
+  // Only owners and admins can create posts
+  const canCreatePost = isOwner || isAdmin;
   
   return (
     <div className="flex items-center gap-3">
@@ -58,15 +62,27 @@ const ViewControls: React.FC<ViewControlsProps> = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button 
-        onClick={onCreatePost}
-        className="bg-purple-600 hover:bg-purple-700 text-white flex gap-2"
-        size={isMobile ? "sm" : "default"}
-      >
-        <PlusCircle size={isMobile ? 16 : 18} />
-        {!isMobile && "Create post"}
-        {isMobile && "Post"}
-      </Button>
+      {/* Show loading state while determining permissions */}
+      {loading ? (
+        <Button 
+          disabled
+          className="bg-gray-300 dark:bg-gray-700 text-white flex gap-2"
+          size={isMobile ? "sm" : "default"}
+        >
+          <Loader2 size={isMobile ? 16 : 18} className="animate-spin" />
+          {!isMobile && "Loading..."}
+        </Button>
+      ) : canCreatePost && (
+        <Button 
+          onClick={onCreatePost}
+          className="bg-purple-600 hover:bg-purple-700 text-white flex gap-2"
+          size={isMobile ? "sm" : "default"}
+        >
+          <PlusCircle size={isMobile ? 16 : 18} />
+          {!isMobile && "Create post"}
+          {isMobile && "Post"}
+        </Button>
+      )}
     </div>
   );
 };

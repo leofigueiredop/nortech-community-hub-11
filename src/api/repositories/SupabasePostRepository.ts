@@ -10,8 +10,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async getAll(page: number = 1, limit: number = 10): Promise<{ posts: Post[], total: number }> {
     try {
-      await this.setTenantContext();
-      
       // Get total count
       const { count, error: countError } = await this.supabase
         .from('posts')
@@ -44,7 +42,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async getById(id: string): Promise<Post> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('posts')
         .select('*, author:profiles(*), comments:post_comments(*, author:profiles(*))')
@@ -61,7 +58,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async create(post: Partial<Post>): Promise<Post> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('posts')
         .insert([{
@@ -80,7 +76,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async update(id: string, post: Partial<Post>): Promise<Post> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('posts')
         .update(post)
@@ -98,7 +93,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async delete(id: string): Promise<void> {
     try {
-      await this.setTenantContext();
       const { error } = await this.supabase
         .from('posts')
         .delete()
@@ -113,7 +107,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async getFeaturedPosts(limit: number = 5): Promise<Post[]> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('posts')
         .select('*, author:profiles(*)')
@@ -131,7 +124,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async getPostsByUser(userId: string, limit: number = 10): Promise<Post[]> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('posts')
         .select('*, author:profiles(*)')
@@ -149,7 +141,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async addComment(postId: string, comment: Partial<PostComment>): Promise<PostComment> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('post_comments')
         .insert([{
@@ -175,7 +166,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async getComments(postId: string): Promise<PostComment[]> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('post_comments')
         .select('*, author:profiles(*)')
@@ -191,8 +181,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async deleteComment(commentId: string): Promise<void> {
     try {
-      await this.setTenantContext();
-      
       // Get post_id first to update comment count
       const { data: commentData, error: fetchError } = await this.supabase
         .from('post_comments')
@@ -222,8 +210,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async addReaction(postId: string, userId: string, reactionType: string): Promise<PostReaction> {
     try {
-      await this.setTenantContext();
-      
       // Remove existing reaction if present
       await this.removeReaction(postId, userId);
       
@@ -247,7 +233,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async removeReaction(postId: string, userId: string): Promise<void> {
     try {
-      await this.setTenantContext();
       const { error } = await this.supabase
         .from('post_reactions')
         .delete()
@@ -262,7 +247,6 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
 
   async getUserReaction(postId: string, userId: string): Promise<PostReaction | null> {
     try {
-      await this.setTenantContext();
       const { data, error } = await this.supabase
         .from('post_reactions')
         .select('*')
@@ -270,8 +254,15 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
         .eq('user_id', userId)
         .single();
       
-      if (error && error.code !== 'PGRST116') throw error;
-      return data || null;
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No record found
+          return null;
+        }
+        throw error;
+      }
+      
+      return data;
     } catch (error) {
       return this.handleError(error);
     }

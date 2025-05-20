@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import CreatePostDialog from '@/components/post/CreatePostDialog';
@@ -7,6 +6,9 @@ import SettingsPopover from '@/components/feed/SettingsPopover';
 import ViewControls from '@/components/feed/ViewControls';
 import { useFeedData } from '@/components/feed/useFeedData';
 import FeedSegmentTabs from '@/components/feed/FeedSegmentTabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 const Feed: React.FC = () => {
   const [createPostOpen, setCreatePostOpen] = useState(false);
@@ -60,6 +62,9 @@ const Feed: React.FC = () => {
     totalPages,
     hasFilters,
     clearAllFilters,
+    loading,
+    error,
+    isPremiumUser
   } = useFeedData(5, activeSegment);
 
   // Set accessFilter based on activeSegment
@@ -102,6 +107,61 @@ const Feed: React.FC = () => {
     return post;
   });
 
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="space-y-4 w-full">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-lg border p-4 space-y-3">
+              <div className="flex items-center space-x-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+              </div>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error loading posts</AlertTitle>
+          <AlertDescription>
+            {error}. Please try refreshing the page.
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    return (
+      <FeedContent
+        posts={preparedPosts}
+        contentFilter={contentFilter}
+        setContentFilter={setContentFilter}
+        accessFilter={accessFilter}
+        setAccessFilter={setAccessFilter}
+        selectedTags={selectedTags}
+        setSelectedTags={setSelectedTags}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        hasFilters={hasFilters}
+        onClearFilters={clearAllFilters}
+        activeSegment={activeSegment}
+      />
+    );
+  };
+
   return (
     <MainLayout title="Feed">
       <div className="flex justify-between items-center mb-6">
@@ -125,23 +185,7 @@ const Feed: React.FC = () => {
       />
 
       <div className="w-full">
-        <FeedContent
-          posts={preparedPosts}
-          contentFilter={contentFilter}
-          setContentFilter={setContentFilter}
-          accessFilter={accessFilter}
-          setAccessFilter={setAccessFilter}
-          selectedTags={selectedTags}
-          setSelectedTags={setSelectedTags}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          hasFilters={hasFilters}
-          onClearFilters={clearAllFilters}
-          activeSegment={activeSegment}
-        />
+        {renderContent()}
       </div>
 
       <CreatePostDialog

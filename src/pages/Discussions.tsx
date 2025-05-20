@@ -1,189 +1,201 @@
-
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useViewContext } from '@/components/layout/MainLayout';
-import { useDiscussions } from '@/hooks/useDiscussions';
-import TopicCard from '@/components/discussions/TopicCard';
-import DiscussionCard from '@/components/discussions/DiscussionCard';
+import { 
+  Users, 
+  MessageSquare, 
+  PlusCircle, 
+  TrendingUp, 
+  Loader2,
+  Search 
+} from 'lucide-react';
+import { useRealDiscussions } from '@/hooks/useRealDiscussions';
+import { useAuth } from '@/context/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
+import { formatDistanceToNow } from 'date-fns';
+import { Badge } from '@/components/ui/badge';
+import { DiscussionTopic } from '@/types/discussion';
 import CreateTopicDialog from '@/components/discussions/CreateTopicDialog';
-import DiscussionFilters from '@/components/discussions/DiscussionFilters';
-import ActiveUsersList from '@/components/discussions/ActiveUsersList';
-import { DiscussionFilter } from '@/types/discussion';
 
 const Discussions = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('topics');
-  const [activeFilters, setActiveFilters] = useState<DiscussionFilter[]>([]);
+  const [filteredTopics, setFilteredTopics] = useState<DiscussionTopic[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
-  const { viewAs } = useViewContext();
-  const { 
-    getAllTopics, 
-    getDiscussions, 
-    filterDiscussions
-  } = useDiscussions();
-  
-  const topics = getAllTopics();
-  
-  // Combine all discussions for "recent" and "popular" tabs
-  const allDiscussions = topics.flatMap(topic => 
-    getDiscussions(topic.id).map(discussion => ({
-      ...discussion,
-      topicId: topic.id
-    }))
-  );
-  
-  // Filter discussions based on search query and active filters
-  const filteredDiscussions = allDiscussions.filter(discussion => {
-    // Apply search filter
-    const matchesSearch = searchQuery === '' || 
-      discussion.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      discussion.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      discussion.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isOwnerOrAdmin, isLoading: isRoleLoading } = useUserRole();
+  const { topics, loadTopics, loading } = useRealDiscussions();
+
+  // Load topics on component mount
+  useEffect(() => {
+    loadTopics();
+  }, [loadTopics]);
+
+  // Filter topics based on search query
+  useEffect(() => {
+    if (!topics) return;
     
-    // Apply active filters
-    const matchesFilters = activeFilters.length === 0 || activeFilters.every(filter => {
-      switch (filter.type) {
-        case 'tag':
-          return discussion.tags.includes(filter.value);
-        case 'status':
-          if (filter.value === 'hot') return discussion.isHot;
-          if (filter.value === 'answered') return discussion.isAnswered;
-          if (filter.value === 'unanswered') return !discussion.isAnswered;
-          return true;
-        case 'time':
-          // Simple time filter based on activity string
-          if (filter.value === 'today') 
-            return discussion.lastActivity.includes('hora') || 
-                  discussion.lastActivity.includes('minuto') || 
-                  discussion.lastActivity.includes('agora');
-          if (filter.value === 'week') 
-            return !discussion.lastActivity.includes('mês');
-          return true;
-        case 'format':
-          return discussion.format === filter.value;
-        default:
-          return true;
-      }
-    });
+    if (!searchQuery.trim()) {
+      setFilteredTopics(topics);
+      return;
+    }
     
-    return matchesSearch && matchesFilters;
-  });
-  
-  // Sort by recent activity for the "recent" tab
-  const recentDiscussions = [...filteredDiscussions].sort((a, b) => {
-    if (a.lastActivity.includes('agora')) return -1;
-    if (b.lastActivity.includes('agora')) return 1;
-    if (a.lastActivity.includes('minuto') && !b.lastActivity.includes('minuto')) return -1;
-    if (!a.lastActivity.includes('minuto') && b.lastActivity.includes('minuto')) return 1;
-    if (a.lastActivity.includes('hora') && b.lastActivity.includes('dia')) return -1;
-    if (a.lastActivity.includes('dia') && b.lastActivity.includes('hora')) return 1;
-    return 0;
-  });
-  
-  // Filter for popular/hot discussions
-  const popularDiscussions = filteredDiscussions.filter(d => d.isHot);
-  
-  // Determine if user can create topics (admin or moderator)
-  const canCreateTopic = viewAs === 'admin' || viewAs === 'moderator';
+    const query = searchQuery.toLowerCase();
+    const filtered = topics.filter(topic => 
+      (topic.title || topic.name || '').toLowerCase().includes(query) || 
+      (topic.description || '').toLowerCase().includes(query)
+    );
+    
+    setFilteredTopics(filtered);
+  }, [searchQuery, topics]);
+
+  // Handle topic click
+  const handleTopicClick = (topicId: string) => {
+    navigate(`/discussions/topic/${topicId}`);
+  };
+
+  // Determine if the user can create topics
+  const canCreateTopics = !isRoleLoading && (isOwnerOrAdmin || user);
 
   return (
     <MainLayout title="Discussions">
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Fóruns de Discussão</h1>
-          {canCreateTopic && (
-            <CreateTopicDialog 
-              isOpen={isDialogOpen}
-              onClose={() => setIsDialogOpen(false)}
-            />
-          )}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">Discussion Forums</h1>
+          <p className="text-muted-foreground mt-1">
+            Join the conversation in our community forums
+          </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2">
-            <DiscussionFilters 
-              topicId="" 
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onFilterChange={setActiveFilters}
-              activeFilters={activeFilters}
-            />
-
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-              <TabsList>
-                <TabsTrigger value="topics">Tópicos</TabsTrigger>
-                <TabsTrigger value="recent">Discussões Recentes</TabsTrigger>
-                <TabsTrigger value="popular">Populares</TabsTrigger>
-              </TabsList>
-              <TabsContent value="topics" className="mt-4">
-                <h2 className="text-lg font-semibold mb-4">Tópicos da Comunidade</h2>
-                {topics.length > 0 ? (
-                  topics.map(topic => (
-                    <TopicCard key={topic.id} topic={topic} />
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>Não há tópicos disponíveis no momento.</p>
-                  </div>
-                )}
-              </TabsContent>
-              <TabsContent value="recent" className="mt-4">
-                <h2 className="text-lg font-semibold mb-4">Discussões Recentes</h2>
-                {recentDiscussions.length > 0 ? (
-                  recentDiscussions.map(discussion => (
-                    <DiscussionCard 
-                      key={discussion.id} 
-                      discussion={discussion} 
-                      topicId={discussion.topicId} 
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>Não há discussões recentes no momento.</p>
-                  </div>
-                )}
-              </TabsContent>
-              <TabsContent value="popular" className="mt-4">
-                <h2 className="text-lg font-semibold mb-4">Discussões Populares</h2>
-                {popularDiscussions.length > 0 ? (
-                  popularDiscussions.map(discussion => (
-                    <DiscussionCard 
-                      key={discussion.id} 
-                      discussion={discussion} 
-                      topicId={discussion.topicId} 
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>Não há discussões populares no momento.</p>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </div>
-          
-          <div className="space-y-6">
-            <ActiveUsersList />
-            
-            <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-4">
-              <h3 className="text-sm font-medium mb-3">Sobre os Fóruns</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Participe das discussões da comunidade, faça perguntas, ajude outros membros e ganhe pontos de experiência.
-              </p>
-              <div className="text-sm text-muted-foreground">
-                <p>• Ganhe 10 XP ao criar discussões</p>
-                <p>• Ganhe 5 XP ao responder</p>
-                <p>• Ganhe 15 XP quando sua resposta for aceita</p>
-                <p>• Ganhe 2 XP por cada upvote recebido</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        {canCreateTopics && (
+          <Button 
+            onClick={() => setIsDialogOpen(true)}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            <PlusCircle size={16} className="mr-2" />
+            New Topic
+          </Button>
+        )}
       </div>
+      
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search topics..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+      
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : filteredTopics.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTopics.map((topic) => (
+            <Card 
+              key={topic.id} 
+              className="cursor-pointer hover:border-purple-300 transition-colors"
+              onClick={() => handleTopicClick(topic.id)}
+            >
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle>{topic.title || topic.name}</CardTitle>
+                    <CardDescription className="mt-1">{topic.description}</CardDescription>
+                  </div>
+                  {topic.icon && (
+                    <div 
+                      className="text-white rounded-md p-2 flex items-center justify-center"
+                      style={{ 
+                        backgroundColor: topic.color || '#6941C6',
+                        width: '40px',
+                        height: '40px'
+                      }}
+                    >
+                      {(() => {
+                        // This would ideally use a dynamic icon component
+                        switch (topic.icon) {
+                          case 'users':
+                            return <Users size={20} />;
+                          case 'trending-up':
+                            return <TrendingUp size={20} />;
+                          default:
+                            return <MessageSquare size={20} />;
+                        }
+                      })()}
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center text-sm gap-2">
+                  <Badge variant="outline" className="text-xs">
+                    {topic.discussionCount || 0} Discussions
+                  </Badge>
+                  
+                  {topic.is_featured && (
+                    <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100 border-purple-200 text-xs">
+                      Featured
+                    </Badge>
+                  )}
+                  
+                  {topic.is_private && (
+                    <Badge variant="outline" className="text-xs">
+                      Private
+                    </Badge>
+                  )}
+                </div>
+              </CardContent>
+              <CardFooter className="text-sm text-muted-foreground">
+                <div className="flex justify-between items-center w-full">
+                  <span className="flex items-center">
+                    <Users size={14} className="mr-1" /> {topic.memberCount || 0} members
+                  </span>
+                  <span>
+                    {topic.recentActivity ? (
+                      `Updated ${formatDistanceToNow(new Date(topic.recentActivity), { addSuffix: true })}`
+                    ) : (
+                      `Created ${formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}`
+                    )}
+                  </span>
+                </div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-16 border rounded-lg bg-card">
+          <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No topics found</h3>
+          <p className="text-muted-foreground mb-6">
+            {searchQuery ? 
+              `No topics matching "${searchQuery}"` : 
+              "There are no discussion topics yet"
+            }
+          </p>
+          {canCreateTopics && (
+            <Button onClick={() => setIsDialogOpen(true)}>
+              <PlusCircle size={16} className="mr-2" />
+              Create the first topic
+            </Button>
+          )}
+        </div>
+      )}
+      
+      {/* Topic creation dialog */}
+      <CreateTopicDialog 
+        open={isDialogOpen} 
+        onOpenChange={setIsDialogOpen} 
+        onTopicCreated={loadTopics}
+      />
     </MainLayout>
   );
 };

@@ -9,6 +9,9 @@ export interface Community {
   theme_config: {
     primaryColor: string;
   } | null;
+  owner_id?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface CommunitySettings {
@@ -41,13 +44,11 @@ export const mockCommunities: Community[] = [
   {
     id: "comm-1",
     name: "Nortech",
-    slug: "nortech",
     description: "A technology learning community",
     logo_url: "https://placehold.co/150",
-    banner_url: "https://placehold.co/1200x300",
-    primary_color: "#6E56CF",
-    secondary_color: "#4A36A0",
-    is_public: true,
+    theme_config: {
+      primaryColor: "#6E56CF"
+    },
     owner_id: "user-1",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -65,4 +66,5 @@ export interface CommunityContext {
     background_color?: string;
     text_color?: string;
   };
+  owner_id?: string;
 }

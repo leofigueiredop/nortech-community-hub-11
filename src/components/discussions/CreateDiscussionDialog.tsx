@@ -1,5 +1,8 @@
-
-import React from 'react';
+import React, { useState } from 'react';
+import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -8,10 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -19,10 +18,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
-import { TagInput } from '@/components/ui/tag-input';
-import { useUser } from '@/hooks/use-user';
-import { Discussion, DiscussionTopic } from '@/types/discussion';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Loader2, MessageSquare, HelpCircle, BellRing } from 'lucide-react';
+import { DiscussionTopic } from '@/types/discussion';
+import { useRealDiscussions } from '@/hooks/useRealDiscussions';
+import { useAuth } from '@/context/AuthContext';
 
 interface CreateDiscussionDialogProps {
   open: boolean;
@@ -31,152 +42,275 @@ interface CreateDiscussionDialogProps {
   onDiscussionCreated?: () => void;
 }
 
-const formats = [
-  { value: 'discussion', label: 'Discussion' },
-  { value: 'question', label: 'Question' },
-];
+const formSchema = z.object({
+  title: z.string().min(5, 'Title must be at least 5 characters'),
+  content: z.string().min(20, 'Content must be at least 20 characters'),
+  format: z.enum(['discussion', 'question', 'announcement']),
+  tags: z.string().optional(),
+});
 
-const createDiscussion = async (discussion: Partial<Discussion>) => {
-  // Mock API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(discussion);
-    }, 500);
-  });
-};
-
-export default function CreateDiscussionDialog({
+const CreateDiscussionDialog: React.FC<CreateDiscussionDialogProps> = ({
   open,
   onOpenChange,
   topic,
   onDiscussionCreated
-}: CreateDiscussionDialogProps) {
-  const [title, setTitle] = React.useState('');
-  const [description, setDescription] = React.useState('');
-  const [selectedFormat, setSelectedFormat] = React.useState('');
-  const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
+}) => {
+  const { createDiscussion, loading } = useRealDiscussions();
+  const { user } = useAuth();
   const { toast } = useToast();
-  const { user } = useUser();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!title || !description || !selectedFormat) {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: '',
+      content: '',
+      format: 'discussion',
+      tags: '',
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!user) {
       toast({
-        title: "Missing fields",
-        description: "Please fill out all required fields",
-        variant: "destructive",
+        title: 'Authentication Required',
+        description: 'Please sign in to create a discussion',
+        variant: 'destructive',
       });
       return;
     }
+
+    setIsSubmitting(true);
     
-    // Create discussion object
-    const newDiscussion: Partial<Discussion> = {
-      title,
-      content: description,
-      topic_id: topic.id,
-      format: selectedFormat as 'question' | 'discussion',
-      tags: selectedTags,
-      community_id: topic.community_id,
-      is_locked: false,
-      is_featured: false,
-      is_anonymous: false,
-      votes: 0,
-      view_count: 0,
-      author: {
-        id: user.id,
-        name: user.display_name || user.email.split('@')[0],
-        avatar: user.avatar_url, // Changed from avatar_url to avatar
-        level: 1, // Default values for compatibility
-        xp: 0 // Default values for compatibility
-      }
-    };
-    
-    // Mock API call
-    createDiscussion(newDiscussion)
-      .then(() => {
-        toast({
-          title: "Discussion created",
-          description: "Your discussion has been created successfully",
-        });
-        onDiscussionCreated?.();
-        onOpenChange(false);
-        resetForm();
-      })
-      .catch((error) => {
-        toast({
-          title: "Error creating discussion",
-          description: error.message,
-          variant: "destructive",
-        });
+    try {
+      // Parse tags from comma-separated string to array
+      const tagsArray = values.tags 
+        ? values.tags.split(',').map(tag => tag.trim()).filter(Boolean) 
+        : [];
+      
+      const result = await createDiscussion({
+        topic_id: topic.id,
+        title: values.title,
+        content: values.content,
+        format: values.format,
+        tags: tagsArray,
       });
+      
+      if (result) {
+        toast({
+          title: 'Discussion Created',
+          description: 'Your discussion has been posted',
+        });
+        
+        // Reset form and close dialog
+        form.reset();
+        onOpenChange(false);
+        
+        // Call the callback if provided
+        if (onDiscussionCreated) {
+          onDiscussionCreated();
+        }
+      }
+    } catch (error) {
+      console.error('Error creating discussion:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create discussion',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const resetForm = () => {
-    setTitle('');
-    setDescription('');
-    setSelectedFormat('');
-    setSelectedTags([]);
+  const getFormatIcon = (format: string) => {
+    switch (format) {
+      case 'question':
+        return <HelpCircle className="w-4 h-4 mr-2" />;
+      case 'announcement':
+        return <BellRing className="w-4 h-4 mr-2" />;
+      default:
+        return <MessageSquare className="w-4 h-4 mr-2" />;
+    }
   };
+
+  if (!user) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Authentication Required</DialogTitle>
+            <DialogDescription>
+              You need to be signed in to create a discussion.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => onOpenChange(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Create New Discussion</DialogTitle>
+          <DialogTitle>New Discussion</DialogTitle>
           <DialogDescription>
-            Start a new discussion in <strong>{topic.title}</strong> topic.
+            Create a new discussion in {topic.title || topic.name}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              placeholder="What's this discussion about?"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Enter a title for your discussion" 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Keep it concise and descriptive
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Elaborate more on your discussion..."
-              rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+            
+            <FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Content</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Enter your discussion content here..." 
+                      className="min-h-[150px]"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Provide details, context, or your question
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="format">Format</Label>
-            <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-              <SelectTrigger id="format">
-                <SelectValue placeholder="Select a format" />
-              </SelectTrigger>
-              <SelectContent>
-                {formats.map((format) => (
-                  <SelectItem key={format.value} value={format.value}>
-                    {format.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="tags">Tags</Label>
-            <TagInput
-              id="tags"
-              tags={selectedTags}
-              onTagsChange={setSelectedTags}
-              placeholder="Add some tags..."
-            />
-          </div>
-          <DialogFooter>
-            <Button type="submit">Create Discussion</Button>
-          </DialogFooter>
-        </form>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="format"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type</FormLabel>
+                    <Select 
+                      defaultValue={field.value} 
+                      onValueChange={field.onChange}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select type">
+                            {field.value && (
+                              <div className="flex items-center">
+                                {getFormatIcon(field.value)}
+                                <span>
+                                  {field.value.charAt(0).toUpperCase() + field.value.slice(1)}
+                                </span>
+                              </div>
+                            )}
+                          </SelectValue>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="discussion">
+                          <div className="flex items-center">
+                            <MessageSquare className="w-4 h-4 mr-2" />
+                            Discussion
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="question">
+                          <div className="flex items-center">
+                            <HelpCircle className="w-4 h-4 mr-2" />
+                            Question
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="announcement">
+                          <div className="flex items-center">
+                            <BellRing className="w-4 h-4 mr-2" />
+                            Announcement
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose the type of your post
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tags</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="tag1, tag2, tag3" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Comma-separated list of tags
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={isSubmitting || loading}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create Discussion'
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default CreateDiscussionDialog;

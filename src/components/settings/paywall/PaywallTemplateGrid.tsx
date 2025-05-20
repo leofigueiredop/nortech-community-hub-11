@@ -1,22 +1,24 @@
-
 import React from 'react';
 import PaywallTemplateCard from './PaywallTemplateCard';
 import { Lock, Check } from 'lucide-react';
+import { PaywallTemplate } from '@/types/paywall';
 
-export type PaywallTemplateType = 'simple' | 'featured' | 'premium';
+export type PaywallTemplateType = 'simple' | 'featured' | 'premium' | string;
 
 interface PaywallTemplateGridProps {
   activeTemplate: PaywallTemplateType;
   setActiveTemplate: (template: PaywallTemplateType) => void;
   onPreview: () => void;
+  availableTemplates?: PaywallTemplate[];
 }
 
 const PaywallTemplateGrid: React.FC<PaywallTemplateGridProps> = ({ 
   activeTemplate, 
   setActiveTemplate,
-  onPreview
+  onPreview,
+  availableTemplates = []
 }) => {
-  const paywallTemplates = {
+  const defaultTemplates = {
     simple: {
       title: "Simple & Clean",
       description: "A straightforward paywall with minimal distractions",
@@ -114,9 +116,40 @@ const PaywallTemplateGrid: React.FC<PaywallTemplateGridProps> = ({
     }
   };
 
+  // Combine default templates with custom ones from API
+  const templatesMap = { ...defaultTemplates };
+  
+  // Add custom templates if provided
+  if (availableTemplates && availableTemplates.length > 0) {
+    availableTemplates.forEach(template => {
+      if (!defaultTemplates[template.id]) {
+        templatesMap[template.id] = {
+          title: template.name,
+          description: template.description,
+          preview: (
+            <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-800 flex items-center justify-center p-8">
+              {template.previewImage ? (
+                <img 
+                  src={template.previewImage} 
+                  alt={template.name} 
+                  className="max-w-full h-auto rounded" 
+                />
+              ) : (
+                <div className="text-center p-12">
+                  <h3 className="font-medium text-lg">{template.name}</h3>
+                  <p className="text-sm text-gray-500 mt-2">Layout: {template.layout}</p>
+                </div>
+              )}
+            </div>
+          )
+        };
+      }
+    });
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-      {Object.entries(paywallTemplates).map(([key, template]) => (
+      {Object.entries(templatesMap).map(([key, template]) => (
         <PaywallTemplateCard 
           key={key}
           title={template.title}

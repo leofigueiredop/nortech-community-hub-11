@@ -1,4 +1,3 @@
-
 import { Discussion, DiscussionReply, DiscussionTopic } from '@/types/discussion';
 
 export interface IDiscussionRepository {
@@ -17,4 +16,7 @@ export interface IDiscussionRepository {
   deleteReply(id: string): Promise<void>;
   markReplyAsSolution(replyId: string): Promise<DiscussionReply>;
   incrementViewCount(discussionId: string): Promise<void>;
+  upvoteDiscussion(id: string, isUpvoted: boolean): Promise<boolean>;
+  getDiscussionUpvotes(discussionId: string): Promise<string[]>;
+  checkUserUpvoted(discussionId: string, userId: string): Promise<boolean>;
 }
