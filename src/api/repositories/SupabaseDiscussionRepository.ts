@@ -4,8 +4,8 @@ import { BaseRepository } from '@/api/repositories/BaseRepository';
 import { DiscussionTopic, Discussion, DiscussionReply } from '@/types/discussion';
 
 export class SupabaseDiscussionRepository extends BaseRepository implements IDiscussionRepository {
-  constructor(supabase: SupabaseClient, communityId?: string) {
-    super(supabase, communityId);
+  constructor(supabase: SupabaseClient) {
+    super(supabase);
   }
 
   async getAllTopics(): Promise<DiscussionTopic[]> {
