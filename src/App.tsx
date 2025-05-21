@@ -7,6 +7,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { useAuth } from '@/context/AuthContext';
 
 // Import pages
+import Index from '@/pages/Index';
 import LoginPage from '@/pages/auth/login.page';
 import Dashboard from '@/pages/Dashboard';
 import Library from '@/pages/Library';
@@ -30,18 +31,21 @@ import PointsDashboard from '@/pages/PointsDashboard';
 import PointsStore from '@/pages/PointsStore';
 import Leaderboard from '@/pages/Leaderboard';
 
+// Import onboarding pages
+import Welcome from '@/pages/onboarding/Welcome';
+import Creator from '@/pages/onboarding/Creator';
+import Community from '@/pages/onboarding/Community';
+import CommunityType from '@/pages/onboarding/CommunityType';
+import Features from '@/pages/onboarding/Features';
+import MembershipPlans from '@/pages/onboarding/MembershipPlans';
+import InviteMembers from '@/pages/onboarding/InviteMembers';
+import FinalStep from '@/pages/onboarding/FinalStep';
+
 // Auth-protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading, community } = useAuth();
   
-  // Check localStorage for a smoother UX (before auth state is fully loaded)
-  const hasStoredCommunityId = Boolean(localStorage.getItem('currentCommunityId'));
-  
-  // Improved fallback auth check
-  const hasFallbackAuth = Boolean(user) || Boolean(community) || hasStoredCommunityId;
-  
   if (isLoading) {
-    // Show loading spinner or skeleton while checking auth
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -49,10 +53,29 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  // Only redirect if no auth methods are available
-  if (!hasFallbackAuth) {
-    console.log('No authentication found, redirecting to login');
+  // If not authenticated, redirect to login
+  if (!user) {
     return <Navigate to="/auth/login" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Auth-aware route that redirects to dashboard if already authenticated
+const AuthAwareRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
+  // If authenticated, redirect to dashboard
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
   }
   
   return <>{children}</>;
@@ -65,12 +88,32 @@ function App() {
         <PointsProvider>
           <NotificationsProvider>
             <Routes>
-              {/* Auth pages */}
-              <Route path="/auth/login" element={<LoginPage />} />
-              <Route path="/auth/callback" element={<LoginPage />} />
+              {/* Public landing page - always accessible */}
+              <Route path="/" element={<Index />} />
               
-              {/* Public routes */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              {/* Onboarding Routes */}
+              <Route path="/onboarding">
+                <Route path="welcome" element={<Welcome />} />
+                <Route path="creator" element={<Creator />} />
+                <Route path="community" element={<Community />} />
+                <Route path="type" element={<CommunityType />} />
+                <Route path="features" element={<Features />} />
+                <Route path="plans" element={<MembershipPlans />} />
+                <Route path="invite" element={<InviteMembers />} />
+                <Route path="final" element={<FinalStep />} />
+              </Route>
+              
+              {/* Auth routes - redirect to dashboard if already authenticated */}
+              <Route path="/auth/login" element={
+                <AuthAwareRoute>
+                  <LoginPage />
+                </AuthAwareRoute>
+              } />
+              <Route path="/auth/callback" element={
+                <AuthAwareRoute>
+                  <LoginPage />
+                </AuthAwareRoute>
+              } />
               
               {/* Protected app routes */}
               <Route path="/dashboard" element={
@@ -298,9 +341,8 @@ function App() {
               } />
               
               {/* Catch-all route for 404 */}
-              <Route path="*" element={<Navigate to="/auth/login" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-            
             <Toaster />
           </NotificationsProvider>
         </PointsProvider>

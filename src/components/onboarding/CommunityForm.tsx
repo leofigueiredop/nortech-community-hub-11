@@ -12,7 +12,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
-import { api } from '../../api';
 
 const formSchema = z.object({
   communityName: z.string().min(2, 'Community name must be at least 2 characters'),
@@ -26,7 +25,7 @@ const CommunityForm: React.FC = () => {
   const navigate = useNavigate();
   const [showBadge, setShowBadge] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useAuth();
+  const { user, createCommunity, setCurrentOnboardingStep } = useAuth();
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -57,32 +56,19 @@ const CommunityForm: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Create the community in Supabase
-      const { error: communityError } = await api.supabase
-        .from('communities')
-        .insert([{
-          name: data.communityName,
-          description: 'A new learning community',
-          creator_id: user.id,
-          domain: data.communitySlug,
-          status: 'active',
-          theme_config: {}, // Initialize empty theme config
-          api_keys: {}, // Initialize empty API keys
-          is_private: false // Default to public community
-        }]);
-
-      if (communityError) {
-        console.error('Community creation error:', communityError);
-        throw communityError;
-      }
-      
-      // Store community data in localStorage
-      localStorage.setItem('communityName', data.communityName);
-      localStorage.setItem('communityDescription', 'A new learning community');
-      localStorage.setItem('onboardingStep', '3');
+      // Create the community using our auth context
+      await createCommunity({
+        name: data.communityName,
+        description: 'A new learning community',
+        category: 'general',
+        is_private: false
+      });
       
       // Show achievement badge
       setShowBadge(true);
+      
+      // Update onboarding step
+      setCurrentOnboardingStep(3);
       
       // Show achievement toast
       toast({

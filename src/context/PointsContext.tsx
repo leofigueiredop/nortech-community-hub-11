@@ -70,10 +70,36 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [pointsHistory, setPointsHistory] = useState<PointsActivity[]>([]);
   const api = ApiClient.getInstance();
 
-  // Skip subscription during onboarding
+  // Subscribe to realtime points updates
   useEffect(() => {
     if (!user || !user.isOnboarded) return;
-    usePointsSubscription();
+    
+    const subscription = supabase
+      .channel('points-changes')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'points_transactions',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        // Update state when new points transaction occurs
+        const newActivity = payload.new as PointsActivity;
+        setPointsHistory(prev => [newActivity, ...prev]);
+        setTotalPoints(prev => prev + newActivity.points);
+        
+        // Show toast notification
+        if (newActivity.points > 0) {
+          toast.success(`+${newActivity.points} points: ${newActivity.description}`);
+        } else {
+          toast.error(`${newActivity.points} points: ${newActivity.description}`);
+        }
+      })
+      .subscribe();
+    
+    // Clean up subscription
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [user]);
 
   useEffect(() => {
@@ -86,24 +112,44 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return;
       }
       
-      // Fetch points history from points_transactions table
-      const { data: history, error } = await supabase
-        .from('points_transactions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      try {
+        // First try to get user's total points from user_points table
+        const { data: userPoints, error: userPointsError } = await supabase
+          .from('user_points')
+          .select('points')
+          .eq('user_id', user.id)
+          .single();
+          
+        if (!userPointsError && userPoints) {
+          setTotalPoints(userPoints.points);
+        }
+        
+        // Fetch points history from points_transactions table
+        const { data: history, error } = await supabase
+          .from('points_transactions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50);
 
-      if (error) {
-        console.error('Error fetching points history:', error);
+        if (error) {
+          console.error('Error fetching points history:', error);
+          toast.error('Failed to load points data');
+          return;
+        }
+
+        if (history) {
+          setPointsHistory(history);
+          
+          // If we didn't get points from user_points, calculate from history
+          if (userPointsError || !userPoints) {
+            const total = history.reduce((sum, activity) => sum + activity.points, 0);
+            setTotalPoints(total);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading points data:', error);
         toast.error('Failed to load points data');
-        return;
-      }
-
-      if (history) {
-        setPointsHistory(history);
-        // Calculate total points
-        const total = history.reduce((sum, activity) => sum + activity.points, 0);
-        setTotalPoints(total);
       }
     };
 
@@ -114,16 +160,18 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!user) return;
 
     try {
-      const activity: NewPointsActivity = {
+      const activity = {
         user_id: user.id,
         points,
         description,
-        type: 'points_earned',
+        source: 'app',
+        community_id: user.currentCommunity || null,
         created_at: new Date().toISOString()
       };
 
+      // Insert into points_transactions table
       const { error } = await supabase
-        .from('points_history')
+        .from('points_transactions')
         .insert([activity]);
 
       if (error) {
@@ -132,10 +180,28 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return;
       }
 
+      // Update user_points table through RPC function
+      if (user.currentCommunity) {
+        const { error: rpcError } = await supabase.rpc('add_points', {
+          user_id: user.id,
+          community_id: user.currentCommunity,
+          points_to_add: points
+        });
+        
+        if (rpcError) {
+          console.error('Error updating user points total:', rpcError);
+        }
+      }
+
       // Update local state
       setTotalPoints(prev => prev + points);
-      setPointsHistory(prev => [activity as PointsActivity, ...prev]);
-      toast.success(`Awarded ${points} points!`);
+      setPointsHistory(prev => [{
+        ...activity,
+        id: uuidv4(),
+        type: points > 0 ? 'points_earned' : 'points_spent'
+      } as PointsActivity, ...prev]);
+      
+      toast.success(`${points > 0 ? '+' : ''}${points} points: ${description}`);
     } catch (error) {
       console.error('Error in awardPoints:', error);
       toast.error('Failed to award points');
@@ -148,34 +214,21 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [awardPoints]);
 
   // Deduct points from the user
-  const deductPoints = useCallback(async (points: number, description = '') => {
+  const deductPoints = useCallback(async (points: number, description = 'Points redeemed') => {
     if (!user) return;
-
-    const newActivity: PointsActivity = {
-      id: Date.now().toString(),
-      type: 'reward_redemption',
-      points: -Math.abs(points), // Ensure it's negative
-      description,
-      created_at: new Date().toISOString(),
-      user_id: user.id
-    };
     
-    setPointsHistory(prev => [newActivity, ...prev]);
-    setTotalPoints(prev => prev - Math.abs(points));
-
-    // Sync with backend
-    await api.points.addPoints(
-      user.id,
-      -Math.abs(points),
-      'reward_redemption',
-      description
-    );
-  }, [user]);
+    // Always convert to positive number then make negative for consistency
+    const pointsToDeduct = Math.abs(points) * -1;
+    
+    // Call awardPoints with negative value
+    await awardPoints(pointsToDeduct, description);
+  }, [user, awardPoints]);
 
   // Award badge (simplified implementation)
   const awardBadge = useCallback((badge: { name: string; description: string; category: string }) => {
     console.log(`Badge awarded: ${badge.name} (${badge.category})`);
     // In a real implementation, this would save the badge to user's profile
+    toast.success(`🏆 Badge awarded: ${badge.name}`);
   }, []);
 
   // Calculate user level based on total points
@@ -190,78 +243,21 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [totalPoints]);
 
   const redeemPoints = useCallback(async (points: number, description: string) => {
-    if (!user || points > totalPoints) return;
+    if (!user || points > totalPoints) {
+      if (points > totalPoints) {
+        toast.error("You don't have enough points for this redemption");
+      }
+      return;
+    }
 
     try {
-      const newActivity: PointsActivity = {
-        id: uuidv4(),
-        type: 'reward_redemption',
-        points: -points,
-        description,
-        created_at: new Date().toISOString(),
-        user_id: user.id
-      };
-
-      // Update local state
-      setTotalPoints(prev => prev - points);
-      setPointsHistory(prev => [newActivity, ...prev]);
-
-      // Save to database
-      await api.points.addPoints(
-        user.id,
-        -points,
-        'reward_redemption',
-        description
-      );
+      // Use deductPoints to handle the redemption
+      await deductPoints(points, description);
     } catch (error) {
       console.error('Error redeeming points:', error);
+      toast.error('Failed to redeem points');
     }
-  }, [user, totalPoints]);
-
-  const addPointsActivity = async (activity: NewPointsActivity) => {
-    if (!user) return;
-    
-    const newActivity: PointsActivity = {
-      id: uuidv4(),
-      user_id: user.id,
-      created_at: new Date().toISOString(),
-      ...activity
-    };
-
-    setPointsHistory(prev => [...prev, newActivity]);
-    
-    try {
-      await supabase
-        .from('points_transactions')
-        .insert([newActivity]);
-    } catch (error) {
-      console.error('Error saving points activity:', error);
-      toast.error('Failed to save points activity');
-    }
-  };
-
-  const loadPointsHistory = async () => {
-    if (!user || !user.isOnboarded) return;
-    
-    try {
-      const { data: history, error } = await supabase
-        .from('points_transactions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error loading points history:', error);
-        toast.error('Failed to load points history');
-        return;
-      }
-
-      setPointsHistory(history);
-    } catch (error) {
-      console.error('Error in loadPointsHistory:', error);
-      toast.error('Failed to load points history');
-    }
-  };
+  }, [user, totalPoints, deductPoints]);
 
   return (
     <PointsContext.Provider value={{

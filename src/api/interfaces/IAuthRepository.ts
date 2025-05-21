@@ -13,11 +13,13 @@ export interface AuthUser {
   id: string;
   email: string;
   profile: Profile;
+  isOnboarded?: boolean;
+  currentCommunity?: string | null;
 }
 
 export interface AuthResponse {
   user: AuthUser;
-  community: CommunityContext;
+  community: CommunityContext | null;
 }
 
 export interface IAuthRepository {
@@ -25,4 +27,12 @@ export interface IAuthRepository {
   logout(): Promise<void>;
   getSession(): Promise<AuthResponse>;
   handleAuthCallback(): Promise<AuthResponse>;
+  register(email: string, password: string, fullName: string): Promise<AuthResponse>;
+  createCommunity(communityData: {
+    name: string;
+    description: string;
+    logo_url?: string | null;
+    category?: string;
+    is_private?: boolean;
+  }): Promise<CommunityContext>;
 }
