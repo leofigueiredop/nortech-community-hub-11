@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -8,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { ContentItem, ContentFormat } from '@/types/content';
 import { useLibraryContent } from '@/hooks/useLibraryContent';
-import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from '@/context/AuthContext';
+import { StorageService } from '@/services/StorageService';
 import ContentBasicInfo from './form/ContentBasicInfo';
 import FileUploader from './form/FileUploader';
 import TagsInput from './form/TagsInput';
@@ -16,11 +16,12 @@ import AccessOptions from './form/AccessOptions';
 import ResourceUrlInput from './form/ResourceUrlInput';
 import { needsFileUpload, needsUrlInput } from './constants/contentFormOptions';
 import { POINTS_VALUES } from '@/context/PointsContext';
+import { toast } from '@/components/ui/use-toast';
 
 interface ContentUploadFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (content: ContentItem) => void;
+  onSave: (content: ContentItem, contentFile?: File, thumbnailFile?: File) => void;
   editItem: ContentItem | null;
 }
 
@@ -30,8 +31,8 @@ const formSchema = z.object({
   format: z.string().min(1, "Format is required"),
   resourceUrl: z.string().optional(),
   tags: z.string().optional(),
-  accessLevel: z.enum(["free", "premium", "premium_plus"]),
-  visibility: z.enum(["public", "premium", "points", "hidden", "vip-only", "limited-time"]).optional(),
+  accessLevel: z.string().min(1, "Access level is required"),
+  visibility: z.string().optional(),
   categoryId: z.string().optional(),
   pointsEnabled: z.boolean().default(false),
   pointsValue: z.number().default(POINTS_VALUES.content_completion),
@@ -44,7 +45,9 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const { categories, allTags } = useLibraryContent();
+  const { community } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,18 +73,18 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
         title: editItem.title,
         description: editItem.description || '',
         format: editItem.format,
-        resourceUrl: editItem.resourceUrl || editItem.url || '',
+        resourceUrl: editItem.resource_url || '',
         tags: editItem.tags ? editItem.tags.join(', ') : '',
-        accessLevel: editItem.accessLevel || editItem.access_level || 'free',
+        accessLevel: editItem.access_level || 'free',
         visibility: editItem.visibility || 'public',
-        categoryId: editItem.categoryId || editItem.category_id || '',
-        pointsEnabled: editItem.pointsEnabled || false,
-        pointsValue: editItem.pointsValue || POINTS_VALUES.content_completion,
-        completionCriteria: editItem.completionCriteria as any || 'view',
-        completionThreshold: editItem.completionThreshold || 80
+        categoryId: editItem.category_id || '',
+        pointsEnabled: editItem.points_enabled || false,
+        pointsValue: editItem.points_value || POINTS_VALUES.content_completion,
+        completionCriteria: editItem.completion_criteria as any || 'view',
+        completionThreshold: editItem.completion_threshold || 80
       });
       setSelectedTags(editItem.tags || []);
-      setPreviewImage(editItem.thumbnailUrl || editItem.thumbnail || null);
+      setPreviewImage(editItem.thumbnail || null);
     } else {
       form.reset({
         title: '',
@@ -104,48 +107,52 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
     setThumbnailFile(null);
   }, [editItem, form, isOpen]);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const now = new Date().toISOString();
-    
-    const newContent: ContentItem = {
-      id: editItem?.id || uuidv4(),
-      title: values.title,
-      description: values.description,
-      format: values.format as ContentFormat,
-      url: values.resourceUrl || (file ? `mock-file-path/${file.name}` : ''),
-      resourceUrl: values.resourceUrl || (file ? `mock-file-path/${file.name}` : ''),
-      thumbnail: previewImage || '/placeholder.svg',
-      thumbnailUrl: previewImage || '/placeholder.svg',
-      author: editItem?.author || 'System User',
-      duration: editItem?.duration || 0,
-      tags: selectedTags,
-      access_level: values.accessLevel,
-      accessLevel: values.accessLevel,
-      created_at: editItem?.created_at || now,
-      updated_at: now,
-      views: editItem?.views || 0,
-      category_id: values.categoryId === 'none' ? undefined : values.categoryId,
-      categoryId: values.categoryId === 'none' ? undefined : values.categoryId,
-      visibility: values.visibility || 'public',
-      is_featured: editItem?.is_featured || false,
-      featured: editItem?.featured || false,
-      pointsEnabled: values.pointsEnabled,
-      pointsValue: values.pointsValue,
-      completionCriteria: values.completionCriteria,
-      completionThreshold: values.completionThreshold,
-      community_id: editItem?.community_id || '1',
-    };
-    
-    // Add optional fields based on format
-    if (['video', 'audio'].includes(values.format)) {
-      newContent.duration = editItem?.duration || 0;
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (!community) {
+        toast({
+          title: "Error",
+          description: "Community context is missing",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      setIsUploading(true);
+      
+      // We'll let the parent component handle file uploads and Supabase insertion
+      // This ensures proper transaction management and error handling
+      const newContent: Partial<ContentItem> = {
+        title: values.title,
+        description: values.description,
+        format: values.format as ContentFormat,
+        access_level: values.accessLevel as any,
+        category_id: values.categoryId === 'none' ? undefined : values.categoryId,
+        tags: selectedTags,
+        visibility: values.visibility as any || 'public',
+        points_enabled: values.pointsEnabled,
+        points_value: values.pointsValue,
+        completion_criteria: values.completionCriteria || 'view',
+        completion_threshold: values.completionThreshold || 80,
+      };
+      
+      // If there's a resource URL (for link-type content)
+      if (values.resourceUrl) {
+        newContent.resource_url = values.resourceUrl;
+      }
+      
+      // Let parent component save with files for upload
+      onSave(newContent as ContentItem, file, thumbnailFile);
+    } catch (error) {
+      console.error('Error in form submission:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to save content",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
     }
-    
-    if (['pdf', 'image'].includes(values.format)) {
-      newContent.fileSize = editItem?.fileSize || (file ? Math.round(file.size / 1024) : 0);
-    }
-    
-    onSave(newContent);
   };
 
   return (
@@ -168,6 +175,7 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
                     id="content-file"
                     placeholder="Click to upload"
                     helpText={`Supports ${form.watch('format')} files`}
+                    accept={getAcceptForFormat(form.watch('format'))}
                   />
                 )}
                 
@@ -199,11 +207,11 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
             </div>
             
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button type="button" variant="outline" onClick={onClose} disabled={isUploading}>
                 Cancel
               </Button>
-              <Button type="submit">
-                {editItem ? 'Save Changes' : 'Upload Content'}
+              <Button type="submit" disabled={isUploading}>
+                {isUploading ? 'Uploading...' : editItem ? 'Save Changes' : 'Upload Content'}
               </Button>
             </DialogFooter>
           </form>
@@ -212,5 +220,21 @@ const ContentUploadForm: React.FC<ContentUploadFormProps> = ({ isOpen, onClose, 
     </Dialog>
   );
 };
+
+// Helper function to get the accept string for different content formats
+function getAcceptForFormat(format: string): string {
+  switch (format) {
+    case 'video':
+      return 'video/*,.mp4,.mov,.avi,.webm';
+    case 'audio':
+      return 'audio/*,.mp3,.wav,.ogg,.m4a';
+    case 'pdf':
+      return '.pdf';
+    case 'image':
+      return 'image/*,.jpg,.jpeg,.png,.gif,.webp';
+    default:
+      return '*';
+  }
+}
 
 export default ContentUploadForm;
