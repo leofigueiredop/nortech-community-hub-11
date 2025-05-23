@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { useRealDiscussions } from '@/hooks/useRealDiscussions';
 import { useAuth } from '@/context/AuthContext';
-import { useUserRole } from '@/hooks/useUserRole';
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { DiscussionTopic } from '@/types/discussion';
@@ -28,7 +27,6 @@ const Discussions = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isOwnerOrAdmin, isLoading: isRoleLoading } = useUserRole();
   const { topics, loadTopics, loading } = useRealDiscussions();
 
   // Load topics on component mount
@@ -59,8 +57,8 @@ const Discussions = () => {
     navigate(`/discussions/topic/${topicId}`);
   };
 
-  // Determine if the user can create topics
-  const canCreateTopics = !isRoleLoading && (isOwnerOrAdmin || user);
+  // Qualquer usuário autenticado pode criar tópicos
+  const canCreateTopics = !!user;
 
   return (
     <MainLayout title="Discussions">

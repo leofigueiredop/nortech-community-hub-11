@@ -1,0 +1,35 @@
+{
+  "name": "nortech-community-hub-tests",
+  "version": "1.0.0",
+  "description": "Scripts de teste para o Nortech Community Hub",
+  "main": "functional-tests.js",
+  "scripts": {
+    "test:api": "node functional-tests.js",
+    "test:ui": "node ui-tests.js",
+    "test:health": "node app-healthcheck.js",
+    "test:data": "node data-integrity-check.js",
+    "test:components": "node component-tests.js",
+    "test:permissions": "node user-permissions-test.js",
+    "test:journey:owner": "node run-journeys.js --owner",
+    "test:journey:user": "node run-journeys.js --user",
+    "test:journey:all": "node run-journeys.js --all",
+    "test:connections": "node analyze-connections.js",
+    "test:connections:pdf": "node analyze-connections.js --output=conexoes-supabase.pdf",
+    "status:md": "node analyze-connections.js && echo 'Relatório de status gerado em status-report.md'",
+    "status:pdf": "node generate-status-report.js",
+    "report": "node generate-report.js",
+    "test": "npm run test:health && npm run test:api && npm run test:data && npm run test:components && npm run test:permissions"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4",
+    "chalk": "^4.1.2",
+    "dotenv": "^16.3.1",
+    "marked": "^4.3.0",
+    "node-fetch": "^2.7.0",
+    "pdf-lib": "^1.17.1",
+    "playwright": "^1.40.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

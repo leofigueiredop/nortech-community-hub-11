@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { 
   Bold, 
   Italic, 
@@ -38,13 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Card } from '@/components/ui/card';
-import { useApi } from '@/hooks/useApi';
+import { api } from '@/api/ApiClient';
 import { useAuth } from '@/context/AuthContext';
 import { Post } from '@/types/post';
 
@@ -53,14 +47,10 @@ interface CreatePostDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-// Mock data for spaces - TODO: Replace with data from API
-const spaces = [
-  { id: 1, name: 'General Discussion' },
-  { id: 2, name: 'Free Group' },
-  { id: 3, name: 'Premium Group' },
-  { id: 4, name: 'Mentorship Circle' },
-  { id: 5, name: 'Announcements' },
-];
+interface Space {
+  id: string;
+  name: string;
+}
 
 const TextFormatButton = ({ 
   icon: Icon, 
@@ -85,14 +75,22 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedSpace, setSelectedSpace] = useState<string>('');
+  const [spaces, setSpaces] = useState<Space[]>([]);
+  const [loadingSpaces, setLoadingSpaces] = useState(false);
   const [showPollDialog, setShowPollDialog] = useState(false);
   const [showFileAttachDialog, setShowFileAttachDialog] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { client } = useApi();
   const { user, community } = useAuth();
+
+  // Load spaces when dialog opens
+  useEffect(() => {
+    if (open && community) {
+      loadSpaces();
+    }
+  }, [open, community]);
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -102,6 +100,38 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
       setSelectedSpace('');
     }
   }, [open]);
+
+  // Load spaces from the API
+  const loadSpaces = async () => {
+    if (!community) return;
+    
+    try {
+      setLoadingSpaces(true);
+      const { data, error } = await api.supabase
+        .from('spaces')
+        .select('id, name')
+        .eq('community_id', community.id)
+        .order('name');
+        
+      if (error) throw error;
+      
+      setSpaces(data || []);
+      
+      // If there's at least one space, select the first one by default
+      if (data && data.length > 0) {
+        setSelectedSpace(data[0].id);
+      }
+    } catch (err) {
+      console.error('Error loading spaces:', err);
+      toast({
+        title: "Error Loading Spaces",
+        description: "Could not load spaces from the server.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingSpaces(false);
+    }
+  };
 
   // Poll state
   const [pollQuestion, setPollQuestion] = useState('');
@@ -178,24 +208,23 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
     try {
       setIsPublishing(true);
 
-      // Create post object
-      const newPost: Partial<Post> = {
-        title: title.trim() || undefined,
-        content: content.trim(),
-        author_id: user.id,
-        community_id: community.id,
-        space_id: selectedSpace,
-        type: 'text', // Default type
-        status: 'published',
-        view_count: 0,
-        comment_count: 0,
-        pinned: false,
-        tags: [],
-        visibility: 'public', // Default visibility
-      };
-
-      // Call repository to create post
-      const createdPost = await client.posts.create(newPost);
+      // Create post using direct Supabase query
+      const { data, error } = await api.supabase
+        .from('posts')
+        .insert({
+          title: title.trim() || null,
+          content: content.trim(),
+          author_id: user.id,
+          community_id: community.id,
+          space_id: selectedSpace,
+          type: 'text', // Default type
+          visibility: 'public', // Default visibility
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select();
+        
+      if (error) throw error;
 
       toast({
         title: "Post Published",
@@ -307,18 +336,23 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
             <div className="flex items-center gap-3">
               <Select value={selectedSpace} onValueChange={setSelectedSpace}>
                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white min-w-[200px]">
-                  <SelectValue placeholder="Choose a space to post in" />
+                  <SelectValue placeholder={loadingSpaces ? "Loading spaces..." : "Choose a space to post in"} />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700 text-white">
                   {spaces.map((space) => (
                     <SelectItem 
                       key={space.id} 
-                      value={space.id.toString()}
+                      value={space.id}
                       className="hover:bg-gray-700"
                     >
                       {space.name}
                     </SelectItem>
                   ))}
+                  {spaces.length === 0 && !loadingSpaces && (
+                    <div className="px-2 py-1 text-sm text-gray-400">
+                      No spaces found
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
 
