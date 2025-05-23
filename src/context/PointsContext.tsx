@@ -66,21 +66,29 @@ const PointsContext = createContext<PointsContextType>({
 // Points provider component
 export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
+  usePointsSubscription();
   const [totalPoints, setTotalPoints] = useState(0);
   const [pointsHistory, setPointsHistory] = useState<PointsActivity[]>([]);
   const api = ApiClient.getInstance();
 
   // Skip subscription during onboarding
-  useEffect(() => {
-    if (!user || !user.isOnboarded) return;
-    usePointsSubscription();
-  }, [user]);
+  // useEffect(() => {
+  //   if (!user || !user.isOnboarded) return;
+  //   usePointsSubscription();
+  // }, [user]);
+
+
 
   useEffect(() => {
     // Load initial points data
     const loadPointsData = async () => {
       // Skip if no user or if user is in onboarding
-      if (!user || !user.isOnboarded) {
+      // if (!user || !user.isOnboarded) {
+      //   setTotalPoints(0);
+      //   setPointsHistory([]);
+      //   return;
+      // }
+      if (!user) {
         setTotalPoints(0);
         setPointsHistory([]);
         return;
@@ -241,7 +249,8 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const loadPointsHistory = async () => {
-    if (!user || !user.isOnboarded) return;
+    // if (!user || !user.isOnboarded) return;
+    if (!user) return;
     
     try {
       const { data: history, error } = await supabase

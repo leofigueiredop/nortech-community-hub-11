@@ -3,8 +3,8 @@ import { ReactNode } from 'react';
 
 export type EventType = 'workshop' | 'webinar' | 'meetup' | 'conference' | 'course' | 'other' | 'live' | 'mentoria';
 
-export interface Event {
-  id: string | number;
+export interface EventWithUI {
+  id: number;
   community_id: string;
   title: string;
   description: string;
