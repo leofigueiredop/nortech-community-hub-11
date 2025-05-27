@@ -1,22 +1,23 @@
-import React from 'react';
-import { 
-  Settings, Palette, RefreshCw, Trophy, 
-  MessageSquare, FileText, Layout, Shield, Workflow, Bot,
-  DollarSign, BarChart3, Share2, CreditCard, Bell,
-  Globe, Search, Star
-} from 'lucide-react';
-import SectionDivider from './SectionDivider';
-import SettingsMenuItem from './SettingsMenuItem';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Search, Star, Settings, Palette, Globe, RefreshCw, Layout, MessageSquare, FileText, Shield, 
+  Workflow, Bot, Trophy, CreditCard, DollarSign, BarChart3, Share2, Bell, Key } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import SettingsMenuItem from './SettingsMenuItem';
+import { useTheme } from '@/context/ThemeContext';
 
 interface SettingsSidebarProps {
   activeSection?: string;
 }
 
+const SectionDivider = () => (
+  <div className="h-px bg-gray-200 dark:bg-gray-700 mx-3 my-3" />
+);
+
 const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection = "general" }) => {
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [pinnedItems, setPinnedItems] = React.useState(["branding", "analytics"]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pinnedItems, setPinnedItems] = useState(["branding", "analytics"]);
+  const { colors } = useTheme();
   
   const togglePin = (sectionName: string) => {
     setPinnedItems(prev => 
@@ -42,8 +43,11 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection = "gene
 
       {pinnedItems.length > 0 && (
         <div className="pt-3">
-          <div className="px-3 pb-1 text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-2">
-            <Star className="h-3.5 w-3.5" />
+          <div 
+            className="px-3 pb-1 text-xs font-semibold flex items-center gap-2"
+            style={{ color: colors.primaryColor }}
+          >
+            <Star className="h-3.5 w-3.5" style={{ color: colors.primaryColor }} />
             PINNED ITEMS
           </div>
           <div className="space-y-1 px-2">

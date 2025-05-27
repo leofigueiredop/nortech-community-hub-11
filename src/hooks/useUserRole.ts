@@ -10,6 +10,7 @@ interface UseUserRoleResult {
   isAdmin: boolean;
   isModerator: boolean;
   isMember: boolean;
+  isOwnerOrAdmin: boolean; // Convenience property for frequent check
   loading: boolean;
   error: string | null;
 }
@@ -31,14 +32,26 @@ export function useUserRole(): UseUserRoleResult {
       try {
         setLoading(true);
 
-        // First check if the user is the creator/owner of the community
-        if (community.owner_id === user.id) {
+        // First check if the user is the creator of the community
+        // Looking for creator_id in the communities table
+        const { data: communityData, error: communityError } = await api.supabase
+          .from('communities')
+          .select('creator_id')
+          .eq('id', community.id)
+          .single();
+
+        if (communityError) {
+          console.error('Error fetching community data:', communityError);
+          throw communityError;
+        }
+
+        if (communityData && communityData.creator_id === user.id) {
           setRole('owner');
           setLoading(false);
           return;
         }
 
-        // Query the community_members table to get the role
+        // If not creator, query the community_members table to get the role
         const { data, error } = await api.supabase
           .from('community_members')
           .select('role')
@@ -47,18 +60,22 @@ export function useUserRole(): UseUserRoleResult {
           .single();
 
         if (error) {
+          console.error('Error fetching user role from community_members:', error);
           throw error;
         }
 
         if (data) {
           setRole(data.role as UserRole);
         } else {
+          // User exists in auth but not in community_members
           setRole('none');
         }
       } catch (err) {
         console.error('Error fetching user role:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch user role');
-        // Fallback to checking if the user is at least a member
+        
+        // Fallback to checking if the user has any role (default to member)
+        // This is a safe fallback in case the role can't be determined
         setRole(user && community ? 'member' : 'none');
       } finally {
         setLoading(false);
@@ -74,6 +91,7 @@ export function useUserRole(): UseUserRoleResult {
     isAdmin: role === 'owner' || role === 'admin',
     isModerator: role === 'owner' || role === 'admin' || role === 'moderator',
     isMember: role === 'owner' || role === 'admin' || role === 'moderator' || role === 'member',
+    isOwnerOrAdmin: role === 'owner' || role === 'admin', // Convenient property for common check
     loading,
     error
   };

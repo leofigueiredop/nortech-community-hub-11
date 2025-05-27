@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { Community } from '@/types/community';
-import { mockCommunities } from '@/types/community';
+import { api } from '@/api/ApiClient';
 
 /**
  * Custom hook to fetch communities from the API
- * Currently uses mock data but can be updated to fetch from API
  */
 export function useCommunities() {
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -16,14 +14,21 @@ export function useCommunities() {
     const fetchCommunities = async () => {
       try {
         setIsLoading(true);
-        // In a real implementation, this would fetch from an API
-        // const response = await fetch('/api/communities');
-        // const data = await response.json();
         
-        // Using mock data instead
-        setCommunities(mockCommunities);
+        // Fetch communities directly from Supabase
+        const { data: fetchedCommunities, error: apiError } = await api.supabase
+          .from('communities')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (apiError) {
+          throw apiError;
+        }
+        
+        setCommunities(fetchedCommunities || []);
         setIsLoading(false);
       } catch (err: any) {
+        console.error('Error fetching communities:', err);
         setError(err instanceof Error ? err : new Error('Failed to fetch communities'));
         setIsLoading(false);
       }

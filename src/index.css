@@ -42,6 +42,30 @@
     --sidebar-muted-foreground: 215.4 16.3% 46.9%;
     --sidebar-border: 214.3 31.8% 91.4%;
     --sidebar-ring: 222.2 84% 4.9%;
+    --sidebar-primary: 260 80% 64%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 260 80% 64%;
+    --sidebar-accent-foreground: 210 40% 98%;
+
+    /* Toast custom variables */
+    --toast-background: 0 0% 100%;
+    --toast-foreground: 222.2 84% 4.9%;
+    --toast-border: 214.3 31.8% 91.4%;
+    --toast-title: 222.2 84% 4.9%;
+    --toast-description: 215.4 16.3% 46.9%;
+    --toast-destructive-background: 0 84.2% 60.2%;
+    --toast-destructive-foreground: 210 40% 98%;
+
+    /* Custom UI element variables */
+    --active-item-bg: 260 80% 64% / 0.15;
+    --hover-item-bg: 260 80% 64% / 0.1;
+    --active-icon: 260 80% 64%;
+    --menu-active: 260 80% 64%;
+    --tab-active: 260 80% 64%;
+    --pinned-bg: 260 80% 64% / 0.15;
+    --pinned-color: 260 80% 64%;
+    --selected: 260 80% 64%;
+    --highlight: 260 80% 64%;
   }
 
   .dark {
@@ -79,6 +103,30 @@
     --sidebar-muted-foreground: 215 20.2% 65.1%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-primary: 217.2 91.2% 59.8%;
+    --sidebar-primary-foreground: 222.2 47.4% 11.2%;
+    --sidebar-accent: 217.2 91.2% 59.8%;
+    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+
+    /* Toast custom variables for dark mode */
+    --toast-background: 222.2 84% 4.9%;
+    --toast-foreground: 210 40% 98%;
+    --toast-border: 217.2 32.6% 17.5%;
+    --toast-title: 210 40% 98%;
+    --toast-description: 215 20.2% 65.1%;
+    --toast-destructive-background: 0 62.8% 30.6%;
+    --toast-destructive-foreground: 210 40% 98%;
+
+    /* Custom UI elements for dark mode */
+    --active-item-bg: 217.2 91.2% 59.8% / 0.2;
+    --hover-item-bg: 217.2 91.2% 59.8% / 0.15;
+    --active-icon: 217.2 91.2% 59.8%;
+    --menu-active: 217.2 91.2% 59.8%;
+    --tab-active: 217.2 91.2% 59.8%;
+    --pinned-bg: 217.2 91.2% 59.8% / 0.2;
+    --pinned-color: 217.2 91.2% 59.8%;
+    --selected: 217.2 91.2% 59.8%;
+    --highlight: 217.2 91.2% 59.8%;
   }
 }
 

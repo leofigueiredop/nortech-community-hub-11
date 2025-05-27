@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useAuth } from '@/context/AuthContext';
 
 interface ViewControlsProps {
   currentView: string;
@@ -22,10 +23,11 @@ const ViewControls: React.FC<ViewControlsProps> = ({
   onCreatePost 
 }) => {
   const { isMobile } = useIsMobile();
-  const { isOwner, isAdmin, loading } = useUserRole();
+  const { loading } = useUserRole();
+  const { user } = useAuth();
   
-  // Only owners and admins can create posts
-  const canCreatePost = isOwner || isAdmin;
+  // Qualquer usuário autenticado pode criar posts
+  const canCreatePost = !!user;
   
   return (
     <div className="flex items-center gap-3">

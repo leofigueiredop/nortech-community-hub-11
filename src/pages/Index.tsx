@@ -113,13 +113,13 @@ const Index: React.FC = () => {
           </Link>
           
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/dashboard" className="text-gray-600 hover:text-gray-900">
+            <Link to={user ? "/dashboard" : "/"} className="text-gray-600 hover:text-gray-900">
               Browse
             </Link>
-            <Link to="/events" className="text-gray-600 hover:text-gray-900">
+            <Link to={user ? "/events" : "/"} className="text-gray-600 hover:text-gray-900">
               Events
             </Link>
-            <Link to="/resources" className="text-gray-600 hover:text-gray-900">
+            <Link to={user ? "/resources" : "/"} className="text-gray-600 hover:text-gray-900">
               Resources
             </Link>
             <Link to="/about" className="text-gray-600 hover:text-gray-900">
@@ -128,20 +128,38 @@ const Index: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <Link to="/login" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
-              Log in
-            </Link>
-            <Button asChild variant="outline" className="hidden sm:flex">
-              <Link to="/onboarding/profile">
-                Register
-              </Link>
-            </Button>
-            <Button asChild className="bg-nortech-purple hover:bg-nortech-purple/90">
-              <Link to="/onboarding">
-                <Plus size={16} className="mr-1" />
-                Create Community
-              </Link>
-            </Button>
+            {user ? (
+              <>
+                <Button asChild variant="outline">
+                  <Link to="/dashboard">
+                    Dashboard
+                  </Link>
+                </Button>
+                <Button asChild className="bg-nortech-purple hover:bg-nortech-purple/90">
+                  <Link to="/onboarding/welcome">
+                    <Plus size={16} className="mr-1" />
+                    Create Community
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/auth/login" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+                  Log in
+                </Link>
+                <Button asChild variant="outline" className="hidden sm:flex">
+                  <Link to="/auth/signup">
+                    Register
+                  </Link>
+                </Button>
+                <Button asChild className="bg-nortech-purple hover:bg-nortech-purple/90">
+                  <Link to="/onboarding/welcome">
+                    <Plus size={16} className="mr-1" />
+                    Create Community
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>

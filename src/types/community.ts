@@ -65,6 +65,10 @@ export interface CommunityContext {
     secondary_color?: string;
     background_color?: string;
     text_color?: string;
+    card_color?: string;
+    muted_color?: string;
+    accent_color?: string;
+    border_color?: string;
   };
   owner_id?: string;
 }

@@ -14,7 +14,6 @@ import ActiveUsersList from '@/components/discussions/ActiveUsersList';
 import { DiscussionFilter } from '@/types/discussion';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
-import { useUserRole } from '@/hooks/useUserRole';
 
 const DiscussionTopic = () => {
   const { topicId } = useParams<{ topicId: string }>();
@@ -26,7 +25,6 @@ const DiscussionTopic = () => {
   const { toast } = useToast();
   const { viewAs } = useViewContext();
   const { user } = useAuth();
-  const { isOwnerOrAdmin, isLoading } = useUserRole();
   const { 
     loadDiscussionsByTopic,
     currentTopic,
@@ -73,8 +71,8 @@ const DiscussionTopic = () => {
     }
   };
   
-  // Determine if user can create discussions based on role and auth
-  const canCreateDiscussion = !isLoading && (isOwnerOrAdmin || viewAs === 'admin' || viewAs === 'moderator' || user);
+  // Qualquer usuário autenticado pode criar discussões
+  const canCreateDiscussion = !!user;
   
   // Handle back button click
   const handleBackClick = () => {

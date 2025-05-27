@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Settings, Palette, Globe, RefreshCw, 
@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
 
 const settingsGroups = [
   {
@@ -54,7 +55,8 @@ const settingsGroups = [
 ];
 
 const SettingsMenu: React.FC = () => {
-  const [pinnedItems, setPinnedItems] = React.useState(["analytics", "branding"]);
+  const [pinnedItems, setPinnedItems] = useState(["analytics", "branding"]);
+  const { colors } = useTheme();
   
   const togglePin = (itemName: string) => {
     setPinnedItems(prev => 
@@ -69,8 +71,13 @@ const SettingsMenu: React.FC = () => {
       {pinnedItems.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Star className="h-4 w-4 text-amber-400" />
-            <h2 className="font-semibold text-lg">Pinned Settings</h2>
+            <Star 
+              className="h-4 w-4" 
+              style={{ fill: colors.primaryColor, color: colors.primaryColor }}
+            />
+            <h2 className="font-semibold text-lg" style={{ color: colors.primaryColor }}>
+              Pinned Settings
+            </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {settingsGroups.flatMap(group => 
@@ -78,7 +85,12 @@ const SettingsMenu: React.FC = () => {
                 pinnedItems.includes(item.name.toLowerCase())
               ).map((item) => (
                 <Link key={`pinned-${item.name.toLowerCase()}`} to={item.path}>
-                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow flex items-center gap-3">
+                  <div 
+                    className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow flex items-center gap-3"
+                    style={{ 
+                      backgroundColor: `rgba(${hexToRgb(colors.primaryColor)}, 0.1)`
+                    }}
+                  >
                     <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full p-2">
                       {item.icon}
                     </div>
@@ -94,7 +106,10 @@ const SettingsMenu: React.FC = () => {
                         togglePin(item.name.toLowerCase());
                       }}
                     >
-                      <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                      <Star 
+                        className="h-4 w-4" 
+                        style={{ fill: colors.primaryColor, color: colors.primaryColor }}
+                      />
                     </Button>
                   </div>
                 </Link>
@@ -131,7 +146,13 @@ const SettingsMenu: React.FC = () => {
                         togglePin(item.name.toLowerCase());
                       }}
                     >
-                      <Star className={`h-4 w-4 ${pinnedItems.includes(item.name.toLowerCase()) ? 'fill-amber-400 text-amber-400' : 'text-gray-400'}`} />
+                      <Star 
+                        className="h-4 w-4" 
+                        style={pinnedItems.includes(item.name.toLowerCase()) 
+                          ? { fill: colors.primaryColor, color: colors.primaryColor } 
+                          : { color: 'var(--muted-foreground)' }
+                        }
+                      />
                     </Button>
                   </div>
                 </div>
@@ -142,6 +163,19 @@ const SettingsMenu: React.FC = () => {
       ))}
     </div>
   );
+};
+
+// Helper function to convert hex color to RGB
+const hexToRgb = (hex: string): string => {
+  // Remove # if present
+  const cleanHex = hex.replace('#', '');
+  
+  // Parse RGB values
+  const r = parseInt(cleanHex.substring(0, 2), 16);
+  const g = parseInt(cleanHex.substring(2, 4), 16);
+  const b = parseInt(cleanHex.substring(4, 6), 16);
+  
+  return `${r}, ${g}, ${b}`;
 };
 
 export default SettingsMenu;

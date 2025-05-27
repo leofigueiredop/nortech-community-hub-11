@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { User, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import { api } from '@/api/ApiClient';
+import { useAuth } from '@/context/AuthContext';
 
 const formSchema = z.object({
   fullName: z.string().min(2, 'Nome completo é obrigatório'),
@@ -25,6 +25,7 @@ const CreatorForm: React.FC = () => {
   const navigate = useNavigate();
   const [showBadge, setShowBadge] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register, setCurrentOnboardingStep } = useAuth();
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -39,13 +40,8 @@ const CreatorForm: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Register the user as a community creator
-      const response = await api.auth.register({ 
-        email: data.email, 
-        password: data.password, 
-        name: data.fullName,
-        signupType: 'community_creator'
-      });
+      // Register the user using our auth context
+      await register(data.email, data.password, data.fullName);
       
       // Show achievement badge
       setShowBadge(true);
@@ -56,11 +52,13 @@ const CreatorForm: React.FC = () => {
         duration: 3000,
       });
       
-      // Wait for auth state to be properly set
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Update onboarding step
+      setCurrentOnboardingStep(2);
       
-      // Navigate to community type selection
-      navigate('/onboarding/community-type');
+      // Navigate to community creation
+      setTimeout(() => {
+        navigate('/onboarding/community');
+      }, 1500);
     } catch (error) {
       console.error('Registration error:', error);
       toast({
@@ -78,18 +76,21 @@ const CreatorForm: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Note: This is a placeholder for Google auth with Supabase
+      // This will be implemented with Supabase OAuth later
       toast({
         title: "Google Sign-in",
         description: "Google authentication is not fully implemented yet with Supabase",
         duration: 3000,
       });
       
-      // This would be replaced with actual Google auth
+      // Placeholder for now
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Show achievement badge
       setShowBadge(true);
+      
+      // Update onboarding step
+      setCurrentOnboardingStep(2);
       
       setTimeout(() => {
         navigate('/onboarding/community');

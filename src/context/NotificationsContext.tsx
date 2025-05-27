@@ -1,128 +1,162 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import { api } from '@/api/ApiClient';
+
+export type NotificationType = 'post' | 'reply' | 'event' | 'announcement' | 'milestone' | 'system';
 
 export interface Notification {
   id: string;
-  type: 'post' | 'event' | 'reply' | 'mention' | 'content' | 'invitation' | 'milestone' | 'announcement';
+  type: NotificationType;
   title: string;
-  message: string;
-  link: string;
+  message?: string;
+  link?: string;
   timestamp: Date;
   read: boolean;
-  priority?: 'normal' | 'high';
-  icon?: React.ReactNode;
+  priority?: 'low' | 'medium' | 'high';
 }
 
 interface NotificationsContextType {
   notifications: Notification[];
   unreadCount: number;
+  totalCount: number;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
-  deleteNotification: (id: string) => void;
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;
-  notificationsOpen: boolean;
-  setNotificationsOpen: (open: boolean) => void;
+  loading: boolean;
+  error: string | null;
 }
 
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
-// Mock data for demonstrations
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    type: 'post',
-    title: 'New post in Web3 Space',
-    message: 'Pablo just posted "Introduction to Smart Contracts" in the Web3 space',
-    link: '/feed',
-    timestamp: new Date(Date.now() - 25 * 60 * 1000), // 25 minutes ago
-    read: false
-  },
-  {
-    id: '2',
-    type: 'reply',
-    title: 'New reply to your post',
-    message: 'Maria replied to your post "React Best Practices"',
-    link: '/feed',
-    timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
-    read: false
-  },
-  {
-    id: '3',
-    type: 'event',
-    title: 'Upcoming event reminder',
-    message: 'Your scheduled event "Web3 Workshop" starts in 30 minutes',
-    link: '/events',
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-    read: true
-  },
-  {
-    id: '4',
-    type: 'announcement',
-    title: 'Platform Update',
-    message: 'We just launched a new Notifications system! Check your settings to customize your preferences.',
-    link: '/settings/notifications',
-    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-    read: true,
-    priority: 'high'
-  },
-  {
-    id: '5',
-    type: 'milestone',
-    title: 'Achievement Unlocked!',
-    message: "Congratulations! You've completed your first course on Nortech Communities.",
-    link: '/courses',
-    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-    read: true
-  }
-];
-
 export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  
-  const unreadCount = notifications.filter(notif => !notif.read).length;
-  
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
-  };
-  
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notif => ({ ...notif, read: true }))
-    );
-  };
-  
-  const deleteNotification = (id: string) => {
-    setNotifications(prev => 
-      prev.filter(notif => notif.id !== id)
-    );
-  };
-  
-  const addNotification = (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
-    const newNotification: Notification = {
-      ...notification,
-      id: Date.now().toString(),
-      timestamp: new Date(),
-      read: false
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user, community } = useAuth();
+
+  // Fetch notifications when user or community changes
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!user || !community) {
+        setNotifications([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        
+        // Get notifications directly from Supabase
+        const { data: apiNotifications, error: fetchError } = await api.supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('community_id', community.id)
+          .order('created_at', { ascending: false });
+          
+        if (fetchError) {
+          throw fetchError;
+        }
+        
+        // Format notifications
+        if (apiNotifications) {
+          const formattedNotifications = apiNotifications.map(notification => ({
+            id: notification.id,
+            type: (notification.type || 'system') as NotificationType,
+            title: notification.title,
+            message: notification.content,
+            link: notification.link,
+            timestamp: new Date(notification.created_at),
+            read: !!notification.read,
+            priority: 'medium' as 'low' | 'medium' | 'high'
+          }));
+          
+          setNotifications(formattedNotifications);
+        }
+        
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching notifications:', err);
+        setError('Failed to load notifications');
+      } finally {
+        setLoading(false);
+      }
     };
+
+    fetchNotifications();
     
-    setNotifications(prev => [newNotification, ...prev]);
+    // Set up polling or realtime subscription for new notifications
+    const notificationInterval = setInterval(fetchNotifications, 60000); // Poll every minute
+    
+    return () => {
+      clearInterval(notificationInterval);
+    };
+  }, [user, community]);
+
+  // Helper to count unread notifications
+  const unreadCount = notifications.filter(notification => !notification.read).length;
+  const totalCount = notifications.length;
+
+  // Mark notification as read
+  const markAsRead = async (id: string) => {
+    try {
+      // Update in API directly using Supabase
+      const { error: updateError } = await api.supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', id);
+        
+      if (updateError) {
+        throw updateError;
+      }
+      
+      // Update local state
+      setNotifications(prevNotifications =>
+        prevNotifications.map(notification =>
+          notification.id === id
+            ? { ...notification, read: true }
+            : notification
+        )
+      );
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+    }
   };
-  
+
+  // Mark all notifications as read
+  const markAllAsRead = async () => {
+    if (notifications.length === 0 || !user || !community) return;
+    
+    try {
+      // Update all notifications for this user and community
+      const { error: updateError } = await api.supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('user_id', user.id)
+        .eq('community_id', community.id);
+        
+      if (updateError) {
+        throw updateError;
+      }
+      
+      // Update local state
+      setNotifications(prevNotifications =>
+        prevNotifications.map(notification => ({ ...notification, read: true }))
+      );
+    } catch (err) {
+      console.error('Error marking all notifications as read:', err);
+    }
+  };
+
   return (
     <NotificationsContext.Provider
       value={{
         notifications,
         unreadCount,
+        totalCount,
         markAsRead,
         markAllAsRead,
-        deleteNotification,
-        addNotification,
-        notificationsOpen,
-        setNotificationsOpen
+        loading,
+        error
       }}
     >
       {children}
@@ -132,8 +166,10 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useNotifications = () => {
   const context = useContext(NotificationsContext);
+  
   if (context === undefined) {
     throw new Error('useNotifications must be used within a NotificationsProvider');
   }
+  
   return context;
 };
