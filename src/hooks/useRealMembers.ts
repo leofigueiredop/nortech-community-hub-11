@@ -5,6 +5,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { CommunityMember } from '@/types/community';
 import { MemberFilters } from '@/api/interfaces/IMembersRepository';
 import { differenceInDays, formatDistance } from 'date-fns';
+import { EmailService } from '@/services/EmailService';
 
 // Expandir interface ExtendedMember para incluir subscription_plan_id opcional
 export interface ExtendedMember extends CommunityMember {
@@ -106,18 +107,57 @@ export const useRealMembers = () => {
   }, [toast]);
 
   // Invite a new member
-  const inviteMember = useCallback(async (email: string, role: string = 'member') => {
+  const inviteMember = useCallback(async (email: string, role: string = 'member', plan: string = 'Free') => {
     setLoading(true);
     try {
-      const { error } = await api.members.inviteMember(email, role);
-      if (error) {
-        throw error;
+      console.log('Inviting member:', { email, role, plan, community: community?.id, user: user?.id });
+      
+      if (!community?.id) {
+        throw new Error('No community context available');
       }
       
-      toast({
-        title: 'Invitation Sent',
-        description: `Invitation has been sent to ${email}`,
+      if (!user?.id) {
+        throw new Error('No user context available');
+      }
+
+      // Ensure community context is set in API client
+      api.setCurrentCommunity(community.id);
+      
+      // Create invitation in database
+      const { data: invite, error: inviteError } = await api.invite.createInvite(email, role, user.id);
+      if (inviteError) {
+        console.error('Invite creation error:', inviteError);
+        throw inviteError;
+      }
+      
+      console.log('Invitation created:', invite);
+      
+      // Generate invitation link
+      const inviteLink = `${window.location.origin}/invite?email=${encodeURIComponent(email)}&role=${role}&communityId=${community.id}&communityName=${encodeURIComponent(community.name || 'Community')}`;
+      
+      // Send invitation email
+      const emailResult = await EmailService.sendMemberInvite({
+        recipientEmail: email,
+        communityName: community.name || 'Community',
+        inviterName: user.profile?.full_name || 'Community Admin',
+        role: role,
+        plan: plan,
+        inviteLink: inviteLink
       });
+      
+      if (emailResult.success) {
+        toast({
+          title: 'Invitation Sent',
+          description: `Invitation email has been sent to ${email}`,
+        });
+      } else {
+        // Still show success for the invitation creation, but warn about email
+        toast({
+          title: 'Invitation Created',
+          description: `Invitation created but email could not be sent: ${emailResult.error}`,
+          variant: 'default',
+        });
+      }
       
       return true;
     } catch (error) {
@@ -131,7 +171,7 @@ export const useRealMembers = () => {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, community, user]);
 
   // Remove a member
   const removeMember = useCallback(async (userId: string) => {

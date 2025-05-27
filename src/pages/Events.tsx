@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Calendar, List, Grid } from 'lucide-react';
 import { usePoints } from '@/context/PointsContext';
 import { useNotifications } from '@/context/NotificationsContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import EventsList from '@/components/events/EventsList';
 import EventGrid from '@/components/events/EventGrid';
 import { Event, EventType } from '@/components/events/types/EventTypes';
@@ -36,7 +37,7 @@ const Events = () => {
   
   const { toast } = useToast();
   const { awardPoints } = usePoints();
-  const { addNotification } = useNotifications();
+  const { isOwnerOrAdmin } = useUserRole();
   const { 
     loading: eventsLoading, 
     events, 
@@ -100,12 +101,7 @@ const Events = () => {
           points: 5
         });
         
-        addNotification({
-          type: 'event',
-          title: 'Event Registration Confirmed',
-          message: `You're registered for "${event.title}" on ${format(new Date(event.date), 'dd/MM/yyyy')}`,
-          link: '/events',
-        });
+        // Event registration confirmed
       }
     }
     
@@ -174,7 +170,7 @@ const Events = () => {
             </TabsContent>
             
             <TabsContent value="list">
-              {loading ? (
+              {eventsLoading ? (
                 <div className="flex justify-center items-center py-12">
                   <div className="spinner animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full"></div>
                 </div>
@@ -188,7 +184,7 @@ const Events = () => {
             </TabsContent>
             
             <TabsContent value="calendar" className="md:flex space-x-4">
-              {loading ? (
+              {eventsLoading ? (
                 <div className="flex justify-center items-center py-12 w-full">
                   <div className="spinner animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full"></div>
                 </div>

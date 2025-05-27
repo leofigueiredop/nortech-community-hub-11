@@ -28,6 +28,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/api/ApiClient';
 import { useAuth } from '@/context/AuthContext';
 import PostComments from './PostComments';
+import { UserTier, shouldBlurContent, SPACE_ACCESS } from '@/types/subscription';
 
 export interface PostProps {
   id: string;
@@ -42,6 +43,7 @@ export interface PostProps {
   likes: number;
   comments: number;
   space: string;
+  spaceTier?: UserTier;
   type?: 'post' | 'event' | 'live' | 'content';
   isPinned?: boolean;
   isAnnouncement?: boolean;
@@ -62,6 +64,7 @@ const Post: React.FC<PostProps> = ({
   likes, 
   comments,
   space,
+  spaceTier,
   type,
   isPinned,
   isAnnouncement,
@@ -72,8 +75,12 @@ const Post: React.FC<PostProps> = ({
   showAccessBadge = false,
   onCommentClick
 }) => {
+  // Ensure likes and comments are always numbers
+  const safeLikes = typeof likes === 'number' ? likes : 0;
+  const safeComments = typeof comments === 'number' ? comments : 0;
+  
   const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(likes);
+  const [likeCount, setLikeCount] = useState(safeLikes);
   const [premiumInteractions, setPremiumInteractions] = useState(0);
   const [loading, setLoading] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -86,7 +93,7 @@ const Post: React.FC<PostProps> = ({
     
     const fetchUserLikeStatus = async () => {
       try {
-        const { data: userReaction } = await api.reactions.getUserReaction(id, user.id);
+        const userReaction = await api.posts.getUserReaction(id, user.id);
         setIsLiked(!!userReaction);
       } catch (error) {
         console.error('Error fetching like status:', error);
@@ -111,12 +118,12 @@ const Post: React.FC<PostProps> = ({
     try {
       if (isLiked) {
         // Remove the like
-        await api.reactions.removeReaction(id, user.id);
+        await api.posts.removeReaction(id, user.id);
         setLikeCount(prev => prev - 1);
         setIsLiked(false);
       } else {
         // Add the like
-        await api.reactions.addReaction(id, user.id, 'like');
+        await api.posts.addReaction(id, user.id, 'like');
         setLikeCount(prev => prev + 1);
         setIsLiked(true);
         
@@ -225,10 +232,59 @@ const Post: React.FC<PostProps> = ({
   };
   
   const renderContent = () => {
+    const userTier = user?.tier || 'free';
+    const postSpaceTier = spaceTier || SPACE_ACCESS[space]?.requiredTier || 'free';
+    const shouldBlur = shouldBlurContent(postSpaceTier, userTier);
+    
     if (isAnnouncement) {
       return <p className="whitespace-pre-line text-sm">{content}</p>;
     }
     
+    // Check if content should be blurred based on space tier vs user tier
+    if (shouldBlur) {
+      const tierNames = {
+        premium: 'Premium',
+        mentor: 'Mentor',
+        free: 'Free'
+      };
+      
+      return (
+        <>
+          {/* Show teaser if available */}
+          {teaser && <p className="whitespace-pre-line text-sm mb-4">{teaser}</p>}
+          
+          {/* Blurred content preview */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white dark:to-gray-900 z-10 pointer-events-none"></div>
+            <div className="blur-sm select-none pointer-events-none">
+              <p className="whitespace-pre-line text-sm mb-2">
+                {content}
+              </p>
+            </div>
+            <div className="flex flex-col items-center justify-center mt-6 z-20 relative">
+              <div className="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-lg text-center max-w-md">
+                <Lock size={24} className="mx-auto mb-3 text-purple-600" />
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  {tierNames[postSpaceTier]} Content
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  This content is available exclusively for {tierNames[postSpaceTier].toLowerCase()} members
+                </p>
+                <Button 
+                  onClick={handleSubscribe}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  <Lock size={16} className="mr-2" />
+                  Upgrade to {tierNames[postSpaceTier]}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+    
+    // Legacy premium content check (for backward compatibility)
     if (isPaid && accessBadge === 'premium') {
       return (
         <>
@@ -363,7 +419,7 @@ const Post: React.FC<PostProps> = ({
             className={`text-xs flex items-center gap-1 ${showComments ? 'text-purple-600' : ''}`}
             onClick={handleCommentClick}
           >
-            <MessageSquare size={14} className={showComments ? 'fill-purple-600' : ''} /> {comments}
+            <MessageSquare size={14} className={showComments ? 'fill-purple-600' : ''} /> {safeComments}
           </Button>
         </div>
         <Button variant="ghost" size="sm" className="text-xs flex items-center gap-1">

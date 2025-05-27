@@ -50,6 +50,7 @@ interface CreatePostDialogProps {
 interface Space {
   id: string;
   name: string;
+  description?: string;
 }
 
 const TextFormatButton = ({ 
@@ -101,31 +102,34 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
     }
   }, [open]);
 
-  // Load spaces from the API
+  // Load spaces from predefined categories
   const loadSpaces = async () => {
     if (!community) return;
     
     try {
       setLoadingSpaces(true);
-      const { data, error } = await api.supabase
-        .from('spaces')
-        .select('id, name')
-        .eq('community_id', community.id)
-        .order('name');
-        
-      if (error) throw error;
       
-      setSpaces(data || []);
+      // Define spaces based on categories (Free, Premium, Mentor)
+      const predefinedSpaces: Space[] = [
+        { id: 'general-discussion', name: 'General Discussion', description: 'General community discussions' },
+        { id: 'free-group', name: 'Free Group', description: 'Free community group' },
+        { id: 'premium-group', name: 'Premium Group', description: 'Premium members group' },
+        { id: 'mentorship-circle', name: 'Mentorship Circle', description: 'Mentorship and guidance' },
+        { id: 'announcements', name: 'Announcements', description: 'Important announcements' }
+      ];
       
-      // If there's at least one space, select the first one by default
-      if (data && data.length > 0) {
-        setSelectedSpace(data[0].id);
+      setSpaces(predefinedSpaces);
+      
+      // Select the first space by default
+      const firstSpace = predefinedSpaces[0];
+      if (firstSpace) {
+        setSelectedSpace(firstSpace.id);
       }
     } catch (err) {
       console.error('Error loading spaces:', err);
       toast({
         title: "Error Loading Spaces",
-        description: "Could not load spaces from the server.",
+        description: "Could not load spaces.",
         variant: "destructive"
       });
     } finally {
@@ -212,15 +216,10 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
       const { data, error } = await api.supabase
         .from('posts')
         .insert({
-          title: title.trim() || null,
-          content: content.trim(),
+          content: title.trim() ? `${title.trim()}\n\n${content.trim()}` : content.trim(),
           author_id: user.id,
           community_id: community.id,
-          space_id: selectedSpace,
-          type: 'text', // Default type
-          visibility: 'public', // Default visibility
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          visibility: 'public'
         })
         .select();
         
@@ -343,11 +342,14 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({ open, onOpenChange 
                     <SelectItem 
                       key={space.id} 
                       value={space.id}
-                      className="hover:bg-gray-700"
+                      className="hover:bg-gray-700 pl-4"
                     >
-                      {space.name}
+                      <div className="flex items-center gap-2">
+                        {space.name}
+                      </div>
                     </SelectItem>
                   ))}
+                  
                   {spaces.length === 0 && !loadingSpaces && (
                     <div className="px-2 py-1 text-sm text-gray-400">
                       No spaces found

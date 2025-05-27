@@ -9,11 +9,13 @@ import LibraryFilters from '@/components/library/LibraryFilters';
 import LibraryContentArea from '@/components/library/LibraryContentArea';
 import LibraryFiltersSection from '@/components/library/LibraryFiltersSection';
 import { useContentProgress } from '@/hooks/useContentProgress';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
-import { Trophy, Star, Award } from 'lucide-react';
+import { Trophy, Star, Award, PlusCircle } from 'lucide-react';
 
 const Library: React.FC = () => {
   const navigate = useNavigate();
+  const { isOwnerOrAdmin } = useUserRole();
   const [activeView, setActiveView] = useState<'all' | 'free' | 'premium' | 'unlockable'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateContentOpen, setIsCreateContentOpen] = useState(false);
@@ -108,9 +110,21 @@ const Library: React.FC = () => {
                 <span className="text-muted-foreground">/{totalItems} items completed</span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 text-amber-500" />
-              <span className="text-sm font-medium">Total XP: 1,250</span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4 text-amber-500" />
+                <span className="text-sm font-medium">Total XP: 1,250</span>
+              </div>
+              {isOwnerOrAdmin && (
+                <Button 
+                  onClick={() => setIsCreateContentOpen(true)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  size="sm"
+                >
+                  <PlusCircle size={16} className="mr-2" />
+                  Add Content
+                </Button>
+              )}
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import CreatePostDialog from '@/components/post/CreatePostDialog';
 import FeedContent from '@/components/feed/FeedContent';
+import TierSwitcher from '@/components/debug/TierSwitcher';
 import SettingsPopover from '@/components/feed/SettingsPopover';
 import ViewControls from '@/components/feed/ViewControls';
 import { useFeedData } from '@/components/feed/useFeedData';
@@ -9,9 +10,11 @@ import FeedSegmentTabs from '@/components/feed/FeedSegmentTabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const Feed: React.FC = () => {
   const [createPostOpen, setCreatePostOpen] = useState(false);
+  const { isOwnerOrAdmin, loading: roleLoading } = useUserRole();
   
   // Get the last selected feed segment from localStorage or default to 'all'
   const getInitialSegment = () => {
@@ -67,16 +70,22 @@ const Feed: React.FC = () => {
     isPremiumUser
   } = useFeedData(5, activeSegment);
 
-  // Set accessFilter based on activeSegment
+  // Set accessFilter and activeSpace based on activeSegment
   useEffect(() => {
     if (activeSegment === 'free') {
       setAccessFilter('free');
+      setActiveSpace('Free Group');
     } else if (activeSegment === 'premium') {
       setAccessFilter('paid');
+      setActiveSpace('Premium Group');
+    } else if (activeSegment === 'mentor') {
+      setAccessFilter('all');
+      setActiveSpace('Mentorship Circle');
     } else {
       setAccessFilter('all');
+      setActiveSpace('all');
     }
-  }, [activeSegment, setAccessFilter]);
+  }, [activeSegment, setAccessFilter, setActiveSpace]);
 
   const handleViewChange = (view: string) => {
     setCurrentView(view);
@@ -192,6 +201,7 @@ const Feed: React.FC = () => {
         open={createPostOpen}
         onOpenChange={setCreatePostOpen}
       />
+      <TierSwitcher />
     </MainLayout>
   );
 };

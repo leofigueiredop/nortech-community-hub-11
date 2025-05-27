@@ -17,6 +17,7 @@ import { useRealMembers, ExtendedMember } from '@/hooks/useRealMembers';
 import { CommunityMember } from '@/types/community';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import InviteMemberDialog from '@/components/members/InviteMemberDialog';
 
 // Define member plan type
 type MemberPlan = 'Premium' | 'Free' | 'Pro';
@@ -153,6 +154,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, onUpdateRole }) => {
 const Members = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTab, setCurrentTab] = useState('all');
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const { loading, members, totalMembers, newMembersCount, loadAllMembers, loadCounts, updateMemberRole, inviteMember } = useRealMembers();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -162,12 +164,10 @@ const Members = () => {
     loadCounts();
   }, [loadAllMembers, loadCounts]);
   
-  const handleInviteMember = () => {
-    // In a real app, this would open a modal or form
-    const email = prompt('Enter email address to invite:');
-    if (email) {
-      inviteMember(email);
-    }
+  const handleInviteMember = async (email: string, role: string, plan: string) => {
+    await inviteMember(email, role, plan);
+    // Reload members after successful invite
+    loadAllMembers();
   };
 
   const handleUpdateRole = async (userId: string, newRole: string) => {
@@ -219,7 +219,7 @@ const Members = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Members</h1>
           <Button 
-            onClick={handleInviteMember}
+            onClick={() => setInviteDialogOpen(true)}
             className="flex items-center gap-2 bg-nortech-purple hover:bg-nortech-purple/90"
           >
             <UserPlus size={16} />
@@ -328,6 +328,12 @@ const Members = () => {
           </Tabs>
         </div>
       </div>
+
+      <InviteMemberDialog
+        open={inviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+        onInvite={handleInviteMember}
+      />
     </MainLayout>
   );
 };

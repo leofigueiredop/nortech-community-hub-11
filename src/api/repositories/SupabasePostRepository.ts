@@ -24,15 +24,40 @@ export class SupabasePostRepository extends BaseRepository implements IPostRepos
       
       const { data, error } = await this.supabase
         .from('posts')
-        .select('*, author:profiles(*), reactions_count:post_reactions(count)')
+        .select(`
+          *, 
+          author:profiles(*)
+        `)
         .eq('community_id', this.currentCommunityId)
         .order('created_at', { ascending: false })
         .range(from, to);
       
       if (error) throw error;
       
+      // Get counts for each post separately to avoid object issues
+      const postsWithCounts = await Promise.all(
+        (data || []).map(async (post) => {
+          const [reactionsResult, commentsResult] = await Promise.all([
+            this.supabase
+              .from('post_reactions')
+              .select('*', { count: 'exact', head: true })
+              .eq('post_id', post.id),
+            this.supabase
+              .from('post_comments')
+              .select('*', { count: 'exact', head: true })
+              .eq('post_id', post.id)
+          ]);
+          
+          return {
+            ...post,
+            reactions_count: reactionsResult.count || 0,
+            comment_count: commentsResult.count || 0
+          };
+        })
+      );
+      
       return {
-        posts: data as Post[],
+        posts: postsWithCounts as Post[],
         total: count || 0
       };
     } catch (error) {

@@ -17,6 +17,7 @@ import { SupabaseMigrationRepository } from './repositories/SupabaseMigrationRep
 import { SupabaseCommunityRepository } from './repositories/SupabaseCommunityRepository';
 import { SupabaseMembersRepository } from './repositories/SupabaseMembersRepository';
 import { SupabasePostRepository } from './repositories/SupabasePostRepository';
+import { SupabaseInviteRepository } from './repositories/SupabaseInviteRepository';
 import { supabase } from '@/lib/supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Result } from '@/types/api';
@@ -39,6 +40,7 @@ export class ApiClient {
   public supabase: SupabaseClient;
   private userId: string | null = null;
   private communityId: string | null = null;
+  private _invite: SupabaseInviteRepository;
 
   private constructor(supabaseClient: SupabaseClient) {
     this.supabase = supabaseClient;
@@ -51,6 +53,7 @@ export class ApiClient {
     this._community = new SupabaseCommunityRepository(this.supabase);
     this._members = new SupabaseMembersRepository(this.supabase);
     this._posts = new SupabasePostRepository(this.supabase);
+    this._invite = new SupabaseInviteRepository(this.supabase);
 
     try {
       // Tenta obter o communityId de um lugar central
@@ -79,6 +82,7 @@ export class ApiClient {
     (this._community as unknown as IBaseRepository).setCommunityContext(communityId);
     (this._members as unknown as IBaseRepository).setCommunityContext(communityId);
     (this._posts as unknown as IBaseRepository).setCommunityContext(communityId);
+    (this._invite as unknown as IBaseRepository).setCommunityContext(communityId);
   }
 
   public getCurrentCommunityId(): string | null {
@@ -119,6 +123,10 @@ export class ApiClient {
 
   get posts(): IPostRepository {
     return this._posts;
+  }
+
+  get invite(): SupabaseInviteRepository {
+    return this._invite;
   }
 
   // Método para atualizar o contexto da instância

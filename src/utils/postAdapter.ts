@@ -1,9 +1,15 @@
 import { Post } from '@/types/post';
 import { PostProps } from '@/components/post/Post';
 import { formatDistanceToNow } from 'date-fns';
+import { SPACE_ACCESS, UserTier } from '@/types/subscription';
 
 export function adaptPostToProps(post: Post, isPremium: boolean = false): PostProps {
   const formattedDate = formatRelativeTime(post.created_at);
+  const spaceName = post.space_id || 'General Discussion';
+  
+  // Ensure counts are always numbers
+  const likesValue = post.reactions_count;
+  const commentsValue = post.comment_count;
   
   return {
     id: post.id,
@@ -15,9 +21,10 @@ export function adaptPostToProps(post: Post, isPremium: boolean = false): PostPr
     title: post.title || undefined,
     content: post.content,
     createdAt: formattedDate,
-    likes: post.reactions_count || 0,
-    comments: post.comment_count || 0,
-    space: post.space_id || 'General',
+    likes: Number(likesValue) || 0,
+    comments: Number(commentsValue) || 0,
+    space: spaceName,
+    spaceTier: getSpaceTier(spaceName),
     type: getPostType(post),
     isPinned: post.pinned || false,
     isAnnouncement: isAnnouncement(post),
@@ -115,4 +122,9 @@ function getAccessBadge(post: Post, isPremium: boolean): 'free' | 'premium' | 'u
   }
   
   return 'free';
+}
+
+function getSpaceTier(spaceName: string): UserTier {
+  const spaceAccess = SPACE_ACCESS[spaceName];
+  return spaceAccess?.requiredTier || 'free';
 } 

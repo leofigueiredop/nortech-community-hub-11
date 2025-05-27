@@ -34,9 +34,10 @@ export const useFeedData = (postsPerPage: number = 5, initialSegment: string = '
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   
   useEffect(() => {
-    // In a real app, we would check the user's subscription from the backend
-    // For now, let's assume the user doesn't have premium
-    setIsPremiumUser(false);
+    // For demo purposes, we'll use the user's tier from the auth context
+    // In a real app, this would come from the database
+    const userTier = user?.tier || 'free';
+    setIsPremiumUser(userTier === 'premium' || userTier === 'mentor');
     
     // TODO: Implement real subscription check with Supabase
     // Example:

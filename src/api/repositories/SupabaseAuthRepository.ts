@@ -159,7 +159,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         user: {
           id: authData.user.id,
           email: authData.user.email || '',
-          profile
+          profile,
+          tier: 'free' // Default tier for demo purposes
         },
         community
       };
@@ -207,7 +208,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         user: {
           id: session.user.id,
           email: session.user.email || '',
-          profile
+          profile,
+          tier: 'free' // Default tier for demo purposes
         },
         community
       };
@@ -292,7 +294,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         user: {
           id: session.user.id,
           email: session.user.email || '',
-          profile
+          profile,
+          tier: 'free' // Default tier for demo purposes
         },
         community
       };
@@ -350,7 +353,8 @@ export class SupabaseAuthRepository extends BaseRepository implements IAuthRepos
         user: {
           id: authData.user.id,
           email: authData.user.email || '',
-          profile
+          profile,
+          tier: 'free' // Default tier for demo purposes
         },
         community: null
       };

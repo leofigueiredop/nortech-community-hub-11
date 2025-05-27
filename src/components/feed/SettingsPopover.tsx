@@ -1,11 +1,21 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ChevronDown, Settings, Moon, Palette, Keyboard, Eye, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import InviteMemberDialog from '@/components/members/InviteMemberDialog';
+import { useRealMembers } from '@/hooks/useRealMembers';
 
 const SettingsPopover: React.FC = () => {
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const { inviteMember, loadAllMembers } = useRealMembers();
+
+  const handleInviteMember = async (email: string, role: string, plan: string) => {
+    await inviteMember(email, role);
+    loadAllMembers();
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -61,16 +71,22 @@ const SettingsPopover: React.FC = () => {
               <span className="text-sm font-medium">View as</span>
             </Link>
             
-            <Link 
-              to="/settings/invite" 
-              className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white"
+            <button 
+              onClick={() => setInviteDialogOpen(true)}
+              className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white w-full text-left"
             >
               <UserPlus size={20} />
               <span className="text-sm font-medium">Invite member</span>
-            </Link>
+            </button>
           </div>
         </div>
       </PopoverContent>
+      
+      <InviteMemberDialog
+        open={inviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+        onInvite={handleInviteMember}
+      />
     </Popover>
   );
 };

@@ -23,6 +23,7 @@ interface AuthContextType {
   handleAuthCallback: () => Promise<AuthResponse>;
   currentOnboardingStep: number;
   setCurrentOnboardingStep: (step: number) => void;
+  updateUser: (userData: Partial<AuthUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -300,6 +301,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUser = (userData: Partial<AuthUser>) => {
+    if (user) {
+      setUser({ ...user, ...userData });
+    }
+  };
+
   const value = {
     user,
     community,
@@ -311,6 +318,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     handleAuthCallback,
     currentOnboardingStep,
     setCurrentOnboardingStep,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

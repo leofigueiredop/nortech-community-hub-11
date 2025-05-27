@@ -1,0 +1,42 @@
+-- Fix foreign key references in invitations table
+
+-- First, check if the table exists and drop it if needed to recreate with correct types
+DROP TABLE IF EXISTS public.invitations CASCADE;
+
+-- Recreate invitations table with correct foreign key references
+CREATE TABLE public.invitations (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    email text NOT NULL,
+    role text NOT NULL DEFAULT 'member',
+    community_id uuid NOT NULL,
+    invited_by text NOT NULL, -- Changed to text to match profiles.id type
+    status text NOT NULL DEFAULT 'pending',
+    created_at timestamptz DEFAULT now() NOT NULL,
+    expires_at timestamptz NOT NULL,
+    accepted_at timestamptz NULL,
+    CONSTRAINT invitations_pkey PRIMARY KEY (id),
+    CONSTRAINT invitations_community_id_fkey FOREIGN KEY (community_id) REFERENCES public.communities(id) ON DELETE CASCADE,
+    CONSTRAINT invitations_invited_by_fkey FOREIGN KEY (invited_by) REFERENCES public.profiles(id) ON DELETE CASCADE,
+    CONSTRAINT invitations_status_check CHECK (status IN ('pending', 'accepted', 'expired', 'cancelled')),
+    CONSTRAINT invitations_role_check CHECK (role IN ('member', 'moderator', 'admin'))
+);
+
+-- Create indexes for better performance
+CREATE INDEX invitations_community_id_idx ON public.invitations USING btree (community_id);
+CREATE INDEX invitations_email_idx ON public.invitations USING btree (email);
+CREATE INDEX invitations_status_idx ON public.invitations USING btree (status);
+CREATE INDEX invitations_expires_at_idx ON public.invitations USING btree (expires_at);
+CREATE INDEX invitations_invited_by_idx ON public.invitations USING btree (invited_by);
+
+-- Create unique constraint to prevent duplicate pending invitations
+CREATE UNIQUE INDEX invitations_unique_pending_idx ON public.invitations (email, community_id) 
+WHERE status = 'pending';
+
+-- Disable RLS for now to test functionality
+ALTER TABLE public.invitations DISABLE ROW LEVEL SECURITY;
+
+-- Grant permissions
+GRANT ALL ON TABLE public.invitations TO postgres;
+GRANT ALL ON TABLE public.invitations TO anon;
+GRANT ALL ON TABLE public.invitations TO authenticated;
+GRANT ALL ON TABLE public.invitations TO service_role; 

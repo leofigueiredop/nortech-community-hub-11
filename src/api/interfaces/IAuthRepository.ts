@@ -1,4 +1,5 @@
 import { CommunityContext } from '@/types/community';
+import { UserTier } from '@/types/subscription';
 
 export interface Profile {
   id: string;
@@ -15,6 +16,7 @@ export interface AuthUser {
   profile: Profile;
   isOnboarded?: boolean;
   currentCommunity?: string | null;
+  tier?: UserTier;
 }
 
 export interface AuthResponse {

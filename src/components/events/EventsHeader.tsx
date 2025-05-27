@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import CreateEventDialog from './CreateEventDialog';
 
 const EventsHeader: React.FC = () => {
   const { user } = useAuth();
+  const { isOwnerOrAdmin } = useUserRole();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   
   return (
@@ -18,7 +20,7 @@ const EventsHeader: React.FC = () => {
         </p>
       </div>
       
-      {user && (
+      {isOwnerOrAdmin && (
         <Button 
           onClick={() => setShowCreateDialog(true)}
           className="bg-nortech-purple hover:bg-nortech-purple/90"

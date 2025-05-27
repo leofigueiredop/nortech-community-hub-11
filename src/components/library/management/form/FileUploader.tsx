@@ -1,9 +1,10 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { UploadCloud, X } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
-import { uploadFile, deleteFile } from '@/utils/fileUpload';
+import { StorageService } from '@/services/StorageService';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from '@/components/ui/use-toast';
 
 interface FileUploaderProps {
   label: string;
@@ -14,8 +15,6 @@ interface FileUploaderProps {
   id: string;
   placeholder?: string;
   helpText?: string;
-  bucket?: string;
-  path?: string;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({
@@ -26,15 +25,14 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   accept = '*',
   id,
   placeholder = 'Click to upload',
-  helpText,
-  bucket = 'public',
-  path = ''
+  helpText
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(previewImage || null);
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { community } = useAuth();
 
   const handleClick = () => {
     if (fileInputRef.current) {
@@ -67,6 +65,15 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   };
 
   const handleFile = async (file: File) => {
+    if (!community?.id) {
+      toast({
+        title: "Upload failed",
+        description: "Community context not found. Please try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsUploading(true);
     setCurrentFile(file);
     onFileChange(file);
@@ -81,35 +88,41 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     }
     
     try {
-      // Upload to Supabase storage
-      const uploadedUrl = await uploadFile(file, bucket, path);
+      // Upload to Supabase storage using StorageService with community_id organization
+      const uploadedUrl = await StorageService.uploadFile(
+        file,
+        community.id,
+        'content',
+        { customFileName: `${id}-${Date.now()}` }
+      );
       
       // If upload was successful, update preview URL to the persistent storage URL
-      if (uploadedUrl && onPreviewChange) {
-        onPreviewChange(uploadedUrl);
+      if (uploadedUrl) {
+        if (file.type.startsWith('image/')) {
+          setPreviewUrl(uploadedUrl);
+        }
+        if (onPreviewChange) {
+          onPreviewChange(uploadedUrl);
+        }
+        
+        toast({
+          title: 'Upload successful',
+          description: `File "${file.name}" uploaded successfully.`,
+        });
       }
     } catch (error) {
       console.error('Upload failed:', error);
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "Failed to upload file",
+        variant: "destructive"
+      });
     } finally {
       setIsUploading(false);
     }
   };
 
   const clearFile = async () => {
-    // If we have a preview URL from storage, try to delete it
-    if (previewUrl && !previewUrl.startsWith('blob:')) {
-      try {
-        // Extract filename from URL for deletion
-        const urlParts = previewUrl.split('/');
-        const filename = urlParts[urlParts.length - 1];
-        
-        // Delete the file from storage
-        await deleteFile(`${path}/${filename}`, bucket);
-      } catch (error) {
-        console.error('Error deleting file:', error);
-      }
-    }
-    
     // Release object URL if it's a blob
     if (previewUrl && previewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(previewUrl);

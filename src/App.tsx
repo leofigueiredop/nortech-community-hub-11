@@ -10,6 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 // Import pages
 import Index from '@/pages/Index';
 import LoginPage from '@/pages/auth/login.page';
+import InviteAccept from '@/pages/auth/InviteAccept';
 import Dashboard from '@/pages/Dashboard';
 import Library from '@/pages/Library';
 import CourseViewer from '@/pages/CourseViewer';
@@ -23,6 +24,7 @@ import * as Settings from '@/pages/settings';
 
 // Import pages that were missing routes
 import Feed from '@/pages/Feed';
+import CreatePost from '@/pages/CreatePost';
 import Discussions from '@/pages/Discussions';
 import DiscussionTopic from '@/pages/DiscussionTopic';
 import DiscussionDetail from '@/pages/DiscussionDetail';
@@ -117,6 +119,9 @@ function App() {
                   </AuthAwareRoute>
                 } />
                 
+                {/* Invite acceptance route - accessible to both authenticated and unauthenticated users */}
+                <Route path="/invite" element={<InviteAccept />} />
+                
                 {/* Protected app routes */}
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
@@ -176,6 +181,12 @@ function App() {
                 <Route path="/feed" element={
                   <ProtectedRoute>
                     <Feed />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/create-post" element={
+                  <ProtectedRoute>
+                    <CreatePost />
                   </ProtectedRoute>
                 } />
                 
