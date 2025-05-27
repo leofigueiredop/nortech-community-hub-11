@@ -66,6 +66,7 @@ const PointsContext = createContext<PointsContextType>({
 // Points provider component
 export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
+  usePointsSubscription();
   const [totalPoints, setTotalPoints] = useState(0);
   const [pointsHistory, setPointsHistory] = useState<PointsActivity[]>([]);
   const api = ApiClient.getInstance();
@@ -106,7 +107,12 @@ export const PointsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     // Load initial points data
     const loadPointsData = async () => {
       // Skip if no user or if user is in onboarding
-      if (!user || !user.isOnboarded) {
+      // if (!user || !user.isOnboarded) {
+      //   setTotalPoints(0);
+      //   setPointsHistory([]);
+      //   return;
+      // }
+      if (!user) {
         setTotalPoints(0);
         setPointsHistory([]);
         return;

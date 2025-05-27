@@ -9,7 +9,8 @@ import { usePoints } from '@/context/PointsContext';
 import { useNotifications } from '@/context/NotificationsContext';
 import EventsList from '@/components/events/EventsList';
 import EventGrid from '@/components/events/EventGrid';
-import { Event, EventType } from '@/components/events/types/EventTypes';
+import type { Event as RawEvent } from '@/types/events';
+import type { EventWithUI, EventType } from '@/components/events/types/EventTypes';
 import EventConfirmDialog from '@/components/events/EventConfirmDialog';
 import CalendarView from '@/components/events/CalendarView';
 import { format } from 'date-fns';
@@ -25,8 +26,8 @@ type ViewType = 'grid' | 'list' | 'calendar';
 
 const Events = () => {
   const [viewType, setViewType] = useState<ViewType>('grid');
-  const [allEvents, setAllEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [allEvents, setAllEvents] = useState<EventWithUI[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<EventWithUI[]>([]);
   const [confirmEvent, setConfirmEvent] = useState<number | null>(null);
   const [selectedPremiumFilter, setSelectedPremiumFilter] = useState<'all' | 'premium' | 'free'>('all');
   const [selectedTypeFilters, setSelectedTypeFilters] = useState<EventType[]>(['workshop', 'webinar', 'meetup', 'conference']);
@@ -61,18 +62,35 @@ const Events = () => {
   }, [events]);
 
   // Filter events based on premium status, type, and availability
-  useEffect(() => {
-    if (allEvents.length === 0) return;
+   useEffect(() => {
+    if (events.length === 0) {
+      setFilteredEvents([]);
+      return;
+    }
 
-    const filtered = filterEvents(allEvents, {
-      isPremium: selectedPremiumFilter === 'all' ? undefined : selectedPremiumFilter === 'premium',
+    // 1) aplica o filtro ao array cru
+    const rawFiltered = filterEvents(events, {
+      isPremium: selectedPremiumFilter === 'all'
+        ? undefined
+        : selectedPremiumFilter === 'premium',
       type: selectedTypeFilters,
       showAvailableOnly,
-      selectedDate
+      selectedDate,
     });
 
-    setFilteredEvents(filtered);
-  }, [selectedPremiumFilter, selectedTypeFilters, showAvailableOnly, selectedDate, allEvents, filterEvents]);
+    // 2) adapta cada RawEvent para EventWithUI
+    const uiFiltered = rawFiltered.map(adaptEventForComponent);
+
+    setFilteredEvents(uiFiltered);
+  }, [
+    events,                    // <<< usa o array cru aqui, não allEvents
+    selectedPremiumFilter,
+    selectedTypeFilters,
+    showAvailableOnly,
+    selectedDate,
+    filterEvents,
+  ]);
+
 
   // RSVP handler
   const handleRSVP = (eventId: number) => {
@@ -94,11 +112,10 @@ const Events = () => {
           description: `You've successfully registered for "${event.title}"`,
         });
         
-        awardPoints({
-          type: "event_registration",
-          description: `Registered for ${event.title}`,
-          points: 5
-        });
+        awardPoints(
+          5,
+          `Registered for ${event.title}`
+        );
         
         addNotification({
           type: 'event',
