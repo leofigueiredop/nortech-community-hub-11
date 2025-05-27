@@ -35,7 +35,8 @@ const Library: React.FC = () => {
     setAccessFilter,
     setSearchQuery: setGlobalSearchQuery,
     setSortBy,
-    setSelectedItem
+    setSelectedItem,
+    loading
   } = useLibraryContent();
 
   const {
@@ -45,8 +46,8 @@ const Library: React.FC = () => {
 
   const { contentProgress, getAllProgress } = useContentProgress();
 
-  const totalItems = content.length;
-  const completedItems = contentProgress.filter(item => item.completed || item.completed_at !== null).length;
+  const totalItems = content?.length || 0;
+  const completedItems = contentProgress?.filter(item => item.completed || item.completed_at !== null)?.length || 0;
   const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   useEffect(() => {
@@ -70,6 +71,8 @@ const Library: React.FC = () => {
   const isSearchActive = searchQuery.trim() !== '';
 
   const getCompletedVideosThisWeek = () => {
+    if (!contentProgress || !content) return 0;
+    
     const now = new Date();
     const startOfWeek = new Date(now);
     startOfWeek.setDate(now.getDate() - now.getDay());
@@ -147,29 +150,37 @@ const Library: React.FC = () => {
         />
 
         <LibraryFiltersSection
-          formatFilter={formatFilter}
-          tagFilter={tagFilter}
-          accessFilter={accessFilter}
-          sortBy={sortBy}
+          formatFilter={formatFilter || 'all'}
+          tagFilter={tagFilter || ''}
+          accessFilter={accessFilter || 'all'}
+          sortBy={sortBy || 'newest'}
           searchQuery={searchQuery}
-          allTags={allTags}
-          allFormats={allFormats}
+          allTags={allTags || []}
+          allFormats={allFormats || []}
           setFormatFilter={setFormatFilter}
           setTagFilter={setTagFilter}
           setAccessFilter={setAccessFilter}
           setSearchQuery={setGlobalSearchQuery}
           setSortBy={setSortBy}
           showFilters={true}
+          onClearFilters={() => {
+            setFormatFilter('all');
+            setTagFilter('');
+            setAccessFilter('all');
+            setSortBy('newest');
+            setGlobalSearchQuery('');
+          }}
+          hasActiveFilters={formatFilter !== 'all' || tagFilter !== '' || accessFilter !== 'all' || sortBy !== 'newest' || searchQuery !== ''}
         />
 
         <LibraryContentArea
           isSearchActive={isSearchActive}
-          filteredContent={filteredContent}
+          filteredContent={filteredContent || []}
           searchQuery={searchQuery}
           activeView={activeView}
-          featuredContent={featuredContent}
-          content={content}
-          visitedTags={visitedTags}
+          featuredContent={featuredContent || []}
+          content={content || []}
+          visitedTags={visitedTags || []}
           onItemSelect={setSelectedItem}
         />
       </div>

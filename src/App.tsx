@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { PointsProvider } from '@/context/PointsContext';
 import { NotificationsProvider } from '@/context/NotificationsContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import { Toaster } from '@/components/ui/toaster';
 import { useAuth } from '@/context/AuthContext';
 
@@ -85,267 +86,269 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <PointsProvider>
-          <NotificationsProvider>
-            <Routes>
-              {/* Public landing page - always accessible */}
-              <Route path="/" element={<Index />} />
-              
-              {/* Onboarding Routes */}
-              <Route path="/onboarding">
-                <Route path="welcome" element={<Welcome />} />
-                <Route path="creator" element={<Creator />} />
-                <Route path="community" element={<Community />} />
-                <Route path="type" element={<CommunityType />} />
-                <Route path="features" element={<Features />} />
-                <Route path="plans" element={<MembershipPlans />} />
-                <Route path="invite" element={<InviteMembers />} />
-                <Route path="final" element={<FinalStep />} />
-              </Route>
-              
-              {/* Auth routes - redirect to dashboard if already authenticated */}
-              <Route path="/auth/login" element={
-                <AuthAwareRoute>
-                  <LoginPage />
-                </AuthAwareRoute>
-              } />
-              <Route path="/auth/callback" element={
-                <AuthAwareRoute>
-                  <LoginPage />
-                </AuthAwareRoute>
-              } />
-              
-              {/* Protected app routes */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/library" element={
-                <ProtectedRoute>
-                  <Library />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/course/:id" element={
-                <ProtectedRoute>
-                  <CourseViewer />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/content" element={
-                <ProtectedRoute>
-                  <ContentManagement />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/events" element={
-                <ProtectedRoute>
-                  <Events />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/events/calendar" element={
-                <ProtectedRoute>
-                  <EventsCalendar />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/analytics" element={
-                <ProtectedRoute>
-                  <Analytics />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/creator" element={
-                <ProtectedRoute>
-                  <ContentCreatorDashboard />
-                </ProtectedRoute>
-              } />
-              
-              {/* Add routes with correct components */}
-              <Route path="/posts" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/feed" element={
-                <ProtectedRoute>
-                  <Feed />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/discussions" element={
-                <ProtectedRoute>
-                  <Discussions />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/discussions/:topicId" element={
-                <ProtectedRoute>
-                  <DiscussionTopic />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/discussions/:topicId/:discussionId" element={
-                <ProtectedRoute>
-                  <DiscussionDetail />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/members" element={
-                <ProtectedRoute>
-                  <Members />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/matchmaker" element={
-                <ProtectedRoute>
-                  <Matchmaker />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/points" element={
-                <ProtectedRoute>
-                  <PointsDashboard />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/points/store" element={
-                <ProtectedRoute>
-                  <PointsStore />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/points/leaderboard" element={
-                <ProtectedRoute>
-                  <Leaderboard />
-                </ProtectedRoute>
-              } />
-              
-              {/* Settings routes */}
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <SettingsIndex />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/general" element={
-                <ProtectedRoute>
-                  <Settings.General />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/branding" element={
-                <ProtectedRoute>
-                  <Settings.Branding />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/domain" element={
-                <ProtectedRoute>
-                  <Settings.Domain />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/migration" element={
-                <ProtectedRoute>
-                  <Settings.Migration />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/marketing" element={
-                <ProtectedRoute>
-                  <Settings.Marketing />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/posts" element={
-                <ProtectedRoute>
-                  <Settings.Posts />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/spaces" element={
-                <ProtectedRoute>
-                  <Settings.Spaces />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/moderation" element={
-                <ProtectedRoute>
-                  <Settings.Moderation />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/workflows" element={
-                <ProtectedRoute>
-                  <Settings.Workflows />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/ai-agents" element={
-                <ProtectedRoute>
-                  <Settings.AIAgents />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/points-configuration" element={
-                <ProtectedRoute>
-                  <Settings.PointsConfiguration />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/plans" element={
-                <ProtectedRoute>
-                  <Settings.Plans />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/subscriptions" element={
-                <ProtectedRoute>
-                  <Settings.Subscriptions />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/paywall" element={
-                <ProtectedRoute>
-                  <Settings.Paywall />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/analytics" element={
-                <ProtectedRoute>
-                  <Settings.Analytics />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/affiliates" element={
-                <ProtectedRoute>
-                  <Settings.Affiliates />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/legal" element={
-                <ProtectedRoute>
-                  <Settings.Legal />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings/notifications" element={
-                <ProtectedRoute>
-                  <Settings.Notifications />
-                </ProtectedRoute>
-              } />
-              
-              {/* Catch-all route for 404 */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-            <Toaster />
-          </NotificationsProvider>
-        </PointsProvider>
+        <ThemeProvider>
+          <PointsProvider>
+            <NotificationsProvider>
+              <Routes>
+                {/* Public landing page - always accessible */}
+                <Route path="/" element={<Index />} />
+                
+                {/* Onboarding Routes */}
+                <Route path="/onboarding">
+                  <Route path="welcome" element={<Welcome />} />
+                  <Route path="creator" element={<Creator />} />
+                  <Route path="community" element={<Community />} />
+                  <Route path="type" element={<CommunityType />} />
+                  <Route path="features" element={<Features />} />
+                  <Route path="plans" element={<MembershipPlans />} />
+                  <Route path="invite" element={<InviteMembers />} />
+                  <Route path="final" element={<FinalStep />} />
+                </Route>
+                
+                {/* Auth routes - redirect to dashboard if already authenticated */}
+                <Route path="/auth/login" element={
+                  <AuthAwareRoute>
+                    <LoginPage />
+                  </AuthAwareRoute>
+                } />
+                <Route path="/auth/callback" element={
+                  <AuthAwareRoute>
+                    <LoginPage />
+                  </AuthAwareRoute>
+                } />
+                
+                {/* Protected app routes */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/library" element={
+                  <ProtectedRoute>
+                    <Library />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/course/:id" element={
+                  <ProtectedRoute>
+                    <CourseViewer />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/content" element={
+                  <ProtectedRoute>
+                    <ContentManagement />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/events" element={
+                  <ProtectedRoute>
+                    <Events />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/events/calendar" element={
+                  <ProtectedRoute>
+                    <EventsCalendar />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/analytics" element={
+                  <ProtectedRoute>
+                    <Analytics />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/creator" element={
+                  <ProtectedRoute>
+                    <ContentCreatorDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Add routes with correct components */}
+                <Route path="/posts" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/feed" element={
+                  <ProtectedRoute>
+                    <Feed />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/discussions" element={
+                  <ProtectedRoute>
+                    <Discussions />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/discussions/:topicId" element={
+                  <ProtectedRoute>
+                    <DiscussionTopic />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/discussions/:topicId/:discussionId" element={
+                  <ProtectedRoute>
+                    <DiscussionDetail />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/members" element={
+                  <ProtectedRoute>
+                    <Members />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/matchmaker" element={
+                  <ProtectedRoute>
+                    <Matchmaker />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/points" element={
+                  <ProtectedRoute>
+                    <PointsDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/points/store" element={
+                  <ProtectedRoute>
+                    <PointsStore />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/points/leaderboard" element={
+                  <ProtectedRoute>
+                    <Leaderboard />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Settings routes */}
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <SettingsIndex />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/general" element={
+                  <ProtectedRoute>
+                    <Settings.General />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/branding" element={
+                  <ProtectedRoute>
+                    <Settings.Branding />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/domain" element={
+                  <ProtectedRoute>
+                    <Settings.Domain />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/migration" element={
+                  <ProtectedRoute>
+                    <Settings.Migration />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/marketing" element={
+                  <ProtectedRoute>
+                    <Settings.Marketing />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/posts" element={
+                  <ProtectedRoute>
+                    <Settings.Posts />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/spaces" element={
+                  <ProtectedRoute>
+                    <Settings.Spaces />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/moderation" element={
+                  <ProtectedRoute>
+                    <Settings.Moderation />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/workflows" element={
+                  <ProtectedRoute>
+                    <Settings.Workflows />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/ai-agents" element={
+                  <ProtectedRoute>
+                    <Settings.AIAgents />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/points-configuration" element={
+                  <ProtectedRoute>
+                    <Settings.PointsConfiguration />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/plans" element={
+                  <ProtectedRoute>
+                    <Settings.Plans />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/subscriptions" element={
+                  <ProtectedRoute>
+                    <Settings.Subscriptions />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/paywall" element={
+                  <ProtectedRoute>
+                    <Settings.Paywall />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/analytics" element={
+                  <ProtectedRoute>
+                    <Settings.Analytics />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/affiliates" element={
+                  <ProtectedRoute>
+                    <Settings.Affiliates />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/legal" element={
+                  <ProtectedRoute>
+                    <Settings.Legal />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/notifications" element={
+                  <ProtectedRoute>
+                    <Settings.Notifications />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Catch-all route for 404 */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+              <Toaster />
+            </NotificationsProvider>
+          </PointsProvider>
+        </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
   );

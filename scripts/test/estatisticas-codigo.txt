@@ -1,0 +1,43 @@
+=== ESTATÍSTICAS DE CÓDIGO DO PROJETO ===
+
+Data de geração: 5/23/2025, 8:21:41 AM
+
+=== ESTATÍSTICAS GERAIS ===
+Total de Arquivos: 601
+Total de Linhas: 76820
+Linhas de Código: 67432 (88%)
+Linhas de Comentário: 1638 (2%)
+Linhas em Branco: 7750 (10%)
+
+=== CÓDIGO ORIGINAL vs. ADICIONADO ===
+Código Original do Frontend:
+  - Arquivos: 117 (19%)
+  - Linhas Totais: 10861 (14%)
+  - Linhas de Código: 9385 (14%)
+
+Código Adicionado/Modificado:
+  - Arquivos: 484 (81%)
+  - Linhas Totais: 65959 (86%)
+  - Linhas de Código: 58047 (86%)
+
+=== ESTATÍSTICAS POR TIPO DE ARQUIVO ===
+.tsx:
+  - Arquivos: 480
+  - Linhas Totais: 60947 (79%)
+  - Linhas de Código: 54269
+
+.ts:
+  - Arquivos: 118
+  - Linhas Totais: 15582 (20%)
+  - Linhas de Código: 12945
+
+.css:
+  - Arquivos: 2
+  - Linhas Totais: 217 (0%)
+  - Linhas de Código: 168
+
+.js:
+  - Arquivos: 1
+  - Linhas Totais: 74 (0%)
+  - Linhas de Código: 50
+

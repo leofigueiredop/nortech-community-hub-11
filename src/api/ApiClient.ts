@@ -7,6 +7,7 @@ import { IMigrationRepository } from './interfaces/IMigrationRepository';
 import { ICommunityRepository } from './interfaces/ICommunityRepository';
 import { IBaseRepository } from './interfaces/IBaseRepository';
 import { IMembersRepository } from './interfaces/IMembersRepository';
+import { IPostRepository } from './interfaces/IPostRepository';
 import { SupabaseAuthRepository } from './repositories/SupabaseAuthRepository';
 import { SupabaseContentRepository } from './repositories/SupabaseContentRepository';
 import { SupabaseEventsRepository } from './repositories/SupabaseEventsRepository';
@@ -15,6 +16,7 @@ import { SupabasePointsRepository } from './repositories/SupabasePointsRepositor
 import { SupabaseMigrationRepository } from './repositories/SupabaseMigrationRepository';
 import { SupabaseCommunityRepository } from './repositories/SupabaseCommunityRepository';
 import { SupabaseMembersRepository } from './repositories/SupabaseMembersRepository';
+import { SupabasePostRepository } from './repositories/SupabasePostRepository';
 import { supabase } from '@/lib/supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Result } from '@/types/api';
@@ -32,6 +34,7 @@ export class ApiClient {
   private _migration: IMigrationRepository;
   private _community: ICommunityRepository;
   private _members: IMembersRepository;
+  private _posts: IPostRepository;
   private _currentCommunityId: string | null = null;
   public supabase: SupabaseClient;
   private userId: string | null = null;
@@ -47,6 +50,7 @@ export class ApiClient {
     this._migration = new SupabaseMigrationRepository(this.supabase);
     this._community = new SupabaseCommunityRepository(this.supabase);
     this._members = new SupabaseMembersRepository(this.supabase);
+    this._posts = new SupabasePostRepository(this.supabase);
 
     try {
       // Tenta obter o communityId de um lugar central
@@ -74,6 +78,7 @@ export class ApiClient {
     (this._points as unknown as IBaseRepository).setCommunityContext(communityId);
     (this._community as unknown as IBaseRepository).setCommunityContext(communityId);
     (this._members as unknown as IBaseRepository).setCommunityContext(communityId);
+    (this._posts as unknown as IBaseRepository).setCommunityContext(communityId);
   }
 
   public getCurrentCommunityId(): string | null {
@@ -110,6 +115,10 @@ export class ApiClient {
   
   get members(): IMembersRepository {
     return this._members;
+  }
+
+  get posts(): IPostRepository {
+    return this._posts;
   }
 
   // Método para atualizar o contexto da instância

@@ -32,8 +32,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Loader2, MessageSquare, HelpCircle, BellRing } from 'lucide-react';
 import { DiscussionTopic } from '@/types/discussion';
-import { useRealDiscussions } from '@/hooks/useRealDiscussions';
 import { useAuth } from '@/context/AuthContext';
+import { api } from '@/api/ApiClient';
 
 interface CreateDiscussionDialogProps {
   open: boolean;
@@ -55,8 +55,7 @@ const CreateDiscussionDialog: React.FC<CreateDiscussionDialogProps> = ({
   topic,
   onDiscussionCreated
 }) => {
-  const { createDiscussion, loading } = useRealDiscussions();
-  const { user } = useAuth();
+  const { user, community } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,7 +70,7 @@ const CreateDiscussionDialog: React.FC<CreateDiscussionDialogProps> = ({
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!user) {
+    if (!user || !community) {
       toast({
         title: 'Authentication Required',
         description: 'Please sign in to create a discussion',
@@ -88,34 +87,45 @@ const CreateDiscussionDialog: React.FC<CreateDiscussionDialogProps> = ({
         ? values.tags.split(',').map(tag => tag.trim()).filter(Boolean) 
         : [];
       
-      const result = await createDiscussion({
-        topic_id: topic.id,
-        title: values.title,
-        content: values.content,
-        format: values.format,
-        tags: tagsArray,
+      // Create discussion directly using Supabase
+      const { data, error } = await api.supabase
+        .from('discussions')
+        .insert({
+          title: values.title,
+          content: values.content,
+          topic_id: topic.id,
+          author_id: user.id,
+          community_id: community.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          format: values.format,
+          tags: tagsArray,
+          is_closed: false,
+          is_pinned: false,
+          view_count: 0
+        })
+        .select();
+        
+      if (error) throw error;
+      
+      toast({
+        title: 'Discussion Created',
+        description: 'Your discussion has been posted',
       });
       
-      if (result) {
-        toast({
-          title: 'Discussion Created',
-          description: 'Your discussion has been posted',
-        });
-        
-        // Reset form and close dialog
-        form.reset();
-        onOpenChange(false);
-        
-        // Call the callback if provided
-        if (onDiscussionCreated) {
-          onDiscussionCreated();
-        }
+      // Reset form and close dialog
+      form.reset();
+      onOpenChange(false);
+      
+      // Call the callback if provided
+      if (onDiscussionCreated) {
+        onDiscussionCreated();
       }
     } catch (error) {
       console.error('Error creating discussion:', error);
       toast({
         title: 'Error',
-        description: 'Failed to create discussion',
+        description: 'Failed to create discussion. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -293,7 +303,7 @@ const CreateDiscussionDialog: React.FC<CreateDiscussionDialogProps> = ({
               </Button>
               <Button 
                 type="submit" 
-                disabled={isSubmitting || loading}
+                disabled={isSubmitting}
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 {isSubmitting ? (

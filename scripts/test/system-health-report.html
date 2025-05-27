@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório de Saúde do Sistema - Nortech Community Hub</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      background-color: #6C5DD3;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    .report-date {
+      font-style: italic;
+      margin-bottom: 0;
+    }
+    .section {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid #e9ecef;
+    }
+    .output {
+      background-color: #f1f1f1;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      font-family: monospace;
+      border: 1px solid #ddd;
+    }
+    .success {
+      color: #28a745;
+    }
+    .warning {
+      color: #ffc107;
+    }
+    .error {
+      color: #dc3545;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #6c757d;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Relatório de Saúde do Sistema</h1>
+      <h2>Nortech Community Hub</h2>
+      <p class="report-date">Gerado em: 5/23/2025, 6:13:43 AM</p>
+    </header>
+    
+    <div class="section">
+      <h2>Informações do Sistema</h2>
+      <table>
+        <tr>
+          <th>Node.js</th>
+          <td>v18.20.8</td>
+        </tr>
+        <tr>
+          <th>NPM</th>
+          <td>10.8.2</td>
+        </tr>
+        <tr>
+          <th>Repositório</th>
+          <td>https://github.com/seu-usuario/nortech-community-hub</td>
+        </tr>
+        <tr>
+          <th>Branch</th>
+          <td>cursor_backend</td>
+        </tr>
+        <tr>
+          <th>Último Commit</th>
+          <td>branding  and customs</td>
+        </tr>
+      </table>
+    </div>
+    
+    <div class="section">
+      <h2>Verificação de Saúde da Aplicação</h2>
+      <div class="output">📘 INFO: Iniciando verificação de saúde da aplicação...
+🧪 TESTE: Verificando página: http://localhost:8081/
+<span class="success">✅</span> SUCESSO: Página / respondeu com status 200 em 29ms
+🧪 TESTE: Verificando página: http://localhost:8081/login
+<span class="success">✅</span> SUCESSO: Página /login respondeu com status 200 em 7ms
+🧪 TESTE: Verificando página: http://localhost:8081/signup
+<span class="success">✅</span> SUCESSO: Página /signup respondeu com status 200 em 4ms
+🧪 TESTE: Verificando página: http://localhost:8081/dashboard
+<span class="success">✅</span> SUCESSO: Página /dashboard respondeu com status 200 em 4ms
+🧪 TESTE: Verificando página: http://localhost:8081/feed
+<span class="success">✅</span> SUCESSO: Página /feed respondeu com status 200 em 4ms
+🧪 TESTE: Verificando página: http://localhost:8081/discussions
+<span class="success">✅</span> SUCESSO: Página /discussions respondeu com status 200 em 4ms
+🧪 TESTE: Verificando página: http://localhost:8081/events
+<span class="success">✅</span> SUCESSO: Página /events respondeu com status 200 em 5ms
+🧪 TESTE: Verificando página: http://localhost:8081/library
+<span class="success">✅</span> SUCESSO: Página /library respondeu com status 200 em 4ms
+🧪 TESTE: Verificando página: http://localhost:8081/points
+<span class="success">✅</span> SUCESSO: Página /points respondeu com status 200 em 4ms
+🧪 TESTE: Verificando página: http://localhost:8081/store
+<span class="success">✅</span> SUCESSO: Página /store respondeu com status 200 em 3ms
+📘 INFO: Verificação de saúde concluída
+📘 INFO: Páginas OK: 10 / Páginas com erro: 0
+<span class="success">✅</span> SUCESSO: SAÚDE DA APLICAÇÃO: ÓTIMA - Todas as páginas estão funcionando!
+</div>
+    </div>
+    
+    <div class="section">
+      <h2>Verificação de Integridade de Dados</h2>
+      <div class="output">📘 INFO: Iniciando verificação de integridade dos dados...
+🧪 TESTE: Verificando tabela: communities
+<span class="success">✅</span> SUCESSO: Tabela communities existe e contém 24 registros
+<span class="success">✅</span> SUCESSO: Todas as comunidades têm creator_id válido
+🧪 TESTE: Verificando tabela: community_members
+<span class="success">✅</span> SUCESSO: Tabela community_members existe e contém 1 registros
+🧪 TESTE: Verificando tabela: spaces
+<span class="success">✅</span> SUCESSO: Tabela spaces existe e contém 10 registros
+🧪 TESTE: Verificando tabela: posts
+<span class="success">✅</span> SUCESSO: Tabela posts existe e contém 3 registros
+<span class="success">✅</span> SUCESSO: Todos os posts têm author_id válido
+<span class="success">✅</span> SUCESSO: Todos os posts têm conteúdo
+🧪 TESTE: Verificando tabela: post_comments
+<span class="success">✅</span> SUCESSO: Tabela post_comments existe e contém 0 registros
+🧪 TESTE: Verificando tabela: discussion_topics
+<span class="success">✅</span> SUCESSO: Tabela discussion_topics existe e contém 2 registros
+🧪 TESTE: Verificando tabela: discussions
+<span class="success">✅</span> SUCESSO: Tabela discussions existe e contém 1 registros
+<span class="success">✅</span> SUCESSO: Todas as discussões têm tópico válido
+<span class="success">✅</span> SUCESSO: Não foram encontradas respostas órfãs
+🧪 TESTE: Verificando tabela: discussion_replies
+<span class="success">✅</span> SUCESSO: Tabela discussion_replies existe e contém 1 registros
+🧪 TESTE: Verificando tabela: events
+<span class="success">✅</span> SUCESSO: Tabela events existe e contém 0 registros
+🧪 TESTE: Verificando tabela: rewards
+<span class="success">✅</span> SUCESSO: Tabela rewards existe e contém 9 registros
+🧪 TESTE: Verificando tabela: points_activities
+<span class="success">✅</span> SUCESSO: Tabela points_activities existe e contém 0 registros
+<span class="success">✅</span> SUCESSO: Todas as atividades de pontos têm usuário válido
+🧪 TESTE: Verificando tabela: user_points
+<span class="success">✅</span> SUCESSO: Tabela user_points existe e contém 0 registros
+🧪 TESTE: Verificando integridade referencial...
+<span class="success">✅</span> SUCESSO: Posts têm integridade referencial para communities
+<span class="success">✅</span> SUCESSO: Discussões têm integridade referencial para communities
+🧪 TESTE: Verificando consistência de dados...
+<span class="success">✅</span> SUCESSO: Verificação de consistência de dados concluída
+📘 INFO: 0 de 1 discussões verificadas têm respostas
+📘 INFO: Verificação de integridade de dados concluída
+📘 INFO: Sucesso: 12 / Avisos: 0 / Erros: 0
+<span class="success">✅</span> SUCESSO: INTEGRIDADE DE DADOS: EXCELENTE
+</div>
+    </div>
+    
+    <div class="section">
+      <h2>Recomendações</h2>
+      <ul>
+        <li>Resolver quaisquer erros indicados nos relatórios acima.</li>
+        <li>Verificar a conectividade com o Supabase e credenciais de API.</li>
+        <li>Manter backups regulares do banco de dados.</li>
+        <li>Monitorar o uso de recursos no servidor.</li>
+      </ul>
+    </div>
+    
+    <footer>
+      &copy; 2025 Nortech Community Hub - Relatório de Saúde do Sistema
+    </footer>
+  </div>
+</body>
+</html>
+  

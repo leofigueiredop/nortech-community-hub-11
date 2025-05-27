@@ -32,8 +32,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Loader2, Pin, Lock, Tag, Users, MessageSquare, TrendingUp, PieChart } from 'lucide-react';
-import { useRealDiscussions } from '@/hooks/useRealDiscussions';
 import { useAuth } from '@/context/AuthContext';
+import { api } from '@/api/ApiClient';
 
 interface CreateTopicDialogProps {
   open: boolean;
@@ -56,7 +56,6 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({
   onOpenChange,
   onTopicCreated
 }) => {
-  const { createTopic } = useRealDiscussions();
   const { user, community } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -102,38 +101,44 @@ const CreateTopicDialog: React.FC<CreateTopicDialogProps> = ({
         .replace(/[^\w\s]/gi, '')
         .replace(/\s+/g, '-');
       
-      const result = await createTopic({
-        title: values.title,
-        description: values.description,
-        icon: values.icon,
-        color: values.color,
-        is_featured: values.is_featured,
-        is_private: values.is_private,
-        access_level: values.access_level,
-        slug,
-        community_id: community.id,
+      // Create topic directly with Supabase
+      const { data, error } = await api.supabase
+        .from('discussion_topics')
+        .insert({
+          name: values.title,
+          description: values.description,
+          icon: values.icon,
+          color: values.color,
+          is_featured: values.is_featured,
+          is_private: values.is_private,
+          access_level: values.access_level,
+          slug,
+          community_id: community.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select();
+        
+      if (error) throw error;
+      
+      toast({
+        title: 'Topic Created',
+        description: 'Your discussion topic has been created',
       });
       
-      if (result) {
-        toast({
-          title: 'Topic Created',
-          description: 'Your discussion topic has been created',
-        });
-        
-        // Reset form and close dialog
-        form.reset();
-        onOpenChange(false);
-        
-        // Call the callback if provided
-        if (onTopicCreated) {
-          onTopicCreated();
-        }
+      // Reset form and close dialog
+      form.reset();
+      onOpenChange(false);
+      
+      // Call the callback if provided
+      if (onTopicCreated) {
+        onTopicCreated();
       }
     } catch (error) {
       console.error('Error creating topic:', error);
       toast({
         title: 'Error',
-        description: 'Failed to create topic',
+        description: 'Failed to create topic. Please try again.',
         variant: 'destructive',
       });
     } finally {

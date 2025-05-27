@@ -34,8 +34,11 @@ interface LibraryFiltersSectionProps {
   setTagFilter: (tag: string) => void;
   setAccessFilter: (level: string) => void;
   setSortBy: (sort: string) => void;
-  onClearFilters: () => void;
-  hasActiveFilters: boolean;
+  onClearFilters?: () => void;
+  hasActiveFilters?: boolean;
+  showFilters?: boolean;
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
 }
 
 const LibraryFiltersSection: React.FC<LibraryFiltersSectionProps> = ({
@@ -43,8 +46,8 @@ const LibraryFiltersSection: React.FC<LibraryFiltersSectionProps> = ({
   tagFilter,
   accessFilter,
   sortBy,
-  allFormats,
-  allTags,
+  allFormats = [],
+  allTags = [],
   setFormatFilter,
   setTagFilter,
   setAccessFilter,
@@ -93,7 +96,7 @@ const LibraryFiltersSection: React.FC<LibraryFiltersSectionProps> = ({
             All
           </Button>
           
-          {allFormats.map(format => (
+          {allFormats && allFormats.map(format => (
             <Button
               key={format}
               variant={formatFilter === format ? 'default' : 'outline'}
@@ -125,7 +128,7 @@ const LibraryFiltersSection: React.FC<LibraryFiltersSectionProps> = ({
         </div>
         
         {/* Tag filters - simplified for most common tags */}
-        {allTags.length > 0 && (
+        {allTags && allTags.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium mr-1">Tags:</span>
             <DropdownMenu>

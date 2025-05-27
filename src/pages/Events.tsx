@@ -38,7 +38,7 @@ const Events = () => {
   const { awardPoints } = usePoints();
   const { addNotification } = useNotifications();
   const { 
-    loading, 
+    loading: eventsLoading, 
     events, 
     upcomingEvents,
     registerForEvent: registerForEventApi,
@@ -159,7 +159,7 @@ const Events = () => {
             />
 
             <TabsContent value="grid">
-              {loading ? (
+              {eventsLoading ? (
                 <div className="flex justify-center items-center py-12">
                   <div className="spinner animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full"></div>
                 </div>

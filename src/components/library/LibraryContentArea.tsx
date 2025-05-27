@@ -36,12 +36,12 @@ interface LibraryContentAreaProps {
 
 const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
   isSearchActive,
-  filteredContent,
-  searchQuery,
-  activeView,
-  featuredContent,
-  content,
-  visitedTags,
+  filteredContent = [],
+  searchQuery = '',
+  activeView = 'all',
+  featuredContent = [],
+  content = [],
+  visitedTags = [],
   onItemSelect
 }) => {
   
@@ -90,7 +90,7 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
   
   // Featured section (only show if not searching)
   const renderFeaturedSection = () => {
-    if (isSearchActive || featuredContent.length === 0) return null;
+    if (isSearchActive || !featuredContent || featuredContent.length === 0) return null;
     
     return (
       <section className="mb-8">
@@ -150,7 +150,7 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
   const renderContentGrid = () => {
     const contentToDisplay = isSearchActive ? filteredContent : filteredContent;
     
-    if (contentToDisplay.length === 0) {
+    if (!contentToDisplay || contentToDisplay.length === 0) {
       return (
         <div className="bg-muted/40 p-12 rounded-lg text-center">
           <h3 className="text-lg font-medium mb-2">No content found</h3>
@@ -244,7 +244,7 @@ const LibraryContentArea: React.FC<LibraryContentAreaProps> = ({
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">
           {isSearchActive 
-            ? `Search Results (${filteredContent.length})` 
+            ? `Search Results (${filteredContent ? filteredContent.length : 0})` 
             : activeView === 'all' 
               ? 'All Content' 
               : `${activeView.charAt(0).toUpperCase() + activeView.slice(1)} Content`}
