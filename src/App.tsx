@@ -30,7 +30,7 @@ import DiscussionTopic from '@/pages/DiscussionTopic';
 import DiscussionDetail from '@/pages/DiscussionDetail';
 import Members from '@/pages/Members';
 import Matchmaker from '@/pages/Matchmaker';
-import PointsDashboard from '@/pages/PointsDashboard';
+import PointsPage from '@/pages/PointsPage';
 import PointsStore from '@/pages/PointsStore';
 import Leaderboard from '@/pages/Leaderboard';
 
@@ -222,7 +222,7 @@ function App() {
                 
                 <Route path="/points" element={
                   <ProtectedRoute>
-                    <PointsDashboard />
+                    <PointsPage />
                   </ProtectedRoute>
                 } />
                 
@@ -314,6 +314,12 @@ function App() {
                 <Route path="/settings/plans" element={
                   <ProtectedRoute>
                     <Settings.Plans />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/settings/billing" element={
+                  <ProtectedRoute>
+                    <Settings.Billing />
                   </ProtectedRoute>
                 } />
                 

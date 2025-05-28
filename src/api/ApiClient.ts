@@ -24,6 +24,7 @@ import { Result } from '@/types/api';
 import { ContentItem } from '@/types/content';
 import { Profile } from '@/types/profile';
 import { Event } from '@/types/events';
+import { PaywallSettings, PaywallTemplate } from '@/types/paywall';
 
 export class ApiClient {
   private static instance: ApiClient;
@@ -133,6 +134,120 @@ export class ApiClient {
   setContext(userId?: string, communityId?: string) {
     if (userId) this.userId = userId;
     if (communityId) this.communityId = communityId;
+  }
+
+  // Temporary paywall methods to fix the hook error
+  async getPaywallSettings(): Promise<PaywallSettings | null> {
+    if (!this._currentCommunityId) return null;
+    
+    try {
+      const { data, error } = await this.supabase
+        .from('paywall_settings')
+        .select('*')
+        .eq('community_id', this._currentCommunityId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching paywall settings:', error);
+        return null;
+      }
+
+      // Return default settings if none exist
+      const defaultSettings: PaywallSettings = {
+        activeTemplate: 'standard',
+        activeGateways: ['stripe'],
+        gatewayConfigs: {
+          stripe: { 
+            enabled: true,
+            apiKey: '',
+            webhookSecret: '',
+            isDefault: true
+          },
+          paypal: {
+            enabled: false,
+            clientId: '',
+            clientSecret: '',
+            isDefault: false
+          }
+        },
+        messageSettings: {
+          title: 'Upgrade to Premium',
+          description: 'Get access to exclusive content by becoming a premium member.',
+          ctaText: 'Upgrade Now'
+        }
+      };
+
+      return data ? {
+        activeTemplate: data.active_template || defaultSettings.activeTemplate,
+        activeGateways: data.active_gateways || defaultSettings.activeGateways,
+        gatewayConfigs: data.gateway_configs || defaultSettings.gatewayConfigs,
+        messageSettings: data.message_settings || defaultSettings.messageSettings
+      } : defaultSettings;
+    } catch (error) {
+      console.error('Error fetching paywall settings:', error);
+      return null;
+    }
+  }
+
+  async updatePaywallSettings(settings: PaywallSettings): Promise<boolean> {
+    if (!this._currentCommunityId) return false;
+    
+    try {
+      const { error } = await this.supabase
+        .from('paywall_settings')
+        .upsert({
+          community_id: this._currentCommunityId,
+          active_template: settings.activeTemplate,
+          active_gateways: settings.activeGateways,
+          gateway_configs: settings.gatewayConfigs,
+          message_settings: settings.messageSettings,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Error updating paywall settings:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error updating paywall settings:', error);
+      return false;
+    }
+  }
+
+  async getPaywallTemplates(): Promise<PaywallTemplate[]> {
+    try {
+      // Return hardcoded templates for now
+      const templates: PaywallTemplate[] = [
+        {
+          id: 'standard',
+          name: 'Standard',
+          description: 'Clean and simple paywall design',
+          layout: 'modal',
+          previewImage: '/images/templates/standard.png'
+        },
+        {
+          id: 'modern',
+          name: 'Modern',
+          description: 'Modern gradient design with animations',
+          layout: 'inline',
+          previewImage: '/images/templates/modern.png'
+        },
+        {
+          id: 'minimal',
+          name: 'Minimal',
+          description: 'Minimalist design focused on content',
+          layout: 'sidebar',
+          previewImage: '/images/templates/minimal.png'
+        }
+      ];
+
+      return templates;
+    } catch (error) {
+      console.error('Error fetching paywall templates:', error);
+      return [];
+    }
   }
 }
 

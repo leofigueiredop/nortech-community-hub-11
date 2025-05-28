@@ -200,6 +200,14 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection = "gene
             isPinned={pinnedItems.includes("plans")}
           />
           <SettingsMenuItem 
+            icon={<Key size={18} />} 
+            label="Billing & Payments" 
+            to="/settings/billing" 
+            active={activeSection === "billing"} 
+            onPin={() => togglePin("billing")}
+            isPinned={pinnedItems.includes("billing")}
+          />
+          <SettingsMenuItem 
             icon={<DollarSign size={18} />} 
             label="Member Subscriptions" 
             to="/settings/subscriptions" 

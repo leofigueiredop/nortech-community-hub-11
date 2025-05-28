@@ -53,6 +53,7 @@ export interface PostProps {
   accessBadge?: 'free' | 'premium' | 'unlocked';
   showAccessBadge?: boolean;
   onCommentClick?: (postId: string) => void;
+  tier?: 'free' | 'premium' | 'mentor';
 }
 
 const Post: React.FC<PostProps> = ({ 
@@ -73,7 +74,8 @@ const Post: React.FC<PostProps> = ({
   tags,
   accessBadge = 'free',
   showAccessBadge = false,
-  onCommentClick
+  onCommentClick,
+  tier
 }) => {
   // Ensure likes and comments are always numbers
   const safeLikes = typeof likes === 'number' ? likes : 0;
@@ -234,14 +236,20 @@ const Post: React.FC<PostProps> = ({
   const renderContent = () => {
     const userTier = user?.tier || 'free';
     const postSpaceTier = spaceTier || SPACE_ACCESS[space]?.requiredTier || 'free';
-    const shouldBlur = shouldBlurContent(postSpaceTier, userTier);
+    const postTier = tier || 'free';
+    
+    // Check if content should be blurred based on either space tier or post tier
+    const shouldBlurBySpace = shouldBlurContent(postSpaceTier, userTier);
+    const shouldBlurByTier = shouldBlurContent(postTier as UserTier, userTier);
+    const shouldBlur = shouldBlurBySpace || shouldBlurByTier;
     
     if (isAnnouncement) {
       return <p className="whitespace-pre-line text-sm">{content}</p>;
     }
     
-    // Check if content should be blurred based on space tier vs user tier
+    // Check if content should be blurred based on space tier vs user tier OR post tier vs user tier
     if (shouldBlur) {
+      const effectiveTier = shouldBlurByTier ? postTier : postSpaceTier;
       const tierNames = {
         premium: 'Premium',
         mentor: 'Mentor',
@@ -265,17 +273,17 @@ const Post: React.FC<PostProps> = ({
               <div className="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-lg text-center max-w-md">
                 <Lock size={24} className="mx-auto mb-3 text-purple-600" />
                 <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  {tierNames[postSpaceTier]} Content
+                  {tierNames[effectiveTier as keyof typeof tierNames]} Content
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  This content is available exclusively for {tierNames[postSpaceTier].toLowerCase()} members
+                  This content is available exclusively for {tierNames[effectiveTier as keyof typeof tierNames]?.toLowerCase()} members
                 </p>
                 <Button 
                   onClick={handleSubscribe}
                   className="bg-purple-600 hover:bg-purple-700 text-white"
                 >
                   <Lock size={16} className="mr-2" />
-                  Upgrade to {tierNames[postSpaceTier]}
+                  Upgrade to {tierNames[effectiveTier as keyof typeof tierNames]}
                 </Button>
               </div>
             </div>

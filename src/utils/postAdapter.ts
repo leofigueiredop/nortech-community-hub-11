@@ -11,11 +11,38 @@ export function adaptPostToProps(post: Post, isPremium: boolean = false): PostPr
   const likesValue = post.reactions_count;
   const commentsValue = post.comment_count;
   
+  // Robust handling of author data with multiple fallbacks
+  let authorName = 'Unknown User';
+  let authorAvatar = '';
+  
+  if (post.author && typeof post.author === 'object') {
+    // Debug: let's see what we're getting from Supabase
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Author data received:', post.author);
+    }
+    
+    // If author object exists, use its data
+    authorName = post.author.full_name || post.author.id || 'Anonymous User';
+    authorAvatar = post.author.avatar_url || '';
+  } else if (post.author_id) {
+    // Fallback: Use author_id to create a placeholder name
+    authorName = `User ${post.author_id.substring(0, 8)}`;
+  }
+  
+  // Debug log only when author is missing (to help identify problems)
+  if (!post.author && process.env.NODE_ENV === 'development') {
+    console.warn('⚠️ Post missing author data:', {
+      postId: post.id,
+      authorId: post.author_id,
+      content: post.content.substring(0, 30) + '...'
+    });
+  }
+  
   return {
     id: post.id,
     author: {
-      name: post.author?.name || 'Unknown User',
-      avatar: post.author?.avatar_url || '',
+      name: authorName,
+      avatar: authorAvatar,
       role: getRoleFromPost(post),
     },
     title: post.title || undefined,
@@ -32,6 +59,7 @@ export function adaptPostToProps(post: Post, isPremium: boolean = false): PostPr
     teaser: generateTeaser(post.content),
     tags: post.tags || [],
     accessBadge: getAccessBadge(post, isPremium),
+    tier: getPostTier(post),
   };
 }
 
@@ -127,4 +155,22 @@ function getAccessBadge(post: Post, isPremium: boolean): 'free' | 'premium' | 'u
 function getSpaceTier(spaceName: string): UserTier {
   const spaceAccess = SPACE_ACCESS[spaceName];
   return spaceAccess?.requiredTier || 'free';
+}
+
+function getPostTier(post: Post): 'free' | 'premium' | 'mentor' {
+  // Determine post tier based on visibility and other factors
+  if (post.visibility === 'premium') {
+    // Check if it's mentor-level content based on tags or other indicators
+    if (post.tags?.includes('mentor') || post.tags?.includes('mentorship')) {
+      return 'mentor';
+    }
+    return 'premium';
+  }
+  
+  // Check for mentor content based on tags even if not premium
+  if (post.tags?.includes('mentor') || post.tags?.includes('mentorship')) {
+    return 'mentor';
+  }
+  
+  return 'free';
 } 

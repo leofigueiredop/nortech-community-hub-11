@@ -7,6 +7,7 @@ import {
   PaymentMethod,
   PaymentHistory
 } from '../../types/paywall';
+import { Result } from '@/types/api';
 
 export interface IPaywallRepository {
   // Paywall Settings
@@ -39,4 +40,8 @@ export interface IPaywallRepository {
   
   // Payment History
   getPaymentHistory(userId: string): Promise<PaymentHistory[]>;
+
+  getPaywallSettings(communityId: string): Promise<Result<PaywallSettings>>;
+  updatePaywallSettings(communityId: string, settings: PaywallSettings): Promise<Result<PaywallSettings>>;
+  getPaywallTemplates(): Promise<Result<PaywallTemplate[]>>;
 } 

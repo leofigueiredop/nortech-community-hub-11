@@ -5,7 +5,7 @@ import FeedContent from '@/components/feed/FeedContent';
 import TierSwitcher from '@/components/debug/TierSwitcher';
 import SettingsPopover from '@/components/feed/SettingsPopover';
 import ViewControls from '@/components/feed/ViewControls';
-import { useFeedData } from '@/components/feed/useFeedData';
+import useFeedData from '@/components/feed/useFeedData';
 import FeedSegmentTabs from '@/components/feed/FeedSegmentTabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -70,23 +70,7 @@ const Feed: React.FC = () => {
     isPremiumUser
   } = useFeedData(5, activeSegment);
 
-  // Set accessFilter and activeSpace based on activeSegment
-  useEffect(() => {
-    if (activeSegment === 'free') {
-      setAccessFilter('free');
-      setActiveSpace('Free Group');
-    } else if (activeSegment === 'premium') {
-      setAccessFilter('paid');
-      setActiveSpace('Premium Group');
-    } else if (activeSegment === 'mentor') {
-      setAccessFilter('all');
-      setActiveSpace('Mentorship Circle');
-    } else {
-      setAccessFilter('all');
-      setActiveSpace('all');
-    }
-  }, [activeSegment, setAccessFilter, setActiveSpace]);
-
+  // Remove the effect that was mixing segment and space logic
   const handleViewChange = (view: string) => {
     setCurrentView(view);
   };

@@ -91,10 +91,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Don't throw here, the session exists but we couldn't get full data
           // This allows the user to still be logged in but they'll need to refresh
           
+          // Only redirect to onboarding if we're not already on a page that handles membership
+          const currentPath = window.location.pathname;
+          const membershipPages = ['/settings/subscriptions', '/community/', '/settings/'];
+          const isOnMembershipPage = membershipPages.some(page => currentPath.includes(page));
+          
           // Check if it's a "no community access" error and redirect to onboarding
           if (authError instanceof Error && 
-              authError.message.includes('No community access')) {
-            // Redirect to community creation page
+              authError.message.includes('No community access') &&
+              !isOnMembershipPage) {
+            // Only redirect to community creation if not on membership-related pages
             navigate('/onboarding/welcome');
           }
         }
@@ -288,10 +294,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Auth callback error:', error);
       
+      // Only redirect to onboarding if we're not already on a page that handles membership
+      const currentPath = window.location.pathname;
+      const membershipPages = ['/settings/subscriptions', '/community/', '/settings/'];
+      const isOnMembershipPage = membershipPages.some(page => currentPath.includes(page));
+      
       // Check if it's a "no community access" error and redirect to onboarding
       if (error instanceof Error && 
-          error.message.includes('No community access')) {
-        // Redirect to community creation page
+          error.message.includes('No community access') &&
+          !isOnMembershipPage) {
+        // Only redirect to community creation if not on membership-related pages
         navigate('/onboarding/welcome');
       }
       

@@ -1,0 +1,198 @@
+# Nortech Community Hub - Stripe Integration PRD
+
+## 1. Project Overview
+Implementar integração completa do Stripe para cobrança de planos de creators e membros, incluindo onboarding de creators via Stripe Connect e sistema de split de receita.
+
+## 2. Core Objectives
+- Integrar Stripe Connect para onboarding de creators
+- Implementar cobrança de planos para creators (plataforma cobra do creator)
+- Implementar cobrança de planos dos membros (creator cobra dos membros)
+- Configurar sistema de split de receita automático
+- Gerenciar webhooks do Stripe para sincronização de dados
+- Implementar dashboard de pagamentos e receitas
+
+## 3. Technical Requirements
+
+### 3.1 Stripe Connect Integration
+- Configurar Stripe Connect Express accounts para creators
+- Implementar fluxo de onboarding completo
+- Verificação de identidade e documentos
+- Configuração de conta bancária para recebimento
+- Status de verificação em tempo real
+
+### 3.2 Creator Subscription Plans (Platform → Creator)
+- Planos de assinatura para creators usarem a plataforma
+- Cobrança mensal/anual da plataforma para o creator
+- Diferentes tiers (Basic, Pro, Enterprise)
+- Gestão de trial periods
+- Upgrade/downgrade automático
+
+### 3.3 Member Subscription Plans (Creator → Members)
+- Creators podem criar planos para seus membros
+- Cobrança direta dos membros via Stripe
+- Split automático de receita (% para plataforma)
+- Gestão de assinaturas ativas/canceladas
+- Acesso baseado em plano de assinatura
+
+### 3.4 Revenue Split System
+- Configuração de percentual da plataforma por creator
+- Split automático em cada transação
+- Relatórios de receita para creator e plataforma
+- Histórico de transações e splits
+- Reconciliação financeira
+
+### 3.5 Payment Management
+- Dashboard de pagamentos para creators
+- Histórico de transações
+- Gestão de métodos de pagamento
+- Processamento de reembolsos
+- Gestão de disputas (chargebacks)
+
+### 3.6 Webhook Integration
+- Sincronização de eventos do Stripe
+- Atualização de status de assinaturas
+- Processamento de pagamentos
+- Notificações de falhas de pagamento
+- Logs de webhook para debugging
+
+## 4. Database Schema Changes
+
+### 4.1 New Tables
+- `stripe_accounts` - Contas Stripe Connect dos creators
+- `platform_subscriptions` - Assinaturas dos creators na plataforma
+- `member_subscriptions` - Assinaturas dos membros nos creators
+- `revenue_splits` - Configuração de split por creator
+- `payment_transactions` - Histórico de transações
+- `stripe_webhooks` - Log de webhooks recebidos
+
+### 4.2 Updated Tables
+- `communities` - Adicionar stripe_account_id
+- `subscription_plans` - Adicionar stripe_price_id
+- `community_members` - Adicionar stripe_subscription_id
+
+## 5. API Endpoints
+
+### 5.1 Creator Onboarding
+- POST `/api/stripe/connect/onboard` - Iniciar onboarding
+- GET `/api/stripe/connect/status/:accountId` - Status da conta
+- POST `/api/stripe/connect/refresh` - Refresh onboarding link
+
+### 5.2 Platform Subscriptions
+- GET `/api/subscriptions/platform/plans` - Planos da plataforma
+- POST `/api/subscriptions/platform/subscribe` - Assinar plano
+- PUT `/api/subscriptions/platform/change` - Alterar plano
+- DELETE `/api/subscriptions/platform/cancel` - Cancelar assinatura
+
+### 5.3 Member Subscriptions
+- GET `/api/subscriptions/member/plans/:communityId` - Planos do creator
+- POST `/api/subscriptions/member/subscribe` - Assinar plano do creator
+- GET `/api/subscriptions/member/status` - Status da assinatura
+
+### 5.4 Revenue & Analytics
+- GET `/api/revenue/dashboard/:creatorId` - Dashboard de receita
+- GET `/api/revenue/transactions` - Histórico de transações
+- GET `/api/revenue/splits` - Relatório de splits
+
+### 5.5 Webhooks
+- POST `/api/webhooks/stripe` - Endpoint para webhooks do Stripe
+
+## 6. UI/UX Requirements
+
+### 6.1 Creator Onboarding Flow
+- Wizard de configuração do Stripe Connect
+- Verificação de documentos
+- Configuração de conta bancária
+- Status de verificação em tempo real
+- Troubleshooting de problemas
+
+### 6.2 Creator Dashboard
+- Overview de receitas e assinaturas
+- Gestão de planos para membros
+- Configuração de preços e splits
+- Histórico de transações
+- Analytics de performance
+
+### 6.3 Member Subscription Flow
+- Seleção de planos do creator
+- Checkout seguro via Stripe
+- Gestão de assinatura ativa
+- Histórico de pagamentos
+- Cancelamento self-service
+
+### 6.4 Platform Admin
+- Dashboard de receitas da plataforma
+- Gestão de creators e suas contas
+- Configuração de splits globais
+- Monitoramento de transações
+- Relatórios financeiros
+
+## 7. Security & Compliance
+
+### 7.1 PCI Compliance
+- Uso exclusivo de Stripe Elements
+- Nunca armazenar dados de cartão
+- Tokenização segura de pagamentos
+- Logs de auditoria
+
+### 7.2 Data Protection
+- Criptografia de dados sensíveis
+- Acesso baseado em roles
+- Logs de acesso a dados financeiros
+- Backup seguro de transações
+
+## 8. Testing Strategy
+
+### 8.1 Integration Tests
+- Fluxo completo de onboarding
+- Processamento de pagamentos
+- Webhooks do Stripe
+- Split de receita
+
+### 8.2 E2E Tests
+- Jornada completa do creator
+- Jornada completa do member
+- Cenários de erro e recuperação
+- Performance sob carga
+
+## 9. Deployment & Monitoring
+
+### 9.1 Environment Setup
+- Configuração de chaves Stripe (test/live)
+- Webhooks endpoints configurados
+- Monitoramento de uptime
+- Alertas de falhas de pagamento
+
+### 9.2 Monitoring
+- Dashboard de métricas de pagamento
+- Alertas de webhooks falhando
+- Monitoramento de receita
+- Performance de checkout
+
+## 10. Migration Strategy
+
+### 10.1 Existing Data
+- Migração de planos existentes para Stripe
+- Configuração de contas Connect para creators ativos
+- Sincronização de assinaturas ativas
+- Backup de dados antes da migração
+
+### 10.2 Rollout Plan
+- Fase 1: Onboarding de creators (beta)
+- Fase 2: Planos da plataforma
+- Fase 3: Planos de membros
+- Fase 4: Split de receita completo
+
+## 11. Success Metrics
+- Taxa de conversão no onboarding
+- Tempo médio de verificação de conta
+- Volume de transações processadas
+- Taxa de falhas de pagamento
+- Satisfação dos creators e membros
+- Receita da plataforma via splits
+
+## 12. Risk Mitigation
+- Fallback para sistema atual durante migração
+- Testes extensivos em ambiente sandbox
+- Monitoramento 24/7 durante rollout
+- Plano de rollback em caso de problemas
+- Suporte dedicado durante transição 

@@ -20,8 +20,8 @@ export interface Post {
   pinned: boolean;
   author?: {
     id: UUID;
-    name: string;
-    avatar_url?: string;
+    full_name: string | null;
+    avatar_url?: string | null;
   };
   comments?: PostComment[];
   reactions_count?: number;
@@ -47,8 +47,8 @@ export interface PostComment {
   parent_id?: string;
   author?: {
     id: UUID;
-    name: string;
-    avatar_url?: string;
+    full_name: string | null;
+    avatar_url?: string | null;
   };
 }
 

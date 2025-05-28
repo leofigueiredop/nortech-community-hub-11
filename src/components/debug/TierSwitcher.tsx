@@ -11,7 +11,9 @@ const TierSwitcher: React.FC = () => {
   if (!user) return null;
   
   const switchTier = (newTier: UserTier) => {
+    console.log('🔄 TierSwitcher: Changing tier from', user?.tier, 'to', newTier);
     updateUser({ tier: newTier });
+    console.log('✅ TierSwitcher: Tier updated to', newTier);
   };
   
   const getTierIcon = (tier: UserTier) => {

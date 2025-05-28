@@ -1,4 +1,3 @@
-
 import { PostProps } from '@/components/post/Post';
 
 // Filter posts based on content type

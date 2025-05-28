@@ -1,35 +1,43 @@
 === ESTATÍSTICAS DE CÓDIGO DO PROJETO ===
 
-Data de geração: 5/23/2025, 8:21:41 AM
+Data de geração: 5/27/2025, 11:34:37 PM
 
 === ESTATÍSTICAS GERAIS ===
-Total de Arquivos: 601
-Total de Linhas: 76820
-Linhas de Código: 67432 (88%)
-Linhas de Comentário: 1638 (2%)
-Linhas em Branco: 7750 (10%)
+Total de Arquivos: 630
+Total de Linhas: 83461
+Linhas de Código: 73052 (88%)
+Linhas de Comentário: 1967 (2%)
+Linhas em Branco: 8442 (10%)
 
 === CÓDIGO ORIGINAL vs. ADICIONADO ===
 Código Original do Frontend:
-  - Arquivos: 117 (19%)
-  - Linhas Totais: 10861 (14%)
-  - Linhas de Código: 9385 (14%)
+  - Arquivos: 120 (19%)
+  - Linhas Totais: 11241 (13%)
+  - Linhas de Código: 9726 (13%)
 
 Código Adicionado/Modificado:
-  - Arquivos: 484 (81%)
-  - Linhas Totais: 65959 (86%)
-  - Linhas de Código: 58047 (86%)
+  - Arquivos: 499 (79%)
+  - Linhas Totais: 68713 (82%)
+  - Linhas de Código: 60509 (83%)
+
+=== IMPLEMENTAÇÃO STRIPE ===
+Arquivos Específicos do Stripe:
+  - Arquivos: 11
+  - Linhas Totais: 3507 (4%)
+  - Componentes: 4 (UI Components)
+  - API Endpoints: 3 (Backend Services)
+  - Tipos: 1 (TypeScript Types)
 
 === ESTATÍSTICAS POR TIPO DE ARQUIVO ===
 .tsx:
-  - Arquivos: 480
-  - Linhas Totais: 60947 (79%)
-  - Linhas de Código: 54269
+  - Arquivos: 495
+  - Linhas Totais: 64511 (77%)
+  - Linhas de Código: 57542
 
 .ts:
-  - Arquivos: 118
-  - Linhas Totais: 15582 (20%)
-  - Linhas de Código: 12945
+  - Arquivos: 132
+  - Linhas Totais: 18659 (22%)
+  - Linhas de Código: 15292
 
 .css:
   - Arquivos: 2
@@ -40,4 +48,30 @@ Código Adicionado/Modificado:
   - Arquivos: 1
   - Linhas Totais: 74 (0%)
   - Linhas de Código: 50
+
+=== ANÁLISE DE CRESCIMENTO ===
+Crescimento desde última análise:
+  - +54 arquivos (+9%)
+  - +13602 linhas (+18%)
+  - +10935 linhas de código (+16%)
+
+Principais adições:
+  - Integração Stripe completa (Fases 1-4)
+  - Sistema de assinaturas da plataforma
+  - Sistema de assinaturas de membros
+  - Revenue split automático
+  - Dashboards de billing
+  - Webhook handlers
+
+=== DISTRIBUIÇÃO DE FUNCIONALIDADES ===
+Stripe Integration: 3507 linhas (4%)
+  - Platform Subscriptions: ~800 linhas
+  - Member Subscriptions: ~900 linhas
+  - Connect Onboarding: ~400 linhas
+  - Webhook Handlers: ~311 linhas
+
+Core Application: 79954 linhas (96%)
+  - UI Components: ~64000 linhas
+  - API Services: ~18000 linhas
+  - Configuration: ~5000 linhas
 

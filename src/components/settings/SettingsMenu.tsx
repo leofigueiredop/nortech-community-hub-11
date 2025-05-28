@@ -38,6 +38,7 @@ const settingsGroups = [
     description: 'Manage pricing, track revenue and activate growth tools',
     items: [
       { name: 'Nortech Plans', icon: <CreditCard className="mr-2 h-5 w-5" />, path: '/settings/plans', description: 'Configure subscription plans and pricing' },
+      { name: 'Billing & Payments', icon: <CreditCard className="mr-2 h-5 w-5" />, path: '/settings/billing', description: 'Configure Stripe and payment processing' },
       { name: 'Member Subscriptions', icon: <DollarSign className="mr-2 h-5 w-5" />, path: '/settings/subscriptions', description: 'Manage member subscription settings' },
       { name: 'Paywall Setup', icon: <DollarSign className="mr-2 h-5 w-5" />, path: '/settings/paywall', description: 'Configure content access rules' },
       { name: 'Analytics', icon: <BarChart3 className="mr-2 h-5 w-5" />, path: '/settings/analytics', description: 'Community growth and engagement metrics' },

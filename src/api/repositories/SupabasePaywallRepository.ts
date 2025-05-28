@@ -9,6 +9,7 @@ import {
   PaymentMethod,
   PaymentHistory
 } from '../../types/paywall';
+import { Result } from '@/types/api';
 
 export class SupabasePaywallRepository implements IPaywallRepository {
   private supabase: SupabaseClient;
@@ -20,60 +21,138 @@ export class SupabasePaywallRepository implements IPaywallRepository {
   }
 
   // Paywall Settings
-  async getSettings(): Promise<PaywallSettings | null> {
+  async getPaywallSettings(communityId: string): Promise<Result<PaywallSettings>> {
     try {
       const { data, error } = await this.supabase
         .from('paywall_settings')
         .select('*')
-        .eq('community_id', this.communityId)
+        .eq('community_id', communityId)
         .single();
 
-      if (error) throw error;
-      
-      if (!data) return null;
-      
-      return this.mapDbSettingsToModel(data);
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+        return { ok: false, error: error.message };
+      }
+
+      // Return default settings if none exist
+      const defaultSettings: PaywallSettings = {
+        activeTemplate: 'standard',
+        activeGateways: ['stripe'],
+        gatewayConfigs: {
+          stripe: { 
+            enabled: true,
+            apiKey: '',
+            webhookSecret: '',
+            isDefault: true
+          },
+          paypal: {
+            enabled: false,
+            clientId: '',
+            clientSecret: '',
+            isDefault: false
+          }
+        },
+        messageSettings: {
+          title: 'Upgrade to Premium',
+          description: 'Get access to exclusive content by becoming a premium member.',
+          ctaText: 'Upgrade Now'
+        }
+      };
+
+      return { 
+        ok: true, 
+        data: data ? {
+          activeTemplate: data.active_template || defaultSettings.activeTemplate,
+          activeGateways: data.active_gateways || defaultSettings.activeGateways,
+          gatewayConfigs: data.gateway_configs || defaultSettings.gatewayConfigs,
+          messageSettings: data.message_settings || defaultSettings.messageSettings
+        } : defaultSettings
+      };
     } catch (error) {
       console.error('Error fetching paywall settings:', error);
-      return null;
+      return { ok: false, error: 'Failed to fetch paywall settings' };
     }
   }
 
-  async updateSettings(settings: PaywallSettings): Promise<void> {
+  async updatePaywallSettings(communityId: string, settings: PaywallSettings): Promise<Result<PaywallSettings>> {
     try {
-      const { error } = await this.supabase
+      const { data, error } = await this.supabase
         .from('paywall_settings')
         .upsert({
-          community_id: this.communityId,
+          community_id: communityId,
           active_template: settings.activeTemplate,
           active_gateways: settings.activeGateways,
           gateway_configs: settings.gatewayConfigs,
           message_settings: settings.messageSettings,
           updated_at: new Date().toISOString()
-        });
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        return { ok: false, error: error.message };
+      }
+
+      return { ok: true, data: settings };
     } catch (error) {
       console.error('Error updating paywall settings:', error);
-      throw error;
+      return { ok: false, error: 'Failed to update paywall settings' };
     }
   }
 
   // Paywall Templates
-  async getTemplates(): Promise<PaywallTemplate[]> {
+  async getPaywallTemplates(): Promise<Result<PaywallTemplate[]>> {
     try {
-      const { data, error } = await this.supabase
-        .from('paywall_templates')
-        .select('*')
-        .eq('community_id', this.communityId)
-        .order('created_at', { ascending: false });
+      // For now, return hardcoded templates
+      // In the future, these could come from the database
+      const templates: PaywallTemplate[] = [
+        {
+          id: 'standard',
+          name: 'Standard',
+          description: 'Clean and simple paywall design',
+          preview: '/images/templates/standard.png',
+          config: {
+            layout: 'centered',
+            colors: {
+              primary: '#8b5cf6',
+              secondary: '#f3f4f6',
+              text: '#1f2937'
+            }
+          }
+        },
+        {
+          id: 'modern',
+          name: 'Modern',
+          description: 'Modern gradient design with animations',
+          preview: '/images/templates/modern.png',
+          config: {
+            layout: 'split',
+            colors: {
+              primary: '#3b82f6',
+              secondary: '#e5e7eb',
+              text: '#111827'
+            }
+          }
+        },
+        {
+          id: 'minimal',
+          name: 'Minimal',
+          description: 'Minimalist design focused on content',
+          preview: '/images/templates/minimal.png',
+          config: {
+            layout: 'card',
+            colors: {
+              primary: '#059669',
+              secondary: '#f9fafb',
+              text: '#374151'
+            }
+          }
+        }
+      ];
 
-      if (error) throw error;
-      
-      return (data || []).map(this.mapDbTemplateToModel);
+      return { ok: true, data: templates };
     } catch (error) {
       console.error('Error fetching paywall templates:', error);
-      return [];
+      return { ok: false, error: 'Failed to fetch paywall templates' };
     }
   }
 

@@ -1,12 +1,12 @@
 === RELATÓRIO DE CONEXÕES DE DADOS ===
 
-Data de geração: 5/23/2025, 8:10:59 AM
+Data de geração: 5/27/2025, 11:35:21 PM
 
 === RESUMO ===
-Total de Páginas: 74
-Total de Componentes: 332
+Total de Páginas: 76
+Total de Componentes: 340
 Páginas com dados mockados: 6 (8%)
-Componentes com dados mockados: 18 (5%)
+Componentes com dados mockados: 19 (6%)
 
 === PÁGINAS ===
 - AITerminal (src/pages/AITerminal.tsx): N/A (sem dados)
@@ -15,7 +15,7 @@ Componentes com dados mockados: 18 (5%)
 - navigate (src/pages/onboarding/Welcome.tsx): N/A (sem dados)
 - CreateEvent (src/pages/CreateEvent.tsx): N/A (sem dados)
 - CreatePost (src/pages/CreatePost.tsx): N/A (sem dados)
-- handleCreateSpace (src/pages/CreateSpace.tsx): N/A (sem dados)
+- handleCreateSpace (src/pages/settings/Spaces.tsx): N/A (sem dados)
 - handleViewChange (src/pages/Dashboard.tsx): N/A (sem dados)
 - DiscussionDetail (src/pages/DiscussionDetail.tsx): N/A (sem dados)
 - DiscussionTopic (src/pages/DiscussionTopic.tsx): N/A (sem dados)
@@ -33,6 +33,7 @@ Componentes com dados mockados: 18 (5%)
 - NotFound (src/pages/NotFound.tsx): N/A (sem dados)
 - OnboardingLayout (src/pages/OnboardingLayout.tsx): N/A (sem dados)
 - contentProgress (src/pages/PointsDashboard.tsx): Mockado
+- handleLevelUp (src/pages/PointsPage.tsx): N/A (sem dados)
 - PointsStore (src/pages/PointsStore.tsx): N/A (sem dados)
 - mockPosts (src/pages/TagPage.tsx): Mockado
 - USER (src/pages/UserProfile.tsx): Mockado
@@ -41,9 +42,11 @@ Componentes com dados mockados: 18 (5%)
 - engagementData (src/pages/analytics/components/EngagementCharts.tsx): N/A (sem dados)
 - AnalyticsCard (src/pages/analytics/components/OverviewCards.tsx): N/A (sem dados)
 - AuthCallback (src/pages/auth/AuthCallback.tsx): N/A (sem dados)
+- InviteAccept (src/pages/auth/InviteAccept.tsx): N/A (sem dados)
 - loginSchema (src/pages/auth/Step2Authentication.tsx): N/A (sem dados)
 - profileSchema (src/pages/auth/Step3ProfileSetup.tsx): N/A (sem dados)
 - handleSubmit (src/pages/auth/register.page.tsx): N/A (sem dados)
+- SubscriptionPlans (src/pages/community/SubscriptionPlans.tsx): N/A (sem dados)
 - AIMatchmaker (src/pages/matchmaker/Matchmaker.tsx): N/A (sem dados)
 - MatchmakerHeader (src/pages/matchmaker/components/MatchmakerHeader.tsx): N/A (sem dados)
 - MatchmakerTabs (src/pages/matchmaker/components/MatchmakerTabs.tsx): N/A (sem dados)
@@ -58,7 +61,7 @@ Componentes com dados mockados: 18 (5%)
 - handleToggleFeature (src/pages/settings/AIAgents.tsx): N/A (sem dados)
 - Affiliates (src/pages/settings/Affiliates.tsx): N/A (sem dados)
 - Appearance (src/pages/settings/Appearance.tsx): N/A (sem dados)
-- loadBillingInfo (src/pages/settings/Billing.tsx): Misto (verificar)
+- Billing (src/pages/settings/Billing.tsx): N/A (sem dados)
 - Branding (src/pages/settings/Branding.tsx): N/A (sem dados)
 - Domain (src/pages/settings/Domain.tsx): N/A (sem dados)
 - General (src/pages/settings/General.tsx): N/A (sem dados)
@@ -74,7 +77,6 @@ Componentes com dados mockados: 18 (5%)
 - PointsConfiguration (src/pages/settings/PointsConfiguration.tsx): N/A (sem dados)
 - postTypes (src/pages/settings/Posts.tsx): N/A (sem dados)
 - loadPrivacySettings (src/pages/settings/Privacy.tsx): Supabase
-- handleAddCategory (src/pages/settings/Spaces.tsx): N/A (sem dados)
 - Subscriptions (src/pages/settings/Subscriptions.tsx): N/A (sem dados)
 - integrationsData (src/pages/settings/Workflows.tsx): N/A (sem dados)
 - index.page (src/pages/settings/index.page.tsx): N/A (sem dados)
@@ -128,6 +130,7 @@ Componentes com dados mockados: 18 (5%)
 - activeCommunity (src/components/dashboard/CommunitySwitcher.tsx): Mockado
 - handleNext (src/components/settings/marketing/campaign/CampaignWizard.tsx): N/A (sem dados)
 - toggleItemCompletion (src/components/dashboard/SetupChecklist.tsx): N/A (sem dados)
+- switchTier (src/components/debug/TierSwitcher.tsx): N/A (sem dados)
 - ActiveUsersList (src/components/discussions/ActiveUsersList.tsx): Mockado
 - checkUserUpvote (src/components/discussions/Discussion.tsx): Supabase
 - DiscussionCard (src/components/discussions/DiscussionCard.tsx): N/A (sem dados)
@@ -165,7 +168,7 @@ Componentes com dados mockados: 18 (5%)
 - getPageItems (src/components/feed/FeedPagination.tsx): N/A (sem dados)
 - FeedSegmentTabs (src/components/feed/FeedSegmentTabs.tsx): N/A (sem dados)
 - handleUpgradeClick (src/components/feed/PremiumContentUpgrade.tsx): N/A (sem dados)
-- SettingsPopover (src/components/feed/SettingsPopover.tsx): N/A (sem dados)
+- handleInviteMember (src/components/feed/SettingsPopover.tsx): N/A (sem dados)
 - canCreatePost (src/components/feed/ViewControls.tsx): N/A (sem dados)
 - FilterDropdown (src/components/feed/filters/FilterDropdown.tsx): N/A (sem dados)
 - SearchBar (src/components/feed/filters/SearchBar.tsx): N/A (sem dados)
@@ -272,15 +275,17 @@ Componentes com dados mockados: 18 (5%)
 - isCompleted (src/components/points/ContentProgress.tsx): N/A (sem dados)
 - LeaderboardComponent (src/components/points/Leaderboard.tsx): Supabase
 - getSizeClasses (src/components/points/PointsBadge.tsx): N/A (sem dados)
+- comingSoonChallenges (src/components/points/PointsChallenges.tsx): N/A (sem dados)
 - getContentTitle (src/components/points/PointsDashboard.tsx): Mockado
 - PointsHistory (src/components/points/PointsHistory.tsx): N/A (sem dados)
+- streak (src/components/points/PointsOverview.tsx): Mockado
 - PointsStore (src/components/points/store/PointsStore.tsx): N/A (sem dados)
 - rewardCost (src/components/points/store/RedeemDialog.tsx): N/A (sem dados)
 - getActionButton (src/components/points/store/RedemptionHistory.tsx): N/A (sem dados)
 - rewardType (src/components/points/store/RewardCard.tsx): N/A (sem dados)
 - filteredRewards (src/components/points/store/RewardsList.tsx): N/A (sem dados)
 - TextFormatButton (src/components/post/CreatePostDialog.tsx): Supabase
-- fetchUserLikeStatus (src/components/post/Post.tsx): Supabase
+- safeLikes (src/components/post/Post.tsx): Supabase
 - fetchComments (src/components/post/PostComments.tsx): Supabase
 - formatOptions (src/components/post/TextEditorMenu.tsx): N/A (sem dados)
 - MOCK_ATTENDANCE_HISTORY (src/components/profile/EventsAttendanceHistory.tsx): Mockado
@@ -289,7 +294,7 @@ Componentes com dados mockados: 18 (5%)
 - handleDomainSetup (src/components/settings/DomainSettings.tsx): N/A (sem dados)
 - handleScroll (src/components/settings/GeneralSettings.tsx): Supabase
 - IntegrationSettings (src/components/settings/IntegrationSettings.tsx): N/A (sem dados)
-- handleSave (src/components/settings/LegalSettings.tsx): N/A (sem dados)
+- handleSave (src/components/settings/spaces/SpaceSettingsDialog.tsx): N/A (sem dados)
 - checkMigrationStatus (src/components/settings/MigrationSettings.tsx): Supabase
 - handleTogglePreference (src/components/settings/NotificationSettings.tsx): N/A (sem dados)
 - activeTemplate (src/components/settings/PaywallSettings.tsx): N/A (sem dados)
@@ -351,12 +356,18 @@ Componentes com dados mockados: 18 (5%)
 - MonetizationSection (src/components/settings/sidebar/MonetizationSection.tsx): N/A (sem dados)
 - PreferencesSection (src/components/settings/sidebar/PreferencesSection.tsx): N/A (sem dados)
 - TechnicalSection (src/components/settings/sidebar/TechnicalSection.tsx): N/A (sem dados)
+- publicSpaces (src/components/settings/spaces/SidebarPreview.tsx): N/A (sem dados)
+- getTypeColor (src/components/settings/spaces/SpaceCard.tsx): N/A (sem dados)
+- getIcon (src/components/settings/spaces/SpaceTemplates.tsx): N/A (sem dados)
+- index (src/components/ui/carousel/index.tsx): N/A (sem dados)
+- types (src/components/settings/spaces/types.ts): N/A (sem dados)
 - ComingSoonAlert (src/components/settings/workflows/ComingSoonAlert.tsx): N/A (sem dados)
 - IntegrationCard (src/components/settings/workflows/IntegrationCard.tsx): N/A (sem dados)
 - handleConnect (src/components/settings/workflows/IntegrationModal.tsx): N/A (sem dados)
 - StatusBadge (src/components/settings/workflows/StatusBadge.tsx): N/A (sem dados)
 - WorkflowCard (src/components/settings/workflows/WorkflowCard.tsx): N/A (sem dados)
 - WorkflowDetailModal (src/components/settings/workflows/WorkflowDetailModal.tsx): N/A (sem dados)
+- stripeApi (src/components/stripe/StripeOnboardingWizard.tsx): N/A (sem dados)
 - suggestedContent (src/components/tags/TagSuggestions.tsx): N/A (sem dados)
 - Spinner (src/components/ui/Spinner.tsx): N/A (sem dados)
 - Accordion (src/components/ui/accordion.tsx): N/A (sem dados)
@@ -375,7 +386,6 @@ Componentes com dados mockados: 18 (5%)
 - CarouselNext (src/components/ui/carousel/carousel-next.tsx): N/A (sem dados)
 - CarouselPrevious (src/components/ui/carousel/carousel-previous.tsx): N/A (sem dados)
 - Carousel (src/components/ui/carousel/carousel.tsx): Supabase
-- index (src/components/ui/carousel/index.tsx): N/A (sem dados)
 - THEMES (src/components/ui/chart.tsx): N/A (sem dados)
 - Checkbox (src/components/ui/checkbox.tsx): N/A (sem dados)
 - Collapsible (src/components/ui/collapsible.tsx): N/A (sem dados)
@@ -444,10 +454,12 @@ Componentes com dados mockados: 18 (5%)
 - useRewards (src/hooks/useRewards.ts): Supabase
 - useRewardsAdmin (src/hooks/useRewardsAdmin.ts): Mockado
 - useSearchResults (src/hooks/useSearchResults.ts): Mockado
+- useStripeApi (src/hooks/useStripeApi.ts): Supabase
 - useUserRole (src/hooks/useUserRole.ts): Supabase
 
 === REPOSITORIES ===
 - BaseRepository (src/api/repositories/BaseRepository.ts): Supabase
+- StripeRepository (src/api/repositories/StripeRepository.ts): Supabase
 - SupabaseAuthRepository (src/api/repositories/SupabaseAuthRepository.ts): Supabase
 - SupabaseCommunityRepository (src/api/repositories/SupabaseCommunityRepository.ts): Supabase
 - SupabaseCommunitySettingsRepository (src/api/repositories/SupabaseCommunitySettingsRepository.ts): Supabase
@@ -455,6 +467,7 @@ Componentes com dados mockados: 18 (5%)
 - SupabaseDiscussionRepository (src/api/repositories/SupabaseDiscussionRepository.ts): Supabase
 - SupabaseDiscussionsRepository (src/api/repositories/SupabaseDiscussionsRepository.ts): Supabase
 - SupabaseEventsRepository (src/api/repositories/SupabaseEventsRepository.ts): Supabase
+- SupabaseInviteRepository (src/api/repositories/SupabaseInviteRepository.ts): Supabase
 - SupabaseMembersRepository (src/api/repositories/SupabaseMembersRepository.ts): Supabase
 - SupabaseMigrationRepository (src/api/repositories/SupabaseMigrationRepository.ts): Supabase
 - SupabaseModerationRepository (src/api/repositories/SupabaseModerationRepository.ts): Supabase
