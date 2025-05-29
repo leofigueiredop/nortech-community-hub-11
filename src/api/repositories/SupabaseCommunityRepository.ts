@@ -383,4 +383,58 @@ export class SupabaseCommunityRepository implements ICommunityRepository, IBaseR
       return { ok: false, error: { message: 'Failed to check community membership' } };
     }
   }
+
+  async getActiveSpaces(communityId: string): Promise<Result<number>> {
+    try {
+      // Espaços atualizados nos últimos 7 dias
+      const since = new Date();
+      since.setDate(since.getDate() - 7);
+
+      const { count, error } = await this.supabase
+        .from('spaces')
+        .select('id', { count: 'exact', head: true })
+        .eq('community_id', communityId)
+        .gte('updated_at', since.toISOString());
+
+      if (error) throw error;
+      return { ok: true, data: count ?? 0 };
+    } catch (error) {
+      return { ok: false, error };
+    }
+  }
+
+  async getPostsThisWeek(communityId: string): Promise<Result<number>> {
+    try {
+      const since = new Date();
+      since.setDate(since.getDate() - 7);
+    
+      const { count, error } = await this.supabase
+        .from('posts') // troque para o nome real da tabela de posts, se for diferente
+        .select('id', { count: 'exact', head: true })
+        .eq('community_id', communityId)
+        .gte('created_at', since.toISOString());
+    
+      if (error) throw error;
+      return { ok: true, data: count ?? 0 };
+    } catch (error) {
+      return { ok: false, error };
+    }
+  }
+
+  async getUpcomingEvents(communityId: string): Promise<Result<any[]>> {
+    try {
+      const today = new Date().toISOString();
+      const { data, error } = await this.supabase
+        .from('events')
+        .select('*')
+        .eq('community_id', communityId)
+        .gte('start_date', today)
+        .order('start_date', { ascending: true });
+
+      if (error) throw error;
+      return { ok: true, data: data ?? [] };
+    } catch (error) {
+      return { ok: false, error };
+    } 
+  }
 }

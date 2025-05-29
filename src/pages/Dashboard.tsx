@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout, { useViewContext } from '@/components/layout/MainLayout';
 import WelcomeCard from '@/components/dashboard/WelcomeCard';
@@ -24,9 +23,17 @@ const Dashboard: React.FC = () => {
   const { toast } = useToast();
   const { viewAs, setViewAs } = useViewContext();
 
+  // Estado para eventos futuros
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+
+  // Função para receber eventos do CommunityOverview
+  const handleUpcomingEvents = (events: any[]) => {
+    setUpcomingEvents(events);
+  };
+
   const handleViewChange = (newView: 'admin' | 'member' | 'premium' | 'premiumPlus') => {
     setViewAs(newView);
-    
+
     toast({
       title: `Viewing as ${newView.charAt(0).toUpperCase() + newView.slice(1)}`,
       description: `You are now viewing your community as a ${newView} would see it.`,
@@ -41,9 +48,9 @@ const Dashboard: React.FC = () => {
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="h-8 w-8 rounded-full hover:bg-purple-100 hover:text-purple-600"
               >
                 <Eye size={16} />
@@ -65,9 +72,9 @@ const Dashboard: React.FC = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        
+
         {viewAs === 'admin' && (
-          <Button 
+          <Button
             className="flex items-center gap-2 bg-nortech-purple hover:bg-nortech-purple/90"
             onClick={() => setCreateSpaceOpen(true)}
           >
@@ -80,20 +87,20 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 gap-6">
         {/* Welcome Banner */}
         <WelcomeCard />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Main Column */}
           <div className="md:col-span-2 space-y-6">
             {/* Quick Actions */}
             {viewAs === 'admin' && <QuickActions />}
-            
+
             {/* Community Overview */}
-            <CommunityOverview />
-            
+            <CommunityOverview onUpcomingEvents={handleUpcomingEvents} />
+
             {/* AI Suggestions */}
             <AISuggestions />
           </div>
-          
+
           {/* Sidebar Column */}
           <div className="space-y-6">
             {/* Setup Checklist */}
@@ -116,16 +123,16 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             )}
-            
-            {/* Mini Calendar */}
-            <MiniCalendar />
+
+            {/* Mini Calendar - passe os eventos se quiser */}
+            <MiniCalendar events={upcomingEvents} />
           </div>
         </div>
       </div>
 
-      <CreateSpaceDialog 
-        open={createSpaceOpen} 
-        onOpenChange={setCreateSpaceOpen} 
+      <CreateSpaceDialog
+        open={createSpaceOpen}
+        onOpenChange={setCreateSpaceOpen}
       />
 
       {/* Add the guided tour component */}
