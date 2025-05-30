@@ -4,16 +4,46 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/context/AuthContext';
 import { UserTier } from '@/types/subscription';
 import { Crown, Star, User } from 'lucide-react';
+import { api } from '@/api/ApiClient';
+import { toast } from '@/components/ui/use-toast';
 
 const TierSwitcher: React.FC = () => {
   const { user, updateUser } = useAuth();
   
   if (!user) return null;
   
-  const switchTier = (newTier: UserTier) => {
-    console.log('🔄 TierSwitcher: Changing tier from', user?.tier, 'to', newTier);
-    updateUser({ tier: newTier });
-    console.log('✅ TierSwitcher: Tier updated to', newTier);
+  const switchTier = async (newTier: UserTier) => {
+    try {
+      console.log('🔄 TierSwitcher: Changing tier from', user?.tier, 'to', newTier);
+      
+      // Update in database via supabase directly for now
+      const { error } = await api.supabase
+        .from('profiles')
+        .update({ tier: newTier })
+        .eq('id', user.id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Update local state
+      updateUser({ tier: newTier });
+      
+      console.log('✅ TierSwitcher: Tier updated to', newTier);
+      
+      toast({
+        title: 'Tier Updated',
+        description: `Your tier has been updated to ${newTier}`,
+      });
+    } catch (error) {
+      console.error('❌ TierSwitcher: Failed to update tier:', error);
+      
+      toast({
+        title: 'Error',
+        description: 'Failed to update tier. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
   
   const getTierIcon = (tier: UserTier) => {

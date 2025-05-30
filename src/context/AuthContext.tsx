@@ -5,6 +5,7 @@ import { api } from '@/api/ApiClient';
 import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { checkSession, handleAuthError } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -49,6 +50,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Store community ID in localStorage for persistence
       localStorage.setItem('currentCommunityId', communityData.id);
+    }
+  };
+
+  // Function to award daily login bonus
+  const awardDailyLoginBonus = async (userId: string, communityId: string) => {
+    try {
+      const { data, error } = await supabase.rpc('award_daily_login_bonus', {
+        user_id: userId,
+        community_id: communityId
+      });
+      
+      if (error) {
+        console.error('Error awarding daily login bonus:', error);
+      } else if (data) {
+        console.log('✅ Daily login bonus awarded!');
+      }
+    } catch (error) {
+      console.error('Error calling daily login bonus function:', error);
     }
   };
 
@@ -134,6 +153,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Update community context
       if (authResponse.community) {
         updateCommunityContext(authResponse.community);
+        
+        // Award daily login bonus
+        await awardDailyLoginBonus(authResponse.user.id, authResponse.community.id);
         
         // Redirect to dashboard on successful login with community access
         navigate('/dashboard');

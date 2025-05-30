@@ -87,7 +87,7 @@ const Header: React.FC<{
           
           <NotificationBell />
           
-          <PointsBadge size="sm" />
+          <PointsBadge variant="header" />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

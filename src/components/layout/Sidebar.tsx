@@ -11,7 +11,8 @@ import {
   BarChart3, 
   MessageSquare, 
   FileText, 
-  Layout
+  Layout,
+  Trophy
 } from 'lucide-react';
 
 interface SidebarLinkProps {
@@ -115,6 +116,11 @@ const Sidebar: React.FC = () => {
           icon={<Users size={18} />} 
           label="Members" 
           to="/members" 
+        />
+        <SidebarLink 
+          icon={<Trophy size={18} />} 
+          label="Points & Rewards" 
+          to="/points" 
         />
         <SidebarLink 
           icon={<BarChart3 size={18} />} 
